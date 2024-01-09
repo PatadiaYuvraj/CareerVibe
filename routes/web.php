@@ -35,4 +35,5 @@ Route::group(['middleware' => "isAuth"], function () {
     Route::get('/logout', [AccountController::class, "logout"])->name('logout');
     Route::get('/', [AccountController::class, "dashboard"])->name('dashboard');
     Route::get('/account', [AccountController::class, "account"])->name('account');
+    Route::get('/post-job', [AccountController::class, "post_job"])->name('post-job');
 });

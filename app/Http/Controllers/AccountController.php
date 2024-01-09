@@ -15,7 +15,6 @@ class AccountController extends Controller
     {
         $this->user = $demo;
     }
-
     public function login()
     {
         return view('front.login');
@@ -97,5 +96,11 @@ class AccountController extends Controller
     public function account()
     {
         return view('front.account');
+    }
+
+
+    public function post_job()
+    {
+        return view('front.post-job');
     }
 }
