@@ -1,4 +1,4 @@
-@extends('front.appLayout')
+@extends('front.layout.app')
 @section('pageTitle', 'CareerVibe | Find Best Jobs')
 @section('content')
     <section class="section-3 py-5 bg-2 ">
@@ -112,7 +112,8 @@
                                             </div>
 
                                             <div class="d-grid mt-3">
-                                                <a href="job-detail.html" class="btn btn-primary btn-lg">Details</a>
+                                                <a href="{{ route('job-detail') }}"
+                                                    class="btn btn-primary btn-lg">Details</a>
                                             </div>
                                         </div>
                                     </div>
@@ -139,7 +140,8 @@
                                             </div>
 
                                             <div class="d-grid mt-3">
-                                                <a href="job-detail.html" class="btn btn-primary btn-lg">Details</a>
+                                                <a href="{{ route('job-detail') }}"
+                                                    class="btn btn-primary btn-lg">Details</a>
                                             </div>
                                         </div>
                                     </div>
@@ -165,7 +167,8 @@
                                             </div>
 
                                             <div class="d-grid mt-3">
-                                                <a href="job-detail.html" class="btn btn-primary btn-lg">Details</a>
+                                                <a href="{{ route('job-detail') }}"
+                                                    class="btn btn-primary btn-lg">Details</a>
                                             </div>
                                         </div>
                                     </div>
@@ -191,7 +194,8 @@
                                             </div>
 
                                             <div class="d-grid mt-3">
-                                                <a href="job-detail.html" class="btn btn-primary btn-lg">Details</a>
+                                                <a href="{{ route('job-detail') }}"
+                                                    class="btn btn-primary btn-lg">Details</a>
                                             </div>
                                         </div>
                                     </div>
@@ -217,7 +221,8 @@
                                             </div>
 
                                             <div class="d-grid mt-3">
-                                                <a href="job-detail.html" class="btn btn-primary btn-lg">Details</a>
+                                                <a href="{{ route('job-detail') }}"
+                                                    class="btn btn-primary btn-lg">Details</a>
                                             </div>
                                         </div>
                                     </div>
@@ -243,7 +248,8 @@
                                             </div>
 
                                             <div class="d-grid mt-3">
-                                                <a href="job-detail.html" class="btn btn-primary btn-lg">Details</a>
+                                                <a href="{{ route('job-detail') }}"
+                                                    class="btn btn-primary btn-lg">Details</a>
                                             </div>
                                         </div>
                                     </div>

@@ -1,4 +1,4 @@
-@extends('front.appLayout')
+@extends('front.layout.app')
 @section('pageTitle', 'CareerVibe | Find Best Jobs')
 @section('content')
     <section class="section-5 bg-2">
@@ -7,7 +7,7 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3 mb-4">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Home</a></li>
                             <li class="breadcrumb-item active">Account Settings</li>
                         </ol>
                     </nav>
@@ -17,8 +17,8 @@
                 <div class="col-lg-3">
                     <div class="card border-0 shadow mb-4 p-3">
                         <div class="s-body text-center mt-3">
-                            <img src="assets/assets/images/avatar7.png" alt="avatar" class="rounded-circle img-fluid"
-                                style="width: 150px;">
+                            <img src="{{ asset('assets/images/avatar7.png') }}" alt="avatar"
+                                class="rounded-circle img-fluid" style="width: 150px;">
                             <h5 class="mt-3 pb-0">Mohit Singh</h5>
                             <p class="text-muted mb-1 fs-6">Full Stack Developer</p>
                             <div class="d-flex justify-content-center mb-2">
@@ -31,19 +31,19 @@
                         <div class="card-body p-0">
                             <ul class="list-group list-group-flush ">
                                 <li class="list-group-item d-flex justify-content-between p-3">
-                                    <a href="account.html">Account Settings</a>
+                                    <a href="{{ route('account') }}">Account Settings</a>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                    <a href="post-job.html">Post a Job</a>
+                                    <a href="{{ route('post-job') }}">Post a Job</a>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                    <a href="my-jobs.html">My Jobs</a>
+                                    <a href="{{ route('my-jobs') }}">My Jobs</a>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                    <a href="job-applied.html">Jobs Applied</a>
+                                    <a href="{{ route('job-applied') }}">Jobs Applied</a>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between align-items-center p-3">
-                                    <a href="saved-jobs.html">Saved Jobs</a>
+                                    <a href="{{ route('saved-jobs') }}">Saved Jobs</a>
                                 </li>
                             </ul>
                         </div>

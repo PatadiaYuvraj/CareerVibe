@@ -1,4 +1,4 @@
-@extends('front.appLayout')
+@extends('front.layout.app')
 @section('pageTitle', 'CareerVibe | Find Best Jobs')
 @section('content')
     <section class="section-5 bg-2">

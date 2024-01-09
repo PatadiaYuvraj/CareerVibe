@@ -1,4 +1,4 @@
-@extends('front.appLayout')
+@extends('front.layout.app')
 @section('pageTitle', 'CareerVibe | Find Best Jobs')
 @section('content')
     <section class="section-4 bg-2">
@@ -7,7 +7,8 @@
                 <div class="col">
                     <nav aria-label="breadcrumb" class=" rounded-3 p-3">
                         <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a href="jobs.html"><i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            <li class="breadcrumb-item"><a href="{{ route('jobs') }}"><i class="fa fa-arrow-left"
+                                        aria-hidden="true"></i>
                                     &nbsp;Back to Jobs</a></li>
                         </ol>
                     </nav>
@@ -23,7 +24,7 @@
                                 <div class="jobs_left d-flex align-items-center">
 
                                     <div class="jobs_conetent">
-                                        <a href="#">
+                                        <a href="{{ route('dashboard') }}">
                                             <h4>Software Engineer</h4>
                                         </a>
                                         <div class="links_locat d-flex align-items-center">
@@ -38,7 +39,7 @@
                                 </div>
                                 <div class="jobs_right">
                                     <div class="apply_now">
-                                        <a class="heart_mark" href="#"> <i class="fa fa-heart-o"
+                                        <a class="heart_mark" href="{{ route('dashboard') }}"> <i class="fa fa-heart-o"
                                                 aria-hidden="true"></i></a>
                                     </div>
                                 </div>
@@ -83,8 +84,8 @@
                             </div>
                             <div class="border-bottom"></div>
                             <div class="pt-3 text-end">
-                                <a href="#" class="btn btn-secondary">Save</a>
-                                <a href="#" class="btn btn-primary">Apply</a>
+                                <a href="{{ route('dashboard') }}" class="btn btn-secondary">Save</a>
+                                <a href="{{ route('dashboard') }}" class="btn btn-primary">Apply</a>
                             </div>
                         </div>
                     </div>

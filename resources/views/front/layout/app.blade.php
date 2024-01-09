@@ -3,7 +3,7 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>@yield('pageTitle')</title>
+    <title>@yield ('pageTitle')</title>
     <meta name="description" content="" />
     <meta name="viewport"
         content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, user-scalable=no" />
@@ -31,43 +31,27 @@
                             <a class="nav-link" aria-current="page" href="{{ route('dashboard') }}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="jobs.html">Find Jobs</a>
+                            <a class="nav-link" aria-current="page" href="{{ route('jobs') }}">Find Jobs</a>
                         </li>
                     </ul>
-                    <a class="btn btn-outline-primary me-2" href="{{ route('register') }}">Register</a>
-                    {{-- <a class="btn btn-primary" href="post-job.html" type="submit">Post a Job</a> --}}
+                    {{ auth()->user()->name }} &nbsp;
+                    @guest
+                        <a class="btn btn-outline-primary me-2" href="{{ route('login') }}">Login </a>
+                    @endguest
+                    @auth
+                        <a class="btn btn-outline-primary me-2" href="{{ route('logout') }}">Logout</a>
+                    @endauth
+                    <a class="btn btn-primary" href="{{ route('post-job') }}" type="submit">Post a Job</a>
                 </div>
             </div>
         </nav>
     </header>
-    @yield('content')
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title pb-0" id="exampleModalLabel">Change Profile Picture</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div class="mb-3">
-                            <label for="exampleInputEmail1" class="form-label">Profile Image</label>
-                            <input type="file" class="form-control" id="image" name="image">
-                        </div>
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary mx-3">Update</button>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        </div>
 
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    @yield('content')
 
     <footer class="bg-dark py-3 bg-2">
         <div class="container">
-            <p class="text-center text-white pt-3 fw-bold fs-6">© {{ Date('Y') }} careervibe.vercel.com, all right
+            <p class="text-center text-white pt-3 fw-bold fs-6">© {{ Date('Y') }} careervibe.vercel.com , all right
                 reserved</p>
         </div>
     </footer>

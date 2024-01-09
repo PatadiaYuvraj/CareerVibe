@@ -17,12 +17,12 @@ class AccountController extends Controller
     }
     public function login()
     {
-        return view('front.login');
+        return view('front.auth.login');
     }
 
     public function register()
     {
-        return view('front.register');
+        return view('front.auth.register');
     }
 
     public function doLogin(Request $request)

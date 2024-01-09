@@ -1,4 +1,4 @@
-@extends('front.authLayout')
+@extends('front.layout.auth')
 @section('pageTitle', 'CareerVibe | register page')
 @section('content')
     <section class="section-5">
