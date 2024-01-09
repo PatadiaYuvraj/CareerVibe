@@ -103,4 +103,29 @@ class AccountController extends Controller
     {
         return view('front.post-job');
     }
+
+    public function job_applied(Request $request)
+    {
+        return view('front.job-applied');
+    }
+
+    public function saved_jobs(Request $request)
+    {
+        return view('front.saved-jobs');
+    }
+
+    public function my_jobs(Request $request)
+    {
+        return view('front.my-jobs');
+    }
+
+    public function job_detail(Request $request)
+    {
+        return view('front.job-detail');
+    }
+
+    public function jobs(Request $request)
+    {
+        return view('front.jobs');
+    }
 }
