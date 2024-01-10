@@ -17,14 +17,12 @@ class AccountController extends Controller
     }
     public function login()
     {
-        return view('front.auth.login');
+        return view('front.login');
     }
-
     public function register()
     {
-        return view('front.auth.register');
+        return view('front.register');
     }
-
     public function doLogin(Request $request)
     {
         $validate = $this->user->validateUser($request, false);
@@ -36,7 +34,7 @@ class AccountController extends Controller
             ];
             $isAuth = $this->user->authenticate($data);
             if ($isAuth['status']) {
-                return redirect()->route('dashboard');
+                return redirect()->route('index');
             }
             return redirect()->back()->with("msg", "Something went wrong");
         }
@@ -68,7 +66,7 @@ class AccountController extends Controller
                     ];
                 $isAuth = $this->user->authenticate($data);
                 if ($isAuth['status']) {
-                    return redirect()->route('dashboard');
+                    return redirect()->route('index');
                 }
                 return redirect()->back()->with("msg", "Something went wrong");
             }
@@ -86,46 +84,5 @@ class AccountController extends Controller
         Auth::logout();
         Session::flush();
         return redirect()->route("login")->with("msg", "You're Logged Out");
-    }
-
-    public function dashboard()
-    {
-        return view('front.dashboard');
-    }
-
-    public function account()
-    {
-        return view('front.account');
-    }
-
-
-    public function post_job()
-    {
-        return view('front.post-job');
-    }
-
-    public function job_applied(Request $request)
-    {
-        return view('front.job-applied');
-    }
-
-    public function saved_jobs(Request $request)
-    {
-        return view('front.saved-jobs');
-    }
-
-    public function my_jobs(Request $request)
-    {
-        return view('front.my-jobs');
-    }
-
-    public function job_detail(Request $request)
-    {
-        return view('front.job-detail');
-    }
-
-    public function jobs(Request $request)
-    {
-        return view('front.jobs');
     }
 }

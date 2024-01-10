@@ -19,7 +19,7 @@ class isGuest
         // isGuest
         // Auth::check() -> false
         if (Auth::check()) {
-            return redirect()->route("dashboard")->with("msg", "you're logged in ");
+            return redirect()->route("index")->with("msg", "you're logged in ");
         } else {
             return $next($request);
         }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,22 +25,28 @@ Route::group(['middleware' => "isGuest"], function () {
     Route::get('/register', [AccountController::class, "register"])->name('register');
     Route::post('/login', [AccountController::class, "doLogin"])->name('doLogin');
     Route::post('/register', [AccountController::class, "doRegister"])->name('doRegister');
-    Route::group(['prefix' => "admin"], function () {
-    });
+    // Route::group(['prefix' => "admin"], function () {
+    // Route::get('/', function () {
+    // echo "Admin";
+    // });
+    // });
 });
 
-Route::group(['middleware' => "isAuth"], function () {
-    Route::get('/', function () {
-        echo "Admin";
-    });
-
-    Route::get('/logout', [AccountController::class, "logout"])->name('logout');
-    Route::get('/', [AccountController::class, "dashboard"])->name('dashboard');
-    Route::get('/account', [AccountController::class, "account"])->name('account');
-    Route::get('/post-job', [AccountController::class, "post_job"])->name('post-job');
-    Route::get('/job-applied', [AccountController::class, "job_applied"])->name('job-applied');
-    Route::get('/saved-jobs', [AccountController::class, "saved_jobs"])->name('saved-jobs');
-    Route::get('/my-jobs', [AccountController::class, "my_jobs"])->name('my-jobs');
-    Route::get('/job-detail', [AccountController::class, "job_detail"])->name('job-detail');
-    Route::get('/jobs', [AccountController::class, "jobs"])->name('jobs');
+Route::group(['middleware' => ["isAuth", "isUser"]], function () {
+    Route::get("/logout", [AccountController::class, 'logout'])->name('logout');
+    Route::get('/about', [UserController::class, "about"])->name('about');
+    Route::get('/blog-single', [UserController::class, "blog_single"])->name('blog-single');
+    Route::get('/blog', [UserController::class, "blog"])->name('blog');
+    Route::get('/contact', [UserController::class, "contact"])->name('contact');
+    Route::get('/faq', [UserController::class, "faq"])->name('faq');
+    Route::get('/gallery', [UserController::class, "gallery"])->name('gallery');
+    Route::get('/', [UserController::class, "index"])->name('index');
+    Route::get('/job-listings', [UserController::class, "job_listings"])->name('job-listings');
+    Route::get('/job-single', [UserController::class, "job_single"])->name('job-single');
+    Route::get('/portfolio-single', [UserController::class, "portfolio_single"])->name('portfolio-single');
+    Route::get('/portfolio', [UserController::class, "portfolio"])->name('portfolio');
+    Route::get('/post-job', [UserController::class, "post_job"])->name('post-job');
+    Route::get('/service-sinlge', [UserController::class, "service_sinlge"])->name('service-sinlge');
+    Route::get('/services', [UserController::class, "services"])->name('services');
+    Route::get('/testimonials', [UserController::class, "testimonials"])->name('testimonials');
 });

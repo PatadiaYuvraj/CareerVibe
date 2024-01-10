@@ -1,67 +1,197 @@
-<!DOCTYPE html>
-<html class="no-js" lang="en_AU">
+<!doctype html>
+<html lang="en">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>@yield ('pageTitle')</title>
-    <meta name="description" content="" />
-    <meta name="viewport"
-        content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, user-scalable=no" />
-    <meta name="HandheldFriendly" content="True" />
-    <meta name="pinterest" content="nopin" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" />
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css') }}" />
-    <!-- Fav Icon -->
-    <link rel="shortcut icon" type="image/x-icon" href="#" />
+    <title>@yield('pageTitle')</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="{{ asset('front/css/custom-bs.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/jquery.fancybox.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/bootstrap-select.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/fonts/icomoon/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/fonts/line-icons/style.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/animate.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('front/css/quill.snow.css') }}">
+
+
+    <!-- MAIN CSS -->
+    <link rel="stylesheet" href="{{ asset('front/css/style.css') }}">
 </head>
 
-<body data-instant-intensity="mousedown">
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow py-3">
-            <div class="container">
-                <a class="navbar-brand" href="{{ route('dashboard') }}">CareerVibe</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-0 ms-sm-0 me-auto mb-2 mb-lg-0 ms-lg-4">
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('dashboard') }}">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" aria-current="page" href="{{ route('jobs') }}">Find Jobs</a>
-                        </li>
-                    </ul>
-                    {{ auth()->user()->name }} &nbsp;
-                    @guest
-                        <a class="btn btn-outline-primary me-2" href="{{ route('login') }}">Login </a>
-                    @endguest
-                    @auth
-                        <a class="btn btn-outline-primary me-2" href="{{ route('logout') }}">Logout</a>
-                    @endauth
-                    <a class="btn btn-primary" href="{{ route('post-job') }}" type="submit">Post a Job</a>
+<body id="top">
+
+    {{-- <div id="overlayer"></div>
+    <div class="loader">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div> --}}
+
+
+    <div class="site-wrap">
+
+        <div class="site-mobile-menu site-navbar-target">
+            <div class="site-mobile-menu-header">
+                <div class="site-mobile-menu-close mt-3">
+                    <span class="icon-close2 js-menu-toggle"></span>
                 </div>
             </div>
-        </nav>
-    </header>
+            <div class="site-mobile-menu-body"></div>
+        </div> <!-- .site-mobile-menu -->
+        <!-- NAVBAR -->
+        <header class="site-navbar mt-3">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="site-logo col-6"><a href="index.html">JobBoard</a></div>
 
-    @yield('content')
+                    <nav class="mx-auto site-navigation">
+                        <ul class="site-menu js-clone-nav d-none d-xl-block ml-0 pl-0">
+                            <li><a href="index.html" class="nav-link">Home</a></li>
+                            <li><a href="about.html" class="active">About</a></li>
+                            <li class="has-children">
+                                <a href="job-listings.html">Job Listings</a>
+                                <ul class="dropdown">
+                                    <li><a href="job-single.html">Job Single</a></li>
+                                    <li><a href="post-job.html">Post a Job</a></li>
+                                </ul>
+                            </li>
+                            <li class="has-children">
+                                <a href="services.html">Pages</a>
+                                <ul class="dropdown">
+                                    <li><a href="services.html">Services</a></li>
+                                    <li><a href="service-single.html">Service Single</a></li>
+                                    <li><a href="blog-single.html">Blog Single</a></li>
+                                    <li><a href="portfolio.html">Portfolio</a></li>
+                                    <li><a href="portfolio-single.html">Portfolio Single</a></li>
+                                    <li><a href="testimonials.html">Testimonials</a></li>
+                                    <li><a href="faq.html">Frequently Ask Questions</a></li>
+                                    <li><a href="gallery.html">Gallery</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="blog.html">Blog</a></li>
+                            <li><a href="contact.html">Contact</a></li>
+                            {{-- <li class="d-lg-none"><a href="post-job.html"><span class="mr-2">+</span> Post a Job</a>
+                            </li>
+                            <li class="d-lg-none"><a href="login.html">Log In</a></li> --}}
+                        </ul>
+                    </nav>
 
-    <footer class="bg-dark py-3 bg-2">
-        <div class="container">
-            <p class="text-center text-white pt-3 fw-bold fs-6">© {{ Date('Y') }} careervibe.vercel.com , all right
-                reserved</p>
-        </div>
-    </footer>
-    <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('assets/js/bootstrap.bundle.5.1.3.min.js') }}"></script>
-    <script src="{{ asset('assets/js/instantpages.5.1.0.min.js') }}"></script>
-    <script src="{{ asset('assets/js/lazyload.17.6.0.min.js') }}"></script>
-    <script src="{{ asset('assets/js/slick.min.js') }}"></script>
-    <script src="{{ asset('assets/js/lightbox.min.js') }}"></script>
-    <script src="{{ asset('assets/js/custom.js') }}"></script>
+                    <div class="right-cta-menu text-right d-flex aligin-items-center col-6">
+                        <div class="ml-auto">
+                            @guest
+                                @if (Request::is('register'))
+                                    <a href="{{ route('login') }}"
+                                        class="btn btn-primary border-width-2 d-none d-lg-inline-block"><span
+                                            class="mr-2 icon-lock_outline"></span>Log In</a>
+                                @endif
+                                @if (Request::is('login'))
+                                    <a href="{{ route('register') }}"
+                                        class="btn btn-primary border-width-2 d-none d-lg-inline-block"><span
+                                            class="mr-2 icon-lock_outline"></span>Create
+                                        Acconut</a>
+                                @endif
+                            @endguest
+                            @auth
+                                <a href="{{ route('post-job') }}"
+                                    class="btn btn-outline-white border-width-2 d-none d-lg-inline-block"><span
+                                        class="mr-2 icon-add"></span>Post a Job</a>
+                                <a href="{{ route('logout') }}"
+                                    class="btn btn-primary border-width-2 d-none d-lg-inline-block"><span
+                                        class="mr-2 icon-lock_outline"></span>Logout</a>
+                            @endauth
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </header>
+
+        @yield('content')
+
+        <footer class="site-footer">
+
+            <a href="#top" class="smoothscroll scroll-top">
+                <span class="icon-keyboard_arrow_up"></span>
+            </a>
+
+            <div class="container">
+                <div class="row mb-5">
+                    <div class="col-6 col-md-3 mb-4 mb-md-0">
+                        <h3>Search Trending</h3>
+                        <ul class="list-unstyled">
+                            <li><a href="#">Web Design</a></li>
+                            <li><a href="#">Graphic Design</a></li>
+                            <li><a href="#">Web Developers</a></li>
+                            <li><a href="#">Python</a></li>
+                            <li><a href="#">HTML5</a></li>
+                            <li><a href="#">CSS3</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md-3 mb-4 mb-md-0">
+                        <h3>Company</h3>
+                        <ul class="list-unstyled">
+                            <li><a href="#">About Us</a></li>
+                            <li><a href="#">Career</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Resources</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md-3 mb-4 mb-md-0">
+                        <h3>Support</h3>
+                        <ul class="list-unstyled">
+                            <li><a href="#">Support</a></li>
+                            <li><a href="#">Privacy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-6 col-md-3 mb-4 mb-md-0">
+                        <h3>Contact Us</h3>
+                        <div class="footer-social">
+                            <a href="#"><span class="icon-facebook"></span></a>
+                            <a href="#"><span class="icon-twitter"></span></a>
+                            <a href="#"><span class="icon-instagram"></span></a>
+                            <a href="#"><span class="icon-linkedin"></span></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row text-center">
+                    <div class="col-12">
+                        <p class="copyright"><small>
+                                <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                                Copyright &copy;
+                                <script>
+                                    document.write(new Date().getFullYear());
+                                </script> All rights reserved | This template is made with <i
+                                    class="icon-heart text-danger" aria-hidden="true"></i> by <a
+                                    href="https://colorlib.com" target="_blank">Colorlib</a>
+                                <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                            </small></p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="{{ asset('front/js/jquery.min.js') }}"></script>
+    <script src="{{ asset('front/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('front/js/isotope.pkgd.min.js') }}"></script>
+    <script src="{{ asset('front/js/stickyfill.min.js') }}"></script>
+    <script src="{{ asset('front/js/jquery.fancybox.min.js') }}"></script>
+    <script src="{{ asset('front/js/jquery.easing.1.3.js') }}"></script>
+    <script src="{{ asset('front/js/jquery.waypoints.min.js') }}"></script>
+    <script src="{{ asset('front/js/jquery.animateNumber.min.js') }}"></script>
+    <script src="{{ asset('front/js/owl.carousel.min.js') }}"></script>
+    <script src="{{ asset('front/js/quill.min.js') }}"></script>
+    <script src="{{ asset('front/js/bootstrap-select.min.js') }}"></script>
+    <script src="{{ asset('front/js/custom.js') }}"></script>
+
+
+
 </body>
 
 </html>
