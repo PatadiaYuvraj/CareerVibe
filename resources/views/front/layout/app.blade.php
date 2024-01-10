@@ -14,8 +14,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/owl.carousel.min.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/animate.min.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/quill.snow.css') }}">
-
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <!-- MAIN CSS -->
     <link rel="stylesheet" href="{{ asset('front/css/style.css') }}">
 </head>
@@ -177,6 +176,11 @@
     </div>
 
     <!-- SCRIPTS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="
+                            https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js
+                            "></script>
     <script src="{{ asset('front/js/jquery.min.js') }}"></script>
     <script src="{{ asset('front/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('front/js/isotope.pkgd.min.js') }}"></script>
@@ -190,7 +194,30 @@
     <script src="{{ asset('front/js/bootstrap-select.min.js') }}"></script>
     <script src="{{ asset('front/js/custom.js') }}"></script>
 
-
+    <script>
+        toastr.options = {
+            "closeButton": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+        if ("{{ Session::has('success') }}") {
+            toastr.success("{{ Session::get('success') }}")
+        }
+        if ("{{ Session::has('error') }}") {
+            toastr.error("{{ Session::get('error') }}")
+        }
+        if ("{{ Session::has('info') }}") {
+            toastr.info("{{ Session::get('info') }}")
+        }
+        if ("{{ Session::has('warning') }}") {
+            toastr.warning("{{ Session::get('warning') }}")
+        }
+    </script>
 
 </body>
 

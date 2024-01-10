@@ -13,6 +13,22 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string("name", 25);
+            $table->string("email", 50)->unique();
+            $table->string("password", 100);
+            $table->string("userType", 10)->default("USER");
+            $table->string("profile_image_url", 100)->nullable();
+            $table->string("resume_pdf_url", 100)->nullable();
+            $table->string("contact", 15)->nullable();
+            $table->enum("gender", ["MALE", "FEMALE", "OTHER"])->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->string("headline", 200)->nullable();
+            $table->string("education", 200)->nullable();
+            $table->string("interest", 100)->nullable();
+            $table->string("hobby", 100)->nullable();
+            $table->string("city", 30)->nullable();
+            $table->text("about")->nullable();
+            $table->string("experience", 200)->nullable();
             $table->timestamps();
         });
     }

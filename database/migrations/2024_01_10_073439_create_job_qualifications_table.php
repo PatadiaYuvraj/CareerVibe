@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('job_qualifications', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger("jobs_id")->unsigned();
+            $table->bigInteger("qualifications_id")->unsigned();
+            $table->foreign('jobs_id')->references('id')->on('jobs');
+            $table->foreign('qualifications_id')->references('id')->on('qualifications');
+            $table->unique(['jobs_id', 'qualifications_id']);
             $table->timestamps();
         });
     }

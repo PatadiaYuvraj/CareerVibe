@@ -19,7 +19,7 @@ class isUser
         if (Auth::check() && Auth::user()->userType === "USER") {
             return $next($request);
         } else {
-            return redirect()->route("login")->with("msg", "you're logged out ");
+            return redirect()->route("login")->with("warning", "you're logged out ");
         }
         return $next($request);
     }

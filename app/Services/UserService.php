@@ -16,7 +16,7 @@ class UserService implements UserRepo
     {
         if (!$data) return ["status" => false, "msg" => "Data not found", "data" => null];
         $user = ["email" => $data['email'], "password" => $data['password']];
-        if (Auth::attempt($user)) {
+        if (Auth::guard('user')->attempt($user)) {
             return ["status" => true, "msg" => "User is Authenticated", "data" => null];
         } else {
             return ["status" => false, "msg" => "User is not Authenticated", "data" => null];
@@ -53,14 +53,14 @@ class UserService implements UserRepo
         $data['password'] = Hash::make($data['password']);
         $user = User::create($data);
         $user = $user->only(["id", "name", "email", "password", "created_at", "updated_at"]);
-        return ["status" => true, "msg" => "User Created Successfully", "data" => (array)$user];
+        return ["status" => true, "msg" => "User Created Successfully", "data" => $user->toArray()];
     }
 
     public function getUsers(): array
     {
         $user = User::all();
         if (!isset($user[0])) return ["status" => false, "msg" => "Data not found", "data" => null];
-        return ["status" => true, "msg" => "Data found", "data" => (array) $user];
+        return ["status" => true, "msg" => "Data found", "data" => $user->toArray()];
     }
 
     public function getUserByIdWithoutPassword(int $id): array
@@ -69,7 +69,7 @@ class UserService implements UserRepo
         $user = User::find('2');
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
         $user = $user->only(["id", "name", "email", "created_at", "updated_at"]);
-        return ["status" => true, "msg" => "Data found", "data" => (array) $user];
+        return ["status" => true, "msg" => "Data found", "data" => $user->toArray()];
     }
 
     public function getUserById(int $id): array
@@ -78,23 +78,21 @@ class UserService implements UserRepo
         $user = User::find($id);
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
         $user = $user->only(["id", "name", "email", "password", "created_at", "updated_at"]);
-        return $user;
+        return ["status" => true, "msg" => "Data found", "data" => $user->toArray()];
     }
 
     public function updateUser(int $id, array $data): array
     {
-        if (!$id) return [];
-        if (!$data) return [];
-        return ["status" => true, "msg" => "User found", "data" => null];
+        if (!$id) return ["status" => false, "msg" => "User found", "data" => null];
+        if (!$data) return ["status" => false, "msg" => "User found", "data" => null];
+        return ["status" => false, "msg" => "User found", "data" => null];
     }
 
     public function replaceUser(int $id, array $data): array
     {
-        if (!$id) return ["status" => false, "msg" => "ID is not found", "data" => null];
-        if (!$data) return ["status" => false, "msg" => "data is not found", "data" => null];
-        $user = User::find($id);
-        $user->save();
-        return ["status" => true, "msg" => "User found", "data" => (array)$user];
+        if (!$id) return ["status" => false, "msg" => "User found", "data" => null];
+        if (!$data) return ["status" => false, "msg" => "User found", "data" => null];
+        return ["status" => false, "msg" => "User found", "data" => null];
     }
 
     public function deleteUser(int $id): array
@@ -102,7 +100,7 @@ class UserService implements UserRepo
         if (!$id) return ["status" => false, "msg" => "ID is not found", "data" => null];
         $user = User::find($id);
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
-        $user->delete();
-        return ["status" => true, "msg" => "User Deleted Successfully", "data" => (array)$user];
+        if (!($user->delete())) return ["status" => false, "msg" => "Deleting error", "data" => null];
+        return ["status" => true, "msg" => "User Deleted Successfully", "data" => $user->toArray()];
     }
 }

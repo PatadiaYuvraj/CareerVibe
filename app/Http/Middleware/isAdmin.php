@@ -19,7 +19,7 @@ class isAdmin
         if (Auth::check() && Auth::user()->userType === "ADMIN") {
             return $next($request);
         } else {
-            return redirect()->route("login")->with("msg", "you're logged out ");
+            return redirect()->route("admin.login")->with("warning", "you're logged out ");
         }
         return $next($request);
     }

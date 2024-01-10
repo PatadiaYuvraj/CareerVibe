@@ -34,9 +34,9 @@ class AccountController extends Controller
             ];
             $isAuth = $this->user->authenticate($data);
             if ($isAuth['status']) {
-                return redirect()->route('index');
+                return redirect()->route('index')->with('success', 'You are signed up ');
             }
-            return redirect()->back()->with("msg", "Something went wrong");
+            return redirect()->back()->with("warning", "Not Authenticated");
         }
         if ($validate->fails()) {
             return redirect()->back()
@@ -66,11 +66,11 @@ class AccountController extends Controller
                     ];
                 $isAuth = $this->user->authenticate($data);
                 if ($isAuth['status']) {
-                    return redirect()->route('index');
+                    return redirect()->route('index')->with('success', 'You are logged in');
                 }
-                return redirect()->back()->with("msg", "Something went wrong");
+                return redirect()->back()->with("warning", "Something went wrong");
             }
-            return redirect()->back()->with("msg", "Something went wrong");
+            return redirect()->back()->with("warning", "Something went wrong");
         }
         if ($validate->fails()) {
             return redirect()->back()
@@ -83,6 +83,6 @@ class AccountController extends Controller
     {
         Auth::logout();
         Session::flush();
-        return redirect()->route("login")->with("msg", "You're Logged Out");
+        return redirect()->route("login")->with("success", "You're Logged Out");
     }
 }
