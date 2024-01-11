@@ -21,6 +21,12 @@ class Company extends Authenticatable
         'name',
         'email',
         'password',
+        'website',
+        'address_line_1',
+        'address_line_2',
+        'linkedin_profile',
+        'description',
+
     ];
 
     /**

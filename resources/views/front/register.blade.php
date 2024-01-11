@@ -54,10 +54,10 @@
                     </div>
                     <div class="row form-group mb-4">
                         <div class="col-md-12 mb-3 mb-md-0">
-                            <label class="text-black" for="confirm_password">Re-Type Password</label>
-                            <input type="password" id="confirm_password" name="confirm_password" class="form-control"
-                                placeholder="Re-type Password" />
-                            @error('confirm_password')
+                            <label class="text-black" for="password_confirmation">Re-Type Password</label>
+                            <input type="password" id="password_confirmation" name="password_confirmation"
+                                class="form-control" placeholder="Re-type Password" />
+                            @error('password_confirmation')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>

@@ -12,6 +12,15 @@ use Illuminate\Validation\Validator as ValidationValidator;
 
 class UserService implements UserRepo
 {
+    private AuthService $auth;
+    private User $user;
+
+    public function __construct(AuthService $auth, User $user)
+    {
+        $this->auth = $auth;
+        $this->user = $user;
+    }
+
     public function authenticate(array $data): array
     {
         if (!$data) return ["status" => false, "msg" => "Data not found", "data" => null];
@@ -34,7 +43,7 @@ class UserService implements UserRepo
                 "name" => "required|min:5|max:30",
                 "email" => "required|unique:users,email|email",
                 "password" => "required|min:8",
-                "confirm_password" => 'required_with:password|same:password|min:8'
+                "password_confirmation" => 'required_with:password|same:password|min:8'
             ]);
         } else {
             // login route validation
@@ -58,49 +67,61 @@ class UserService implements UserRepo
 
     public function getUsers(): array
     {
-        $user = User::all();
-        if (!isset($user[0])) return ["status" => false, "msg" => "Data not found", "data" => null];
+
+        $user = User::all()->toArray();
+        if (!isset($user[0])) return ["status" => false, "msg" => "Data not found", "data" => $user];
         return ["status" => true, "msg" => "Data found", "data" => $user];
     }
 
-    public function getUserByIdWithoutPassword(int $id): array
-    {
-        if (!$id) return ["status" => false, "msg" => "ID is not found", "data" => null];
-        $user = User::find('2');
-        if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
-        $user = $user->only(["id", "name", "email", "created_at", "updated_at"]);
-        return ["status" => true, "msg" => "Data found", "data" => $user];
-    }
+    // public function getUserByIdWithoutPassword(int $id): array
+    // {
+    //     if (!$id) return ["status" => false, "msg" => "ID is not found", "data" => null];
+    //     $user = User::find('2');
+    //     if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
+    //     $user = $user->only(["id", "name", "email", "created_at", "updated_at"]);
+    //     return ["status" => true, "msg" => "Data found", "data" => $user];
+    // }
 
     public function getUserById(int $id): array
     {
         if (!$id) return ["status" => false, "msg" => "ID is not found", "data" => null];
         $user = User::find($id);
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
-        $user = $user->only(["id", "name", "email", "password", "created_at", "updated_at"]);
         return ["status" => true, "msg" => "Data found", "data" => $user];
     }
 
     public function updateUser(int $id, array $data): array
     {
-        if (!$id) return ["status" => false, "msg" => "User found", "data" => null];
-        if (!$data) return ["status" => false, "msg" => "User found", "data" => null];
-        return ["status" => false, "msg" => "User found", "data" => null];
+        if (!$id) return ["status" => false, "msg" => "ID is not found", "data" => null];
+        if (!$data) return ["status" => false, "msg" => "Data not found", "data" => null];
+        $user = User::find($id);
+        if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
+        $user->update($data);
+        return ["status" => true, "msg" => "User Updated Successfully", "data" => $user];
     }
 
     public function replaceUser(int $id, array $data): array
     {
-        if (!$id) return ["status" => false, "msg" => "User found", "data" => null];
-        if (!$data) return ["status" => false, "msg" => "User found", "data" => null];
-        return ["status" => false, "msg" => "User found", "data" => null];
-    }
-
-    public function deleteUser(int $id): array
-    {
         if (!$id) return ["status" => false, "msg" => "ID is not found", "data" => null];
+        if (!$data) return ["status" => false, "msg" => "Data not found", "data" => null];
         $user = User::find($id);
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
-        if (!($user->delete())) return ["status" => false, "msg" => "Deleting error", "data" => null];
-        return ["status" => true, "msg" => "User Deleted Successfully", "data" => $user];
+        $user->replace($data);
+        return ["status" => true, "msg" => "User Replaced Successfully", "data" => $user];
+    }
+
+    public function deleteUser(int $id): bool
+    {
+        // if (!$id) return ["status" => false, "msg" => "ID is not found", "data" => null];
+        // $user = User::find($id);
+        // if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
+        // if (!($user->delete())) return ["status" => false, "msg" => "Deleting error", "data" => null];
+        // return ["status" => true, "msg" => "User Deleted Successfully", "data" => $user];
+
+        if (!$id) return false;
+        $user = User::find($id);
+        if (!$user) return false;
+        if (!($user->delete())) return false;
+        return true;
     }
 }

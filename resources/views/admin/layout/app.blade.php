@@ -212,7 +212,7 @@
                         data-bs-toggle="dropdown">
                         {{-- <img src="{{ asset('admin/img/profile-img.jpg') }}" alt="Profile" class="rounded-circle"> --}}
                         <span class="d-none d-md-block dropdown-toggle ps-2">
-                            {{ ucfirst(Str::lower($admin['name'])) }}</span>
+                            {{ auth()->guard('admin')->user()->name }}</span>
                     </a><!-- End Profile Iamge Icon -->
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
@@ -259,35 +259,35 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.getCompanies') }}">
+                <a class="nav-link " href="{{ route('admin.company.index') }}">
                     {{-- <i class="bi bi-grid"></i> --}}
                     <span>Company</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.getUsers') }}">
+                <a class="nav-link " href="{{ route('admin.user.index') }}">
                     {{-- <i class="bi bi-grid"></i> --}}
                     <span>User</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.getJobs') }}">
+                <a class="nav-link " href="{{ route('admin.job.index') }}">
                     {{-- <i class="bi bi-grid"></i> --}}
                     <span>Job</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.getLocations') }}">
+                <a class="nav-link " href="{{ route('admin.location.index') }}">
                     {{-- <i class="bi bi-grid"></i> --}}
                     <span>Location</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.getQualifications') }}">
+                <a class="nav-link " href="{{ route('admin.qualification.index') }}">
                     {{-- <i class="bi bi-grid"></i> --}}
                     <span>Qualification</span>
                 </a>

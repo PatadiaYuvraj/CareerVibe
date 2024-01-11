@@ -1,9 +1,5 @@
 <?php
 
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,13 +17,23 @@ use Illuminate\Support\Facades\Route;
 // https://sneat-vuetify-admin-template.vercel.app/dashboard
 // 
 
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\Front\UserController as FrontUserController;
+use App\Http\Controllers\Admin\JobController;
+use App\Http\Controllers\Admin\LocationController;
+use App\Http\Controllers\Admin\QualificationController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/test',  [FrontUserController::class, "test"])->name('test');
+Route::post('/testing',  [FrontUserController::class, "testing"])->name('testing');
 Route::group(['middleware' => "isGuest"], function () {
-    Route::get('/test',  [UserController::class, "test"])->name('test');
-    Route::post('/testing',  [UserController::class, "testing"])->name('testing');
-    Route::get('/login',  [UserController::class, "login"])->name('login');
-    Route::get('/register', [UserController::class, "register"])->name('register');
-    Route::post('/login', [UserController::class, "doLogin"])->name('doLogin');
-    Route::post('/register', [UserController::class, "doRegister"])->name('doRegister');
+
+    Route::get('/login',  [FrontUserController::class, "login"])->name('login');
+    Route::get('/register', [FrontUserController::class, "register"])->name('register');
+    Route::post('/login', [FrontUserController::class, "doLogin"])->name('doLogin');
+    Route::post('/register', [FrontUserController::class, "doRegister"])->name('doRegister');
 
 
     // Admin Routes 
@@ -42,32 +48,70 @@ Route::group(['middleware' => "isGuest"], function () {
 
 
 Route::group(['middleware' => "isUser"], function () {
-    Route::get("/logout", [UserController::class, 'logout'])->name('logout');
-    Route::get('/about', [UserController::class, "about"])->name('about');
-    Route::get('/blog-single', [UserController::class, "blog_single"])->name('blog-single');
-    Route::get('/blog', [UserController::class, "blog"])->name('blog');
-    Route::get('/contact', [UserController::class, "contact"])->name('contact');
-    Route::get('/faq', [UserController::class, "faq"])->name('faq');
-    Route::get('/gallery', [UserController::class, "gallery"])->name('gallery');
-    Route::get('/', [UserController::class, "index"])->name('index');
-    Route::get('/job-listings', [UserController::class, "job_listings"])->name('job-listings');
-    Route::get('/job-single', [UserController::class, "job_single"])->name('job-single');
-    Route::get('/portfolio-single', [UserController::class, "portfolio_single"])->name('portfolio-single');
-    Route::get('/portfolio', [UserController::class, "portfolio"])->name('portfolio');
-    Route::get('/post-job', [UserController::class, "post_job"])->name('post-job');
-    Route::get('/service-sinlge', [UserController::class, "service_sinlge"])->name('service-sinlge');
-    Route::get('/services', [UserController::class, "services"])->name('services');
-    Route::get('/testimonials', [UserController::class, "testimonials"])->name('testimonials');
+    Route::get('/', [FrontUserController::class, "index"])->name('index');
+    Route::get("/logout", [FrontUserController::class, 'logout'])->name('logout');
+    Route::get('/about', [FrontUserController::class, "about"])->name('about');
+    Route::get('/blog-single', [FrontUserController::class, "blog_single"])->name('blog-single');
+    Route::get('/blog', [FrontUserController::class, "blog"])->name('blog');
+    Route::get('/contact', [FrontUserController::class, "contact"])->name('contact');
+    Route::get('/faq', [FrontUserController::class, "faq"])->name('faq');
+    Route::get('/gallery', [FrontUserController::class, "gallery"])->name('gallery');
+    Route::get('/job-listings', [FrontUserController::class, "job_listings"])->name('job-listings');
+    Route::get('/job-single', [FrontUserController::class, "job_single"])->name('job-single');
+    Route::get('/portfolio-single', [FrontUserController::class, "portfolio_single"])->name('portfolio-single');
+    Route::get('/portfolio', [FrontUserController::class, "portfolio"])->name('portfolio');
+    Route::get('/post-job', [FrontUserController::class, "post_job"])->name('post-job');
+    Route::get('/service-sinlge', [FrontUserController::class, "service_sinlge"])->name('service-sinlge');
+    Route::get('/services', [FrontUserController::class, "services"])->name('services');
+    Route::get('/testimonials', [FrontUserController::class, "testimonials"])->name('testimonials');
 });
 
 Route::group(['middleware' => "isAdmin"], function () {
     Route::prefix('/admin')->group(function () {
-        Route::get('/logout',  [AdminController::class, "logout"])->name('admin.logout');
+        // dashboard 
         Route::get('/dashboard',  [AdminController::class, "dashboard"])->name('admin.dashboard');
-        Route::get('/getCompanies',  [CompanyController::class, "index"])->name('admin.getCompanies');
-        Route::get('/getUsers',  [UserController::class, "index"])->name('admin.getUsers');
-        Route::get('/getJobs',  [UserController::class, "index"])->name('admin.getJobs');
-        Route::get('/getLocations',  [AdminController::class, "index"])->name('admin.getLocations');
-        Route::get('/getQualifications',  [AdminController::class, "index"])->name('admin.getQualifications');
+        // logout 
+        Route::get('/logout',  [AdminController::class, "logout"])->name('admin.logout');
+        // User Routes 
+        Route::get('/user/create',  [AdminUserController::class, "create"])->name('admin.user.create');
+        Route::post('/user/store',  [AdminUserController::class, "store"])->name('admin.user.store');
+        Route::get('/user',  [AdminUserController::class, "index"])->name('admin.user.index');
+        // Route::get('/user/{id}',  [AdminUserController::class, "show"])->name('admin.user.show');
+        Route::get('/user/edit/{id}',  [AdminUserController::class, "edit"])->name('admin.user.edit');
+        Route::post('/user/update/{id}',  [AdminUserController::class, "update"])->name('admin.user.update');
+        Route::get('/user/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
+        // Company Routes 
+        Route::get('/company/create',  [CompanyController::class, "create"])->name('admin.company.create');
+        Route::post('/company/store',  [CompanyController::class, "store"])->name('admin.company.store');
+        Route::get('/company',  [CompanyController::class, "index"])->name('admin.company.index');
+        // Route::get('/company/{id}',  [CompanyController::class, "show"])->name('admin.company.show');
+        Route::get('/company/edit/{id}',  [CompanyController::class, "edit"])->name('admin.company.edit');
+        Route::post('/company/update/{id}',  [CompanyController::class, "update"])->name('admin.company.update');
+        Route::get('/company/delete/{id}',  [CompanyController::class, "delete"])->name('admin.company.delete');
+        Route::get('/company/toggle-verified/{id}',  [CompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
+        // Job Routes 
+        Route::get('/job/create',  [JobController::class, "create"])->name('admin.job.create');
+        Route::post('/job/store',  [JobController::class, "store"])->name('admin.job.store');
+        Route::get('/job',  [JobController::class, "index"])->name('admin.job.index');
+        // Route::get('/job/{id}',  [JobController::class, "show"])->name('admin.job.show');
+        Route::get('/job/edit/{id}',  [JobController::class, "edit"])->name('admin.job.edit');
+        Route::post('/job/update/{id}',  [JobController::class, "update"])->name('admin.job.update');
+        Route::get('/job/delete/{id}',  [JobController::class, "delete"])->name('admin.job.delete');
+        // Location Routes // $isUpdated = $this->updateLocation($id, $data);
+        Route::get('/location/create',  [LocationController::class, "create"])->name('admin.location.create');
+        Route::post('/location/store',  [LocationController::class, "store"])->name('admin.location.store');
+        Route::get('/location',  [LocationController::class, "index"])->name('admin.location.index');
+        // Route::get('/location/{id}',  [LocationController::class, "show"])->name('admin.location.show');
+        Route::get('/location/edit/{id}',  [LocationController::class, "edit"])->name('admin.location.edit');
+        Route::post('/location/update/{id}',  [LocationController::class, "update"])->name('admin.location.update');
+        Route::get('/location/delete/{id}',  [LocationController::class, "delete"])->name('admin.location.delete');
+        // Qualification Routesuser
+        Route::get('/qualification/create',  [QualificationController::class, "create"])->name('admin.qualification.create');
+        Route::post('/qualification/store',  [QualificationController::class, "store"])->name('admin.qualification.store');
+        Route::get('/qualification',  [QualificationController::class, "index"])->name('admin.qualification.index');
+        // Route::get('/qualification/{id}',  [QualificationController::class, "show"])->name('admin.qualification.show');
+        Route::get('/qualification/edit/{id}',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
+        Route::post('/qualification/update/{id}',  [QualificationController::class, "update"])->name('admin.qualification.update');
+        Route::get('/qualification/delete/{id}',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
     });
 });
