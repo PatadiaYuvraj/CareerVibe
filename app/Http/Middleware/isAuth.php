@@ -16,12 +16,10 @@ class isAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // isAuth
-        // Auth::check() -> true
-        if (Auth::check()) {
-            return $next($request);
-        } else {
-            return redirect()->route("login")->with("warning", "you're logged out ");
+        dd(Auth::guard('admin')->check());
+        if (!(Auth::guard('user')->check() || Auth::guard('admin')->check() || Auth::guard('company')->check())) {
+            return redirect()->route("admin.dashboard")->with("warning", "you're logged in ");
         }
+        return $next($request);
     }
 }

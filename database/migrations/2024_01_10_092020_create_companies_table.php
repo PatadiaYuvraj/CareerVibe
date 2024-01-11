@@ -19,10 +19,11 @@ return new class extends Migration
             $table->string('email', 100)->unique();
             $table->string('password', 100)->nullable();
             $table->string('website', 100)->nullable();
-            $table->string('address_line_1', 100);
+            $table->string('address_line_1', 100)->nullable();
             $table->string('address_line_2', 100)->nullable();
             $table->string('linkedin_profile', 100)->nullable();
             $table->text('description')->nullable();
+            $table->rememberToken();
             $table->timestamps();
         });
     }

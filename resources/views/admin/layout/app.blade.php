@@ -25,9 +25,10 @@
     {{-- <link href="{{ asset('admin/vendor/quill/quill.snow.css') }}" rel="stylesheet"> --}}
     {{-- <link href="{{ asset('admin/vendor/quill/quill.bubble.css') }}" rel="stylesheet"> --}}
     {{-- <link href="{{ asset('admin/vendor/remixicon/remixicon.css') }}" rel="stylesheet"> --}}
-    {{-- <link href="{{ asset('admin/vendor/simple-datatables/style.css') }}" rel="stylesheet"> --}}
+    <link href="{{ asset('admin/vendor/simple-datatables/style.css') }}" rel="stylesheet">
 
     <link href="{{ asset('admin/css/style.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 
 </head>
 
@@ -210,17 +211,15 @@
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="javascript:void(0);"
                         data-bs-toggle="dropdown">
                         {{-- <img src="{{ asset('admin/img/profile-img.jpg') }}" alt="Profile" class="rounded-circle"> --}}
-                        <span class="d-none d-md-block dropdown-toggle ps-2">{{ 'Admin' }}</span>
+                        <span class="d-none d-md-block dropdown-toggle ps-2">
+                            {{ ucfirst(Str::lower($admin['name'])) }}</span>
                     </a><!-- End Profile Iamge Icon -->
 
                     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
-                        <li class="dropdown-header">
-                            <h6>Kevin Anderson</h6>
-                            <span>Web Designer</span>
-                        </li>
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
+                        {{-- <li class="dropdown-header">
+                            <h6>{{ auth()->guard('admin')->user()->name }}</h6>
+                            <span>{{ auth()->guard('admin')->user()->userType }}</span>
+                        </li> --}}
 
                         <li>
                             <a class="dropdown-item d-flex align-items-center" href="users-profile.html">
@@ -240,7 +239,7 @@
                         </li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="{{ route('admin.login') }}">
+                            <a class="dropdown-item d-flex align-items-center" href="{{ route('admin.logout') }}">
                                 <i class="bi bi-box-arrow-right"></i>
                                 <span>Sign Out</span>
                             </a>
@@ -260,13 +259,41 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link " href="index.html">
-                    <i class="bi bi-grid"></i>
-                    <span>Dashboard</span>
+                <a class="nav-link " href="{{ route('admin.getCompanies') }}">
+                    {{-- <i class="bi bi-grid"></i> --}}
+                    <span>Company</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link " href="{{ route('admin.getUsers') }}">
+                    {{-- <i class="bi bi-grid"></i> --}}
+                    <span>User</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link " href="{{ route('admin.getJobs') }}">
+                    {{-- <i class="bi bi-grid"></i> --}}
+                    <span>Job</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link " href="{{ route('admin.getLocations') }}">
+                    {{-- <i class="bi bi-grid"></i> --}}
+                    <span>Location</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link " href="{{ route('admin.getQualifications') }}">
+                    {{-- <i class="bi bi-grid"></i> --}}
+                    <span>Qualification</span>
                 </a>
             </li>
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
                     <i class="bi bi-menu-button-wide"></i><span>Components</span><i
                         class="bi bi-chevron-down ms-auto"></i>
@@ -288,7 +315,7 @@
                         </a>
                     </li>
                 </ul>
-            </li>
+            </li> --}}
 
         </ul>
 
@@ -308,18 +335,43 @@
     </footer>
 
     <!-- Vendor JS Files -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js "></script>
     {{-- <script src="{{ asset('admin/vendor/apexcharts/apexcharts.min.js') }}"></script> --}}
     <script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     {{-- <script src="{{ asset('admin/vendor/chart.js/chart.umd.js') }}"></script> --}}
     {{-- <script src="{{ asset('admin/vendor/echarts/echarts.min.js') }}"></script> --}}
     {{-- <script src="{{ asset('admin/vendor/quill/quill.min.js') }}"></script> --}}
-    {{-- <script src="{{ asset('admin/vendor/simple-datatables/simple-datatables.js') }}"></script> --}}
+    <script src="{{ asset('admin/vendor/simple-datatables/simple-datatables.js') }}"></script>
     <script src="{{ asset('admin/vendor/tinymce/tinymce.min.js') }}"></script>
     {{-- <script src="{{ asset('admin/vendor/php-email-form/validate.js') }}"></script> --}}
 
     <!-- Template Main JS File -->
     <script src="{{ asset('admin/js/main.js') }}"></script>
-
+    <script>
+        toastr.options = {
+            "closeButton": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+        if ("{{ Session::has('success') }}") {
+            toastr.success("{{ Session::get('success') }}")
+        }
+        if ("{{ Session::has('error') }}") {
+            toastr.error("{{ Session::get('error') }}")
+        }
+        if ("{{ Session::has('info') }}") {
+            toastr.info("{{ Session::get('info') }}")
+        }
+        if ("{{ Session::has('warning') }}") {
+            toastr.warning("{{ Session::get('warning') }}")
+        }
+    </script>
 </body>
 
 </html>

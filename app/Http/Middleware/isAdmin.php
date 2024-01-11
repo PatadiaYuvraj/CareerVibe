@@ -16,7 +16,7 @@ class isAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->userType === "ADMIN") {
+        if (Auth::guard('admin')->check() && Auth::guard('admin')->user()->userType === "ADMIN") {
             return $next($request);
         } else {
             return redirect()->route("admin.login")->with("warning", "you're logged out ");

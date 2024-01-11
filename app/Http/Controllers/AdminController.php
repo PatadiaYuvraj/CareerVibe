@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
+use App\Models\Company;
+use App\Models\Job;
+use App\Models\Location;
+use App\Models\Qualification;
+use App\Models\User;
 use App\Services\AdminService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +23,9 @@ class AdminController extends Controller
     }
     public function dashboard()
     {
-        return view('admin.index');
+        $admin_id = Auth::guard('admin')->user()->id;
+        $admin = Admin::find($admin_id)?->toArray();
+        return view('admin.index', compact('admin'));
     }
     public function login()
     {
@@ -37,10 +45,11 @@ class AdminController extends Controller
                 "password" => $request->get("password")
             ];
             $isAuth = $this->admin->authenticate($data);
+
             if ($isAuth['status']) {
-                return redirect()->route('admin.index');
+                return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
             }
-            return redirect()->back()->with("msg", "Something went wrong");
+            return redirect()->back()->with("warning", "Something went wrong");
         }
         if ($validate->fails()) {
             return redirect()->back()
@@ -70,11 +79,11 @@ class AdminController extends Controller
                     ];
                 $isAuth = $this->admin->authenticate($data);
                 if ($isAuth['status']) {
-                    return redirect()->route('admin.index');
+                    return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
                 }
-                return redirect()->back()->with("msg", "Something went wrong");
+                return redirect()->back()->with("warning", "Something went wrong");
             }
-            return redirect()->back()->with("msg", "Something went wrong");
+            return redirect()->back()->with("warning", "Something went wrong");
         }
         if ($validate->fails()) {
             return redirect()->back()
@@ -85,7 +94,7 @@ class AdminController extends Controller
 
     public function logout()
     {
-        Auth::logout();
+        Auth::guard('admin')->logout();
         Session::flush();
         return redirect()->route("admin.login")->with("msg", "You're Logged Out");
     }

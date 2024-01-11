@@ -53,14 +53,14 @@ class UserService implements UserRepo
         $data['password'] = Hash::make($data['password']);
         $user = User::create($data);
         $user = $user->only(["id", "name", "email", "password", "created_at", "updated_at"]);
-        return ["status" => true, "msg" => "User Created Successfully", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "User Created Successfully", "data" => $user];
     }
 
     public function getUsers(): array
     {
         $user = User::all();
         if (!isset($user[0])) return ["status" => false, "msg" => "Data not found", "data" => null];
-        return ["status" => true, "msg" => "Data found", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "Data found", "data" => $user];
     }
 
     public function getUserByIdWithoutPassword(int $id): array
@@ -69,7 +69,7 @@ class UserService implements UserRepo
         $user = User::find('2');
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
         $user = $user->only(["id", "name", "email", "created_at", "updated_at"]);
-        return ["status" => true, "msg" => "Data found", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "Data found", "data" => $user];
     }
 
     public function getUserById(int $id): array
@@ -78,7 +78,7 @@ class UserService implements UserRepo
         $user = User::find($id);
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
         $user = $user->only(["id", "name", "email", "password", "created_at", "updated_at"]);
-        return ["status" => true, "msg" => "Data found", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "Data found", "data" => $user];
     }
 
     public function updateUser(int $id, array $data): array
@@ -101,6 +101,6 @@ class UserService implements UserRepo
         $user = User::find($id);
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
         if (!($user->delete())) return ["status" => false, "msg" => "Deleting error", "data" => null];
-        return ["status" => true, "msg" => "User Deleted Successfully", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "User Deleted Successfully", "data" => $user];
     }
 }

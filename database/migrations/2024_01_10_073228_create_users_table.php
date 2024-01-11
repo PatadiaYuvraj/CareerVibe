@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string("city", 30)->nullable();
             $table->text("about")->nullable();
             $table->string("experience", 200)->nullable();
+            $table->rememberToken();
             $table->timestamps();
         });
     }

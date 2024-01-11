@@ -6,18 +6,14 @@
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
-                    <h1>Dashboard</h1>
-                    <nav>
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                            <li class="breadcrumb-item active">Dashboard</li>
-                        </ol>
-                    </nav>
+                    <span class="h3 text-black">DashBoard</span>
                 </div>
                 <div class="card-body">
                     <div class="card">
                         <div class="card-body">
-                            {{-- Main Content --}}
+
+                            DashBoard Body
+
                         </div>
                     </div>
                 </div>

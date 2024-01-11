@@ -28,6 +28,7 @@
     <link href="{{ asset('admin/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
     <link href="{{ asset('admin/vendor/simple-datatables/style.css') }}" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <!-- Template Main CSS File -->
     <link href="{{ asset('admin/css/style.css') }}" rel="stylesheet">
 
@@ -118,12 +119,37 @@
         </div>
     </main><!-- End #main -->
     <!-- Vendor JS Files -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js "></script>
     <script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('admin/vendor/tinymce/tinymce.min.js') }}"></script>
 
     <!-- Template Main JS File -->
     <script src="{{ asset('admin/js/main.js') }}"></script>
-
+    <script>
+        toastr.options = {
+            "closeButton": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+        if ("{{ Session::has('success') }}") {
+            toastr.success("{{ Session::get('success') }}")
+        }
+        if ("{{ Session::has('error') }}") {
+            toastr.error("{{ Session::get('error') }}")
+        }
+        if ("{{ Session::has('info') }}") {
+            toastr.info("{{ Session::get('info') }}")
+        }
+        if ("{{ Session::has('warning') }}") {
+            toastr.warning("{{ Session::get('warning') }}")
+        }
+    </script>
 </body>
 
 </html>

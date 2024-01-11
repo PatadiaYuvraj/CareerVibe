@@ -16,12 +16,17 @@ class isGuest
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // isGuest
-        // Auth::check() -> false
-        if (Auth::check()) {
+        if (Auth::guard('user')->check()) {
             return redirect()->route("index")->with("warning", "you're logged in ");
-        } else {
-            return $next($request);
         }
+        //admin
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route("admin.dashboard")->with("warning", "you're logged in ");
+        }
+        // compay
+        if (Auth::guard('company')->check()) {
+            return redirect()->route("dmin.dashboard")->with("warning", "you're logged in ");
+        }
+        return $next($request);
     }
 }

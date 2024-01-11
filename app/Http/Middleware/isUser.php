@@ -16,7 +16,7 @@ class isUser
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->userType === "USER") {
+        if (Auth::guard('user')->check() && Auth::guard('user')->user()->userType === "USER") {
             return $next($request);
         } else {
             return redirect()->route("login")->with("warning", "you're logged out ");

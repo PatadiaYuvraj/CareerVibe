@@ -21,7 +21,7 @@ class AdminService implements AdminRepo
     {
         if (!$data) return ["status" => false, "msg" => "Data not found", "data" => null];
         $user = ["email" => $data['email'], "password" => $data['password']];
-        if (Auth::guard('user')->attempt($user)) {
+        if (Auth::guard('admin')->attempt($user, true)) {
             return ["status" => true, "msg" => "User is Authenticated", "data" => null];
         } else {
             return ["status" => false, "msg" => "User is not Authenticated", "data" => null];
@@ -55,20 +55,19 @@ class AdminService implements AdminRepo
     public function createAdmin(array $data): array
     {
         // TODO: Implement createAdmin() method.
-        return [];
         // The data should be properly validated.
         if (!$data) return ["status" => false, "msg" => "Data not found", "data" => null];
         $data['password'] = Hash::make($data['password']);
         $user = User::create($data);
         $user = $user->only(["id", "name", "email", "password", "created_at", "updated_at"]);
-        return ["status" => true, "msg" => "User Created Successfully", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "User Created Successfully", "data" => $user];
     }
 
     public function getAdmins(): array
     { // TODO: Implement getAdmins() method.
         $user = User::all();
         if (!isset($user[0])) return ["status" => false, "msg" => "Data not found", "data" => null];
-        return ["status" => true, "msg" => "Data found", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "Data found", "data" => $user];
     }
 
     public function getAdminByIdWithoutPassword(int $id): array
@@ -78,7 +77,7 @@ class AdminService implements AdminRepo
         $user = User::find('2');
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
         $user = $user->only(["id", "name", "email", "created_at", "updated_at"]);
-        return ["status" => true, "msg" => "Data found", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "Data found", "data" => $user];
     }
 
     public function getAdminById(int $id): array
@@ -88,7 +87,7 @@ class AdminService implements AdminRepo
         $user = User::find($id);
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
         $user = $user->only(["id", "name", "email", "password", "created_at", "updated_at"]);
-        return ["status" => true, "msg" => "Data found", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "Data found", "data" => $user];
     }
 
     // public function updateAdmin(int $id, array $data): array
@@ -114,6 +113,6 @@ class AdminService implements AdminRepo
         $user = User::find($id);
         if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
         if (!($user->delete())) return ["status" => false, "msg" => "Deleting error", "data" => null];
-        return ["status" => true, "msg" => "User Deleted Successfully", "data" => $user->toArray()];
+        return ["status" => true, "msg" => "User Deleted Successfully", "data" => $user];
     }
 }

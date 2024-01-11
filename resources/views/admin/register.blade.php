@@ -28,6 +28,7 @@
     <link href="{{ asset('admin/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
     <link href="{{ asset('admin/vendor/simple-datatables/style.css') }}" rel="stylesheet">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <!-- Template Main CSS File -->
     <link href="{{ asset('admin/css/style.css') }}" rel="stylesheet">
 
@@ -69,7 +70,7 @@
                                     <form class="row g-3" action="{{ route('admin.doRegister') }}" method="POST">
                                         @csrf
                                         <div class="col-12">
-                                            <label for="name" class="form-label">Email</label>
+                                            <label for="name" class="form-label">Name</label>
                                             <input type="text" name="name" class="form-control"
                                                 placeholder="Enter Email" value="{{ old('name') }}" id="name">
                                             @error('name')
@@ -96,19 +97,29 @@
                                         </div>
 
                                         <div class="col-12">
-                                            <label for="password" class="form-label">Password</label>
-                                            <input type="password" name="password" class="form-control" id="password"
-                                                placeholder="Enter Password">
-                                            @error('password')
+                                            <label for="confirm_password" class="form-label">Re-Type Password</label>
+                                            <input type="password" name="confirm_password" class="form-control"
+                                                id="confirm_password" placeholder="Confirm Password">
+                                            @error('confirm_password')
                                                 <span class="text-danger">{{ $message }}</span>
                                             @enderror
                                         </div>
+                                        {{-- <div class="col-12">
+                                            <div class="form-check">
+                                                <input class="form-check-input" name="terms" type="checkbox"
+                                                    value="" id="acceptTerms" required>
+                                                <label class="form-check-label" for="acceptTerms">I agree and accept the
+                                                    <a href="#">terms and conditions</a></label>
+                                                <div class="invalid-feedback">You must agree before submitting.</div>
+                                            </div>
+                                        </div> --}}
                                         <div class="col-12">
-                                            <button class="btn btn-primary w-100" type="submit">Create Account</button>
+                                            <button class="btn btn-primary w-100" type="submit">Create
+                                                Account</button>
                                         </div>
                                         <div class="col-12">
                                             <p class="small mb-0">Already have an account? <a
-                                                    href="{{ route('admin.register') }}">Log in</a></p>
+                                                    href="{{ route('admin.login') }}">Log in</a></p>
                                         </div>
                                     </form>
 
@@ -129,7 +140,8 @@
     </main><!-- End #main -->
 
 
-
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js "></script>
     <!-- Vendor JS Files -->
     <script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('admin/vendor/tinymce/tinymce.min.js') }}"></script>
@@ -137,6 +149,30 @@
     <!-- Template Main JS File -->
     <script src="{{ asset('admin/js/main.js') }}"></script>
 
+    <script>
+        toastr.options = {
+            "closeButton": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+        if ("{{ Session::has('success') }}") {
+            toastr.success("{{ Session::get('success') }}")
+        }
+        if ("{{ Session::has('error') }}") {
+            toastr.error("{{ Session::get('error') }}")
+        }
+        if ("{{ Session::has('info') }}") {
+            toastr.info("{{ Session::get('info') }}")
+        }
+        if ("{{ Session::has('warning') }}") {
+            toastr.warning("{{ Session::get('warning') }}")
+        }
+    </script>
 </body>
 
 </html>

@@ -16,10 +16,10 @@ class isCompany
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->userType === "COMPANY") {
+        if (Auth::guard('company')->check() && Auth::guard('company')->user()->userType === "USER") {
             return $next($request);
         } else {
-            return redirect()->route("admin.login")->with("warning", "you're logged out ");
+            return redirect()->route("company.login")->with("warning", "you're logged out ");
         }
         return $next($request);
     }
