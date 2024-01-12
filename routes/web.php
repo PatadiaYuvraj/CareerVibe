@@ -77,57 +77,68 @@ Route::group(['middleware' => "isAdmin"], function () {
         // logout 
         Route::get('/logout',  [AdminController::class, "logout"])->name('admin.logout');
         // User Routes 
-        Route::get('/user/create',  [AdminUserController::class, "create"])->name('admin.user.create');
-        Route::post('/user/store',  [AdminUserController::class, "store"])->name('admin.user.store');
-        Route::get('/user',  [AdminUserController::class, "index"])->name('admin.user.index');
-        // Route::get('/user/{id}',  [AdminUserController::class, "show"])->name('admin.user.show');
-        Route::get('/user/edit/{id}',  [AdminUserController::class, "edit"])->name('admin.user.edit');
-        Route::post('/user/update/{id}',  [AdminUserController::class, "update"])->name('admin.user.update');
-        Route::get('/user/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
+        Route::prefix('user')->group(function () {
+            Route::get('/create',  [AdminUserController::class, "create"])->name('admin.user.create');
+            Route::post('/store',  [AdminUserController::class, "store"])->name('admin.user.store');
+            Route::get('/',  [AdminUserController::class, "index"])->name('admin.user.index');
+            Route::get('/{id}',  [AdminUserController::class, "show"])->name('admin.user.show');
+            Route::get('/edit/{id}',  [AdminUserController::class, "edit"])->name('admin.user.edit');
+            Route::post('/update/{id}',  [AdminUserController::class, "update"])->name('admin.user.update');
+            Route::get('/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
+        });
         // Company Routes 
-        Route::get('/company/create',  [CompanyController::class, "create"])->name('admin.company.create');
-        Route::post('/company/store',  [CompanyController::class, "store"])->name('admin.company.store');
-        Route::get('/company',  [CompanyController::class, "index"])->name('admin.company.index');
-        // Route::get('/company/{id}',  [CompanyController::class, "show"])->name('admin.company.show');
-        Route::get('/company/edit/{id}',  [CompanyController::class, "edit"])->name('admin.company.edit');
-        Route::post('/company/update/{id}',  [CompanyController::class, "update"])->name('admin.company.update');
-        Route::get('/company/delete/{id}',  [CompanyController::class, "delete"])->name('admin.company.delete');
-        Route::get('/company/toggle-verified/{id}/{is_verified}',  [CompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
+        Route::prefix('company')->group(function () {
+            Route::get('/create',  [CompanyController::class, "create"])->name('admin.company.create');
+            Route::post('/store',  [CompanyController::class, "store"])->name('admin.company.store');
+            Route::get('/',  [CompanyController::class, "index"])->name('admin.company.index');
+            Route::get('/{id}',  [CompanyController::class, "show"])->name('admin.company.show');
+            Route::get('/edit/{id}',  [CompanyController::class, "edit"])->name('admin.company.edit');
+            Route::post('/update/{id}',  [CompanyController::class, "update"])->name('admin.company.update');
+            Route::get('/delete/{id}',  [CompanyController::class, "delete"])->name('admin.company.delete');
+            Route::get('/toggle-verified/{id}/{is_verified}',  [CompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
+        });
         // Job Routes 
-        Route::get('/job/create',  [JobController::class, "create"])->name('admin.job.create');
-        Route::post('/job/store',  [JobController::class, "store"])->name('admin.job.store');
-        Route::get('/job',  [JobController::class, "index"])->name('admin.job.index');
-        // Route::get('/job/{id}',  [JobController::class, "show"])->name('admin.job.show');
-        Route::get('/job/edit/{id}',  [JobController::class, "edit"])->name('admin.job.edit');
-        Route::post('/job/update/{id}',  [JobController::class, "update"])->name('admin.job.update');
-        Route::get('/job/delete/{id}',  [JobController::class, "delete"])->name('admin.job.delete');
-        Route::get('/job/toggle-verified/{id}/{is_verified}',  [JobController::class, "toggleVerified"])->name('admin.job.toggleVerified');
-        Route::get('/job/toggle-featured/{id}/{is_featured}',  [JobController::class, "toggleFeatured"])->name('admin.job.toggleFeatured');
-        Route::get('/job/toggle-active/{id}/{is_active}',  [JobController::class, "toggleActive"])->name('admin.job.toggleActive');
-        // Location Routes // $isUpdated = $this->updateLocation($id, $data);
-        Route::get('/location/create',  [LocationController::class, "create"])->name('admin.location.create');
-        Route::post('/location/store',  [LocationController::class, "store"])->name('admin.location.store');
-        Route::get('/location',  [LocationController::class, "index"])->name('admin.location.index');
-        // Route::get('/location/{id}',  [LocationController::class, "show"])->name('admin.location.show');
-        Route::get('/location/edit/{id}',  [LocationController::class, "edit"])->name('admin.location.edit');
-        Route::post('/location/update/{id}',  [LocationController::class, "update"])->name('admin.location.update');
-        Route::get('/location/delete/{id}',  [LocationController::class, "delete"])->name('admin.location.delete');
-        // Qualification Routesuser
-        Route::get('/qualification/create',  [QualificationController::class, "create"])->name('admin.qualification.create');
-        Route::post('/qualification/store',  [QualificationController::class, "store"])->name('admin.qualification.store');
-        Route::get('/qualification',  [QualificationController::class, "index"])->name('admin.qualification.index');
-        // Route::get('/qualification/{id}',  [QualificationController::class, "show"])->name('admin.qualification.show');
-        Route::get('/qualification/edit/{id}',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
-        Route::post('/qualification/update/{id}',  [QualificationController::class, "update"])->name('admin.qualification.update');
-        Route::get('/qualification/delete/{id}',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
-
+        Route::prefix('job')->group(function () {
+            Route::get('/create',  [JobController::class, "create"])->name('admin.job.create');
+            Route::post('/store',  [JobController::class, "store"])->name('admin.job.store');
+            Route::get('/',  [JobController::class, "index"])->name('admin.job.index');
+            Route::get('/{id}',  [JobController::class, "show"])->name('admin.job.show');
+            Route::get('/edit/{id}',  [JobController::class, "edit"])->name('admin.job.edit');
+            Route::post('/update/{id}',  [JobController::class, "update"])->name('admin.job.update');
+            Route::get('/delete/{id}',  [JobController::class, "delete"])->name('admin.job.delete');
+            Route::get('/toggle-verified/{id}/{is_verified}',  [JobController::class, "toggleVerified"])->name('admin.job.toggleVerified');
+            Route::get('/toggle-featured/{id}/{is_featured}',  [JobController::class, "toggleFeatured"])->name('admin.job.toggleFeatured');
+            Route::get('/toggle-active/{id}/{is_active}',  [JobController::class, "toggleActive"])->name('admin.job.toggleActive');
+        });
         // Job Profiles Routes 
-        Route::get('/job-profile/create',  [ProfileController::class, "create"])->name('admin.job-profile.create');
-        Route::post('/job-profile/store',  [ProfileController::class, "store"])->name('admin.job-profile.store');
-        Route::get('/job-profile',  [ProfileController::class, "index"])->name('admin.job-profile.index');
-        // Route::get('/job-profile/{id}',  [ProfileController::class, "show"])->name('admin.job-profile.show');
-        Route::get('/job-profile/edit/{id}',  [ProfileController::class, "edit"])->name('admin.job-profile.edit');
-        Route::post('/job-profile/update/{id}',  [ProfileController::class, "update"])->name('admin.job-profile.update');
-        Route::get('/job-profile/delete/{id}',  [ProfileController::class, "delete"])->name('admin.job-profile.delete');
+        Route::prefix('/job-profile')->group(function () {
+            Route::get('/create',  [ProfileController::class, "create"])->name('admin.job-profile.create');
+            Route::post('/store',  [ProfileController::class, "store"])->name('admin.job-profile.store');
+            Route::get('/',  [ProfileController::class, "index"])->name('admin.job-profile.index');
+            Route::get('/{id}',  [ProfileController::class, "show"])->name('admin.job-profile.show');
+            Route::get('/edit/{id}',  [ProfileController::class, "edit"])->name('admin.job-profile.edit');
+            Route::post('/update/{id}',  [ProfileController::class, "update"])->name('admin.job-profile.update');
+            Route::get('/delete/{id}',  [ProfileController::class, "delete"])->name('admin.job-profile.delete');
+        });
+        // Location Routes 
+        Route::prefix('location')->group(function () {
+            Route::get('/create',  [LocationController::class, "create"])->name('admin.location.create');
+            Route::post('/store',  [LocationController::class, "store"])->name('admin.location.store');
+            Route::get('/',  [LocationController::class, "index"])->name('admin.location.index');
+            Route::get('/{id}',  [LocationController::class, "show"])->name('admin.location.show');
+            Route::get('/edit/{id}',  [LocationController::class, "edit"])->name('admin.location.edit');
+            Route::post('/update/{id}',  [LocationController::class, "update"])->name('admin.location.update');
+            Route::get('/delete/{id}',  [LocationController::class, "delete"])->name('admin.location.delete');
+        });
+        // Qualification Routes
+        Route::prefix('qualification')->group(function () {
+            Route::get('/create',  [QualificationController::class, "create"])->name('admin.qualification.create');
+            Route::post('/store',  [QualificationController::class, "store"])->name('admin.qualification.store');
+            Route::get('/',  [QualificationController::class, "index"])->name('admin.qualification.index');
+            Route::get('/{id}',  [QualificationController::class, "show"])->name('admin.qualification.show');
+            Route::get('/edit/{id}',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
+            Route::post('/update/{id}',  [QualificationController::class, "update"])->name('admin.qualification.update');
+            Route::get('/delete/{id}',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
+        });
     });
 });

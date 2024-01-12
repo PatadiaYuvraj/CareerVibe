@@ -6,19 +6,19 @@
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
-                    <span class="h3 text-black">Add Qualification</span>
-                    <a href="{{ route('admin.qualification.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
+                    <span class="h3 text-black">Update Profile</span>
+                    <a href="{{ route('admin.job-profile.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <div class="card">
                         <div class="card-body">
-                            <form action="{{ route('admin.qualification.update', $qualification['id']) }}" method="POST">
+                            <form action="{{ route('admin.job-profile.update', $profile['id']) }}" method="POST">
                                 @csrf
                                 <div class="mb-3">
-                                    <label for="qualification" class="form-label">Qualification</label>
-                                    <input type="text" name="qualification" class="form-control"
-                                        value="{{ old('qualification', $qualification['qualification']) }}">
-                                    @error('qualification')
+                                    <label for="profile" class="form-label">Job Profile</label>
+                                    <input type="text" name="profile" class="form-control"
+                                        value="{{ old('profile', $profile['profile']) }}">
+                                    @error('profile')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>

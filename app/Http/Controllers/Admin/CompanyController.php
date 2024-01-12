@@ -11,14 +11,12 @@ use Illuminate\Support\Facades\Validator;
 class CompanyController extends Controller
 {
 
-    // test method
-    public function test()
-    {
-        // get company with jobs
-        $companies = Company::with('jobs')->get()->toArray();
-        dd($companies);
-    }
+    private Company $company;
 
+    public function __construct(Company $company)
+    {
+        $this->company = $company;
+    }
 
     public function create()
     {
@@ -46,7 +44,7 @@ class CompanyController extends Controller
                 "linkedin_profile" => $request->get("linkedin_profile") || null,
                 "description" => $request->get("description") || null,
             ];
-            $isCreated = Company::create($data);
+            $isCreated = $this->company->create($data);
             if ($isCreated) {
                 return redirect()->route('admin.company.index')->with('success', 'Company is created');
             }
@@ -59,20 +57,27 @@ class CompanyController extends Controller
 
     public function index()
     {
-        $companies = Company::all()->toArray();
+        $companies = $this->company->all()->toArray();
         return view('admin.company.index', compact('companies'));
     }
 
-    // public function show($id)
-    // {
-    //     // $Company = $this->QetCompanyById($id);
-    //     $Company = Company::find($id);
-    //     return view('admin.Company.show', compact('Company'));
-    // }
+    public function show($id)
+    {
+        $company = $this->company->where('id', $id)->get()->ToArray();
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $company = $company[0];
+        return view('admin.company.show', compact('company'));
+    }
 
     public function edit($id)
     {
-        $company = Company::find($id);
+        $company = $this->company->where('id', $id)->get()->ToArray();
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $company = $company[0];
         return view('admin.company.edit', compact('company'));
     }
 
@@ -82,9 +87,9 @@ class CompanyController extends Controller
         $validate = Validator::make($request->all(), [
             "name" => "required|string|max:60",
             "email" => "required",
-            "password" => "string|max:100",
+            // "password" => "string|max:100",
             "website" => "required|string|max:100",
-            "address_line_1" => "required|string|max:100",
+            // "address_line_1" => "required|string|max:100",
         ]);
         if ($validate->passes()) {
             $data = [
@@ -97,7 +102,7 @@ class CompanyController extends Controller
                 "linkedin_profile" => $request->get("linkedin_profile") || null,
                 "description" => $request->get("description") || null,
             ];
-            $isUpdated = Company::find($id)->update($data);
+            $isUpdated = $this->company->find($id)->update($data);
             if ($isUpdated) {
                 return redirect()->route('admin.company.index')->with('success', 'Company is updated');
             }
@@ -112,7 +117,7 @@ class CompanyController extends Controller
 
     public function delete($id)
     {
-        $isDeleted = Company::find($id)->delete();
+        $isDeleted = $this->company->find($id)->delete();
         if ($isDeleted) {
             return redirect()->route('admin.company.index')->with('success', 'Company is deleted');
         }
@@ -127,7 +132,7 @@ class CompanyController extends Controller
             return redirect()->back()->with("warning", "You are not authorized");
         }
 
-        $company = Company::find($id);
+        $company = $this->company->where('id', $id)->get()->ToArray();
         if (!$company) {
             return redirect()->back()->with("warning", "Company is not found");
         }

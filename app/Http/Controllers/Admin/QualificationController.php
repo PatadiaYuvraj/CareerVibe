@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Validator;
 
 class QualificationController extends Controller
 {
+    private Qualification $qualification;
+
+    public function __construct(Qualification $qualification)
+    {
+        $this->qualification = $qualification;
+    }
+
     public function create()
     {
         return view('admin.qualification.create');
@@ -23,7 +30,7 @@ class QualificationController extends Controller
             $data = [
                 "qualification" => $request->get("qualification"),
             ];
-            $isCreated = Qualification::create($data);
+            $isCreated = $this->qualification->create($data);
             if ($isCreated) {
                 return redirect()->route('admin.qualification.index')->with('success', 'Qualification is created');
             }
@@ -38,22 +45,28 @@ class QualificationController extends Controller
 
     public function index()
     {
-        $qualifications = Qualification::all()->toArray();
+        $qualifications = $this->qualification->all()->toArray();
         return view('admin.qualification.index', compact('qualifications'));
     }
 
-    // public function show($id)
-    // {
-    //     $Qualification = Qualification::where('id', $id)->get()->ToArray();
-    //     return view('admin.Qualification.show', compact('Qualification'));
-    // }
-
-    public function edit($id)
+    public function show($id)
     {
-        $qualification = Qualification::where('id', $id)->get()->ToArray();
+        $qualification = $this->qualification->where('id', $id)->get()->ToArray();
         if (!$qualification) {
             return redirect()->back()->with("warning", "Qualification is not found");
         }
+        $qualification =  $qualification[0];
+        dd($qualification);
+        return view('admin.qualification.show', compact('qualification'));
+    }
+
+    public function edit($id)
+    {
+        $qualification = $this->qualification->where('id', $id)->get()->ToArray();
+        if (!$qualification) {
+            return redirect()->back()->with("warning", "Qualification is not found");
+        }
+        $qualification =  $qualification[0];
         return view('admin.qualification.edit', compact('qualification'));
     }
 
@@ -66,7 +79,7 @@ class QualificationController extends Controller
             $data = [
                 "qualification" => $request->get("qualification"),
             ];
-            $isUpdated = Qualification::find($id)->update($data);
+            $isUpdated = $this->qualification->where('id', $id)->update($data);
             if ($isUpdated) {
                 return redirect()->route('admin.qualification.index')->with('success', 'Qualification is updated');
             }
@@ -81,7 +94,7 @@ class QualificationController extends Controller
 
     public function delete($id)
     {
-        $isDeleted = Qualification::where('id', $id)->delete();
+        $isDeleted = $this->qualification->where('id', $id)->delete();
         if ($isDeleted) {
             return redirect()->route('admin.qualification.index')->with('success', 'Qualification is deleted');
         }

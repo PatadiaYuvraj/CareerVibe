@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+    private User $user;
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
     public function create()
     {
         return view('admin.user.create');
@@ -29,7 +36,7 @@ class UserController extends Controller
                 "password" => $request->get("password"),
                 "password_confirmation" => $request->get("password_confirmation"),
             ];
-            $isCreated = User::create($data);
+            $isCreated = $this->user->create($data);
             if ($isCreated) {
                 return redirect()->route('admin.user.index')->with('success', 'User is created');
             }
@@ -44,26 +51,29 @@ class UserController extends Controller
 
     public function index()
     {
-        $user = User::all()->toArray();
+        $users = $this->user->all()->toArray();
         return view('admin.user.index', compact('users'));
     }
 
     public function show($id)
     {
-        $user = User::where('id', $id)->get()->ToArray();
+        $user = $this->user->where('id', $id)->get()->ToArray();
+        dd($user);
         if (!$user) {
             return redirect()->back()->with("warning", "User is not found");
         }
+        $user  =  $user[0];
         return view('admin.user.show', compact('user'));
     }
 
 
     public function edit($id)
     {
-        $user = User::where('id', $id)->get()->ToArray();
+        $user = $this->user->where('id', $id)->get()->ToArray();
         if (!$user) {
             return redirect()->back()->with("warning", "User is not found");
         }
+        $user  =  $user[0];
         return view('admin.user.edit', compact('user'));
     }
 
@@ -81,7 +91,7 @@ class UserController extends Controller
                 // "password" => $request->get("password"),
                 // "confirm_password" => $request->get("confirm_password"),
             ];
-            $isUpdated = User::find($id)->update($data);
+            $isUpdated = $this->user->where('id', $id)->update($data);
             if ($isUpdated) {
                 return redirect()->route('admin.user.index')->with('success', 'User is updated');
             }
@@ -96,7 +106,7 @@ class UserController extends Controller
 
     public function delete($id)
     {
-        $isDeleted = User::where('id', $id)->delete();
+        $isDeleted = $this->user->where('id', $id)->delete();
         if ($isDeleted) {
             return redirect()->route('admin.user.index')->with('success', 'User is deleted');
         }

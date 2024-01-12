@@ -12,6 +12,6 @@ class TestController extends Controller
     // test func
     public function test()
     {
-        dd("sdugush");
+        dd("Testing...");
     }
 }

@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Validator;
 
 class LocationController extends Controller
 {
+    private Location $location;
+
+    public function __construct(Location $location)
+    {
+        $this->location = $location;
+    }
+
     public function create()
     {
         return view('admin.location.create');
@@ -29,7 +36,7 @@ class LocationController extends Controller
                 "country" => $request->get("country"),
                 "pincode" => $request->get("pincode"),
             ];
-            $isCreated = Location::create($data);
+            $isCreated = $this->location->create($data);
             if ($isCreated) {
                 return redirect()->route('admin.location.index')->with('success', 'Location is created');
             }
@@ -44,19 +51,28 @@ class LocationController extends Controller
 
     public function index()
     {
-        $locations = Location::all()->toArray();
+        $locations = $this->location->all()->toArray();
         return view('admin.location.index', compact('locations'));
     }
 
-    // public function show($id)
-    // {
-    //     $location = $this->getLocationById($id);
-    //     return view('admin.location.show', compact('location'));
-    // }
+    public function show($id)
+    {
+        $location = $this->location->where('id', $id)->get()->ToArray();
+        if (!$location) {
+            return redirect()->back()->with("warning", "Location is not found");
+        }
+        $location =  $location[0];
+        dd($location);
+        return view('admin.location.show', compact('location'));
+    }
 
     public function edit($id)
     {
-        $location = Location::find($id);
+        $location = $this->location->where('id', $id)->get()->ToArray();
+        if (!$location) {
+            return redirect()->back()->with("warning", "Location is not found");
+        }
+        $location =  $location[0];
         return view('admin.location.edit', compact('location'));
     }
 
@@ -75,7 +91,7 @@ class LocationController extends Controller
                 "country" => $request->get("country"),
                 "pincode" => $request->get("pincode"),
             ];
-            $isUpdated = Location::find($id)->update($data);
+            $isUpdated = $this->location->where('id', $id)->update($data);
             if ($isUpdated) {
                 return redirect()->route('admin.location.index')->with('success', 'Location is updated');
             }
@@ -90,7 +106,7 @@ class LocationController extends Controller
 
     public function delete($id)
     {
-        $isDeleted = Location::find($id)->delete();
+        $isDeleted = $this->location->where('id', $id)->delete();
         if ($isDeleted) {
             return redirect()->route('admin.location.index')->with('success', 'Location is deleted');
         }

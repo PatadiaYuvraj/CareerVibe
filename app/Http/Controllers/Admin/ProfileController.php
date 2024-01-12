@@ -9,6 +9,15 @@ use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
+
+    private Profile $profile;
+
+    public function __construct(Profile $profile)
+    {
+        $this->profile = $profile;
+    }
+
+
     public function create()
     {
         return view('admin.job-profile.create');
@@ -23,7 +32,7 @@ class ProfileController extends Controller
             $data = [
                 "profile" => $request->get("profile"),
             ];
-            $isCreated = Profile::create($data);
+            $isCreated = $this->profile->create($data);
             if ($isCreated) {
                 return redirect()->route('admin.job-profile.index')->with('success', 'Profile is created');
             }
@@ -38,22 +47,27 @@ class ProfileController extends Controller
 
     public function index()
     {
-        $profiles = Profile::all()->toArray();
+        $profiles = $this->profile->all()->toArray();
         return view('admin.job-profile.index', compact('profiles'));
     }
 
-    // public function show($id)
-    // {
-    //     $Profile = Profile::where('id', $id)->get()->ToArray();
-    //     return view('admin.Profile.show', compact('Profile'));
-    // }
-
-    public function edit($id)
+    public function show($id)
     {
-        $profile = Profile::where('id', $id)->get()->ToArray();
+        $profile = $this->profile->where('id', $id)->get()->ToArray();
         if (!$profile) {
             return redirect()->back()->with("warning", "Profile is not found");
         }
+        $profile =  $profile[0];
+        return view('admin.profile.show', compact('profile'));
+    }
+
+    public function edit($id)
+    {
+        $profile = $this->profile->where('id', $id)->get()->ToArray();
+        if (!$profile) {
+            return redirect()->back()->with("warning", "Profile is not found");
+        }
+        $profile =  $profile[0];
         return view('admin.job-profile.edit', compact('profile'));
     }
 
@@ -67,7 +81,7 @@ class ProfileController extends Controller
             $data = [
                 "profile" => $request->get("profile"),
             ];
-            $isUpdated = Profile::where('id', $id)->update($data);
+            $isUpdated = $this->profile->where('id', $id)->update($data);
             if ($isUpdated) {
                 return redirect()->route('admin.job-profile.index')->with('success', 'Profile is updated');
             }
@@ -82,7 +96,7 @@ class ProfileController extends Controller
 
     public function delete($id)
     {
-        $isDeleted = Profile::where('id', $id)->delete();
+        $isDeleted =  $this->profile->where('id', $id)->delete();
         if ($isDeleted) {
             return redirect()->route('admin.job-profile.index')->with('success', 'Profile is deleted');
         }

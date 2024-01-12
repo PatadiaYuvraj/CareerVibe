@@ -9,8 +9,15 @@ class Profile extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'profile',
+    ];
+
+    // job profile has many jobs
+
+
     public function jobs()
     {
-        return $this->belongsToMany(Job::class, 'job_profiles', 'profiless_id', 'jobs_id');
+        return $this->hasMany(JobProfile::class, "profiles_id", "jobs_id");
     }
 }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Job;
-use App\Models\Qualification;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,20 +11,13 @@ use Illuminate\Support\Facades\Validator;
 class JobController extends Controller
 {
     private AuthService $auth;
+    private Job $job;
 
-    public function __construct(AuthService $auth)
+    public function __construct(AuthService $auth, Job $job)
     {
         $this->auth = $auth;
+        $this->job = $job;
     }
-
-    // public function test()
-    // {
-
-    //     // $qualification = Qualification::with('jobs')->get()->toArray();
-    //     // // get all jobs with qualification
-    //     // // $jobs = Job::with(['locations', 'qualifications', 'company'])->get()->toArray();
-    //     // dd($qualification);
-    // }
 
     public function create()
     {
@@ -59,7 +51,7 @@ class JobController extends Controller
                 "keywords" => $request->get("keywords"),
                 "work_type" => $request->get("work_type"),
             ];
-            $isCreated = Job::create($data);
+            $isCreated = $this->job->create($data);
             if ($isCreated) {
                 return redirect()->route('admin.job.index')->with('success', 'Job is created');
             }
@@ -72,23 +64,26 @@ class JobController extends Controller
 
     public function index()
     {
-        $jobs = Job::all()->toArray();
+        $jobs = $this->job->all()->toArray();
         return view('admin.job.index', compact('jobs'));
     }
 
-    // public function show($id)
-    // {
-    //     // $Job = $this->QetJobById($id);
-    //     $Job = Job::find($id);
-    //     return view('admin.Job.show', compact('Job'));
-    // }
-
-    public function edit($id)
+    public function show($id)
     {
-        $job = Job::where('id', $id)->get()->ToArray();
+        $job = $this->job->where('id', $id)->get()->ToArray();
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }
+        return view('admin.job.show', compact('job'));
+    }
+
+    public function edit($id)
+    {
+        $job = $this->job->where('id', $id)->get()->ToArray();
+        if (!$job) {
+            return redirect()->back()->with("warning", "Job is not found");
+        }
+        $job  =  $job[0];
         return view('admin.job.edit', compact('job'));
     }
 
@@ -120,8 +115,7 @@ class JobController extends Controller
                 "keywords" => $request->get("keywords"),
                 "work_type" => $request->get("work_type"),
             ];
-            // $isUpdated = $this->updateJob($id, $data);
-            $isUpdated = Job::find($id)->update($data);
+            $isUpdated = $this->job->where('id', $id)->update($data);
             if ($isUpdated) {
                 return redirect()->route('admin.job.index')->with('success', 'Job is updated');
             }
@@ -134,7 +128,7 @@ class JobController extends Controller
 
     public function delete($id)
     {
-        $isDeleted = Job::where('id', $id)->delete();
+        $isDeleted = $this->job->where('id', $id)->delete();
         if ($isDeleted) {
             return redirect()->route('admin.job.index')->with('success', 'Job is deleted');
         }
@@ -147,7 +141,7 @@ class JobController extends Controller
         if (!$this->auth->isAdmin()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $job = Job::find($id);
+        $job = $this->job->where('id', $id)->get()->ToArray();
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }
@@ -167,7 +161,7 @@ class JobController extends Controller
         if (!$this->auth->isAdmin() && !$this->auth->isCompany()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $job = Job::find($id);
+        $job = $this->job->where('id', $id)->get()->ToArray();
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }
@@ -187,7 +181,7 @@ class JobController extends Controller
         if (!$this->auth->isAdmin() && !$this->auth->isCompany()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $job = Job::find($id);
+        $job = $this->job->where('id', $id)->get()->ToArray();
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }

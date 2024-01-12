@@ -21,7 +21,7 @@ class AdminController extends Controller
     public function dashboard()
     {
         $admin_id = Auth::guard('admin')->user()->id;
-        $admin = Admin::find($admin_id)?->toArray();
+        $admin = Admin::find($admin_id)->toArray();
         return view('admin.dashboard.index', compact('admin'));
     }
 
