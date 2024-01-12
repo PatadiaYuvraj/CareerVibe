@@ -22,17 +22,17 @@ class AdminController extends Controller
     {
         $admin_id = Auth::guard('admin')->user()->id;
         $admin = Admin::find($admin_id)?->toArray();
-        return view('admin.index', compact('admin'));
+        return view('admin.dashboard.index', compact('admin'));
     }
 
     public function login()
     {
-        return view('admin.login');
+        return view('admin.auth.login');
     }
 
     public function register()
     {
-        return view('admin.register');
+        return view('admin.auth.register');
     }
 
     public function doLogin(Request $request)

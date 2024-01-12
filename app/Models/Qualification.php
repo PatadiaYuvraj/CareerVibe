@@ -12,4 +12,10 @@ class Qualification extends Model
     protected $fillable = [
         'qualification',
     ];
+
+    // qualification has many jobs
+    public function jobs()
+    {
+        return $this->belongsToMany(Job::class, 'job_qualifications', 'qualifications_id', 'jobs_id');
+    }
 }

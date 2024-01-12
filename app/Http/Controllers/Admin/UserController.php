@@ -44,8 +44,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $data = User::all();
-        $users = $data;
+        $user = User::all()->toArray();
         return view('admin.user.index', compact('users'));
     }
 

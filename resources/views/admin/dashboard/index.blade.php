@@ -12,7 +12,7 @@
                     <div class="card">
                         <div class="card-body">
 
-                            DashBoard Body
+                            DashBoard Bod
 
                         </div>
                     </div>

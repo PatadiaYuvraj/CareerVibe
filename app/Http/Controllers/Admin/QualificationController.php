@@ -51,6 +51,9 @@ class QualificationController extends Controller
     public function edit($id)
     {
         $qualification = Qualification::where('id', $id)->get()->ToArray();
+        if (!$qualification) {
+            return redirect()->back()->with("warning", "Qualification is not found");
+        }
         return view('admin.qualification.edit', compact('qualification'));
     }
 

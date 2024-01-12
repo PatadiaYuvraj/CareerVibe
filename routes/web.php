@@ -24,10 +24,14 @@ use App\Http\Controllers\Front\UserController as FrontUserController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\QualificationController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/test',  [FrontUserController::class, "test"])->name('test');
-Route::post('/testing',  [FrontUserController::class, "testing"])->name('testing');
+Route::get('/test',  [TestController::class, "test"])->name('test');
+Route::post('/testing',  [TestController::class, "testing"])->name('testing');
+
+
 Route::group(['middleware' => "isGuest"], function () {
 
     Route::get('/login',  [FrontUserController::class, "login"])->name('login');
@@ -81,7 +85,6 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::post('/user/update/{id}',  [AdminUserController::class, "update"])->name('admin.user.update');
         Route::get('/user/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
         // Company Routes 
-        Route::get('/company/test',  [CompanyController::class, "test"])->name('admin.company.test');
         Route::get('/company/create',  [CompanyController::class, "create"])->name('admin.company.create');
         Route::post('/company/store',  [CompanyController::class, "store"])->name('admin.company.store');
         Route::get('/company',  [CompanyController::class, "index"])->name('admin.company.index');
@@ -91,7 +94,6 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::get('/company/delete/{id}',  [CompanyController::class, "delete"])->name('admin.company.delete');
         Route::get('/company/toggle-verified/{id}/{is_verified}',  [CompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
         // Job Routes 
-        Route::get('/job/test',  [JobController::class, "test"])->name('admin.job.test');
         Route::get('/job/create',  [JobController::class, "create"])->name('admin.job.create');
         Route::post('/job/store',  [JobController::class, "store"])->name('admin.job.store');
         Route::get('/job',  [JobController::class, "index"])->name('admin.job.index');
@@ -118,5 +120,14 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::get('/qualification/edit/{id}',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
         Route::post('/qualification/update/{id}',  [QualificationController::class, "update"])->name('admin.qualification.update');
         Route::get('/qualification/delete/{id}',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
+
+        // Job Profiles Routes 
+        Route::get('/job-profile/create',  [ProfileController::class, "create"])->name('admin.job-profile.create');
+        Route::post('/job-profile/store',  [ProfileController::class, "store"])->name('admin.job-profile.store');
+        Route::get('/job-profile',  [ProfileController::class, "index"])->name('admin.job-profile.index');
+        // Route::get('/job-profile/{id}',  [ProfileController::class, "show"])->name('admin.job-profile.show');
+        Route::get('/job-profile/edit/{id}',  [ProfileController::class, "edit"])->name('admin.job-profile.edit');
+        Route::post('/job-profile/update/{id}',  [ProfileController::class, "update"])->name('admin.job-profile.update');
+        Route::get('/job-profile/delete/{id}',  [ProfileController::class, "delete"])->name('admin.job-profile.delete');
     });
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Job;
+use App\Models\Qualification;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -17,11 +18,14 @@ class JobController extends Controller
         $this->auth = $auth;
     }
 
-    public function test()
-    {
-        // get location with jobs
-        $jobs = Job::with('locations')->get()->toArray();
-    }
+    // public function test()
+    // {
+
+    //     // $qualification = Qualification::with('jobs')->get()->toArray();
+    //     // // get all jobs with qualification
+    //     // // $jobs = Job::with(['locations', 'qualifications', 'company'])->get()->toArray();
+    //     // dd($qualification);
+    // }
 
     public function create()
     {
