@@ -4,11 +4,22 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class CompanyController extends Controller
 {
+
+    // test method
+    public function test()
+    {
+        // get company with jobs
+        $companies = Company::with('jobs')->get()->toArray();
+        dd($companies);
+    }
+
+
     public function create()
     {
         return view('admin.company.create');
@@ -21,11 +32,8 @@ class CompanyController extends Controller
             "email" => "required|email|unique:companies,email",
             "password" => "required|string|max:100",
             "password_confirmation" => "required|string|max:100|same:password",
-            "website" => "required|string|max:100",
+            "website" => "required|string|max:100|url|unique:companies,website",
             "address_line_1" => "required|string|max:100",
-            "address_line_2" => "string|max:100",
-            "linkedin_profile" => "string|max:100",
-            "description" => "string|max:100",
         ]);
         if ($validate->passes()) {
             $data = [
@@ -34,9 +42,9 @@ class CompanyController extends Controller
                 "password" => $request->get("password"),
                 "website" => $request->get("website"),
                 "address_line_1" => $request->get("address_line_1"),
-                "address_line_2" => $request->get("address_line_2"),
-                "linkedin_profile" => $request->get("linkedin_profile"),
-                "description" => $request->get("description"),
+                "address_line_2" => $request->get("address_line_2") || null,
+                "linkedin_profile" => $request->get("linkedin_profile") || null,
+                "description" => $request->get("description") || null,
             ];
             $isCreated = Company::create($data);
             if ($isCreated) {
@@ -51,7 +59,7 @@ class CompanyController extends Controller
 
     public function index()
     {
-        $companies = Company::all();
+        $companies = Company::all()->toArray();
         return view('admin.company.index', compact('companies'));
     }
 
@@ -77,9 +85,6 @@ class CompanyController extends Controller
             "password" => "string|max:100",
             "website" => "required|string|max:100",
             "address_line_1" => "required|string|max:100",
-            "address_line_2" => "string|max:100",
-            "linkedin_profile" => "string|max:100",
-            "description" => "string|max:100",
         ]);
         if ($validate->passes()) {
             $data = [
@@ -88,9 +93,9 @@ class CompanyController extends Controller
                 "password" => $request->get("password"),
                 "website" => $request->get("website"),
                 "address_line_1" => $request->get("address_line_1"),
-                "address_line_2" => $request->get("address_line_2"),
-                "linkedin_profile" => $request->get("linkedin_profile"),
-                "description" => $request->get("description"),
+                "address_line_2" => $request->get("address_line_2") || null,
+                "linkedin_profile" => $request->get("linkedin_profile") || null,
+                "description" => $request->get("description") || null,
             ];
             $isUpdated = Company::find($id)->update($data);
             if ($isUpdated) {
@@ -115,10 +120,18 @@ class CompanyController extends Controller
     }
 
     // toggle verified
-    public function toggleVerified($id)
+    public function toggleVerified($id, $is_verified)
     {
+        $auth = new AuthService();
+        if (!$auth->isAdmin()) {
+            return redirect()->back()->with("warning", "You are not authorized");
+        }
+
         $company = Company::find($id);
-        if ($company->is_verified == 1) {
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        if ($is_verified == 1) {
             $company->is_verified = 0;
             $company->save();
             return redirect()->back()->with('success', 'Company is unverified');

@@ -81,6 +81,7 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::post('/user/update/{id}',  [AdminUserController::class, "update"])->name('admin.user.update');
         Route::get('/user/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
         // Company Routes 
+        Route::get('/company/test',  [CompanyController::class, "test"])->name('admin.company.test');
         Route::get('/company/create',  [CompanyController::class, "create"])->name('admin.company.create');
         Route::post('/company/store',  [CompanyController::class, "store"])->name('admin.company.store');
         Route::get('/company',  [CompanyController::class, "index"])->name('admin.company.index');
@@ -88,8 +89,9 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::get('/company/edit/{id}',  [CompanyController::class, "edit"])->name('admin.company.edit');
         Route::post('/company/update/{id}',  [CompanyController::class, "update"])->name('admin.company.update');
         Route::get('/company/delete/{id}',  [CompanyController::class, "delete"])->name('admin.company.delete');
-        Route::get('/company/toggle-verified/{id}',  [CompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
+        Route::get('/company/toggle-verified/{id}/{is_verified}',  [CompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
         // Job Routes 
+        Route::get('/job/test',  [JobController::class, "test"])->name('admin.job.test');
         Route::get('/job/create',  [JobController::class, "create"])->name('admin.job.create');
         Route::post('/job/store',  [JobController::class, "store"])->name('admin.job.store');
         Route::get('/job',  [JobController::class, "index"])->name('admin.job.index');
@@ -97,6 +99,9 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::get('/job/edit/{id}',  [JobController::class, "edit"])->name('admin.job.edit');
         Route::post('/job/update/{id}',  [JobController::class, "update"])->name('admin.job.update');
         Route::get('/job/delete/{id}',  [JobController::class, "delete"])->name('admin.job.delete');
+        Route::get('/job/toggle-verified/{id}/{is_verified}',  [JobController::class, "toggleVerified"])->name('admin.job.toggleVerified');
+        Route::get('/job/toggle-featured/{id}/{is_featured}',  [JobController::class, "toggleFeatured"])->name('admin.job.toggleFeatured');
+        Route::get('/job/toggle-active/{id}/{is_active}',  [JobController::class, "toggleActive"])->name('admin.job.toggleActive');
         // Location Routes // $isUpdated = $this->updateLocation($id, $data);
         Route::get('/location/create',  [LocationController::class, "create"])->name('admin.location.create');
         Route::post('/location/store',  [LocationController::class, "store"])->name('admin.location.store');

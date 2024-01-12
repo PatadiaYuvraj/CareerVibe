@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('company_id')->unsigned();
             $table->string('job_profile', 100); // One to Many 
             $table->tinyInteger("vacancy")->nullable(); // no of vacancy of this job
-            // $table->tinyInteger("applicant")->nullable(); // no of applicants of this job
-            $table->tinyInteger("min_salary")->nullable();
-            $table->tinyInteger("max_salary")->isEmployernullable();
+            $table->mediumInteger("min_salary")->nullable();
+            $table->mediumInteger("max_salary")->nullable();
             $table->text('description')->nullable();
             $table->text('responsibility')->nullable();
             $table->text('benifits_perks')->nullable();
@@ -27,6 +27,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->string('keywords')->nullable();
             $table->enum('work_type', ['REMOTE', "WFO", "HYBRID"])->nullable();
+            // company relation
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->timestamps();
         });
     }

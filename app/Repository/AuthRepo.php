@@ -6,5 +6,5 @@ interface AuthRepo
 {
     public function isUser(): bool;
     public function isAdmin(): bool;
-    public function isComapny(): bool;
+    public function isCompany(): bool;
 }

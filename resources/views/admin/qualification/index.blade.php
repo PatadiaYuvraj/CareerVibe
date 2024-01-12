@@ -17,21 +17,25 @@
                         <div class="card-body">
 
                             <!-- Table with stripped rows -->
-                            <table class="table datatable">
+                            <table class="table datatable table-striped">
                                 {{-- populate data of qualification in table --}}
                                 <thead>
                                     <tr>
-                                        <th>name</th>
+                                        {{-- # --}}
+                                        <th>#</th>
+                                        <th>Name</th>
                                         <th>Created At</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
 
-                                    @forelse ($qualifications as $qualification)
+                                    @foreach ($qualifications as $qualification)
                                         <tr>
+                                            <td>{{ $loop->iteration }}</td>
                                             <td>{{ $qualification['qualification'] }}</td>
-                                            <td>{{ $qualification['created_at'] }}</td>
+                                            {{--   print date and time of created_at --}}
+                                            <td>{{ date('d-m-Y', strtotime($qualification['created_at'])) }}</td>
                                             <td>
                                                 <a href="{{ route('admin.qualification.edit', $qualification['id']) }}"
                                                     class="btn btn-sm btn-primary">Edit</a>
@@ -39,11 +43,7 @@
                                                     class="btn btn-sm btn-danger">Delete</a>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center">No Data Found</td>
-                                        </tr>
-                                    @endforelse
+                                    @endforeach
                             </table>
                             <!-- End Table with stripped rows -->
 

@@ -17,7 +17,7 @@ class AuthService implements AuthRepo
         return Auth::guard('admin')->check();
     }
 
-    public function isComapny(): bool
+    public function isCompany(): bool
     {
         return Auth::guard('company')->check();
     }

@@ -17,20 +17,24 @@ class AdminController extends Controller
     {
         $this->admin = $admin;
     }
+
     public function dashboard()
     {
         $admin_id = Auth::guard('admin')->user()->id;
         $admin = Admin::find($admin_id)?->toArray();
         return view('admin.index', compact('admin'));
     }
+
     public function login()
     {
         return view('admin.login');
     }
+
     public function register()
     {
         return view('admin.register');
     }
+
     public function doLogin(Request $request)
     {
         $validate = $this->admin->validateAdmin($request, false);
@@ -53,7 +57,6 @@ class AdminController extends Controller
                 ->withInput();
         }
     }
-
 
     public function doRegister(Request $request)
     {

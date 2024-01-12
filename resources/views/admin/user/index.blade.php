@@ -15,23 +15,24 @@
                     <div class="card">
                         <div class="card-body">
 
-                            <!-- Table with stripped rows -->
-                            <table class="table datatable">
+                            <table class="table datatable table-striped">
                                 <thead>
                                     <tr>
+                                        <th>#</th>
                                         <th>Name</th>
                                         <th>Email</th>
-                                        <th>Created At</th>
+                                        {{-- <th>Created At</th> --}}
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
 
-                                    @forelse ($users as $user)
+                                    @foreach ($users as $user)
                                         <tr>
+                                            <td>{{ $loop->iteration }}</td>
                                             <td>{{ $user['name'] }}</td>
                                             <td>{{ $user['email'] }}</td>
-                                            <td>{{ date('d-m-Y', strtotime($user['created_at'])) }}</td>
+                                            {{-- <td>{{ date('d-m-Y', strtotime($user['created_at'])) }}</td> --}}
                                             <td>
                                                 <a href="{{ route('admin.user.edit', $user['id']) }}"
                                                     class="btn btn-sm btn-primary">Edit</a>
@@ -39,11 +40,7 @@
                                                     class="btn btn-sm btn-danger">Delete</a>
                                             </td>
                                         </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center">No Data Found</td>
-                                        </tr>
-                                    @endforelse
+                                    @endforeach
 
                                 </tbody>
                             </table>

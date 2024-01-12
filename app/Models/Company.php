@@ -48,4 +48,9 @@ class Company extends Authenticatable
     //     'email_verified_at' => 'datetime',
     //     'password' => 'hashed',
     // ];
+
+    public function jobs()
+    {
+        return $this->hasMany(Job::class, 'company_id', 'id');
+    }
 }

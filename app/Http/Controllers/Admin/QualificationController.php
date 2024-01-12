@@ -38,19 +38,19 @@ class QualificationController extends Controller
 
     public function index()
     {
-        $qualifications = Qualification::all();
+        $qualifications = Qualification::all()->toArray();
         return view('admin.qualification.index', compact('qualifications'));
     }
 
     // public function show($id)
     // {
-    //     $Qualification = $this->QetqualificationById($id);
+    //     $Qualification = Qualification::where('id', $id)->get()->ToArray();
     //     return view('admin.Qualification.show', compact('Qualification'));
     // }
 
     public function edit($id)
     {
-        $qualification = Qualification::find($id);
+        $qualification = Qualification::where('id', $id)->get()->ToArray();
         return view('admin.qualification.edit', compact('qualification'));
     }
 
@@ -78,7 +78,7 @@ class QualificationController extends Controller
 
     public function delete($id)
     {
-        $isDeleted = Qualification::find($id)->delete();
+        $isDeleted = Qualification::where('id', $id)->delete();
         if ($isDeleted) {
             return redirect()->route('admin.qualification.index')->with('success', 'Qualification is deleted');
         }
