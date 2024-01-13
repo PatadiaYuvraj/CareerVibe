@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Profile;
+use App\Models\JobProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class ProfileController extends Controller
+class JobProfileController extends Controller
 {
 
-    private Profile $profile;
+    private JobProfile $profile;
 
-    public function __construct(Profile $profile)
+    public function __construct(JobProfile $profile)
     {
         $this->profile = $profile;
     }
@@ -47,7 +47,7 @@ class ProfileController extends Controller
 
     public function index()
     {
-        $profiles = $this->profile->all()->toArray();
+        $profiles = $this->profile->paginate(1);
         return view('admin.job-profile.index', compact('profiles'));
     }
 

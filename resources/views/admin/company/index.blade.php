@@ -43,11 +43,17 @@
                                                 </a>
                                             </td>
                                             {{-- <td>{{ date('d-m-Y', strtotime($company['created_at'])) }}</td> --}}
-                                            <td>
-                                                <a href="{{ route('admin.company.edit', $company['id']) }}"
-                                                    class="btn btn-sm btn-primary">Edit</a>
-                                                <a href="{{ route('admin.company.delete', $company['id']) }}"
-                                                    class="btn btn-sm btn-danger">Delete</a>
+                                            <td class="col-2">
+                                                <div class="btn-group btn-group-sm d-flex">
+                                                    @if ($company['is_verified'])
+                                                        <a href="{{ route('admin.job.create', $company['id']) }}"
+                                                            class="btn btn-sm btn-primary">Add Job</a>
+                                                    @endif
+                                                    <a href="{{ route('admin.company.edit', $company['id']) }}"
+                                                        class="btn btn-sm btn-primary">Edit</a>
+                                                    <a href="{{ route('admin.company.delete', $company['id']) }}"
+                                                        class="btn btn-sm btn-primary">Delete</a>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach

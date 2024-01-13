@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id')->unsigned();
+            $table->bigInteger('profile_id')->unsigned();
             $table->tinyInteger("vacancy")->nullable(); // no of vacancy of this job
             $table->mediumInteger("min_salary")->nullable();
             $table->mediumInteger("max_salary")->nullable();
@@ -27,6 +28,7 @@ return new class extends Migration
             $table->string('keywords')->nullable();
             $table->enum('work_type', ['REMOTE', "WFO", "HYBRID"])->nullable();
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+            $table->foreign('profile_id')->references('id')->on('job_profiles')->onDelete('cascade');
             $table->timestamps();
         });
     }

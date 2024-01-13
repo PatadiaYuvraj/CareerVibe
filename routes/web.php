@@ -24,7 +24,7 @@ use App\Http\Controllers\Front\UserController as FrontUserController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\QualificationController;
-use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\JobProfileController;
 use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 
@@ -99,8 +99,8 @@ Route::group(['middleware' => "isAdmin"], function () {
         });
         // Job Routes 
         Route::prefix('job')->group(function () {
-            Route::get('/create',  [JobController::class, "create"])->name('admin.job.create');
-            Route::post('/store',  [JobController::class, "store"])->name('admin.job.store');
+            Route::get('/create/{id}',  [JobController::class, "create"])->name('admin.job.create');
+            Route::post('/store/{id}',  [JobController::class, "store"])->name('admin.job.store');
             Route::get('/',  [JobController::class, "index"])->name('admin.job.index');
             Route::get('/{id}',  [JobController::class, "show"])->name('admin.job.show');
             Route::get('/edit/{id}',  [JobController::class, "edit"])->name('admin.job.edit');
@@ -112,13 +112,13 @@ Route::group(['middleware' => "isAdmin"], function () {
         });
         // Job Profiles Routes 
         Route::prefix('/job-profile')->group(function () {
-            Route::get('/create',  [ProfileController::class, "create"])->name('admin.job-profile.create');
-            Route::post('/store',  [ProfileController::class, "store"])->name('admin.job-profile.store');
-            Route::get('/',  [ProfileController::class, "index"])->name('admin.job-profile.index');
-            Route::get('/{id}',  [ProfileController::class, "show"])->name('admin.job-profile.show');
-            Route::get('/edit/{id}',  [ProfileController::class, "edit"])->name('admin.job-profile.edit');
-            Route::post('/update/{id}',  [ProfileController::class, "update"])->name('admin.job-profile.update');
-            Route::get('/delete/{id}',  [ProfileController::class, "delete"])->name('admin.job-profile.delete');
+            Route::get('/create',  [JobProfileController::class, "create"])->name('admin.job-profile.create');
+            Route::post('/store',  [JobProfileController::class, "store"])->name('admin.job-profile.store');
+            Route::get('/',  [JobProfileController::class, "index"])->name('admin.job-profile.index');
+            Route::get('/{id}',  [JobProfileController::class, "show"])->name('admin.job-profile.show');
+            Route::get('/edit/{id}',  [JobProfileController::class, "edit"])->name('admin.job-profile.edit');
+            Route::post('/update/{id}',  [JobProfileController::class, "update"])->name('admin.job-profile.update');
+            Route::get('/delete/{id}',  [JobProfileController::class, "delete"])->name('admin.job-profile.delete');
         });
         // Location Routes 
         Route::prefix('location')->group(function () {

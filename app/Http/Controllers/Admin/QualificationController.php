@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Qualification;
 use Illuminate\Http\Request;
+use DB;
 use Illuminate\Support\Facades\Validator;
 
 class QualificationController extends Controller
@@ -30,7 +31,9 @@ class QualificationController extends Controller
             $data = [
                 "qualification" => $request->get("qualification"),
             ];
-            $isCreated = $this->qualification->create($data);
+            // $isCreated = $this->qualification->create($data);
+            // optimised way to create data
+            $isCreated = $this->qualification->insert($data);
             if ($isCreated) {
                 return redirect()->route('admin.qualification.index')->with('success', 'Qualification is created');
             }
@@ -45,7 +48,7 @@ class QualificationController extends Controller
 
     public function index()
     {
-        $qualifications = $this->qualification->all()->toArray();
+        $qualifications = $this->qualification->paginate(5);
         return view('admin.qualification.index', compact('qualifications'));
     }
 
@@ -94,6 +97,7 @@ class QualificationController extends Controller
 
     public function delete($id)
     {
+        // optimised way to delete data
         $isDeleted = $this->qualification->where('id', $id)->delete();
         if ($isDeleted) {
             return redirect()->route('admin.qualification.index')->with('success', 'Qualification is deleted');

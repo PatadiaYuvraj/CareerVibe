@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('qualifications', function (Blueprint $table) {
             $table->id();
-            $table->string('qualification', 100);
+            $table->string('qualification', 20);
+            $table->index(['qualification', 'id']);
             $table->timestamps();
         });
     }

@@ -51,7 +51,7 @@ class LocationController extends Controller
 
     public function index()
     {
-        $locations = $this->location->all()->toArray();
+        $locations = $this->location->paginate(2);
         return view('admin.location.index', compact('locations'));
     }
 

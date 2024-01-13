@@ -17,14 +17,13 @@
                         <div class="card-body">
 
                             <!-- Table with stripped rows -->
-                            <table class="table datatable table-striped">
+                            <table class="table  table-striped">
                                 {{-- populate data of qualification in table --}}
                                 <thead>
                                     <tr>
                                         {{-- # --}}
                                         <th>#</th>
                                         <th>Name</th>
-                                        <th>Created At</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -34,8 +33,6 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>{{ $qualification['qualification'] }}</td>
-                                            {{--   print date and time of created_at --}}
-                                            <td>{{ date('d-m-Y', strtotime($qualification['created_at'])) }}</td>
                                             <td>
                                                 <a href="{{ route('admin.qualification.edit', $qualification['id']) }}"
                                                     class="btn btn-sm btn-primary">Edit</a>
@@ -44,9 +41,11 @@
                                             </td>
                                         </tr>
                                     @endforeach
+                                </tbody>
                             </table>
-                            <!-- End Table with stripped rows -->
-
+                            <div class="justify-content-center">
+                                {{ $qualifications->links('pagination::bootstrap-5') }}
+                            </div>
                         </div>
                     </div>
                 </div>

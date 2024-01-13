@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Models\Job;
+use App\Models\JobProfile;
+use App\Models\Location;
+use App\Models\Profile;
+use App\Models\Qualification;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -16,16 +21,32 @@ class JobController extends Controller
     public function __construct(AuthService $auth, Job $job)
     {
         $this->auth = $auth;
+
         $this->job = $job;
     }
 
-    public function create()
+    public function create($company_id)
     {
-        return view('admin.job.create');
+        $company = Company::where('id', $company_id)->get()->toArray();
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $company = $company[0];
+        if ($company['is_verified'] == 0) {
+            return redirect()->back()->with("warning", "Company is not verified");
+        }
+        $job_profiles = JobProfile::all()->toArray();
+        $locations = Location::all()->toArray();
+        $qualifications = Qualification::all()->toArray();
+
+        // dd($company, $job_profiles, $locations, $qualifications);
+        return view('admin.job.create', compact('company', 'job_profiles', 'locations', 'qualifications'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $id)
     {
+        dd($request->all());
+
         $validate = Validator::make($request->all(), [
             "job_profile" => "required|string|max:100",
             "vacancy" => "required|integer",
@@ -51,6 +72,7 @@ class JobController extends Controller
                 "keywords" => $request->get("keywords"),
                 "work_type" => $request->get("work_type"),
             ];
+            dd($data);
             $isCreated = $this->job->create($data);
             if ($isCreated) {
                 return redirect()->route('admin.job.index')->with('success', 'Job is created');
@@ -64,7 +86,7 @@ class JobController extends Controller
 
     public function index()
     {
-        $jobs = $this->job->all()->toArray();
+        $jobs = $this->job->with(['profile', "company", "qualifications", "locations"])->get()->toArray();
         return view('admin.job.index', compact('jobs'));
     }
 

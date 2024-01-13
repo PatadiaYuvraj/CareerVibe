@@ -15,7 +15,7 @@
                     <div class="card">
                         <div class="card-body">
 
-                            <table class="table datatable table-striped">
+                            <table class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -46,6 +46,9 @@
                             </table>
                             <!-- End Table with stripped rows -->
 
+                            <div class="justify-content-center">
+                                {{ $users->links('pagination::bootstrap-5') }}
+                            </div>
                         </div>
                     </div>
                 </div>

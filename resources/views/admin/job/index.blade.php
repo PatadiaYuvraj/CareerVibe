@@ -9,7 +9,7 @@
                     <span class="h3 text-black">
                         Job
                     </span>
-                    <a href="{{ route('admin.job.create') }}" class="float-end btn btn-sm btn-primary">Add Job</a>
+                    {{-- <a href="{{ route('admin.job.create') }}" class="float-end btn btn-sm btn-primary">Add Job</a> --}}
                 </div>
                 <div class="card-body">
                     <div class="card">

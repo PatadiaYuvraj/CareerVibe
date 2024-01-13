@@ -51,7 +51,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = $this->user->all()->toArray();
+        $users = $this->user->paginate(5);
         return view('admin.user.index', compact('users'));
     }
 

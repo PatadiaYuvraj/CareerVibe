@@ -47,6 +47,6 @@ class Job extends Model
     // job has one profile
     public function profile()
     {
-        return $this->hasMany(JobProfile::class, 'profiles_id', 'jobs_id');
+        return $this->belongsTo(JobProfile::class, 'profile_id', 'id');
     }
 }

@@ -16,7 +16,7 @@
                     <div class="card">
                         <div class="card-body">
 
-                            <table class="table datatable table-striped">
+                            <table class="table table-striped">
                                 {{-- populate data of qualification in table --}}
                                 <thead>
                                     <tr>
@@ -41,8 +41,12 @@
                                             </td>
                                         </tr>
                                     @endforeach
+                                </tbody>
                             </table>
-
+                            {{-- paginate    --}}
+                            <div class="justify-content-center">
+                                {{ $profiles->links('pagination::bootstrap-5') }}
+                            </div>
                         </div>
                     </div>
                 </div>

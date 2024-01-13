@@ -131,8 +131,7 @@ class CompanyController extends Controller
         if (!$auth->isAdmin()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-
-        $company = $this->company->where('id', $id)->get()->ToArray();
+        $company = $this->company->find($id);
         if (!$company) {
             return redirect()->back()->with("warning", "Company is not found");
         }

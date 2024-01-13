@@ -17,7 +17,7 @@
                         <div class="card-body">
 
                             <!-- Table with stripped rows -->
-                            <table class="table datatable table-striped">
+                            <table class="table  table-striped">
                                 {{-- populate data of location in table --}}
                                 <thead>
                                     <tr>
@@ -48,10 +48,14 @@
                                             </td>
                                         </tr>
                                     @endforeach
+
                             </table>
-                            <!-- End Table with stripped rows -->
+                            <div class="justify-content-center">
+                                {{ $locations->links('pagination::bootstrap-5') }}
+                            </div>
 
                         </div>
+
                     </div>
                 </div>
             </div>
