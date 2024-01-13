@@ -1,4 +1,3 @@
-{{-- @dd($jobs[0]['profile']) --}}
 @extends('admin.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
@@ -6,46 +5,54 @@
 
         <section class="section dashboard">
             <div class="card">
-                <div class="card-header pagetitle">
-                    <span class="h3 text-black">
-                        Job
-                    </span>
-                    {{-- <a href="{{ route('admin.job.create') }}" class="float-end btn btn-sm btn-primary">Add Job</a> --}}
+                <div class="card-header">
+                    <nav aria-label="breadcrumb" class="">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.job-profile.index') }}">Profile</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Show</li>
+                        </ol>
+                    </nav>
+                    {{-- <a href="{{ route('admin.job-profile.index') }}" class="float-end btn btn-sm btn-primary">Back</a> --}}
                 </div>
                 <div class="card-body">
+                    {{--  --}}
+
+                    <div class="jumbotron">
+                        <h1 class="display-5">{{ $profile['profile'] }}</h1>
+                        <p class="lead">Created At :
+                            @if ($profile['created_at'])
+                                {{ date('d-m-Y', strtotime($profile['created_at'])) }}
+                            @else
+                                {{ 'N/A' }}
+                            @endif
+                        </p>
+                        <p class="lead">
+                            <a class="btn btn-outline-primary btn"
+                                href="{{ route('admin.job-profile.edit', $profile['id']) }}">Edit</a>
+                        </p>
+                    </div>
+
                     <div class="card">
+                        <div class="card-header"></div>
                         <div class="card-body">
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th>#</th>
+                                        <th>Job</th>
                                         <th>Job Profile</th>
-                                        <th>Job Vacancy</th>
-                                        <th>Salary Range</th>
-                                        <th>Work Type</th>
                                         <th>Is Verified</th>
                                         <th>Is Featured</th>
                                         <th>Is Active</th>
-                                        <th>Action</th>
+                                        {{-- <th>Action</th> --}}
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($jobs as $job)
+                                    @foreach ($profile['jobs'] as $job)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            {{-- <td>{{ $job['profile']['profile'] }}</td> --}}
-                                            {{-- admin.job.show --}}
-                                            <td>
-                                                <a href="{{ route('admin.job.show', $job['id']) }}">
-                                                    {{ $job['profile']['profile'] }}
-                                                </a>
-                                            </td>
-                                            <td>{{ $job['vacancy'] }}</td>
-                                            <td>
-                                                {{ $job['min_salary'] }} -
-                                                {{ $job['max_salary'] }}
-                                            </td>
-                                            <td>{{ $job['work_type'] }}</td>
+                                            <td>{{ $job['job_profile'] }}</td>
                                             <td>
                                                 <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
                                                     class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
@@ -64,20 +71,22 @@
                                                     {{ $job['is_active'] ? 'Active' : 'Not Active' }}
                                                 </a>
                                             </td>
-                                            <td>
+                                            {{-- <td>
                                                 <a href="{{ route('admin.job.edit', $job['id']) }}"
                                                     class="btn btn-sm btn-primary">Edit</a>
                                                 <a href="{{ route('admin.job.delete', $job['id']) }}"
                                                     class="btn btn-sm btn-danger">Delete</a>
-                                            </td>
+                                            </td> --}}
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    {{--  --}}
                 </div>
             </div>
         </section>
+
     </main>
 @endsection

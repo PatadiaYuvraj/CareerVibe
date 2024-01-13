@@ -54,12 +54,11 @@ class QualificationController extends Controller
 
     public function show($id)
     {
-        $qualification = $this->qualification->where('id', $id)->get()->ToArray();
+        $qualification = $this->qualification->where('id', $id)->with('jobs')->get()->ToArray();
         if (!$qualification) {
             return redirect()->back()->with("warning", "Qualification is not found");
         }
         $qualification =  $qualification[0];
-        dd($qualification);
         return view('admin.qualification.show', compact('qualification'));
     }
 

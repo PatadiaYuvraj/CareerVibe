@@ -38,30 +38,52 @@ class JobController extends Controller
         $job_profiles = JobProfile::all()->toArray();
         $locations = Location::all()->toArray();
         $qualifications = Qualification::all()->toArray();
+        $work_types = [
+            "REMOTE",
+            "WFO",
+            "HYBRID"
+        ];
 
         // dd($company, $job_profiles, $locations, $qualifications);
-        return view('admin.job.create', compact('company', 'job_profiles', 'locations', 'qualifications'));
+        return view('admin.job.create', compact('company', 'job_profiles', 'locations', 'qualifications', 'work_types'));
     }
 
     public function store(Request $request, $id)
     {
-        dd($request->all());
+        // dd($request->get('qualifications'), $request->get('locations'));
+        /*
+        $request->all() =
+        [
+            "vacancy" => "10"
+            "min_salary" => "10000"
+            "max_salary" => "20000"
+            "work_type" => "WFO"
+            "job_profile_id" => "4"
+            "qualifications" => array:2 [▶]
+            "locations" => array:2 [▶]
+            "description" => "Description"
+            "responsibility" => "Responsibilities"
+            "benifits_perks" => "Benifits & Perks"
+            "other_benifits" => "Other Benifits"
+            "keywords" => "Keywords"
+        ]
+        */
+
+
 
         $validate = Validator::make($request->all(), [
-            "job_profile" => "required|string|max:100",
+            "profile_id" => "required|string|max:100",
             "vacancy" => "required|integer",
             "min_salary" => "required|integer",
             "max_salary" => "required|integer",
-            "description" => "required|string",
-            "responsibility" => "required|string",
-            "benifits_perks" => "required|string",
-            "other_benifits" => "required|string",
-            "keywords" => "required|string",
+            "locations" => "required|array",
+            "qualifications" => "required|array",
             "work_type" => "required|string|in:REMOTE,WFO,HYBRID",
         ]);
         if ($validate->passes()) {
             $data = [
-                "job_profile" => $request->get("job_profile"),
+                "company_id" => $id,
+                "profile_id" => $request->get("profile_id"),
                 "vacancy" => $request->get("vacancy"),
                 "min_salary" => $request->get("min_salary"),
                 "max_salary" => $request->get("max_salary"),
@@ -72,9 +94,11 @@ class JobController extends Controller
                 "keywords" => $request->get("keywords"),
                 "work_type" => $request->get("work_type"),
             ];
-            dd($data);
             $isCreated = $this->job->create($data);
+
             if ($isCreated) {
+                $isCreated->qualifications()->attach($request->get('qualifications'));
+                $isCreated->locations()->attach($request->get('locations'));
                 return redirect()->route('admin.job.index')->with('success', 'Job is created');
             }
             return redirect()->back()->with("warning", "Job is not created");
@@ -92,10 +116,11 @@ class JobController extends Controller
 
     public function show($id)
     {
-        $job = $this->job->where('id', $id)->get()->ToArray();
+        $job = $this->job->where('id', $id)->with(['profile', "company", "qualifications", "locations"])->get()->ToArray();
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }
+        $job = $job[0];
         return view('admin.job.show', compact('job'));
     }
 
@@ -137,6 +162,7 @@ class JobController extends Controller
                 "keywords" => $request->get("keywords"),
                 "work_type" => $request->get("work_type"),
             ];
+            dd($data);
             $isUpdated = $this->job->where('id', $id)->update($data);
             if ($isUpdated) {
                 return redirect()->route('admin.job.index')->with('success', 'Job is updated');
@@ -159,11 +185,10 @@ class JobController extends Controller
 
     public function toggleVerified($id, $is_verified)
     {
-
         if (!$this->auth->isAdmin()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $job = $this->job->where('id', $id)->get()->ToArray();
+        $job = $this->job->find($id);
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }
@@ -183,7 +208,7 @@ class JobController extends Controller
         if (!$this->auth->isAdmin() && !$this->auth->isCompany()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $job = $this->job->where('id', $id)->get()->ToArray();
+        $job = $this->job->find($id);
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }
@@ -203,7 +228,7 @@ class JobController extends Controller
         if (!$this->auth->isAdmin() && !$this->auth->isCompany()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $job = $this->job->where('id', $id)->get()->ToArray();
+        $job = $this->job->find($id);
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }

@@ -63,7 +63,7 @@ class CompanyController extends Controller
 
     public function show($id)
     {
-        $company = $this->company->where('id', $id)->get()->ToArray();
+        $company = $this->company->where('id', $id)->with('jobs')->get()->ToArray();
         if (!$company) {
             return redirect()->back()->with("warning", "Company is not found");
         }
@@ -117,7 +117,7 @@ class CompanyController extends Controller
 
     public function delete($id)
     {
-        $isDeleted = $this->company->find($id)->delete();
+        $isDeleted = $this->company->where('id', $id)->delete();
         if ($isDeleted) {
             return redirect()->route('admin.company.index')->with('success', 'Company is deleted');
         }

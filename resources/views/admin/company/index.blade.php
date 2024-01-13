@@ -33,7 +33,11 @@
                                     @foreach ($companies as $company)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $company['name'] }}</td>
+                                            <td>
+                                                <a href="{{ route('admin.company.show', $company['id']) }}">
+                                                    {{ $company['name'] }}
+                                                </a>
+                                            </td>
                                             <td>{{ $company['email'] }}</td>
                                             <td>{{ $company['website'] }}</td>
                                             <td>

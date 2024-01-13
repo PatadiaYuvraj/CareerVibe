@@ -14,4 +14,9 @@ class Location extends Model
         'country',
         'pincode',
     ];
+
+    public function jobs()
+    {
+        return $this->belongsToMany(Job::class, 'job_locations', 'locations_id', 'jobs_id');
+    }
 }

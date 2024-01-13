@@ -35,7 +35,10 @@
                                     @foreach ($locations as $location)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $location['city'] }}</td>
+                                            <td>
+                                                <a href="{{ route('admin.location.show', $location['id']) }}">{{ $location['city'] }}
+                                                </a>
+                                            </td>
                                             <td>{{ $location['state'] }}</td>
                                             <td>{{ $location['country'] }}</td>
                                             <td>{{ $location['pincode'] }}</td>

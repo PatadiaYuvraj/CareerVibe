@@ -22,9 +22,9 @@
                                 <thead>
                                     <tr>
                                         {{-- # --}}
-                                        <th>#</th>
-                                        <th>Name</th>
-                                        <th>Action</th>
+                                        <th class="col-2">#</th>
+                                        <th class="col-7">Name</th>
+                                        <th class="col-3">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -32,8 +32,11 @@
                                     @foreach ($qualifications as $qualification)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $qualification['qualification'] }}</td>
                                             <td>
+                                                <a href="{{ route('admin.qualification.show', $qualification['id']) }}">{{ $qualification['qualification'] }}
+                                                </a>
+                                            </td>
+                                            <td class="">
                                                 <a href="{{ route('admin.qualification.edit', $qualification['id']) }}"
                                                     class="btn btn-sm btn-primary">Edit</a>
                                                 <a href="{{ route('admin.qualification.delete', $qualification['id']) }}"

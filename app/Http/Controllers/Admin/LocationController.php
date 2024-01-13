@@ -57,12 +57,11 @@ class LocationController extends Controller
 
     public function show($id)
     {
-        $location = $this->location->where('id', $id)->get()->ToArray();
+        $location = $this->location->where('id', $id)->with('jobs')->get()->ToArray();
         if (!$location) {
             return redirect()->back()->with("warning", "Location is not found");
         }
         $location =  $location[0];
-        dd($location);
         return view('admin.location.show', compact('location'));
     }
 

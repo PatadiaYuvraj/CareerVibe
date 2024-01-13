@@ -17,7 +17,6 @@
                         <div class="card-body">
 
                             <table class="table table-striped">
-                                {{-- populate data of qualification in table --}}
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -31,7 +30,10 @@
                                     @foreach ($profiles as $profile)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $profile['profile'] }}</td>
+                                            <td>
+                                                <a href="{{ route('admin.job-profile.show', $profile['id']) }}">{{ $profile['profile'] }}
+                                                </a>
+                                            </td>
                                             <td>{{ date('d-m-Y', strtotime($profile['created_at'])) }}</td>
                                             <td>
                                                 <a href="{{ route('admin.job-profile.edit', $profile['id']) }}"

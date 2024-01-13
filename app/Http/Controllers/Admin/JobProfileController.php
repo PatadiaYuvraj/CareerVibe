@@ -47,18 +47,18 @@ class JobProfileController extends Controller
 
     public function index()
     {
-        $profiles = $this->profile->paginate(1);
+        $profiles = $this->profile->paginate(5);
         return view('admin.job-profile.index', compact('profiles'));
     }
 
     public function show($id)
     {
-        $profile = $this->profile->where('id', $id)->get()->ToArray();
+        $profile = $this->profile->where('id', $id)->with('jobs')->get()->toArray();
         if (!$profile) {
             return redirect()->back()->with("warning", "Profile is not found");
         }
         $profile =  $profile[0];
-        return view('admin.profile.show', compact('profile'));
+        return view('admin.job-profile.show', compact('profile'));
     }
 
     public function edit($id)

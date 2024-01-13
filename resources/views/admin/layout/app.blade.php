@@ -39,7 +39,7 @@
 
         <div class="d-flex align-items-center justify-content-between">
             <a href="index.html" class="logo d-flex align-items-center">
-                {{-- <img src="{{ asset('admin/img/logo.png') }}" alt=""> --}}
+                <img src="{{ asset('admin/img/logo.png') }}" alt    ="">
                 <span class="d-none d-lg-block">Carrer Vibe</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -92,68 +92,59 @@
     <aside id="sidebar" class="sidebar">
 
         <ul class="sidebar-nav" id="sidebar-nav">
-
+            {{-- <li class="nav-item">
+                <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse"
+                    href="{{ route('admin.company.index') }}">
+                    <span>Company</span><i class="bi bi-chevron-down ms-auto"></i>
+                </a>
+                <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
+                    <li>
+                        <a class="nav-link " href="{{ route('admin.job.index') }}">
+                            <span>Job</span>
+                        </a>
+                    </li>
+                </ul>
+            </li> --}}
+            {{-- <hr /> --}}
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.company.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.company.index') }}">
                     <span>Company</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.user.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.user.index') }}">
                     <span>User</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.job.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.job.index') }}">
                     <span>Job</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.job-profile.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.job-profile.index') }}">
                     <span>Job Profile</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.location.index') }}">
+                <a class="nav-link collapsed     " href="{{ route('admin.location.index') }}">
                     {{-- <i class="bi bi-grid"></i> --}}
                     <span>Location</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link " href="{{ route('admin.qualification.index') }}">
+                <a class="nav-link  collapsed   " href="{{ route('admin.qualification.index') }}">
                     {{-- <i class="bi bi-grid"></i> --}}
                     <span>Qualification</span>
                 </a>
             </li>
 
-            {{-- <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse" href="#">
-                    <i class="bi bi-menu-button-wide"></i><span>Components</span><i
-                        class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a href="components-alerts.html">
-                            <i class="bi bi-circle"></i><span>Alerts</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="components-accordion.html">
-                            <i class="bi bi-circle"></i><span>Accordion</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="components-badges.html">
-                            <i class="bi bi-circle"></i><span>Badges</span>
-                        </a>
-                    </li>
-                </ul>
-            </li> --}}
+
 
         </ul>
 
