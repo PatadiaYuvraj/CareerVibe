@@ -47,7 +47,7 @@
                                                 </a>
                                             </td>
                                             {{-- <td>{{ date('d-m-Y', strtotime($company['created_at'])) }}</td> --}}
-                                            <td class="col-2">
+                                            <td class="col-3">
                                                 <div class="btn-group btn-group-sm d-flex">
                                                     @if ($company['is_verified'])
                                                         <a href="{{ route('admin.job.create', $company['id']) }}"

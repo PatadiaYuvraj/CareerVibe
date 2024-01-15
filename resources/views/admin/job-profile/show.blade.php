@@ -33,26 +33,26 @@
                         </p>
                     </div>
 
-                    <div class="card">
+                    {{-- <div class="card">
                         <div class="card-header"></div>
                         <div class="card-body">
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
                                         <th>#</th>
-                                        <th>Job</th>
+                                        <th>Company</th>
                                         <th>Job Profile</th>
                                         <th>Is Verified</th>
                                         <th>Is Featured</th>
                                         <th>Is Active</th>
-                                        {{-- <th>Action</th> --}}
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach ($profile['jobs'] as $job)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $job['job_profile'] }}</td>
+                                            <td>{{ $job['company']['name'] }}</td>
                                             <td>
                                                 <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
                                                     class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
@@ -71,19 +71,54 @@
                                                     {{ $job['is_active'] ? 'Active' : 'Not Active' }}
                                                 </a>
                                             </td>
-                                            {{-- <td>
+                                            <td>
                                                 <a href="{{ route('admin.job.edit', $job['id']) }}"
                                                     class="btn btn-sm btn-primary">Edit</a>
                                                 <a href="{{ route('admin.job.delete', $job['id']) }}"
                                                     class="btn btn-sm btn-danger">Delete</a>
-                                            </td> --}}
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
                             </table>
                         </div>
+                    </div> --}}
+                    <div class="card shadow-none">
+                        <div class="card-header h3">Jobs</div>
+                        <div class="card-body">
+                            <div class="row row-cols-3">
+                                @forelse ($profile['jobs'] as $job)
+                                    <div class="card-body shadow-none mt-3 col-4">
+                                        <h6 class="card-subtitle mb-2  h5 text-decoration-underline">
+                                            Offered by {{ $job['company']['name'] }}
+                                        </h6>
+                                        <h6 class="card-subtitle mb-2 text-muted">Vacancy :
+                                            {{ $job['vacancy'] }}
+                                        </h6>
+                                        <h6 class="card-subtitle mb-2 text-muted">Salary :
+                                            {{ $job['min_salary'] . ' - ' . $job['max_salary'] }}
+                                        </h6>
+                                        <h6 class="card-subtitle mb-2 text-muted">Job is
+                                            {{ $job['is_active'] ? 'Active' : 'Not Active' }}
+                                        </h6>
+                                        <h6 class="card-subtitle mb-2 text-muted">Job is
+                                            {{ $job['is_featured'] ? 'Featured' : 'Not Featured' }}
+                                        </h6>
+                                        <h6 class="card-subtitle mb-2 text-muted">Job is
+                                            {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
+                                        </h6>
+                                        {{-- <a href="{{ route('admin.job.edit', $job['id']) }}" class="card-link">Edit</a>
+                                        <a href="{{ route('admin.job.delete', $job['id']) }}" class="card-link">Delete</a> --}}
+                                    </div>
+                                @empty
+                                    <div class="card-body">
+                                        <h5 class="card-title">No Jobs Available</h5>
+                                    </div>
+                                @endforelse
+                                {{--  --}}
+                            </div>
+                        </div>
                     </div>
-                    {{--  --}}
                 </div>
             </div>
         </section>

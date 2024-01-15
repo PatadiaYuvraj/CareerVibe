@@ -17,6 +17,6 @@ class Location extends Model
 
     public function jobs()
     {
-        return $this->belongsToMany(Job::class, 'job_locations', 'locations_id', 'jobs_id');
+        return $this->belongsToMany(Job::class, 'job_locations', 'locations_id', 'jobs_id')->with(['company', 'profile', 'qualifications', 'locations']);
     }
 }

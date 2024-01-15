@@ -16,7 +16,27 @@
                             <label for="email" class="form-label">Company Name</label>
                             <label class="form-control">{{ $company['name'] }}</label>
                         </div>
-
+                        <div class="mt-3">
+                            <label for="email" class="form-label">Select Job Profile</label>
+                            <div class="row row-cols-3">
+                                @foreach ($job_profiles as $profile)
+                                    <div class="col">
+                                        <label for="{{ $profile['profile'] }}" class="input-group mb-3">
+                                            <div class="input-group-text">
+                                                <input class="form-check-input mt-0" id="{{ $profile['profile'] }}"
+                                                    type="radio" value="{{ $profile['id'] }}" name="profile_id">
+                                            </div>
+                                            <div class="form-control">
+                                                {{ Str::ucfirst(Str::lower($profile['profile'])) }}
+                                            </div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @error('job_profile_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
                         <div class="row mb-3">
                             <div class="col">
                                 <label for="vacancy" class="form-label">Vacancy</label>
@@ -60,27 +80,6 @@
                                 @endforeach
                             </div>
                             @error('work_type')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="mt-3">
-                            <label for="email" class="form-label">Select Job Profile</label>
-                            <div class="row row-cols-3">
-                                @foreach ($job_profiles as $profile)
-                                    <div class="col">
-                                        <label for="{{ $profile['profile'] }}" class="input-group mb-3">
-                                            <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $profile['profile'] }}"
-                                                    type="radio" value="{{ $profile['id'] }}" name="profile_id">
-                                            </div>
-                                            <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower($profile['profile'])) }}
-                                            </div>
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                            @error('job_profile_id')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>

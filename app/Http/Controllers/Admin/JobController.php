@@ -133,14 +133,15 @@ class JobController extends Controller
             return redirect()->back()->with("warning", "Job is not found");
         }
         $job  =  $job[0];
-        return view('admin.job.edit', compact('job', "qualifications", "locations"));
+        return view('admin.job.edit', compact('job', 'qualifications', 'locations', 'profiles'));
     }
 
     public function update(Request $request, $id)
     {
         // if value is available in request then do not validate that value 
+        // dd($id);
         $validate = Validator::make($request->all(), [
-            "job_profile" => "required|string|max:100",
+            "profile_id" => "required|string|max:100",
             "vacancy" => "required|integer",
             "min_salary" => "required|integer",
             "max_salary" => "required|integer",
@@ -153,7 +154,7 @@ class JobController extends Controller
         ]);
         if ($validate->passes()) {
             $data = [
-                "job_profile" => $request->get("job_profile"),
+                "profile_id" => $request->get("profile_id"),
                 "vacancy" => $request->get("vacancy"),
                 "min_salary" => $request->get("min_salary"),
                 "max_salary" => $request->get("max_salary"),
@@ -164,9 +165,11 @@ class JobController extends Controller
                 "keywords" => $request->get("keywords"),
                 "work_type" => $request->get("work_type"),
             ];
-            dd($data);
-            $isUpdated = $this->job->where('id', $id)->update($data);
+            $isUpdated = $this->job->where('id', $id)->first();
+            $isUpdated->update($data);
             if ($isUpdated) {
+                $d = $isUpdated->qualifications()->sync($request->get('qualifications'));
+                $isUpdated->locations()->sync($request->get('locations'));
                 return redirect()->route('admin.job.index')->with('success', 'Job is updated');
             }
             return redirect()->back()->with("warning", "Job is not updated");

@@ -53,7 +53,7 @@ class JobProfileController extends Controller
 
     public function show($id)
     {
-        $profile = $this->profile->where('id', $id)->with('jobs')->get()->toArray();
+        $profile = $this->profile->where('id', $id)->with(['jobs'])->get()->toArray();
         if (!$profile) {
             return redirect()->back()->with("warning", "Profile is not found");
         }
