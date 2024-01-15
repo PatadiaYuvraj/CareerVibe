@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string("email", 50)->unique()->index();
             $table->string("password", 100);
             $table->string("userType", 10)->default("USER");
-            $table->string("profile_image_url", 100)->nullable();
+            $table->string('profileImage')->nullable();
             $table->string("resume_pdf_url", 100)->nullable();
             $table->string("contact", 15)->nullable();
             $table->enum("gender", ["MALE", "FEMALE", "OTHER"])->nullable();
