@@ -9,25 +9,21 @@
                     <a href="{{ route('admin.qualification.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
-                    <div class="card">
-                        <div class="card-body">
-                            <form action="{{ route('admin.qualification.store') }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="qualification" class="form-label">Qualification</label>
-                                    <input type="text" name="qualification" class="form-control"
-                                        value="{{ old('qualification') }}">
-                                    @error('qualification')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </form>
+                    <form action="{{ route('admin.qualification.store') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="qualification" class="form-label">Qualification</label>
+                            <input type="text" name="qualification" class="form-control"
+                                value="{{ old('qualification') }}">
+                            @error('qualification')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
-                    </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <a href="{{ route('admin.qualification.index') }}" class="btn btn-danger">Cancel</a>
+                    </form>
                 </div>
             </div>
         </section>
-
     </main>
 @endsection

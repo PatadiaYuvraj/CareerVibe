@@ -13,47 +13,44 @@
                         profile</a>
                 </div>
                 <div class="card-body">
-                    <div class="card">
-                        <div class="card-body">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Profile</th>
+                                <th>Created At</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
 
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Profile</th>
-                                        <th>Created At</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                    @foreach ($profiles as $profile)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>
-                                                <a href="{{ route('admin.job-profile.show', $profile['id']) }}">{{ $profile['profile'] }}
-                                                </a>
-                                            </td>
-                                            <td>{{ date('d-m-Y', strtotime($profile['created_at'])) }}</td>
-                                            <td>
-                                                <a href="{{ route('admin.job-profile.edit', $profile['id']) }}"
-                                                    class="btn btn-sm btn-primary">Edit</a>
-                                                <a href="{{ route('admin.job-profile.delete', $profile['id']) }}"
-                                                    class="btn btn-sm btn-danger">Delete</a>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                            {{-- paginate    --}}
-                            <div class="justify-content-center">
-                                {{ $profiles->links('pagination::bootstrap-5') }}
-                            </div>
-                        </div>
+                            @forelse ($profiles as $profile)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>
+                                        <a href="{{ route('admin.job-profile.show', $profile['id']) }}">{{ $profile['profile'] }}
+                                        </a>
+                                    </td>
+                                    <td>{{ date('d-m-Y', strtotime($profile['created_at'])) }}</td>
+                                    <td>
+                                        <a href="{{ route('admin.job-profile.edit', $profile['id']) }}"
+                                            class="btn btn-sm btn-primary">Edit</a>
+                                        <a href="{{ route('admin.job-profile.delete', $profile['id']) }}"
+                                            class="btn btn-sm btn-danger">Delete</a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">No Job Profile Found</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                    <div class="justify-content-center">
+                        {{ $profiles->links('pagination::bootstrap-5') }}
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 @endsection

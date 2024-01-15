@@ -14,7 +14,6 @@
                             <li class="breadcrumb-item active" aria-current="page">Show</li>
                         </ol>
                     </nav>
-                    {{-- <a href="{{ route('admin.location.index') }}" class="float-end btn btn-sm btn-primary">Back</a> --}}
                 </div>
                 <div class="card-body">
 
@@ -22,7 +21,7 @@
                         <h1 class="d-inline display-4">
                             {{ $location['city'] }},
                         </h1>
-                        <h1 class="display-5 d-inline ">
+                        <h1 class="display-6 d-inline ">
                             {{ $location['state'] }}
                             ({{ $location['country'] }})
                         </h1>

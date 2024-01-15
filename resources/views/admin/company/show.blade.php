@@ -41,57 +41,54 @@
                         </p>
                     </div>
 
-                    <div class="card">
-                        <div class="card-header"></div>
-                        <div class="card-body">
-                            <table class="table table-striped">
-                                <thead>
+
+                    <div class="card-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Job</th>
+                                    {{-- <th>Job Profile</th> --}}
+                                    <th>Is Verified</th>
+                                    <th>Is Featured</th>
+                                    <th>Is Active</th>
+                                    {{-- <th>Action</th> --}}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($company['jobs'] as $job)
                                     <tr>
-                                        <th>#</th>
-                                        <th>Job</th>
-                                        {{-- <th>Job Profile</th> --}}
-                                        <th>Is Verified</th>
-                                        <th>Is Featured</th>
-                                        <th>Is Active</th>
-                                        {{-- <th>Action</th> --}}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($company['jobs'] as $job)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            {{-- <td>{{ $job['job_profile'] }}</td> --}}
-                                            <td>
-                                                <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
-                                                    class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
-                                                    {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('admin.job.toggleFeatured', [$job['id'], $job['is_featured']]) }}"
-                                                    class="badge bg-{{ $job['is_featured'] ? 'success' : 'danger' }}">
-                                                    {{ $job['is_featured'] ? 'Featured' : 'Not Featured' }}
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('admin.job.toggleActive', [$job['id'], $job['is_active']]) }}"
-                                                    class="badge bg-{{ $job['is_active'] ? 'success' : 'danger' }}">
-                                                    {{ $job['is_active'] ? 'Active' : 'Not Active' }}
-                                                </a>
-                                            </td>
-                                            {{-- <td>
+                                        <td>{{ $loop->iteration }}</td>
+                                        {{-- <td>{{ $job['job_profile'] }}</td> --}}
+                                        <td>
+                                            <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
+                                                class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
+                                                {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('admin.job.toggleFeatured', [$job['id'], $job['is_featured']]) }}"
+                                                class="badge bg-{{ $job['is_featured'] ? 'success' : 'danger' }}">
+                                                {{ $job['is_featured'] ? 'Featured' : 'Not Featured' }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ route('admin.job.toggleActive', [$job['id'], $job['is_active']]) }}"
+                                                class="badge bg-{{ $job['is_active'] ? 'success' : 'danger' }}">
+                                                {{ $job['is_active'] ? 'Active' : 'Not Active' }}
+                                            </a>
+                                        </td>
+                                        {{-- <td>
                                                 <a href="{{ route('admin.job.edit', $job['id']) }}"
                                                     class="btn btn-sm btn-primary">Edit</a>
                                                 <a href="{{ route('admin.job.delete', $job['id']) }}"
                                                     class="btn btn-sm btn-danger">Delete</a>
                                             </td> --}}
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
-                    {{--  --}}
                 </div>
             </div>
         </section>

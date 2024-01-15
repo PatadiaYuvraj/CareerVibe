@@ -109,7 +109,8 @@ class JobController extends Controller
 
     public function index()
     {
-        $jobs = $this->job->with(['profile', "company"])->get()->toArray();
+        // $jobs = $this->job->with(['profile', "company"])->get()->toArray();
+        $jobs = $this->job->with(['profile', "company"])->paginate(10);
         return view('admin.job.index', compact('jobs'));
     }
 
@@ -138,8 +139,7 @@ class JobController extends Controller
 
     public function update(Request $request, $id)
     {
-        // if value is available in request then do not validate that value 
-        // dd($id);
+
         $validate = Validator::make($request->all(), [
             "profile_id" => "required|string|max:100",
             "vacancy" => "required|integer",

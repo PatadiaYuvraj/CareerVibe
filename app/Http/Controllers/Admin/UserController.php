@@ -51,7 +51,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = $this->user->paginate(5);
+        $users = $this->user->paginate(1);
         return view('admin.user.index', compact('users'));
     }
 
@@ -63,6 +63,7 @@ class UserController extends Controller
             return redirect()->back()->with("warning", "User is not found");
         }
         $user  =  $user[0];
+        dd($user);
         return view('admin.user.show', compact('user'));
     }
 

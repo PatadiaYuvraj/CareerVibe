@@ -57,7 +57,9 @@ class CompanyController extends Controller
 
     public function index()
     {
-        $companies = $this->company->all()->toArray();
+        // $companies = $this->company->all()->toArray();
+        // pagination
+        $companies = $this->company->paginate(5);
         return view('admin.company.index', compact('companies'));
     }
 

@@ -16,10 +16,10 @@
                             <label for="email" class="form-label">Company Name</label>
                             <label class="form-control">{{ $company['name'] }}</label>
                         </div>
-                        <div class="mt-3">
+                        <div class="mb-3">
                             <label for="email" class="form-label">Select Job Profile</label>
                             <div class="row row-cols-3">
-                                @foreach ($job_profiles as $profile)
+                                @forelse ($job_profiles as $profile)
                                     <div class="col">
                                         <label for="{{ $profile['profile'] }}" class="input-group mb-3">
                                             <div class="input-group-text">
@@ -31,9 +31,14 @@
                                             </div>
                                         </label>
                                     </div>
-                                @endforeach
+                                @empty
+                                    <div class="col">
+                                        <input type="text" class="text-danger form-control" readonly
+                                            value="No Profile Found" required>
+                                    </div>
+                                @endforelse
                             </div>
-                            @error('job_profile_id')
+                            @error('profile_id')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -86,7 +91,7 @@
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Qualification</label>
                             <div class="row row-cols-3">
-                                @foreach ($qualifications as $qualification)
+                                @forelse ($qualifications as $qualification)
                                     <div class="col">
                                         <label for="{{ $qualification['qualification'] }}" class="input-group mb-3">
                                             <div class="input-group-text">
@@ -99,7 +104,12 @@
                                             </div>
                                         </label>
                                     </div>
-                                @endforeach
+                                @empty
+                                    <div class="col">
+                                        <input type="text" class="form-control text-danger" readonly
+                                            value="No Qualification Found" required>
+                                    </div>
+                                @endforelse
                             </div>
                             @error('qualifications')
                                 <span class="text-danger">{{ $message }}</span>
@@ -108,7 +118,7 @@
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Location</label>
                             <div class="row row-cols-3">
-                                @foreach ($locations as $location)
+                                @forelse ($locations as $location)
                                     <div class="col">
                                         <label for="{{ $location['city'] }}" class="input-group mb-3">
                                             <div class="input-group-text">
@@ -121,7 +131,12 @@
                                             </div>
                                         </label>
                                     </div>
-                                @endforeach
+                                @empty
+                                    <div class="col">
+                                        <input type="text" class="form-control text-danger" readonly
+                                            value="No Location Found" required>
+                                    </div>
+                                @endforelse
                             </div>
                             @error('locations')
                                 <span class="text-danger">{{ $message }}</span>
@@ -130,28 +145,39 @@
                         <div class="row row-cols-2 mb-3">
                             <div class="col">
                                 <label for="description" class="form-label">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3">{{ old('description') }}</textarea>
+                                <textarea class="form-control" id="description" name="description" rows="3">
+                                    {{ old('description') }}
+                                </textarea>
                             </div>
                             <div class="col">
                                 <label for="responsibility" class="form-label">Responsibilities</label>
-                                <textarea class="form-control" id="responsibility" name="responsibility" rows="3">{{ old('responsibility') }}</textarea>
+                                <textarea class="form-control" id="responsibility" name="responsibility" rows="3">
+                                    {{ old('responsibility') }}
+                                </textarea>
                             </div>
                         </div>
                         <div class="row row-cols-2 mb-3">
                             <div class="col">
                                 <label for="benifits_perks" class="form-label">Benifits & Perks</label>
-                                <textarea class="form-control" id="benifits_perks" name="benifits_perks" rows="3">{{ old('benifits_perks') }}</textarea>
+                                <textarea class="form-control" id="benifits_perks" name="benifits_perks" rows="3">
+                                    {{ old('benifits_perks') }}
+                                </textarea>
                             </div>
                             <div class="col">
                                 <label for="other_benifits" class="form-label">Other Benifits</label>
-                                <textarea class="form-control" id="other_benifits" name="other_benifits" rows="3">{{ old('other_benifits') }}</textarea>
+                                <textarea class="form-control" id="other_benifits" name="other_benifits" rows="3">
+                                    {{ old('other_benifits') }}
+                                </textarea>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="keywords" class="form-label">Keywords</label>
-                            <textarea class="form-control" id="keywords" name="keywords" rows="3">{{ old('keywords') }}</textarea>
+                            <textarea class="form-control" id="keywords" name="keywords" rows="3">
+                                {{ old('keywords') }}
+                            </textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
+                        <a href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
                     </form>
                 </div>
             </div>

@@ -11,24 +11,20 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    <div class="card">
-                        <div class="card-body">
-                            <form action="{{ route('admin.job-profile.store') }}" method="POST">
-                                @csrf
-                                <div class="mb-3">
-                                    <label for="profile" class="form-label">Job Profile</label>
-                                    <input type="text" name="profile" class="form-control" value="{{ old('profile') }}">
-                                    @error('profile')
-                                        <span class="text-danger">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </form>
+                    <form action="{{ route('admin.job-profile.store') }}" method="POST">
+                        @csrf
+                        <div class="mb-3">
+                            <label for="profile" class="form-label">Job Profile</label>
+                            <input type="text" name="profile" class="form-control" value="{{ old('profile') }}">
+                            @error('profile')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
-                    </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <a href="{{ route('admin.job-profile.index') }}" class="btn btn-danger">Cancel</a>
+                    </form>
                 </div>
             </div>
         </section>
-
     </main>
 @endsection

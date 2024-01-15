@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('qualifications', function (Blueprint $table) {
             $table->id();
-            $table->string('qualification', 20);
+            $table->string('qualification', 20)->unique();
             $table->index(['qualification', 'id']);
             $table->timestamps();
         });
