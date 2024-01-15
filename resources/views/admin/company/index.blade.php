@@ -15,7 +15,7 @@
                         <div class="card-body">
 
                             <!-- Table with stripped rows -->
-                            <table class="table datatable table-striped">
+                            <table class="table table-striped">
                                 {{-- populate data of company in table --}}
                                 <thead>
                                     <tr>
@@ -42,7 +42,7 @@
                                             <td>{{ $company['website'] }}</td>
                                             <td>
                                                 <a href="{{ route('admin.company.toggleVerified', [$company['id'], $company['is_verified']]) }}"
-                                                    class="badge bg-{{ $company['is_verified'] ? 'success' : 'danger' }}">
+                                                    class=" badge bg-{{ $company['is_verified'] ? 'success' : 'danger' }}">
                                                     {{ $company['is_verified'] ? 'Verified' : 'Not Verified' }}
                                                 </a>
                                             </td>
@@ -63,7 +63,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-
                         </div>
                     </div>
                 </div>

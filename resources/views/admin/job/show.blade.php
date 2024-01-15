@@ -1,6 +1,6 @@
 {{-- 
     
-array:21 [
+"job" => [
   "id" => 1
   "company_id" => 1
   "profile_id" => 3
@@ -74,7 +74,7 @@ array:21 [
   ]
 ]
 
-    --}}
+--}}
 @extends('admin.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
@@ -82,7 +82,7 @@ array:21 [
 
         <section class="section dashboard">
             <div class="card">
-                <div class="card-header">
+                <div class="card-header ">
                     <nav aria-label="breadcrumb" class="">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
@@ -90,85 +90,160 @@ array:21 [
                             <li class="breadcrumb-item active" aria-current="page">Show</li>
                         </ol>
                     </nav>
-                    {{-- <a href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a> --}}
                 </div>
                 <div class="card-body">
-                    {{--  --}}
-
-                    <div class="jumbotron">
+                    <div class="col pt-3">
                         <h1 class="display-5">
-                            {{ $company['name'] }}
+                            {{-- {{ $job['pr'] }} --}}
+                            {{ $job['profile']['profile'] }}
                         </h1>
                         <p class="lead position-relative">
-                            <a href="{{ route('admin.company.toggleVerified', [$company['id'], $company['is_verified']]) }}"
-                                class="badge bg-{{ $company['is_verified'] ? 'success' : 'danger' }}">
-                                {{ $company['is_verified'] ? 'Verified' : 'Not Verified' }}
+                            <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
+                                class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
+                                {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
                             </a>
                         </p>
                         <p class="lead">Created At :
-                            @if ($company['created_at'])
-                                {{ date('d-m-Y', strtotime($company['created_at'])) }}
+                            @if ($job['created_at'])
+                                {{ date('d-m-Y', strtotime($job['created_at'])) }}
                             @else
                                 {{ 'N/A' }}
                             @endif
                         </p>
                         <p class="lead">
-                            <a class="btn btn-outline-primary btn"
-                                href="{{ route('admin.company.edit', $company['id']) }}">Edit</a>
+                            <a class="btn btn-outline-primary btn" href="{{ route('admin.job.edit', $job['id']) }}">Edit</a>
                         </p>
                     </div>
-
-                    <div class="card">
-                        <div class="card-header"></div>
+                    <hr />
+                    <div class="col" style="">
                         <div class="card-body">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Job</th>
-                                        {{-- <th>Job Profile</th> --}}
-                                        <th>Is Verified</th>
-                                        <th>Is Featured</th>
-                                        <th>Is Active</th>
-                                        {{-- <th>Action</th> --}}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($company['jobs'] as $job)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            {{-- <td>{{ $job['job_profile'] }}</td> --}}
-                                            <td>
-                                                <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
-                                                    class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
-                                                    {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('admin.job.toggleFeatured', [$job['id'], $job['is_featured']]) }}"
-                                                    class="badge bg-{{ $job['is_featured'] ? 'success' : 'danger' }}">
-                                                    {{ $job['is_featured'] ? 'Featured' : 'Not Featured' }}
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('admin.job.toggleActive', [$job['id'], $job['is_active']]) }}"
-                                                    class="badge bg-{{ $job['is_active'] ? 'success' : 'danger' }}">
-                                                    {{ $job['is_active'] ? 'Active' : 'Not Active' }}
-                                                </a>
-                                            </td>
-                                            {{-- <td>
-                                                <a href="{{ route('admin.job.edit', $job['id']) }}"
-                                                    class="btn btn-sm btn-primary">Edit</a>
-                                                <a href="{{ route('admin.job.delete', $job['id']) }}"
-                                                    class="btn btn-sm btn-danger">Delete</a>
-                                            </td> --}}
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                            <h5 class="card-title">
+                                Company
+                            </h5>
+                            <h6 class="">
+                                {{ $job['company']['name'] }}
+                            </h6>
+                            {{-- email --}}
+                            <h6 class="">
+                                {{ $job['company']['email'] }}
+                            </h6>
                         </div>
                     </div>
-                    {{--  --}}
+                    <hr />
+                    <div class="row">
+                        <div class="col" style="">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Qualifications
+                                </h5>
+                                <h6 class="">
+                                    @foreach ($job['qualifications'] as $qualification)
+                                        <span class="badge bg-primary">{{ $qualification['qualification'] }}</span>
+                                    @endforeach
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="col" style="">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Locations
+                                </h5>
+                                <h6 class="">
+                                    @foreach ($job['locations'] as $location)
+                                        <span class="badge bg-primary">{{ $location['city'] }}</span>
+                                    @endforeach
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col" style="">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Vacancies
+                                </h5>
+                                <h6 class="">
+                                    {{ $job['vacancy'] }}
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="col" style="">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Salary Package
+                                </h5>
+                                <h6 class="">
+                                    {{ $job['min_salary'] }} - {{ $job['max_salary'] }}
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="col" style="">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Work Type
+                                </h5>
+                                <h6 class="">
+                                    {{ $job['work_type'] }}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="col" style="">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Description
+                            </h5>
+                            <h6 class="">
+                                {{ $job['description'] }}
+                            </h6>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="col" style="">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Responsibilities
+                            </h5>
+                            <h6 class="">
+                                {{ $job['responsibility'] }}
+                            </h6>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="col" style="">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Benifits & Perks
+                            </h5>
+                            <h6 class="">
+                                {{ $job['benifits_perks'] }}
+                            </h6>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="col" style="">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Other Benifits
+                            </h5>
+                            <h6 class="">
+                                {{ $job['other_benifits'] }}
+                            </h6>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="col" style="">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Keywords
+                            </h5>
+                            <h6 class="">
+                                {{ $job['keywords'] }}
+                            </h6>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

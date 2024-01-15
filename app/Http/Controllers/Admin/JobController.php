@@ -7,7 +7,6 @@ use App\Models\Company;
 use App\Models\Job;
 use App\Models\JobProfile;
 use App\Models\Location;
-use App\Models\Profile;
 use App\Models\Qualification;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
@@ -110,7 +109,7 @@ class JobController extends Controller
 
     public function index()
     {
-        $jobs = $this->job->with(['profile', "company", "qualifications", "locations"])->get()->toArray();
+        $jobs = $this->job->with(['profile', "company"])->get()->toArray();
         return view('admin.job.index', compact('jobs'));
     }
 
@@ -126,12 +125,15 @@ class JobController extends Controller
 
     public function edit($id)
     {
-        $job = $this->job->where('id', $id)->get()->ToArray();
+        $job = $this->job->where('id', $id)->with(['profile', "company", "qualifications", "locations"])->get()->ToArray();
+        $qualifications = Qualification::all()->toArray();
+        $locations = Location::all()->toArray();
+        $profiles = JobProfile::all()->toArray();
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }
         $job  =  $job[0];
-        return view('admin.job.edit', compact('job'));
+        return view('admin.job.edit', compact('job', "qualifications", "locations"));
     }
 
     public function update(Request $request, $id)

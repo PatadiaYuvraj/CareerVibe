@@ -38,8 +38,8 @@
     <header id="header" class="header fixed-top d-flex align-items-center">
 
         <div class="d-flex align-items-center justify-content-between">
-            <a href="index.html" class="logo d-flex align-items-center">
-                <img src="{{ asset('admin/img/logo.png') }}" alt    ="">
+            <a href="{{ route('admin.dashboard') }}" class="logo d-flex align-items-center">
+                <img src="{{ asset('admin/img/logo.png') }}">
                 <span class="d-none d-lg-block">Carrer Vibe</span>
             </a>
             <i class="bi bi-list toggle-sidebar-btn"></i>
@@ -49,8 +49,8 @@
             <ul class="d-flex align-items-center">
 
                 <li class="nav-item me-3">
-                    <form class="search-form d-flex align-items-center" method="POST" action="#">
-                        <input type="text" name="query" placeholder="Search" title="Enter search keyword">
+                    <form class="search-form d-flex align-items-center">
+                        <input type="text" placeholder="Search" title="Enter search keyword">
                         <button type="submit" title="Search"><i class="bi bi-search"></i></button>
                     </form>
                 </li><!-- End Search Icon-->

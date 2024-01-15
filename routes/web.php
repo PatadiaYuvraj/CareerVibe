@@ -72,6 +72,11 @@ Route::group(['middleware' => "isUser"], function () {
 
 Route::group(['middleware' => "isAdmin"], function () {
     Route::prefix('/admin')->group(function () {
+        // admin edit profile
+        Route::get('/edit-profile',  [AdminController::class, "editProfile"])->name('admin.editProfile');
+        Route::post('/update-profile',  [AdminController::class, "updateProfile"])->name('admin.updateProfile');
+        Route::get('/change-password',  [AdminController::class, "changePassword"])->name('admin.changePassword');
+        Route::post('/change-password',  [AdminController::class, "doChangePassword"])->name('admin.doChangePassword');
         // dashboard 
         Route::get('/dashboard',  [AdminController::class, "dashboard"])->name('admin.dashboard');
         // logout 

@@ -115,4 +115,37 @@ class AdminService implements AdminRepo
         if (!($user->delete())) return ["status" => false, "msg" => "Deleting error", "data" => null];
         return ["status" => true, "msg" => "User Deleted Successfully", "data" => $user];
     }
+
+
+    public function validatePassword(Request $request): ValidationValidator
+    {
+        $validate = Validator::make($request->all(), [
+            "currentPassword" => "required|min:8",
+            "newPassword" => "required|min:8",
+            "confirmPassword" => 'required_with:newPassword|same:newPassword|min:8'
+        ]);
+
+        return $validate;
+    }
+
+    public function changePassword(array $data, $admin_id): array
+    {
+        $user = User::find($admin_id);
+        if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
+        if (!(Hash::check($data['currentPassword'], $user->password))) return ["status" => false, "msg" => "Current Password is not matched", "data" => null];
+        $user->password = Hash::make($data['newPassword']);
+        if (!($user->save())) return ["status" => false, "msg" => "Password not changed", "data" => null];
+        return ["status" => true, "msg" => "Password changed successfully", "data" => null];
+    }
+
+
+    public function updateAdmin(array $data, $admin_id): array
+    {
+        $user = User::find($admin_id);
+        if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        if (!($user->save())) return ["status" => false, "msg" => "User not updated", "data" => null];
+        return ["status" => true, "msg" => "User updated successfully", "data" => null];
+    }
 }
