@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string("state", 100);
             $table->string("country", 100);
             $table->integer("pincode")->nullable();
+            $table->index(['city', 'state', 'id']);
             $table->timestamps();
         });
     }

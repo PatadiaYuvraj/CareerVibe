@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\AdminService;
 use App\Services\AuthService;
+use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
@@ -17,6 +19,12 @@ class AdminController extends Controller
     public function __construct(AdminService $admin)
     {
         $this->admin = $admin;
+    }
+
+
+    public function dashboardNew()
+    {
+        return view('admin.dashboard.new');
     }
 
     public function dashboard()
@@ -165,5 +173,91 @@ class AdminController extends Controller
                 ->withErrors($validate)
                 ->withInput();
         }
+    }
+
+    public function updateProfileImage(Request $request)
+    {
+        $auth = new AuthService();
+        if (!$auth->isAdmin()) {
+            return redirect()->back()->with("warning", "You are not authorized");
+        }
+        $admin_id = Auth::guard('admin')->user()->id;
+        $validate = Validator::make($request->all(), [
+            "profile_image_url" => "required|image|mimes:jpeg,png,jpg|max:2048",
+        ]);
+        if ($validate->passes()) {
+            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
+            $obj = (new UploadApi())->upload(
+                $stored_path,
+                [
+                    'folder' => 'career-vibe/admins/profile_image',
+                    'resource_type' => 'image'
+                ]
+            );
+            $data = [
+                "profile_image_url" => $obj['secure_url'],
+            ];
+            $isUpdated = $this->admin->updateProfileImage($data, $admin_id);
+            if ($isUpdated['status']) {
+                unlink($stored_path);
+                return redirect()->route('admin.dashboard')->with("success", $isUpdated['msg']);
+            }
+            return redirect()->back()->with("warning", $isUpdated['msg']);
+        }
+        if ($validate->fails()) {
+            return redirect()->back()
+                ->withErrors($validate)
+                ->withInput();
+        }
+    }
+
+    // public function updateResume(Request $request)
+    // {
+    //     $auth = new AuthService();
+    //     if (!$auth->isAdmin()) {
+    //         return redirect()->back()->with("warning", "You are not authorized");
+    //     }
+    //     $admin_id = Auth::guard('admin')->user()->id;
+    //     $validate = Validator::make($request->all(), [
+    //         "resume_pdf_url" => "required|mimes:pdf|max:2048",
+    //     ]);
+    //     if ($validate->passes()) {
+    //         $stored_path = Storage::putFile('temp', $request->file('file'));
+    //         $obj = (new UploadApi())->upload(
+    //             $stored_path,
+    //             [
+    //                 'folder' => 'career-vibe/users/resume',
+    //                 'resource_type' => 'raw'
+    //             ]
+    //         );
+    //         $data = [
+    //             "resume_pdf_url" => $obj['secure_url'],
+    //         ];
+    //         $isUpdated = $this->admin->updateAdmin($data, $admin_id);
+    //         if ($isUpdated['status']) {
+    //             unlink($stored_path);
+    //             return redirect()->route('admin.dashboard')->with("success", $isUpdated['msg']);
+    //         }
+    //         return redirect()->back()->with("warning", $isUpdated['msg']);
+    //     }
+    //     if ($validate->fails()) {
+    //         return redirect()->back()
+    //             ->withErrors($validate)
+    //             ->withInput();
+    //     }
+    // }
+
+    public function deleteProfileImage()
+    {
+        $auth = new AuthService();
+        if (!$auth->isAdmin()) {
+            return redirect()->back()->with("warning", "You are not authorized");
+        }
+        $admin_id = Auth::guard('admin')->user()->id;
+        $isDeleted = $this->admin->deleteProfileImage($admin_id);
+        if ($isDeleted['status']) {
+            return redirect()->route('admin.dashboard')->with("success", $isDeleted['msg']);
+        }
+        return redirect()->back()->with("warning", $isDeleted['msg']);
     }
 }

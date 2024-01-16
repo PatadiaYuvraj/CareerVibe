@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string("email", 50)->unique()->index();
             $table->string("password", 100);
             $table->string("userType", 10)->default("USER");
-            $table->string('profileImage')->nullable();
-            $table->string("resume_pdf_url", 100)->nullable();
+            $table->text("profile_image_url")->nullable();
+            $table->text("resume_pdf_url")->nullable();
             $table->string("contact", 15)->nullable();
             $table->enum("gender", ["MALE", "FEMALE", "OTHER"])->nullable();
             $table->boolean('is_active')->default(true);
@@ -30,6 +30,7 @@ return new class extends Migration
             $table->text("about")->nullable();
             $table->string("experience", 200)->nullable();
             $table->rememberToken();
+            $table->index(['name', 'email', 'id']);
             $table->timestamps();
         });
     }

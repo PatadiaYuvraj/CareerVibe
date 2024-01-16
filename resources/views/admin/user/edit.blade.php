@@ -9,6 +9,43 @@
                     <a href="{{ route('admin.user.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
+                    <div class="row row-cols-2">
+                        <div class="mb-3 col">
+                            <label for="profile_image_url" class="form-label">Profile Image</label>
+                            <form action="{{ route('admin.user.updateProfileImage', $user['id']) }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="input-group">
+                                    <input name="profile_image_url" type="file" class="form-control"
+                                        id="profile_image_url" />
+                                    <button type="submit" class="btn btn-primary">
+                                        Upload
+                                    </button>
+                                </div>
+                                @error('profile_image_url')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </form>
+
+                        </div>
+                        <div class="mb-3 col">
+                            <label for="resume_pdf_url" class="form-label">Upload your resume here</label>
+                            <form action="{{ route('admin.user.updateResumePdf', $user['id']) }}" method="POST"
+                                enctype="multipart/form-data">
+                                @csrf
+                                <div class="input-group">
+                                    <input name="resume_pdf_url" type="file" class="form-control" id="resume_pdf_url" />
+                                    <button type="submit" class="btn btn-primary">
+                                        Upload
+                                    </button>
+                                </div>
+                                @error('resume_pdf_url')
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </form>
+
+                        </div>
+                    </div>
                     <form action="{{ route('admin.user.update', $user['id']) }}" method="POST">
                         @csrf
                         <div class="mb-3">

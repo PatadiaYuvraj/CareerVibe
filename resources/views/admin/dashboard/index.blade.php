@@ -2,27 +2,6 @@
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
 
-    {{-- 
-
-        name
-        email
-        password
-        userType
-        profileImage
-        resume_pdf_url
-        contact
-        gender
-        is_active
-        headline
-        education
-        interest
-        hobby
-        city
-        about
-        experience
-
-    --}}
-
     <main id="main" class="main">
         <section class="section profile">
             <div class="row">
@@ -53,24 +32,28 @@
                                     <h5 class="card-title">
                                         Profile Details
                                     </h5>
-                                    <div class="row mb-3">
-                                        <div class=" align-self-center col-lg-3 col-md-4 label">
+                                    <div class="row row-cols-3 mb-3">
+                                        <div class="col col-lg-3 col-md-4 label">
                                             Profile Image
                                         </div>
-                                        <div class="col col-md-8 col-lg-9">
-                                            <img class=" col img-fluid rounded-pill"
-                                                src="{{ asset('admin/img/profile-img.jpg') }}" alt="Profile" />
-                                            <div class="pt-2">
-                                                <a href="#" class="btn btn-primary btn-sm"
-                                                    title="Upload new profile image">
-                                                    <i class="bi bi-upload"></i>
-                                                </a>
-                                                <a href="#" class="btn btn-danger btn-sm"
-                                                    title="Remove my profile image">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
+                                        @if (Auth::guard('admin')->user()->profile_image_url)
+                                            <div class="col row row-cols-2">
+                                                <img src="{{ Auth::guard('admin')->user()->profile_image_url }}"
+                                                    alt="Profile Image" class="col p-1 img-thumbnail" width="100"
+                                                    height="100">
+                                                <form class="col" action="{{ route('admin.deleteProfileImage') }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    <button type="submit"
+                                                        class="btn btn-danger btn-sm mt-2">Delete</button>
+                                                </form>
+
                                             </div>
-                                        </div>
+                                        @else
+                                            <div class="col col-lg-9 col-md-8 text-danger">
+                                                No Profile Image
+                                            </div>
+                                        @endif
                                     </div>
                                     <div class="row">
                                         <div class="col col-lg-3 col-md-4 label">
@@ -88,36 +71,6 @@
                                             {{ Auth::guard('admin')->user()->email }}
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-lg-3 col-md-4 label">
-                                            Contact
-                                        </div>
-                                        <div class="col-lg-9 col-md-8">
-                                            {{-- check if not available --}}
-                                            @if (Auth::guard('admin')->user()->contact == null)
-                                                Not Available
-                                            @else
-                                                {{ Auth::guard('admin')->user()->contact }}
-                                            @endif
-                                        </div>
-                                    </div>
-                                    {{-- gender --}}
-
-
-
-
-
-                                    {{--  --}}
-                                    <div class="row mb-3">
-                                        <div class=" align-self-center col-lg-3 col-md-4 label">
-                                            Resume PDF
-                                        </div>
-                                        <div class="col col-md-8 col-lg-9">
-                                            <img class=" col img-fluid rounded-pill"
-                                                src="{{ asset('admin/img/profile-img.jpg') }}" alt="Profile" />
-                                        </div>
-                                    </div>
-                                    {{--  --}}
                                 </div>
                             </div>
                         </div>

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
@@ -107,10 +109,77 @@ class UserController extends Controller
 
     public function delete($id)
     {
-        $isDeleted = $this->user->where('id', $id)->delete();
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        if ($user->profile_image_url) {
+            Storage::delete($user->profile_image_url);
+        }
+        $isDeleted = $user->delete();
+
         if ($isDeleted) {
             return redirect()->route('admin.user.index')->with('success', 'User is deleted');
         }
         return redirect()->back()->with("warning", "User is not deleted");
+    }
+
+    // updateUserProfileImage
+    public function updateUserProfileImage(Request $request, $id)
+    {
+        $validate = Validator::make($request->all(), [
+            "profile_image_url" => "required|image|mimes:jpeg,png,jpg|max:2048",
+        ]);
+        // dd($validate->passes());
+        if ($validate->passes()) {
+            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
+            $obj = (new UploadApi())->upload(
+                $stored_path,
+                [
+                    'folder' => 'career-vibe/users/profile_image',
+                    'resource_type' => 'image'
+                ]
+            );
+            $data = [
+                "profile_image_url" => $obj['secure_url'],
+            ];
+            $isUpdated = $this->user->where('id', $id)->update($data);
+            if ($isUpdated) {
+                unlink($stored_path);
+                return redirect()->route('admin.user.index')->with("success", "User profile image is updated");
+            }
+            return redirect()->back()->with("warning", "User profile image is not updated");
+        }
+        if ($validate->fails()) {
+            return redirect()->back()
+                ->withErrors($validate)
+                ->withInput();
+        }
+    }
+
+    // updateUserResume
+    public function updateUserResume(Request $request, $id)
+    {
+        $validate = Validator::make($request->all(), [
+            "resume_pdf_url" => "required|mimes:pdf|max:2048",
+        ]);
+        // dd($validate->passes());
+        if ($validate->passes()) {
+            $stored_path = Storage::putFile('temp', $request->file('resume_pdf_url'));
+            $data = [
+                "resume_pdf_url" => $stored_path,
+            ];
+            $isUpdated = $this->user->where('id', $id)->update($data);
+            if ($isUpdated) {
+                // unlink($stored_path);
+                return redirect()->route('admin.user.index')->with("success", "User resume is updated");
+            }
+            return redirect()->back()->with("warning", "User resume is not updated");
+        }
+        if ($validate->fails()) {
+            return redirect()->back()
+                ->withErrors($validate)
+                ->withInput();
+        }
     }
 }

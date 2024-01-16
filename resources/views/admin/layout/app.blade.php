@@ -59,7 +59,10 @@
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="javascript:void(0);"
                         data-bs-toggle="dropdown">
-                        {{-- <img src="{{ asset('admin/img/profile-img.jpg') }}" alt="Profile" class="rounded-circle"> --}}
+                        @if (auth()->guard('admin')->user()->profile_image_url !== null)
+                            <img class="p-0 img-thumbnail border-0"
+                                src="{{ auth()->guard('admin')->user()->profile_image_url }}" />
+                        @endif
                         <span class="d-none d-md-block dropdown-toggle ps-2">
                             {{ auth()->guard('admin')->user()->name }}</span>
                     </a><!-- End Profile Iamge Icon -->
@@ -107,6 +110,12 @@
             </li> --}}
             {{-- <hr /> --}}
             <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('admin.dashboard') }}">
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('admin.company.index') }}">
                     <span>Company</span>
                 </a>
@@ -143,7 +152,13 @@
                     <span>Qualification</span>
                 </a>
             </li>
-
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link  collapsed   " href="{{ route('admin.dashboard.new') }}">
+                    {{-- <i class="bi bi-grid"></i> --}}
+                    <span>New Dashboard</span>
+                </a>
+            </li>
 
 
         </ul>

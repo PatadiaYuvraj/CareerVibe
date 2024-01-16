@@ -27,6 +27,11 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->string('keywords')->nullable();
             $table->enum('work_type', ['REMOTE', "WFO", "HYBRID"])->nullable();
+            $table->enum('job_type', ['FULL_TIME', "PART_TIME", "INTERNSHIP", "CONTRACT"])->nullable();
+            $table->enum('experience_level', ['FRESHER', "EXPERIENCED"])->nullable();
+            // if experience_level is EXPERIENCED then experience_type is required
+            $table->enum('experience_type', ['ANY', "1-2", "2-3", "3-5", "5-8", "8-10", "10+"])->nullable();
+            $table->index(['keywords', 'id']);
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->foreign('profile_id')->references('id')->on('job_profiles')->onDelete('cascade');
             $table->timestamps();

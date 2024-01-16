@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreign('jobs_id')->references('id')->on('jobs');
             $table->foreign('locations_id')->references('id')->on('locations');
             $table->unique(['jobs_id', 'locations_id']);
+            $table->index(['jobs_id', 'locations_id']);
             $table->timestamps();
         });
     }

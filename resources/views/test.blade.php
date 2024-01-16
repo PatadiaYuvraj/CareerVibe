@@ -15,14 +15,15 @@
 <body>
     <form action="{{ route('testing') }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <div class="card">
+        {{-- <div class="card">
             <div class="card-body">
 
                 <textarea class="tinymce-editor" name="name"></textarea>
             </div>
-        </div>
+        </div> --}}
+        <input type="file" name="file" id="file">
         <br>
-        <button type="submit">Send</button>
+        <button class="btn btn-primary" type="submit">Send</button>
     </form>
 </body>
 <script src="{{ asset('admin/vendor/quill/quill.min.js') }}"></script>

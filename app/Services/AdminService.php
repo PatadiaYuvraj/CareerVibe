@@ -148,4 +148,33 @@ class AdminService implements AdminRepo
         if (!($user->save())) return ["status" => false, "msg" => "User not updated", "data" => null];
         return ["status" => true, "msg" => "User updated successfully", "data" => null];
     }
+
+    public function updateProfileImage(array $data, $admin_id): array
+    {
+        $user = User::find($admin_id);
+        if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
+        $user->profile_image_url = $data['profile_image_url'];
+        if (!($user->save())) return ["status" => false, "msg" => "User not updated", "data" => null];
+        return ["status" => true, "msg" => "User updated successfully", "data" => null];
+    }
+
+    public function updateResumePdf(array $data, $admin_id): array
+    {
+        $user = User::find($admin_id);
+        if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
+        $user->resume_pdf_url = $data['resume_pdf_url'];
+        if (!($user->save())) return ["status" => false, "msg" => "User not updated", "data" => null];
+        return ["status" => true, "msg" => "User updated successfully", "data" => null];
+    }
+
+    // deleteProfileImage
+
+    public function deleteProfileImage($admin_id): array
+    {
+        $user = User::find($admin_id);
+        if (!$user) return ["status" => false, "msg" => "User not found", "data" => null];
+        $user->profile_image_url = null;
+        if (!($user->save())) return ["status" => false, "msg" => "User not updated", "data" => null];
+        return ["status" => true, "msg" => "User updated successfully", "data" => null];
+    }
 }
