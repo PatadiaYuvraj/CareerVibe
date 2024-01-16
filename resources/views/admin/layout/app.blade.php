@@ -29,7 +29,6 @@
 
     <link href="{{ asset('admin/css/style.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-
 </head>
 
 <body>
@@ -46,8 +45,8 @@
         </div><!-- End Logo -->
 
         <nav class="header-nav ms-auto">
-            <ul class="d-flex align-items-center">
 
+            <ul class="d-flex align-items-center">
                 <li class="nav-item me-3">
                     <form class="search-form d-flex align-items-center">
                         <input type="text" placeholder="Search" title="Enter search keyword">
@@ -152,15 +151,6 @@
                     <span>Qualification</span>
                 </a>
             </li>
-            <hr>
-            <li class="nav-item">
-                <a class="nav-link  collapsed   " href="{{ route('admin.dashboard.new') }}">
-                    {{-- <i class="bi bi-grid"></i> --}}
-                    <span>New Dashboard</span>
-                </a>
-            </li>
-
-
         </ul>
 
     </aside><!-- End Sidebar-->
@@ -216,6 +206,7 @@
             toastr.warning("{{ Session::get('warning') }}")
         }
     </script>
+    @yield('scripts')
 </body>
 
 </html>

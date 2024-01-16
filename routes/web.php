@@ -72,25 +72,18 @@ Route::group(['middleware' => "isUser"], function () {
 
 Route::group(['middleware' => "isAdmin"], function () {
     Route::prefix('/admin')->group(function () {
-        // admin edit profile 
         Route::get('/edit-profile',  [AdminController::class, "editProfile"])->name('admin.editProfile');
         Route::post('/update-profile',  [AdminController::class, "updateProfile"])->name('admin.updateProfile');
         Route::get('/change-password',  [AdminController::class, "changePassword"])->name('admin.changePassword');
         Route::post('/change-password',  [AdminController::class, "doChangePassword"])->name('admin.doChangePassword');
-        // profile_image_url
         Route::get('/edit-profile-image',  [AdminController::class, "editProfileImage"])->name('admin.editProfileImage');
         Route::post('/update-profile-image',  [AdminController::class, "updateProfileImage"])->name('admin.updateProfileImage');
-        // resume_pdf_url
         Route::get('/edit-resume-pdf',  [AdminController::class, "editResumePdf"])->name('admin.editResumePdf');
         Route::post('/update-resume-pdf',  [AdminController::class, "updateResumePdf"])->name('admin.updateResumePdf');
-        // deleteProfileImage
         Route::post('/delete-profile-image',  [AdminController::class, "deleteProfileImage"])->name('admin.deleteProfileImage');
-        // dashboard 
         Route::get('/dashboard',  [AdminController::class, "dashboard"])->name('admin.dashboard');
-        // admin.dashboard.new
-        Route::get('/dashboard/new',  [AdminController::class, "dashboardNew"])->name('admin.dashboard.new');
-        // logout 
         Route::get('/logout',  [AdminController::class, "logout"])->name('admin.logout');
+
         // User Routes 
         Route::prefix('user')->group(function () {
             Route::get('/create',  [AdminUserController::class, "create"])->name('admin.user.create');
@@ -100,10 +93,8 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/edit/{id}',  [AdminUserController::class, "edit"])->name('admin.user.edit');
             Route::post('/update/{id}',  [AdminUserController::class, "update"])->name('admin.user.update');
             Route::get('/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
-            // update Profile image
             // Route::get('/edit-profile-image/{id}',  [AdminUserController::class, "editProfileImage"])->name('admin.user.editProfileImage');
             Route::post('/update-profile-image/{id}',  [AdminUserController::class, "updateUserProfileImage"])->name('admin.user.updateProfileImage');
-            // update Resume pdfupdateResumePdf
             // Route::get('/edit-resume-pdf/{id}',  [AdminUserController::class, "editResumePdf"])->name('admin.user.editResumePdf');
             Route::post('/update-resume-pdf/{id}',  [AdminUserController::class, "updateUserResume"])->name('admin.user.updateResumePdf');
             // delete Profile image
@@ -119,6 +110,10 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::post('/update/{id}',  [CompanyController::class, "update"])->name('admin.company.update');
             Route::get('/delete/{id}',  [CompanyController::class, "delete"])->name('admin.company.delete');
             Route::get('/toggle-verified/{id}/{is_verified}',  [CompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
+            // create profile image store
+            Route::post('/store-profile-image/{id}',  [CompanyController::class, "storeProfileImage"])->name('admin.company.storeProfileImage');
+            Route::post('/update-profile-image/{id}',  [CompanyController::class, "updateCompanyProfileImage"])->name('admin.company.updateProfileImage');
+            Route::post('/delete-profile-image/{id}',  [CompanyController::class, "deleteProfileImage"])->name('admin.company.deleteProfileImage');
         });
         // Job Routes 
         Route::prefix('job')->group(function () {

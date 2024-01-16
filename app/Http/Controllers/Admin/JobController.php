@@ -10,7 +10,6 @@ use App\Models\Location;
 use App\Models\Qualification;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class JobController extends Controller
 {
@@ -49,62 +48,160 @@ class JobController extends Controller
 
     public function store(Request $request, $id)
     {
-        // dd($request->get('qualifications'), $request->get('locations'));
-        /*
-        $request->all() =
-        [
-            "vacancy" => "10"
-            "min_salary" => "10000"
-            "max_salary" => "20000"
-            "work_type" => "WFO"
-            "job_profile_id" => "4"
-            "qualifications" => array:2 [▶]
-            "locations" => array:2 [▶]
-            "description" => "Description"
-            "responsibility" => "Responsibilities"
-            "benifits_perks" => "Benifits & Perks"
-            "other_benifits" => "Other Benifits"
-            "keywords" => "Keywords"
-        ]
-        */
 
+        // 'experience_level' => ['FRESHER', "EXPERIENCED"]
+        // 'experience_type' => ['ANY', "1-2", "2-3", "3-5", "5-8", "8-10", "10+"]
+        // 'job_type' => ['FULL_TIME', "PART_TIME", "INTERNSHIP", "CONTRACT"]
+        $request->validate(
+            [
+                "profile_id" =>
+                [
+                    "required",
+                    "string",
+                    "max:100",
+                    function ($attribute, $value, $fail) {
+                        if (!JobProfile::where('id', $value)->exists()) {
+                            $fail("The selected $attribute is invalid.");
+                        }
+                    },
 
+                ],
+                "vacancy" => [
+                    "required",
+                    "integer",
+                    function ($attribute, $value, $fail) {
+                        if ($value <= 0) {
+                            $fail("The $attribute must be greater than 0.");
+                        }
+                    },
+                ],
+                "min_salary" => [
+                    "required",
+                    "integer",
+                    function ($attribute, $value, $fail) use ($request) {
+                        if ($value <= 0) {
+                            $fail("The minimum salary must be greater than 0.");
+                        }
 
-        $validate = Validator::make($request->all(), [
-            "profile_id" => "required|string|max:100",
-            "vacancy" => "required|integer",
-            "min_salary" => "required|integer",
-            "max_salary" => "required|integer",
-            "locations" => "required|array",
-            "qualifications" => "required|array",
-            "work_type" => "required|string|in:REMOTE,WFO,HYBRID",
-        ]);
-        if ($validate->passes()) {
-            $data = [
-                "company_id" => $id,
-                "profile_id" => $request->get("profile_id"),
-                "vacancy" => $request->get("vacancy"),
-                "min_salary" => $request->get("min_salary"),
-                "max_salary" => $request->get("max_salary"),
-                "description" => $request->get("description"),
-                "responsibility" => $request->get("responsibility"),
-                "benifits_perks" => $request->get("benifits_perks"),
-                "other_benifits" => $request->get("other_benifits"),
-                "keywords" => $request->get("keywords"),
-                "work_type" => $request->get("work_type"),
-            ];
-            $isCreated = $this->job->create($data);
+                        if ($value > $request->get('max_salary')) {
+                            $fail("The minimum salary must be less than max salary.");
+                        }
+                    },
 
-            if ($isCreated) {
-                $isCreated->qualifications()->attach($request->get('qualifications'));
-                $isCreated->locations()->attach($request->get('locations'));
-                return redirect()->route('admin.job.index')->with('success', 'Job is created');
-            }
-            return redirect()->back()->with("warning", "Job is not created");
+                ],
+                "max_salary" => [
+                    "required",
+                    "integer",
+                    // greater than min_salary
+                    function ($attribute, $value, $fail) use ($request) {
+                        if ($value < $request->get('min_salary')) {
+                            $fail("The $attribute must be greater than min salary.");
+                        }
+                    },
+                ],
+                "locations" => [
+                    "required",
+                    "array",
+                    function ($attribute, $value, $fail) {
+                        foreach ($value as $v) {
+                            if (!Location::where('id', $v)->exists()) {
+                                $fail("The selected $attribute is invalid.");
+                            }
+                        }
+                    },
+                ],
+                "qualifications" => [
+                    "required",
+                    "array",
+                    function ($attribute, $value, $fail) {
+                        foreach ($value as $v) {
+                            if (!Qualification::where('id', $v)->exists()) {
+                                $fail("The selected $attribute is invalid.");
+                            }
+                        }
+                    },
+                ],
+            ]
+        );
+        $data = [
+            "company_id" => $id,
+            "profile_id" => $request->get("profile_id"),
+            "vacancy" => $request->get("vacancy"),
+            "min_salary" => $request->get("min_salary"),
+            "max_salary" => $request->get("max_salary"),
+        ];
+
+        if ($request->get('description')) {
+            $request->validate([
+                "description" => "required|string",
+            ]);
+            $data['description'] = $request->get('description');
         }
-        if ($validate->fails()) {
-            return redirect()->back()->withErrors($validate)->withInput();
+        if ($request->get('responsibility')) {
+            $request->validate([
+                "responsibility" => "required|string",
+            ]);
+            $data['responsibility'] = $request->get('responsibility');
         }
+        if ($request->get('benifits_perks')) {
+            $request->validate([
+                "benifits_perks" => "required|string",
+            ]);
+            $data['benifits_perks'] = $request->get('benifits_perks');
+        }
+        if ($request->get('other_benifits')) {
+            $request->validate([
+                "other_benifits" => "required|string",
+            ]);
+            $data['other_benifits'] = $request->get('other_benifits');
+        }
+        if ($request->get('keywords')) {
+            $request->validate([
+                "keywords" => "required|string",
+            ]);
+            $data['keywords'] = $request->get('keywords');
+        }
+        if ($request->get('work_type')) {
+            $request->validate([
+                "work_type" => "required|string|in:REMOTE,WFO,HYBRID",
+            ]);
+            $data['work_type'] = $request->get('work_type');
+        }
+
+        if ($request->get('job_type')) {
+            $request->validate([
+                "job_type" => "required|string|in:FULL_TIME,PART_TIME,INTERNSHIP,CONTRACT",
+            ]);
+            $data['job_type'] = $request->get('job_type');
+        }
+
+        if ($request->get('experience_level')) {
+            $request->validate([
+                "experience_level" => "required|string|in:FRESHER,EXPERIENCED",
+            ]);
+            $data['experience_level'] = $request->get('experience_level');
+        }
+
+        if ($request->get('experience_type')) {
+            $request->validate([
+                "experience_type" => "required|string|in:ANY,1-2,2-3,3-5,5-8,8-10,10+",
+            ]);
+            $data['experience_type'] = $request->get('experience_type');
+        }
+
+        $data['is_verified'] = 0;
+        $data['is_featured'] = 0;
+        $data['is_active'] = 1;
+        $isCreated = $this->job->create($data);
+
+        // dd($isCreated);
+
+        if ($isCreated) {
+            $isCreated->locations()->attach($request->get('locations'));
+            $isCreated->qualifications()->attach($request->get('qualifications'));
+            return redirect()->route('admin.job.index')->with('success', 'Job is created');
+        }
+        return redirect()->back()->with("warning", "Job is not created");
     }
 
     public function index()
@@ -140,52 +237,167 @@ class JobController extends Controller
     public function update(Request $request, $id)
     {
 
-        $validate = Validator::make($request->all(), [
-            "profile_id" => "required|string|max:100",
-            "vacancy" => "required|integer",
-            "min_salary" => "required|integer",
-            "max_salary" => "required|integer",
-            "description" => "required|string",
-            "responsibility" => "required|string",
-            "benifits_perks" => "required|string",
-            "other_benifits" => "required|string",
-            "keywords" => "required|string",
-            "work_type" => "required|string",
-        ]);
-        if ($validate->passes()) {
-            $data = [
-                "profile_id" => $request->get("profile_id"),
-                "vacancy" => $request->get("vacancy"),
-                "min_salary" => $request->get("min_salary"),
-                "max_salary" => $request->get("max_salary"),
-                "description" => $request->get("description"),
-                "responsibility" => $request->get("responsibility"),
-                "benifits_perks" => $request->get("benifits_perks"),
-                "other_benifits" => $request->get("other_benifits"),
-                "keywords" => $request->get("keywords"),
-                "work_type" => $request->get("work_type"),
-            ];
-            $isUpdated = $this->job->where('id', $id)->first();
-            $isUpdated->update($data);
-            if ($isUpdated) {
-                $d = $isUpdated->qualifications()->sync($request->get('qualifications'));
-                $isUpdated->locations()->sync($request->get('locations'));
-                return redirect()->route('admin.job.index')->with('success', 'Job is updated');
-            }
-            return redirect()->back()->with("warning", "Job is not updated");
+        // 'experience_level' => ['FRESHER', "EXPERIENCED"]
+        // 'experience_type' => ['ANY', "1-2", "2-3", "3-5", "5-8", "8-10", "10+"]
+        // 'job_type' => ['FULL_TIME', "PART_TIME", "INTERNSHIP", "CONTRACT"]
+        $request->validate(
+            [
+                "profile_id" =>
+                [
+                    "required",
+                    "string",
+                    "max:100",
+                    function ($attribute, $value, $fail) {
+                        if (!JobProfile::where('id', $value)->exists()) {
+                            $fail("The selected $attribute is invalid.");
+                        }
+                    },
+
+                ],
+                "vacancy" => [
+                    "required",
+                    "integer",
+                    function ($attribute, $value, $fail) {
+                        if ($value <= 0) {
+                            $fail("The $attribute must be greater than 0.");
+                        }
+                    },
+                ],
+                "min_salary" => [
+                    "required",
+                    "integer",
+                    function ($attribute, $value, $fail) use ($request) {
+                        if ($value <= 0) {
+                            $fail("The minimum salary must be greater than 0.");
+                        }
+
+                        if ($value > $request->get('max_salary')) {
+                            $fail("The minimum salary must be less than max salary.");
+                        }
+                    },
+
+                ],
+                "max_salary" => [
+                    "required",
+                    "integer",
+                    // greater than min_salary
+                    function ($attribute, $value, $fail) use ($request) {
+                        if ($value < $request->get('min_salary')) {
+                            $fail("The $attribute must be greater than min salary.");
+                        }
+                    },
+                ],
+                "locations" => [
+                    "required",
+                    "array",
+                    function ($attribute, $value, $fail) {
+                        foreach ($value as $v) {
+                            if (!Location::where('id', $v)->exists()) {
+                                $fail("The selected $attribute is invalid.");
+                            }
+                        }
+                    },
+                ],
+                "qualifications" => [
+                    "required",
+                    "array",
+                    function ($attribute, $value, $fail) {
+                        foreach ($value as $v) {
+                            if (!Qualification::where('id', $v)->exists()) {
+                                $fail("The selected $attribute is invalid.");
+                            }
+                        }
+                    },
+                ],
+            ]
+        );
+        $data = [
+            "profile_id" => $request->get("profile_id"),
+            "vacancy" => $request->get("vacancy"),
+            "min_salary" => $request->get("min_salary"),
+            "max_salary" => $request->get("max_salary"),
+        ];
+
+        if ($request->get('description')) {
+            $request->validate([
+                "description" => "required|string",
+            ]);
+            $data['description'] = $request->get('description');
         }
-        if ($validate->fails()) {
-            return redirect()->back()->withErrors($validate)->withInput();
+        if ($request->get('responsibility')) {
+            $request->validate([
+                "responsibility" => "required|string",
+            ]);
+            $data['responsibility'] = $request->get('responsibility');
         }
+        if ($request->get('benifits_perks')) {
+            $request->validate([
+                "benifits_perks" => "required|string",
+            ]);
+            $data['benifits_perks'] = $request->get('benifits_perks');
+        }
+        if ($request->get('other_benifits')) {
+            $request->validate([
+                "other_benifits" => "required|string",
+            ]);
+            $data['other_benifits'] = $request->get('other_benifits');
+        }
+        if ($request->get('keywords')) {
+            $request->validate([
+                "keywords" => "required|string",
+            ]);
+            $data['keywords'] = $request->get('keywords');
+        }
+        if ($request->get('work_type')) {
+            $request->validate([
+                "work_type" => "required|string|in:REMOTE,WFO,HYBRID",
+            ]);
+            $data['work_type'] = $request->get('work_type');
+        }
+
+        if ($request->get('job_type')) {
+            $request->validate([
+                "job_type" => "required|string|in:FULL_TIME,PART_TIME,INTERNSHIP,CONTRACT",
+            ]);
+            $data['job_type'] = $request->get('job_type');
+        }
+
+        if ($request->get('experience_level')) {
+            $request->validate([
+                "experience_level" => "required|string|in:FRESHER,EXPERIENCED",
+            ]);
+            $data['experience_level'] = $request->get('experience_level');
+        }
+
+        if ($request->get('experience_type')) {
+            $request->validate([
+                "experience_type" => "required|string|in:ANY,1-2,2-3,3-5,5-8,8-10,10+",
+            ]);
+            $data['experience_type'] = $request->get('experience_type');
+        }
+
+        $isUpdated = $this->job->find($id);
+        $isUpdated->update($data);
+        if ($isUpdated) {
+            $d = $isUpdated->qualifications()->sync($request->get('qualifications'));
+            $isUpdated->locations()->sync($request->get('locations'));
+            return redirect()->route('admin.job.index')->with('success', 'Job is updated');
+        }
+        return redirect()->back()->with("warning", "Job is not updated");
     }
 
     public function delete($id)
     {
-        $isDeleted = $this->job->where('id', $id)->delete();
-        if ($isDeleted) {
-            return redirect()->route('admin.job.index')->with('success', 'Job is deleted');
+        // delete job with locatoin and qualification
+        $isDeleted = $this->job->find($id);
+        // delete job with locatoin and qualification
+        $isDeleted->locations()->detach();
+        $isDeleted->qualifications()->detach();
+        $isDeleted->delete();
+        if (!$isDeleted) {
+            return redirect()->back()->with("warning", "Job is not found");
         }
-        return redirect()->back()->with("warning", "Job is not deleted");
+        return redirect()->route('admin.job.index')->with('success', 'Job is deleted');
     }
 
     public function toggleVerified($id, $is_verified)
@@ -230,6 +442,13 @@ class JobController extends Controller
 
     public function toggleActive($id, $is_active)
     {
+
+        // isactice has oly two value 0 and 1 validate it
+
+
+
+
+
         if (!$this->auth->isAdmin() && !$this->auth->isCompany()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }

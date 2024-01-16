@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string("password", 100);
             $table->string("userType", 10)->default("USER");
             $table->text("profile_image_url")->nullable();
+            $table->text("profile_image_public_id")->nullable();
             $table->text("resume_pdf_url")->nullable();
             $table->string("contact", 15)->nullable();
             $table->enum("gender", ["MALE", "FEMALE", "OTHER"])->nullable();

@@ -25,7 +25,8 @@ class QualificationController extends Controller
     public function store(Request $request)
     {
         $validate = Validator::make($request->all(), [
-            "qualification" => "required|string|max:100",
+            // unique
+            "qualification" => "required|string|max:100|unique:qualifications",
         ]);
         if ($validate->passes()) {
             $data = [

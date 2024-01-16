@@ -21,12 +21,6 @@ class AdminController extends Controller
         $this->admin = $admin;
     }
 
-
-    public function dashboardNew()
-    {
-        return view('admin.dashboard.new');
-    }
-
     public function dashboard()
     {
         return view('admin.dashboard.index');

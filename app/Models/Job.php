@@ -20,11 +20,14 @@ class Job extends Model
         'responsibility',
         'benifits_perks',
         'other_benifits',
+        'keywords',
         'is_verified',
         'is_featured',
         'is_active',
-        'keywords',
         'work_type',
+        "job_type",
+        "experience_level",
+        "experience_type"
     ];
 
     // job has one company
