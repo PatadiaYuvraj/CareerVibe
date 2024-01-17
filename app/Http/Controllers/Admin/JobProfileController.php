@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\JobProfile;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class JobProfileController extends Controller
 {
@@ -25,29 +24,27 @@ class JobProfileController extends Controller
 
     public function store(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            "profile" => "required|string|max:100",
+        $request->validate([
+            "profile" => [
+                "required",
+                "string",
+                "max:100",
+                "unique:job_profiles,profile",
+            ]
         ]);
-        if ($validate->passes()) {
-            $data = [
-                "profile" => $request->get("profile"),
-            ];
-            $isCreated = $this->profile->create($data);
-            if ($isCreated) {
-                return redirect()->route('admin.job-profile.index')->with('success', 'Profile is created');
-            }
-            return redirect()->back()->with("warning", "Profile is not created");
+        $data = [
+            "profile" => $request->get("profile"),
+        ];
+        $isCreated = $this->profile->create($data);
+        if ($isCreated) {
+            return redirect()->route('admin.job-profile.index')->with('success', 'Job Profile is created');
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
+        return redirect()->back()->with("warning", "Job Profile is not created");
     }
 
     public function index()
     {
-        $profiles = $this->profile->paginate(5);
+        $profiles = $this->profile->withCount('jobs')->paginate(5);
         return view('admin.job-profile.index', compact('profiles'));
     }
 
@@ -74,32 +71,38 @@ class JobProfileController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validate = Validator::make($request->all(), [
-            "profile" => "required|string|max:100",
+        $request->validate([
+            "profile" => [
+                "required",
+                "string",
+                "max:100",
+                "unique:job_profiles,profile",
+            ]
         ]);
-        if ($validate->passes()) {
-            $data = [
-                "profile" => $request->get("profile"),
-            ];
-            $isUpdated = $this->profile->where('id', $id)->update($data);
-            if ($isUpdated) {
-                return redirect()->route('admin.job-profile.index')->with('success', 'Profile is updated');
-            }
-            return redirect()->back()->with("warning", "Profile is not updated");
+        $data = [
+            "profile" => $request->get("profile"),
+        ];
+        $isUpdated = $this->profile->where('id', $id)->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.job-profile.index')->with('success', 'Job Profile is updated');
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
+        return redirect()->back()->with("warning", "Job Profile is not updated");
     }
 
     public function delete($id)
     {
-        $isDeleted =  $this->profile->where('id', $id)->delete();
-        if ($isDeleted) {
-            return redirect()->route('admin.job-profile.index')->with('success', 'Profile is deleted');
+        $profile = $this->profile->where('id', $id)->withCount('jobs')->get()->ToArray();
+        if (!$profile) {
+            return redirect()->back()->with("warning", "Job Profile is not found");
         }
-        return redirect()->back()->with("warning", "Profile is not deleted");
+        $profile =  $profile[0];
+        if ($profile['jobs_count'] == 0) {
+            $isDeleted = $this->profile->where('id', $id)->delete();
+            if ($isDeleted) {
+                return redirect()->route('admin.job-profile.index')->with('success', 'Job Profile is deleted');
+            }
+            return redirect()->back()->with("warning", "Job Profile is not deleted");
+        }
+        return redirect()->back()->with("warning", "Job Profile is not deleted, because it has jobs associated with it");
     }
 }

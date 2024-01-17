@@ -10,29 +10,35 @@
                     <a href="{{ route('admin.company.create') }}" class="float-end btn btn-sm btn-primary">Add Company</a>
                 </div>
                 <div class="card-body">
-                    <table class="table table-striped">
+                    <table class="table text-center table-striped">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Company Name</th>
-                                <th>Company Email</th>
-                                <th>Company Website</th>
-                                <th>Verified</th>
-                                <th>Action</th>
+                                <th class="col-2">Company Name</th>
+                                <th class="col-2">Company Email</th>
+                                <th class="col-2">Profile</th>
+                                <th class="col-1">Jobs</th>
+                                <th class="col-1">Verified</th>
+                                <th class="col-2">Action</th>
                             </tr>
                         </thead>
 
                         <tbody>
                             @forelse ($companies as $company)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
                                     <td>
                                         <a href="{{ route('admin.company.show', $company['id']) }}">
                                             {{ $company['name'] }}
                                         </a>
                                     </td>
                                     <td>{{ $company['email'] }}</td>
-                                    <td>{{ $company['website'] }}</td>
+                                    <td>
+                                        @if ($company['profile_image_url'])
+                                            <a href="{{ $company['profile_image_url'] }}" target="_blank">View</a>
+                                        @else
+                                            <span class="text-danger">Not Available</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $company['jobs_count'] }}</td>
                                     <td>
                                         <a href="{{ route('admin.company.toggleVerified', [$company['id'], $company['is_verified']]) }}"
                                             class=" badge bg-{{ $company['is_verified'] ? 'success' : 'danger' }}">
@@ -54,7 +60,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center">No Company Found</td>
+                                    <td colspan="100" class="text-center">No Company Found</td>
                                 </tr>
                             @endforelse
                         </tbody>

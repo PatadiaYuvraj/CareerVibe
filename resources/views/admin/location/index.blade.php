@@ -13,16 +13,17 @@
                         Location</a>
                 </div>
                 <div class="card-body">
-                    <table class="table  table-striped">
+                    <table class="table text-center table-striped">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>City</th>
-                                <th>State</th>
-                                <th>Country</th>
-                                <th>Pin Code</th>
-                                <th>Created At</th>
-                                <th>Action</th>
+                                <th class="col-1">#</th>
+                                <th class="col-2">City</th>
+                                <th class="col-1">State</th>
+                                <th class="col-1">Country</th>
+                                <th class="col-2">Pin Code</th>
+                                <th class="col-2">Available Jobs</th>
+                                <th class="col-2">Created At</th>
+                                <th class="col-1">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -33,11 +34,35 @@
                                         <a href="{{ route('admin.location.show', $location['id']) }}">{{ $location['city'] }}
                                         </a>
                                     </td>
-                                    <td>{{ $location['state'] }}</td>
-                                    <td>{{ $location['country'] }}</td>
-                                    <td>{{ $location['pincode'] }}</td>
-                                    <td>{{ date('d-m-Y', strtotime($location['created_at'])) }}</td>
                                     <td>
+                                        @if ($location['state'] != null)
+                                            {{ $location['state'] }}
+                                        @else
+                                            {{ 'N/A' }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($location['country'] != null)
+                                            {{ $location['country'] }}
+                                        @else
+                                            {{ 'N/A' }}
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($location['pincode'] != null)
+                                            {{ $location['pincode'] }}
+                                        @else
+                                            {{ 'N/A' }}
+                                        @endif
+                                    </td>
+                                    <td>{{ $location['jobs_count'] }}</td>
+
+                                    @if ($location['created_at'] != null)
+                                        <td>{{ $location['created_at']->format('d-m-Y') }}</td>
+                                    @else
+                                        <td>N/A</td>
+                                    @endif
+                                    <td class="btn-group">
                                         <a href="{{ route('admin.location.edit', $location['id']) }}"
                                             class="btn btn-sm btn-primary">Edit</a>
                                         <a href="{{ route('admin.location.delete', $location['id']) }}"
@@ -46,7 +71,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7" class="text-center">No Location Found</td>
+                                    <td colspan="8" class="text-center">No Location Found</td>
                                 </tr>
                             @endforelse
                     </table>

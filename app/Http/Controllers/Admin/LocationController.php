@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Location;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class LocationController extends Controller
 {
@@ -23,35 +22,60 @@ class LocationController extends Controller
 
     public function store(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            "city" => "required|string|max:100",
-            "state" => "required|string|max:100",
-            "country" => "required|string|max:100",
-            "pincode" => "required|numeric",
+        $request->validate([
+            "city" => [
+                "required",
+                "string",
+                "max:100",
+            ],
         ]);
-        if ($validate->passes()) {
-            $data = [
-                "city" => $request->get("city"),
-                "state" => $request->get("state"),
-                "country" => $request->get("country"),
-                "pincode" => $request->get("pincode"),
-            ];
-            $isCreated = $this->location->create($data);
-            if ($isCreated) {
-                return redirect()->route('admin.location.index')->with('success', 'Location is created');
-            }
-            return redirect()->back()->with("warning", "Location is not created");
+        // validate request data 
+        $data = [
+            "city" => $request->get("city"),
+        ];
+
+        if ($request->get("state")) {
+            $request->validate([
+                "state" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data["state"] = $request->get("state");
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
+
+        if ($request->get("country")) {
+            $request->validate([
+                "country" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data["country"] = $request->get("country");
         }
+
+        if ($request->get("pincode")) {
+            $request->validate([
+                "pincode" => [
+                    "required",
+                    "numeric",
+                    "digits:6",
+                ],
+            ]);
+            $data["pincode"] = $request->get("pincode");
+        }
+        $isCreated = $this->location->create($data);
+        if ($isCreated) {
+            return redirect()->route('admin.location.index')->with('success', 'Location is created');
+        }
+        return redirect()->back()->with("warning", "Location is not created");
     }
 
     public function index()
     {
-        $locations = $this->location->paginate(2);
+        $locations = $this->location->withCount('jobs')->paginate(5);
         return view('admin.location.index', compact('locations'));
     }
 
@@ -77,38 +101,75 @@ class LocationController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validate = Validator::make($request->all(), [
-            "city" => "required|string|max:100",
-            "state" => "required|string|max:100",
-            "country" => "required|string|max:100",
-            "pincode" => "required|numeric",
+        $request->validate([
+            "city" => [
+                "required",
+                "string",
+                "max:100",
+            ],
         ]);
-        if ($validate->passes()) {
-            $data = [
-                "city" => $request->get("city"),
-                "state" => $request->get("state"),
-                "country" => $request->get("country"),
-                "pincode" => $request->get("pincode"),
-            ];
-            $isUpdated = $this->location->where('id', $id)->update($data);
-            if ($isUpdated) {
-                return redirect()->route('admin.location.index')->with('success', 'Location is updated');
-            }
-            return redirect()->back()->with("warning", "Location is not updated");
+
+        $data = [
+            "city" => $request->get("city"),
+        ];
+
+        if ($request->get("state")) {
+            $request->validate([
+                "state" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data["state"] = $request->get("state");
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
+
+        if ($request->get("country")) {
+            $request->validate([
+                "country" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data["country"] = $request->get("country");
         }
+
+        if ($request->get("pincode")) {
+            $request->validate([
+                "pincode" => [
+                    "required",
+                    "numeric",
+                    "digits:6",
+                ],
+            ]);
+            $data["pincode"] = $request->get("pincode");
+        }
+        $isUpdated = $this->location->find($id);
+        if (!$isUpdated) {
+            return redirect()->back()->with("warning", "Location is not found");
+        }
+        $isUpdated = $isUpdated->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.location.index')->with('success', 'Location is updated');
+        }
+        return redirect()->back()->with("warning", "Location is not updated");
     }
 
     public function delete($id)
     {
-        $isDeleted = $this->location->where('id', $id)->delete();
-        if ($isDeleted) {
-            return redirect()->route('admin.location.index')->with('success', 'Location is deleted');
+        $location = $this->location->where('id', $id)->withCount('jobs')->get()->ToArray();
+        if (!$location) {
+            return redirect()->back()->with("warning", "Location is not found");
         }
-        return redirect()->back()->with("warning", "Location is not deleted");
+        $location =  $location[0];
+        if ($location['jobs_count'] == 0) {
+            $isDeleted = $this->location->where('id', $id)->delete();
+            if ($isDeleted) {
+                return redirect()->route('admin.location.index')->with('success', 'Location is deleted');
+            }
+            return redirect()->back()->with("warning", "Location is not deleted");
+        }
+        return redirect()->back()->with("warning", "Location is not deleted, because it has jobs associated with it");
     }
 }

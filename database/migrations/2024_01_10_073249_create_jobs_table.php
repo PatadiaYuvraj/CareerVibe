@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('company_id')->unsigned();
             $table->bigInteger('profile_id')->unsigned();
-            $table->tinyInteger("vacancy")->nullable(); // no of vacancy of this job
+            $table->tinyInteger("vacancy")->nullable();
             $table->mediumInteger("min_salary")->nullable();
             $table->mediumInteger("max_salary")->nullable();
             $table->text('description')->nullable();

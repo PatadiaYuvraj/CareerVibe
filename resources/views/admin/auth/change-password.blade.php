@@ -46,7 +46,8 @@
 
                                     <div class="row mb-3">
                                         <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">
-                                            New Password</label>
+                                            New Password
+                                        </label>
                                         <div class="col-md-8 col-lg-9">
                                             <input name="newPassword" type="password" class="form-control"
                                                 id="newPassword" />
@@ -57,8 +58,9 @@
                                     </div>
 
                                     <div class="row mb-3">
-                                        <label for="confirmPassword" class="col-md-4 col-lg-3 col-form-label">Confirm
-                                            Password</label>
+                                        <label for="confirmPassword" class="col-md-4 col-lg-3 col-form-label">
+                                            Confirm Password
+                                        </label>
                                         <div class="col-md-8 col-lg-9">
                                             <input name="confirmPassword" type="password" class="form-control"
                                                 id="confirmPassword" />

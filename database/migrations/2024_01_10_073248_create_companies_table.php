@@ -19,11 +19,13 @@ return new class extends Migration
             $table->string('email', 100)->unique();
             $table->string('password', 100)->nullable();
             $table->text("profile_image_url")->nullable();
+            $table->text("profile_image_public_id")->nullable();
             $table->string('website', 100)->nullable();
             $table->string('address_line_1', 100)->nullable();
             $table->string('address_line_2', 100)->nullable();
             $table->string('linkedin_profile', 100)->nullable();
             $table->text('description')->nullable();
+            $table->index(['name', 'email', 'id']);
             $table->rememberToken();
             $table->timestamps();
         });

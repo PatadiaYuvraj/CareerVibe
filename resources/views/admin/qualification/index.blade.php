@@ -13,12 +13,14 @@
                         Qualification</a>
                 </div>
                 <div class="card-body">
-                    <table class="table  table-striped">
+                    <table class="table text-center table-striped">
                         <thead>
                             <tr>
                                 <th class="col-2">#</th>
-                                <th class="col-7">Name</th>
-                                <th class="col-3">Action</th>
+                                <th class="col-2">Name</th>
+                                <th class="col-2">Available Jobs</th>
+                                <th class="col-2">Created At</th>
+                                <th class="col-2">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -29,7 +31,15 @@
                                         <a href="{{ route('admin.qualification.show', $qualification['id']) }}">{{ $qualification['qualification'] }}
                                         </a>
                                     </td>
-                                    <td class="">
+                                    <td>{{ $qualification['jobs_count'] }}</td>
+                                    <td>
+                                        @if ($qualification['created_at'])
+                                            {{ $qualification['created_at']->format('d-m-Y') }}
+                                        @else
+                                            {{ 'N/A' }}
+                                        @endif
+                                    </td>
+                                    <td class="btn-group">
                                         <a href="{{ route('admin.qualification.edit', $qualification['id']) }}"
                                             class="btn btn-sm btn-primary">Edit</a>
                                         <a href="{{ route('admin.qualification.delete', $qualification['id']) }}"
@@ -38,7 +48,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="3" class="text-center">No Qualification Found</td>
+                                    <td colspan="5" class="text-center">No Qualification Found</td>
                                 </tr>
                             @endforelse
                         </tbody>

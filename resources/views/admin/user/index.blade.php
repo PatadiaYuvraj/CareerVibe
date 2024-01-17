@@ -17,10 +17,8 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                {{-- true if profile image is available --}}
                                 <th>Profile Image</th>
                                 <th>Resume</th>
-
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -32,8 +30,6 @@
                                     <td>{{ $user['email'] }}</td>
                                     <td>
                                         @if ($user['profile_image_url'])
-                                            {{-- <img src="{{ $user['profile_image_url'] }}" alt="{{ $user['name'] }}"
-                                                width="100" height="100"> --}}
                                             <a href="{{ $user['profile_image_url'] }}" target="_blank">View</a>
                                         @else
                                             <span class="text-danger">Not Available</span>
@@ -46,7 +42,7 @@
                                             <span class="text-danger">Not Available</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    <td class="btn-group">
                                         <a href="{{ route('admin.user.edit', $user['id']) }}"
                                             class="btn btn-sm btn-primary">Edit</a>
                                         <a href="{{ route('admin.user.delete', $user['id']) }}"

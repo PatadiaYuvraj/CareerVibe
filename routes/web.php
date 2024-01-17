@@ -110,7 +110,6 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::post('/update/{id}',  [CompanyController::class, "update"])->name('admin.company.update');
             Route::get('/delete/{id}',  [CompanyController::class, "delete"])->name('admin.company.delete');
             Route::get('/toggle-verified/{id}/{is_verified}',  [CompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
-            // create profile image store
             Route::post('/store-profile-image/{id}',  [CompanyController::class, "storeProfileImage"])->name('admin.company.storeProfileImage');
             Route::post('/update-profile-image/{id}',  [CompanyController::class, "updateCompanyProfileImage"])->name('admin.company.updateProfileImage');
             Route::post('/delete-profile-image/{id}',  [CompanyController::class, "deleteProfileImage"])->name('admin.company.deleteProfileImage');

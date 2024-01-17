@@ -2,7 +2,6 @@
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
     <main id="main" class="main">
-
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header">
@@ -14,10 +13,8 @@
                             <li class="breadcrumb-item active" aria-current="page">Show</li>
                         </ol>
                     </nav>
-                    {{-- <a href="{{ route('admin.qualification.index') }}" class="float-end btn btn-sm btn-primary">Back</a> --}}
                 </div>
                 <div class="card-body">
-
                     <div class="jumbotron">
                         <h1 class="display-5">{{ $qualification['qualification'] }}</h1>
                         <p class="lead">Created At :
@@ -32,9 +29,10 @@
                                 href="{{ route('admin.qualification.edit', $qualification['id']) }}">Edit</a>
                         </p>
                     </div>
-
                     <div class="card shadow-none">
-                        <div class="card-header h3">Jobs</div>
+                        <div class="card-header h3">
+                            Jobs({{ count($qualification['jobs']) }})
+                        </div>
                         <div class="card-body">
                             <div class="row row-cols-3">
                                 @forelse ($qualification['jobs'] as $job)

@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\DeleteFromCloudinary;
 use App\Models\User;
-use Cloudinary\Api\Admin\AdminApi;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -27,23 +27,20 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            "name" => "required|min:5|max:30",
-            "email" => "required|email|unique:users",
-            "password" => "required|min:8",
-            "password_confirmation" => "required|min:8|same:password",
+            'name' => ['required', 'string', 'max:25'],
+            'email' => ['required', 'string', 'email', 'max:50', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'max:100'],
+            'password_confirmation' => ['required', 'string', 'min:8', 'max:100', 'same:password'],
         ]);
-        // $data = [
-        //     "name" => $request->get("name"),
-        //     "email" => $request->get("email"),
-        //     "password" => $request->get("password"),
-        //     "password_confirmation" => $request->get("password_confirmation"),
-        // ];
-        $data['name'] = $request->get('name');
-        $data['email'] = $request->get('email');
-        $data['password'] = $request->get('password');
+        $data = [
+            "name" => $request->name,
+            "email" => $request->email,
+            "password" => Hash::make($request->password),
+        ];
+
         if ($request->file('profile_image_url')) {
             $request->validate([
-                "profile_image_url" => "required|image|mimes:jpeg,png,jpg|max:2048",
+                "profile_image_url" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
             ]);
             $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
             $obj = (new UploadApi())->upload(
@@ -53,88 +50,98 @@ class UserController extends Controller
                     'resource_type' => 'image'
                 ]
             );
-
-            $data['profile_image_public_id'] = $obj['public_id'];
-            $data['profile_image_url'] = $obj['secure_url'];
+            $data["profile_image_public_id"] = $obj['public_id'];
+            $data["profile_image_url"] = $obj['secure_url'];
             unlink($stored_path);
         }
+
         if ($request->file('resume_pdf_url')) {
             $request->validate([
-                "resume_pdf_url" => "required|mimes:pdf|max:2048",
+                "resume_pdf_url" => ["required", "mimes:pdf", "max:2048",],
             ]);
-            $resume_path = Storage::putFile('temp', $request->file('resume_pdf_url'));
+            $stored_path = Storage::putFile('temp', $request->file('resume_pdf_url'));
+            $data["resume_pdf_url"] = $stored_path;
+            $data["resume_pdf_public_id"] = null;
+        }
 
-            $data['resume_pdf_url'] = $resume_path;
-        }
-        if ($request->get('contact')) {
+        if ($request->contact) {
             $request->validate([
-                "contact" => "required|numeric",
+                "contact" => ["required", "string", "max:15",],
             ]);
-            $data['resume_pdf_url'] = $request->file('resume_pdf_url');
+            $data["contact"] = $request->contact;
         }
-        if ($request->get('city')) {
+
+        if ($request->city) {
             $request->validate([
-                "city" => "required|string",
+                "city" => ["required", "string", "max:30",],
             ]);
-            $data['city'] = $request->get('city');
+            $data["city"] = $request->city;
         }
+
+        if ($request->headline) {
+            $request->validate([
+                "headline" => ["required", "string", "max:100",],
+            ]);
+            $data["headline"] = $request->headline;
+        }
+
         if ($request->get('gender')) {
             $request->validate([
-                'gender' => 'required|in:MALE,FEMALE,OTHER|string'
+                'gender' => ['required', 'string', 'max:10', 'in:MALE,FEMALE,OTHER'],
             ]);
-        }
-        if ($request->get('interest')) {
-            $request->validate([
-                "interest" => "required|string",
-            ]);
-            $data['interest'] = $request->get('interest');
         }
 
-        if ($request->get('hobby')) {
+        if ($request->education) {
             $request->validate([
-                "hobby" => "required|string",
+                "education" => ["required", "string", "max:200",],
             ]);
-            $data['hobby'] = $request->get('hobby');
+            $data["education"] = $request->education;
         }
 
-        if ($request->get('education')) {
+        if ($request->interest) {
             $request->validate([
-                "education" => "required|string",
+                "interest" => ["required", "string", "max:100",],
             ]);
-            $data['education'] = $request->get('education');
-        }
-        if ($request->get('experience')) {
-            $request->validate([
-                "experience" => "required|string",
-            ]);
-            $data['experience'] = $request->get('experience');
+            $data["interest"] = $request->interest;
         }
 
-
-        if ($request->get('about')) {
+        if ($request->hobby) {
             $request->validate([
-                "about" => "required|string",
+                "hobby" => ["required", "string", "max:100",],
             ]);
-            $data['about'] = $request->get('about');
+            $data["hobby"] = $request->hobby;
         }
-        // dd($data);
+
+        if ($request->about) {
+            $request->validate([
+                "about" => ["required", "string", "max:500",],
+            ]);
+            $data["about"] = $request->about;
+        }
+
+        if ($request->experience) {
+            $request->validate([
+                "experience" => ["required", "string", "max:200",],
+            ]);
+            $data["experience"] = $request->experience;
+        }
+
         $isCreated = $this->user->create($data);
         if ($isCreated) {
-            return redirect()->route('admin.user.index')->with('success', 'User is created');
+            return redirect()->route('admin.user.index')->with("success", "User is created");
         }
         return redirect()->back()->with("warning", "User is not created");
     }
 
     public function index()
     {
-        $users = $this->user->paginate(1);
+        $users = $this->user->paginate(5);
         return view('admin.user.index', compact('users'));
     }
 
     public function show($id)
     {
         $user = $this->user->where('id', $id)->get()->ToArray();
-        dd($user);
         if (!$user) {
             return redirect()->back()->with("warning", "User is not found");
         }
@@ -142,7 +149,6 @@ class UserController extends Controller
         dd($user);
         return view('admin.user.show', compact('user'));
     }
-
 
     public function edit($id)
     {
@@ -156,63 +162,35 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validate = Validator::make($request->all(), [
-            "name" => "required|min:5|max:30",
-            "email" => "required|email",
-            // "password" => "required|min:8",
-        ]);
-        if ($validate->passes()) {
-            $data = [
-                "name" => $request->get("name"),
-                "email" => $request->get("email"),
-                // "password" => $request->get("password"),
-                // "confirm_password" => $request->get("confirm_password"),
-            ];
-            $isUpdated = $this->user->where('id', $id)->update($data);
-            if ($isUpdated) {
-                return redirect()->route('admin.user.index')->with('success', 'User is updated');
-            }
-            return redirect()->back()->with("warning", "User is not updated");
-        }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
-    }
-
-    public function delete($id)
-    {
         $user = $this->user->find($id);
         if (!$user) {
             return redirect()->back()->with("warning", "User is not found");
         }
-        if ($user->resume_pdf_url) {
-            Storage::delete($user->resume_pdf_url);
-        }
-        if ($user->profile_image_url) {
-            $public_ids = $user->profile_image_public_id;
-            $result = (new AdminApi())->deleteAssets(
-                $public_ids,
-                ["resource_type" => "image", "type" => "upload"]
-            );
-            // echo json_encode($result, JSON_PRETTY_PRINT);
-        }
-        $isDeleted = $user->delete();
-        if ($isDeleted) {
-            return redirect()->route('admin.user.index')->with('success', 'User is deleted');
-        }
-        return redirect()->back()->with("warning", "User is not deleted");
-    }
-
-    // updateUserProfileImage
-    public function updateUserProfileImage(Request $request, $id)
-    {
-        $validate = Validator::make($request->all(), [
-            "profile_image_url" => "required|image|mimes:jpeg,png,jpg|max:2048",
+        $request->validate([
+            'name' => ['required', 'string', 'max:25'],
+            'email' => ['required', 'string', 'email', 'max:50', 'unique:users,email,' . $id],
         ]);
-        // dd($validate->passes());
-        if ($validate->passes()) {
+        $data = [
+            "name" => $request->name,
+            "email" => $request->email,
+        ];
+
+        // if profile_image_url is already exist then delete it from cloudinary
+        if ($request->file('profile_image_url')) {
+            $request->validate([
+                "profile_image_url" => [
+                    "required",
+                    "image",
+                    "mimes:jpeg,png,jpg",
+                    "max:2048",
+                ],
+            ]);
+
+            if ($user->profile_image_url) {
+                $public_ids = $user->profile_image_public_id;
+                DeleteFromCloudinary::dispatch($public_ids);
+            }
+
             $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
             $obj = (new UploadApi())->upload(
                 $stored_path,
@@ -221,46 +199,294 @@ class UserController extends Controller
                     'resource_type' => 'image'
                 ]
             );
-            $data = [
-                "profile_image_url" => $obj['secure_url'],
-            ];
-            $isUpdated = $this->user->where('id', $id)->update($data);
-            if ($isUpdated) {
-                unlink($stored_path);
-                return redirect()->route('admin.user.index')->with("success", "User profile image is updated");
+            $data["profile_image_public_id"] = $obj['public_id'];
+            $data["profile_image_url"] = $obj['secure_url'];
+            unlink($stored_path);
+        }
+
+        if ($request->file('resume_pdf_url')) {
+            $request->validate([
+                "resume_pdf_url" => [
+                    "required",
+                    "mimes:pdf",
+                    "max:2048",
+                ],
+            ]);
+
+            if ($user->resume_pdf_url) {
+                Storage::delete($user->resume_pdf_url);
             }
-            return redirect()->back()->with("warning", "User profile image is not updated");
+
+            $stored_path = Storage::putFile('temp', $request->file('resume_pdf_url'));
+            $data["resume_pdf_url"] = $stored_path;
+            $data["resume_pdf_public_id"] = null;
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
+
+        if ($request->contact) {
+            $request->validate([
+                "contact" => [
+                    "required",
+                    "string",
+                    "max:15",
+                ],
+            ]);
+            $data["contact"] = $request->contact;
         }
+
+        if ($request->city) {
+            $request->validate([
+                "city" => [
+                    "required",
+                    "string",
+                    "max:30",
+                ],
+            ]);
+            $data["city"] = $request->city;
+        }
+
+        if ($request->headline) {
+            $request->validate([
+                "headline" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data["headline"] = $request->headline;
+        }
+
+        if ($request->get('gender')) {
+            $request->validate([
+                'gender' => [
+                    'required',
+                    'string',
+                    'max:10',
+                    'in:MALE,FEMALE,OTHER'
+                ],
+            ]);
+        }
+
+
+        if ($request->education) {
+            $request->validate([
+                "education" => [
+                    "required",
+                    "string",
+                    "max:200",
+                ],
+            ]);
+            $data["education"] = $request->education;
+        }
+
+        if ($request->interest) {
+            $request->validate([
+                "interest" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data["interest"] = $request->interest;
+        }
+
+        if ($request->hobby) {
+            $request->validate([
+                "hobby" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data["hobby"] = $request->hobby;
+        }
+
+        if ($request->about) {
+            $request->validate([
+                "about" => [
+                    "required",
+                    "string",
+                    "max:500",
+                ],
+            ]);
+            $data["about"] = $request->about;
+        }
+
+        if ($request->experience) {
+            $request->validate([
+                "experience" => [
+                    "required",
+                    "string",
+                    "max:200",
+                ],
+            ]);
+            $data["experience"] = $request->experience;
+        }
+
+        $isUpdated = $this->user->where('id', $id)->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.user.index')->with("success", "User is updated");
+        }
+        return redirect()->back()->with("warning", "User is not updated");
     }
 
-    // updateUserResume
+    public function delete($id)
+    {
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        if ($user->profile_image_url) {
+            $public_ids = $user->profile_image_public_id;
+            DeleteFromCloudinary::dispatch($public_ids);
+        }
+        if ($user->resume_pdf_url) {
+            Storage::delete($user->resume_pdf_url);
+        }
+        $isDeleted = $this->user->where('id', $id)->delete();
+        if ($isDeleted) {
+            return redirect()->route('admin.user.index')->with("success", "User is deleted");
+        }
+        return redirect()->back()->with("warning", "User is not deleted");
+    }
+
+    public function passwordReset($id)
+    {
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        return view('admin.user.password-reset', compact('user'));
+    }
+
+    public function updateUserPassword(Request $request, $id)
+    {
+        $request->validate([
+            'old_password' => ['required', 'string', 'min:8', 'max:100'],
+            'new_password' => ['required', 'string', 'min:8', 'max:100'],
+            'confirm_password' => ['required', 'string', 'min:8', 'max:100', 'same:new_password'],
+        ]);
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+
+        if (!Hash::check($request->old_password, $user->password)) {
+            return redirect()->back()->with("warning", "Old password is not matched");
+        }
+
+        $data = [
+            "password" => Hash::make($request->new_password),
+        ];
+
+        $isUpdated = $this->user->where('id', $id)->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.user.index')->with("success", "User password is updated");
+        }
+        return redirect()->back()->with("warning", "User password is not updated");
+    }
+
+    public function updateUserProfileImage(Request $request, $id)
+    {
+        $request->validate([
+            "profile_image_url" => [
+                "required",
+                "image",
+                "mimes:jpeg,png,jpg",
+                "max:2048",
+            ],
+        ]);
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        if ($user->profile_image_url) {
+            $public_ids = $user->profile_image_public_id;
+            DeleteFromCloudinary::dispatch($public_ids);
+        }
+        $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
+        $obj = (new UploadApi())->upload(
+            $stored_path,
+            [
+                'folder' => 'career-vibe/users/profile_image',
+                'resource_type' => 'image'
+            ]
+        );
+        $data = [
+            "profile_image_public_id" => $obj['public_id'],
+            "profile_image_url" => $obj['secure_url'],
+        ];
+        $isUpdated = $this->user->where('id', $id)->update($data);
+        if ($isUpdated) {
+            unlink($stored_path);
+            return redirect()->route('admin.user.index')->with("success", "User profile image is updated");
+        }
+        return redirect()->back()->with("warning", "User profile image is not updated");
+    }
+
+    public function deleteUserProfileImage($id)
+    {
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        if ($user->profile_image_url) {
+            $public_ids = $user->profile_image_public_id;
+            DeleteFromCloudinary::dispatch($public_ids);
+        }
+        $data = [
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
+        ];
+        $isUpdated = $this->user->where('id', $id)->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.user.index')->with("success", "User profile image is deleted");
+        }
+        return redirect()->back()->with("warning", "User profile image is not deleted");
+    }
+
     public function updateUserResume(Request $request, $id)
     {
-        $validate = Validator::make($request->all(), [
-            "resume_pdf_url" => "required|mimes:pdf|max:2048",
+        $request->validate([
+            "resume_pdf_url" => [
+                "required",
+                "mimes:pdf",
+                "max:2048",
+            ],
         ]);
-        // dd($validate->passes());
-        if ($validate->passes()) {
-            $stored_path = Storage::putFile('temp', $request->file('resume_pdf_url'));
-            $data = [
-                "resume_pdf_url" => $stored_path,
-            ];
-            $isUpdated = $this->user->where('id', $id)->update($data);
-            if ($isUpdated) {
-                // unlink($stored_path);
-                return redirect()->route('admin.user.index')->with("success", "User resume is updated");
-            }
-            return redirect()->back()->with("warning", "User resume is not updated");
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
+        if ($user->resume_pdf_url) {
+            Storage::delete($user->resume_pdf_url);
         }
+        $stored_path = Storage::putFile('temp', $request->file('resume_pdf_url'));
+        $data = [
+            "resume_pdf_url" => $stored_path,
+        ];
+        $isUpdated = $this->user->where('id', $id)->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.user.index')->with("success", "User resume is updated");
+        }
+        return redirect()->back()->with("warning", "User resume is not updated");
+    }
+
+    public function deleteUserResume($id)
+    {
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        if ($user->resume_pdf_url) {
+            Storage::delete($user->resume_pdf_url);
+        }
+        $data = [
+            "resume_pdf_url" => null,
+        ];
+        $isUpdated = $this->user->where('id', $id)->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.user.index')->with("success", "User resume is deleted");
+        }
+        return redirect()->back()->with("warning", "User resume is not deleted");
     }
 }

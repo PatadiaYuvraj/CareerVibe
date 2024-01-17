@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text("profile_image_url")->nullable();
             $table->text("profile_image_public_id")->nullable();
             $table->text("resume_pdf_url")->nullable();
+            $table->text("resume_pdf_public_id")->nullable();
             $table->string("contact", 15)->nullable();
             $table->enum("gender", ["MALE", "FEMALE", "OTHER"])->nullable();
             $table->boolean('is_active')->default(true);

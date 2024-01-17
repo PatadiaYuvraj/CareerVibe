@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Qualification;
 use Illuminate\Http\Request;
-use DB;
-use Illuminate\Support\Facades\Validator;
 
 class QualificationController extends Controller
 {
@@ -24,38 +22,42 @@ class QualificationController extends Controller
 
     public function store(Request $request)
     {
-        $validate = Validator::make($request->all(), [
-            // unique
-            "qualification" => "required|string|max:100|unique:qualifications",
+        // custom validation
+        $request->validate([
+            "qualification" => [
+                "required",
+                "string",
+                "max:100",
+                "unique:qualifications,qualification",
+            ]
         ]);
-        if ($validate->passes()) {
-            $data = [
-                "qualification" => $request->get("qualification"),
-            ];
-            // $isCreated = $this->qualification->create($data);
-            // optimised way to create data
-            $isCreated = $this->qualification->insert($data);
-            if ($isCreated) {
-                return redirect()->route('admin.qualification.index')->with('success', 'Qualification is created');
-            }
-            return redirect()->back()->with("warning", "Qualification is not created");
+        $data = [
+            "qualification" => $request->get("qualification"),
+        ];
+        $isCreated = $this->qualification->create($data);
+        if ($isCreated) {
+            return redirect()->route('admin.qualification.index')->with('success', 'Qualification is created');
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
+        return redirect()->back()->with("warning", "Qualification is not created");
     }
 
     public function index()
     {
-        $qualifications = $this->qualification->paginate(5);
+        $qualifications = $this->qualification->withCount('jobs')->paginate(5);
         return view('admin.qualification.index', compact('qualifications'));
     }
 
     public function show($id)
     {
-        $qualification = $this->qualification->where('id', $id)->with('jobs')->get()->ToArray();
+        $qualification = $this->qualification
+            ->where('id', $id)
+            ->with([
+                'jobs' => function ($query) {
+                    $query->with(['company', 'profile', 'qualifications', 'locations']);
+                }
+            ])
+            ->get()
+            ->ToArray();
         if (!$qualification) {
             return redirect()->back()->with("warning", "Qualification is not found");
         }
@@ -75,33 +77,38 @@ class QualificationController extends Controller
 
     public function update(Request $request, $id)
     {
-        $validate = Validator::make($request->all(), [
-            "qualification" => "required|string|max:100",
+        $request->validate([
+            "qualification" => [
+                "required",
+                "string",
+                "max:100",
+                "unique:qualifications,qualification" . $id,
+            ]
         ]);
-        if ($validate->passes()) {
-            $data = [
-                "qualification" => $request->get("qualification"),
-            ];
-            $isUpdated = $this->qualification->where('id', $id)->update($data);
-            if ($isUpdated) {
-                return redirect()->route('admin.qualification.index')->with('success', 'Qualification is updated');
-            }
-            return redirect()->back()->with("warning", "Qualification is not updated");
+        $data = [
+            "qualification" => $request->get("qualification"),
+        ];
+        $isUpdated = $this->qualification->where('id', $id)->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.qualification.index')->with('success', 'Qualification is updated');
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
+        return redirect()->back()->with("warning", "Qualification is not updated");
     }
 
     public function delete($id)
     {
-        // optimised way to delete data
-        $isDeleted = $this->qualification->where('id', $id)->delete();
-        if ($isDeleted) {
-            return redirect()->route('admin.qualification.index')->with('success', 'Qualification is deleted');
+        $qualification = $this->qualification->where('id', $id)->withCount('jobs')->get()->ToArray();
+        if (!$qualification) {
+            return redirect()->back()->with("warning", "Qualification is not found");
         }
-        return redirect()->back()->with("warning", "Qualification is not deleted");
+        $qualification =  $qualification[0];
+        if ($qualification['jobs_count'] == 0) {
+            $isDeleted = $this->qualification->where('id', $id)->delete();
+            if ($isDeleted) {
+                return redirect()->route('admin.qualification.index')->with('success', 'Qualification is deleted');
+            }
+            return redirect()->back()->with("warning", "Qualification is not deleted");
+        }
+        return redirect()->back()->with("warning", "Qualification is not deleted, because it has jobs associated with it");
     }
 }

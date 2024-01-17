@@ -13,13 +13,14 @@
                         profile</a>
                 </div>
                 <div class="card-body">
-                    <table class="table table-striped">
+                    <table class="table text-center table-striped">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Profile</th>
-                                <th>Created At</th>
-                                <th>Action</th>
+                                <th class="col-2">#</th>
+                                <th class="col-2">Profile</th>
+                                <th class="col-2">Available Jobs</th>
+                                <th class="col-2">Created At</th>
+                                <th class="col-2">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -31,8 +32,9 @@
                                         <a href="{{ route('admin.job-profile.show', $profile['id']) }}">{{ $profile['profile'] }}
                                         </a>
                                     </td>
+                                    <td>{{ $profile['jobs_count'] }}</td>
                                     <td>{{ date('d-m-Y', strtotime($profile['created_at'])) }}</td>
-                                    <td>
+                                    <td class="btn-group">
                                         <a href="{{ route('admin.job-profile.edit', $profile['id']) }}"
                                             class="btn btn-sm btn-primary">Edit</a>
                                         <a href="{{ route('admin.job-profile.delete', $profile['id']) }}"
@@ -41,7 +43,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">No Job Profile Found</td>
+                                    <td colspan="5" class="text-center">No Job Profile Found</td>
                                 </tr>
                             @endforelse
                         </tbody>

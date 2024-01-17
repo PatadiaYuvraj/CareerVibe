@@ -12,15 +12,20 @@
                     <form action="{{ route('admin.qualification.store') }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="qualification" class="form-label">Qualification</label>
+                            <label for="qualification" class="form-label">
+                                Qualification
+                                <span class="text-danger">*</span>
+                            </label>
                             <input type="text" name="qualification" class="form-control"
                                 value="{{ old('qualification') }}">
                             @error('qualification')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <a href="{{ route('admin.qualification.index') }}" class="btn btn-danger">Cancel</a>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('admin.qualification.index') }}" class="btn btn-danger">Cancel</a>
+                        </div>
                     </form>
                 </div>
             </div>

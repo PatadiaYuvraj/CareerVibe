@@ -12,42 +12,49 @@ class Company extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    // $table, $primaryKey, $fillable, $guarded, $timestamp, $nullable, $required
+    protected $table = 'companies';
+    protected $primaryKey = 'id';
+
     protected $fillable = [
+        'is_verified',
         'name',
         'email',
         'password',
+        'profile_image_url',
+        'profile_image_public_id',
         'website',
         'address_line_1',
         'address_line_2',
         'linkedin_profile',
         'description',
-
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    protected $required = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    protected $guarded = [
+        'id',
+        'userType',
+        'created_at',
+        'updated_at',
+        'remember_token',
+    ];
+
+    protected $timestamp = true;
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    // protected $casts = [
-    //     'email_verified_at' => 'datetime',
-    //     'password' => 'hashed',
-    // ];
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
 
     public function jobs()
     {

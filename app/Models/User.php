@@ -17,41 +17,93 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
+
+
+    /*
+        $table->id();
+        $table->string("name", 25);
+        $table->string("email", 50)->unique()->index();
+        $table->string("password", 100);
+        $table->string("userType", 10)->default("USER");
+        $table->text("profile_image_url")->nullable();
+        $table->text("profile_image_public_id")->nullable();
+        $table->text("resume_pdf_url")->nullable();
+        $table->string("contact", 15)->nullable();
+        $table->enum("gender", ["MALE", "FEMALE", "OTHER"])->nullable();
+        $table->boolean('is_active')->default(true);
+        $table->string("headline", 200)->nullable();
+        $table->string("education", 200)->nullable();
+        $table->string("interest", 100)->nullable();
+        $table->string("hobby", 100)->nullable();
+        $table->string("city", 30)->nullable();
+        $table->text("about")->nullable();
+        $table->string("experience", 200)->nullable();
+        $table->rememberToken();
+        $table->index(['name', 'email', 'id']);
+        $table->timestamps();
+    */
+    // $table, $primaryKey, $fillable, $guarded, $timestamp, $nullable, $required
+
+    protected $table = 'users';
+
+    protected $primaryKey = 'id';
+
     protected $fillable = [
-        "name",
-        "email",
-        "password",
-        "userType",
-        "profile_image_url",
-        "profile_image_public_id",
-        "resume_pdf_url",
-        "contact",
-        "gender",
-        "is_active",
-        "headline",
-        "education",
-        "interest",
-        "hobby",
-        "city",
-        "about",
-        "experience",
+        'name',
+        'email',
+        'password',
+        'profile_image_url',
+        'profile_image_public_id',
+        'resume_pdf_url',
+        'resume_pdf_public_id',
+        'contact',
+        'gender',
+        'is_active',
+        'headline',
+        'education',
+        'interest',
+        'hobby',
+        'city',
+        'about',
+        'experience',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    protected $requireds = [
+        'name',
+        'email',
+        'password',
+    ];
+
+    protected $guarded = [
+        'id',
+        'userType',
+        'created_at',
+        'updated_at',
+    ];
+
+    protected $nullable = [
+        'profile_image_url',
+        'profile_image_public_id',
+        'resume_pdf_url',
+        'contact',
+        'gender',
+        'is_active',
+        'headline',
+        'education',
+        'interest',
+        'hobby',
+        'city',
+        'about',
+        'experience',
+    ];
+
+    protected $timestamp = true;
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',

@@ -19,12 +19,15 @@
 
                     <div class="jumbotron">
                         <h1 class="d-inline display-4">
-                            {{ $location['city'] }},
+                            {{ $location['city'] }}
                         </h1>
-                        <h1 class="display-6 d-inline ">
-                            {{ $location['state'] }}
-                            ({{ $location['country'] }})
-                        </h1>
+                        @if ($location['state'] && $location['country'])
+                            <h1 class="display-6 d-inline ">
+                                ({{ $location['state'] }},
+                                {{ $location['country'] }})
+                            </h1>
+                        @endif
+
 
                         <p class="lead">Created At :
                             @if ($location['created_at'])
@@ -39,7 +42,9 @@
                         </p>
                     </div>
                     <div class="card shadow-none">
-                        <div class="card-header h3">Jobs</div>
+                        <div class="card-header h3">
+                            Jobs({{ count($location['jobs']) }})
+                        </div>
                         <div class="card-body">
                             <div class="row row-cols-3">
                                 @forelse ($location['jobs'] as $job)

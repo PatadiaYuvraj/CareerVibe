@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('job_profiles', function (Blueprint $table) {
             $table->id();
-            $table->string('profile', 30);
+            $table->string('profile', 30)->unique();
             $table->index(['profile', 'id']);
             $table->timestamps();
         });

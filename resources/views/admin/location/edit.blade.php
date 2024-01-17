@@ -6,14 +6,18 @@
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
-                    <span class="h3 text-black">Add Location</span>
+                    <span class="h3 text-black">
+                        Edit Location</span>
                     <a href="{{ route('admin.location.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.location.update', $location['id']) }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="city" class="form-label">City</label>
+                            <label for="city" class="form-label">
+                                City
+                                <span class="text-danger">*</span>
+                            </label>
                             <input type="text" name="city" class="form-control"
                                 value="{{ old('city', $location['city']) }}">
                             @error('city')
@@ -44,8 +48,10 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <a href="{{ route('admin.location.index') }}" class="btn btn-danger">Cancel</a>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Update</button>
+                            <a href="{{ route('admin.location.index') }}" class="btn btn-danger">Cancel</a>
+                        </div>
                     </form>
                 </div>
             </div>

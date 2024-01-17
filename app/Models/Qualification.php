@@ -9,9 +9,25 @@ class Qualification extends Model
 {
     use HasFactory;
 
+    protected $table = "qualifications";
+
+    protected $primaryKey = "id";
+
     protected $fillable = [
         'qualification',
     ];
+
+    protected $guarded = [
+        'id',
+        'created_at',
+        'updated_at',
+    ];
+
+    protected $required = [
+        'qualification',
+    ];
+
+    protected $timestamp = true;
 
     public function jobs()
     {

@@ -3,20 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\AdminService;
-use App\Services\AuthService;
+use App\Jobs\DeleteFromCloudinary;
+use App\Jobs\UploadToCloudinary;
+use App\Models\Admin;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Validator;
 
 class AdminController extends Controller
 {
-    private AdminService $admin;
+    private Admin $admin;
+    private string $user_type = 'admin';
+    private string $folder = 'career-vibe/admins/profile_image';
 
-    public function __construct(AdminService $admin)
+    public function __construct(Admin $admin)
     {
         $this->admin = $admin;
     }
@@ -24,9 +27,6 @@ class AdminController extends Controller
     public function dashboard()
     {
         return view('admin.dashboard.index');
-        // $admin_id = Auth::guard('admin')->user()->id;
-        // $admin = Admin::select('id', 'name')->find($admin_id)->toArray();
-        // return view('admin.dashboard.index', compact('admin'));
     }
 
     public function login()
@@ -34,72 +34,66 @@ class AdminController extends Controller
         return view('admin.auth.login');
     }
 
+    public function doLogin(Request $request)
+    {
+        $request->validate([
+            "email" => "required|email",
+            "password" => "required|min:6|max:20"
+        ]);
+        $data = [
+            "email" => $request->get("email"),
+            "password" => $request->get("password")
+        ];
+
+        if (Auth::guard('admin')->attempt($data)) {
+            return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
+        }
+        return redirect()->back()->with("warning", "Invalid Credentials");
+    }
+
     public function register()
     {
         return view('admin.auth.register');
     }
 
-    public function doLogin(Request $request)
-    {
-        $validate = $this->admin->validateAdmin($request, false);
-        if ($validate->passes()) {
-
-            $data = [
-                "email" => $request->get("email"),
-                "password" => $request->get("password")
-            ];
-            $isAuth = $this->admin->authenticate($data);
-
-            if ($isAuth['status']) {
-                return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
-            }
-            return redirect()->back()->with("warning", "Something went wrong");
-        }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
-    }
-
     public function doRegister(Request $request)
     {
-        $validate = $this->admin->validateAdmin($request, true);
-        if ($validate->passes()) {
-            $data =
-                [
-                    "name" => $request->get("name"),
-                    "email" => $request->get("email"),
-                    "password" => $request->get("password")
-                ];
-            $admin = $this->admin->createAdmin($data);
-            if ($admin['status']) {
+        $request->validate([
+            "name" => "required|min:3|max:50",
+            "email" => "required|email|unique:admins,email",
+            "password" => "required|min:6|max:20",
+            "confirm_password" => "required|min:6|max:20|same:password"
+        ]);
 
-                $data =
-                    [
-                        "email" => $request->get("email"),
-                        "password" => $request->get("password")
-                    ];
-                $isAuth = $this->admin->authenticate($data);
-                if ($isAuth['status']) {
-                    return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
-                }
-                return redirect()->back()->with("warning", "Something went wrong");
+        $data = [
+            "name" => $request->get("name"),
+            "email" => $request->get("email"),
+            "password" => Hash::make($request->get("password"))
+        ];
+
+        $isCreated = $this->admin->create($data);
+
+        if ($isCreated) {
+            $isAuth = Auth::guard('admin')->attempt([
+                "email" => $request->get("email"),
+                "password" => $request->get("password")
+            ]);
+
+            if ($isAuth) {
+                return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
             }
-            return redirect()->back()->with("warning", "Something went wrong");
+
+            return redirect()->route('admin.login')->with("success", "Admin Created Successfully");
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
+
+        return redirect()->back()->with("warning", "Admin Not Created");
     }
 
     public function logout()
     {
         Auth::guard('admin')->logout();
         Session::flush();
-        return redirect()->route("admin.login")->with("msg", "You're Logged Out");
+        return redirect()->route('admin.login')->with("success", "You're Logged Out");
     }
 
     public function changePassword()
@@ -109,30 +103,56 @@ class AdminController extends Controller
 
     public function doChangePassword(Request $request)
     {
-        $auth = new AuthService();
-        if (!$auth->isAdmin()) {
+
+        // currentPassword newPassword confirmPassword
+
+        if (!Auth::guard('admin')->check()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $admin_id = Auth::guard('admin')->user()->id;
 
-        $validate = $this->admin->validatePassword($request);
-        if ($validate->passes()) {
-            $data = [
-                "currentPassword" => $request->get("currentPassword"),
-                "newPassword" => $request->get("newPassword"),
-                "confirmPassword" => $request->get("confirmPassword")
-            ];
-            $isChanged = $this->admin->changePassword($data, $admin_id);
-            if ($isChanged['status']) {
-                return redirect()->route('admin.dashboard')->with("success", $isChanged['msg']);
-            }
-            return redirect()->back()->with("warning", $isChanged['msg']);
+        $id = Auth::guard('admin')->user()->id;
+
+        $request->validate([
+            "currentPassword" => [
+                "required",
+                function ($attribute, $value, $fail) use ($id) {
+                    $user = $this->admin->find($id);
+                    if (!Hash::check($value, $user->password)) {
+                        return $fail(__('The current password is incorrect.'));
+                    }
+                }
+
+            ],
+            "newPassword" => [
+                "required",
+                "min:6",
+                "max:20",
+                function ($attribute, $value, $fail) use ($id) {
+                    $user = $this->admin->find($id);
+                    if (Hash::check($value, $user->password)) {
+                        return $fail(__('The new password must be different from current password.'));
+                    }
+                }
+            ],
+            "confirmPassword" => [
+                "required",
+                "min:6",
+                "max:20",
+                "same:newPassword"
+            ]
+        ]);
+
+        $data = [
+            "password" => Hash::make($request->get("newPassword"))
+        ];
+
+        $isUpdated = $this->admin->where('id', $id)->update($data);
+
+        if ($isUpdated) {
+            return redirect()->route('admin.dashboard')->with("success", "Password Updated Successfully");
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
+
+        return redirect()->back()->with("warning", "Password Not Updated");
     }
 
     public function editProfile()
@@ -142,116 +162,185 @@ class AdminController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $auth = new AuthService();
-        if (!$auth->isAdmin()) {
+        if (!Auth::guard('admin')->check()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $admin_id = Auth::guard('admin')->user()->id;
-        $validate = Validator::make($request->all(), [
+
+        $id = Auth::guard('admin')->user()->id;
+
+        $request->validate([
             "name" => "required|min:3|max:50",
-            "email" => "required|email|unique:users,email," . $admin_id,
+            "email" => "required|email|unique:admins,email," . $id
         ]);
-        if ($validate->passes()) {
-            $data = [
-                "name" => $request->get("name"),
-                "email" => $request->get("email"),
-            ];
-            $isUpdated = $this->admin->updateAdmin($data, $admin_id);
-            if ($isUpdated['status']) {
-                return redirect()->route('admin.dashboard')->with("success", $isUpdated['msg']);
-            }
-            return redirect()->back()->with("warning", $isUpdated['msg']);
+
+        $data = [
+            "name" => $request->get("name"),
+            "email" => $request->get("email")
+        ];
+
+        $isUpdated = $this->admin->where('id', $id)->update($data);
+
+        if ($isUpdated) {
+            return redirect()->route('admin.dashboard')->with("success", "Profile Updated Successfully");
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
+
+        return redirect()->back()->with("warning", "Profile Not Updated");
     }
 
     public function updateProfileImage(Request $request)
     {
-        $auth = new AuthService();
-        if (!$auth->isAdmin()) {
+        if (!Auth::guard('admin')->check()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $admin_id = Auth::guard('admin')->user()->id;
-        $validate = Validator::make($request->all(), [
-            "profile_image_url" => "required|image|mimes:jpeg,png,jpg|max:2048",
-        ]);
-        if ($validate->passes()) {
-            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-            $obj = (new UploadApi())->upload(
-                $stored_path,
-                [
-                    'folder' => 'career-vibe/admins/profile_image',
-                    'resource_type' => 'image'
-                ]
-            );
-            $data = [
-                "profile_image_url" => $obj['secure_url'],
-            ];
-            $isUpdated = $this->admin->updateProfileImage($data, $admin_id);
-            if ($isUpdated['status']) {
-                unlink($stored_path);
-                return redirect()->route('admin.dashboard')->with("success", $isUpdated['msg']);
-            }
-            return redirect()->back()->with("warning", $isUpdated['msg']);
-        }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
-    }
 
-    // public function updateResume(Request $request)
-    // {
-    //     $auth = new AuthService();
-    //     if (!$auth->isAdmin()) {
-    //         return redirect()->back()->with("warning", "You are not authorized");
-    //     }
-    //     $admin_id = Auth::guard('admin')->user()->id;
-    //     $validate = Validator::make($request->all(), [
-    //         "resume_pdf_url" => "required|mimes:pdf|max:2048",
-    //     ]);
-    //     if ($validate->passes()) {
-    //         $stored_path = Storage::putFile('temp', $request->file('file'));
-    //         $obj = (new UploadApi())->upload(
-    //             $stored_path,
-    //             [
-    //                 'folder' => 'career-vibe/users/resume',
-    //                 'resource_type' => 'raw'
-    //             ]
-    //         );
-    //         $data = [
-    //             "resume_pdf_url" => $obj['secure_url'],
-    //         ];
-    //         $isUpdated = $this->admin->updateAdmin($data, $admin_id);
-    //         if ($isUpdated['status']) {
-    //             unlink($stored_path);
-    //             return redirect()->route('admin.dashboard')->with("success", $isUpdated['msg']);
-    //         }
-    //         return redirect()->back()->with("warning", $isUpdated['msg']);
-    //     }
-    //     if ($validate->fails()) {
-    //         return redirect()->back()
-    //             ->withErrors($validate)
-    //             ->withInput();
-    //     }
-    // }
+        $id = Auth::guard('admin')->user()->id;
+
+        $request->validate([
+            "profile_image_url" => [
+                "required",
+                "image",
+                "mimes:jpeg,png,jpg",
+                "max:2048",
+            ],
+        ]);
+
+        $user = $this->admin->find($id);
+
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+
+        if ($user->profile_image_url) {
+            $public_ids = $user->profile_image_public_id;
+            DeleteFromCloudinary::dispatch($public_ids);
+        }
+
+
+
+        UploadToCloudinary::dispatch(
+            $request->file('profile_image_url'),
+            $this->folder,
+            $id,
+            $this->user_type
+        );
+
+        $data = [
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
+        ];
+        $isUpdated = $this->admin->where('id', $id)->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.dashboard')->with("success", "Profile Image Updated Successfully");
+        }
+
+        return redirect()->back()->with("warning", "Profile Image Not Updated");
+    }
 
     public function deleteProfileImage()
     {
-        $auth = new AuthService();
-        if (!$auth->isAdmin()) {
+        if (!Auth::guard('admin')->check()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
-        $admin_id = Auth::guard('admin')->user()->id;
-        $isDeleted = $this->admin->deleteProfileImage($admin_id);
-        if ($isDeleted['status']) {
-            return redirect()->route('admin.dashboard')->with("success", $isDeleted['msg']);
+
+        $id = Auth::guard('admin')->user()->id;
+
+        $user = $this->admin->find($id);
+
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
         }
-        return redirect()->back()->with("warning", $isDeleted['msg']);
+
+        if ($user->profile_image_url) {
+            $public_ids = $user->profile_image_public_id;
+            DeleteFromCloudinary::dispatch($public_ids);
+        }
+
+        $data = [
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
+        ];
+
+        $isUpdated = $this->admin->where('id', $id)->update($data);
+
+        if ($isUpdated) {
+            return redirect()->route('admin.dashboard')->with("success", "Profile Image Deleted Successfully");
+        }
+
+        return redirect()->back()->with("warning", "Profile Image Not Deleted");
     }
+
+    // forget password
+
+    // public function forgetPassword()
+    // {
+    //     return view('admin.auth.forget-password');
+    // }
+
+    // public function doForgetPassword(Request $request)
+    // {
+    //     $request->validate([
+    //         "email" => "required|email"
+    //     ]);
+
+    //     $user = $this->admin->where('email', $request->get('email'))->first();
+
+    //     if (!$user) {
+    //         return redirect()->back()->with("warning", "User is not found");
+    //     }
+
+    //     $token = $this->admin->generateToken();
+
+    //     $data = [
+    //         "token" => $token
+    //     ];
+
+    //     $isUpdated = $this->admin->where('id', $user->id)->update($data);
+
+    //     if ($isUpdated) {
+    //         $user->sendPasswordResetNotification($token);
+    //         return redirect()->route('admin.login')->with("success", "Password Reset Link Sent Successfully");
+    //     }
+
+    //     return redirect()->back()->with("warning", "Password Reset Link Not Sent");
+    // }
+
+    // public function resetPassword($token)
+    // {
+    //     $user = $this->admin->where('token', $token)->first();
+
+    //     if (!$user) {
+    //         return redirect()->route('admin.login')->with("warning", "Invalid Token");
+    //     }
+
+    //     return view('admin.auth.reset-password', compact('token'));
+    // }
+
+    // public function doResetPassword(Request $request, $token)
+    // {
+    //     $request->validate([
+    //         "password" => "required|min:6|max:20",
+    //         "confirm_password" => "required|min:6|max:20|same:password"
+    //     ]);
+
+    //     $user = $this->admin->where('token', $token)->first();
+
+    //     if (!$user) {
+    //         return redirect()->route('admin.login')->with("warning", "Invalid Token");
+    //     }
+
+    //     $data = [
+    //         "password" => Hash::make($request->get("password")),
+    //         "token" => null
+    //     ];
+
+    //     $isUpdated = $this->admin->where('id', $user->id)->update($data);
+
+    //     if ($isUpdated) {
+    //         return redirect()->route('admin.login')->with("success", "Password Reset Successfully");
+    //     }
+
+    //     return redirect()->back()->with("warning", "Password Not Reset");
+    // }
+
+
 }
