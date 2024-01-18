@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\DeleteFromCloudinary;
-use App\Jobs\UploadToCloudinary;
 use App\Models\Admin;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
@@ -216,18 +215,22 @@ class AdminController extends Controller
         }
 
 
-
-        UploadToCloudinary::dispatch(
-            $request->file('profile_image_url'),
-            $this->folder,
-            $id,
-            $this->user_type
+        $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
+        $obj = (new UploadApi())->upload(
+            $stored_path,
+            [
+                'folder' => $this->folder,
+                'resource_type' => 'image'
+            ]
         );
 
+
+
         $data = [
-            "profile_image_public_id" => null,
-            "profile_image_url" => null,
+            "profile_image_public_id" => $obj['public_id'],
+            "profile_image_url" => $obj['secure_url'],
         ];
+
         $isUpdated = $this->admin->where('id', $id)->update($data);
         if ($isUpdated) {
             return redirect()->route('admin.dashboard')->with("success", "Profile Image Updated Successfully");

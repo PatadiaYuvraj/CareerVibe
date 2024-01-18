@@ -10,6 +10,19 @@ class Job extends Model
     use HasFactory;
     protected $table = "jobs";
 
+    protected $primaryKey = "id";
+
+    protected $required = [
+        'company_id',
+        'profile_id',
+    ];
+
+    protected $guarded = [
+        'id',
+        'created_at',
+        'updated_at',
+    ];
+
     protected $fillable = [
         'company_id',
         'profile_id',
@@ -30,7 +43,6 @@ class Job extends Model
         "experience_type"
     ];
 
-    // job has one company
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');

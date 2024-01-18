@@ -11,17 +11,17 @@
                     </span>
                 </div>
                 <div class="card-body">
-                    <table class="table table-striped">
+                    <table class="table table-striped text-center">
                         <thead>
                             <tr>
-                                <th>Job Profile</th>
-                                <th>Job Vacancy</th>
-                                <th>Salary Range</th>
-                                <th>Work Type</th>
-                                <th>Is Verified</th>
-                                <th>Is Featured</th>
-                                <th>Is Active</th>
-                                <th>Action</th>
+                                <th class="col-2">Job Profile</th>
+                                <th class="col-2">Job Vacancy</th>
+                                <th class="col-2">Salary Range</th>
+                                <th class="col-2">Work Type</th>
+                                <th class="col-1">Verified</th>
+                                <th class="col-1">Featured</th>
+                                <th class="col-1">Active</th>
+                                <th class="col-1">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -56,7 +56,7 @@
                                             {{ $job['is_active'] ? 'Active' : 'Not Active' }}
                                         </a>
                                     </td>
-                                    <td>
+                                    <td class="d-flex btn-group">
                                         <a href="{{ route('admin.job.edit', $job['id']) }}"
                                             class="btn btn-sm btn-primary">Edit</a>
                                         <a href="{{ route('admin.job.delete', $job['id']) }}"
@@ -65,7 +65,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center">No Job Found</td>
+                                    <td colspan="20" class="text-center">No Job Found</td>
                                 </tr>
                             @endforelse
                         </tbody>

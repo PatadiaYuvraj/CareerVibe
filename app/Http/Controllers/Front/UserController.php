@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
-
-use App\Services\UserService;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
@@ -12,11 +11,11 @@ use Illuminate\Support\Facades\Session;
 class UserController extends Controller
 {
 
-    private UserService $user;
+    private User $user;
 
-    public function __construct(UserService $demo)
+    public function __construct(User $user)
     {
-        $this->user = $demo;
+        $this->user = $user;
     }
 
     public function index()
@@ -34,58 +33,50 @@ class UserController extends Controller
     }
     public function doLogin(Request $request)
     {
-        $validate = $this->user->validateUser($request, false);
-        if ($validate->passes()) {
-
-            $data = [
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:8'
+        ]);
+        $data =
+            [
                 "email" => $request->get("email"),
                 "password" => $request->get("password")
             ];
-            $isAuth = $this->user->authenticate($data);
-            if ($isAuth['status']) {
-                return redirect()->route('index')->with('success', 'You are signed up ');
-            }
-            return redirect()->back()->with("warning", "Not Authenticated");
+        $isAuth = Auth::guard('user')->attempt($data, true);
+        if ($isAuth) {
+            return redirect()->route('index')->with('success', 'You are logged in');
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
+        return redirect()->back()->with("warning", "Something went wrong");
     }
 
 
     public function doRegister(Request $request)
     {
-        $validate = $this->user->validateUser($request, true);
-        if ($validate->passes()) {
+        $request->validate([
+            'name' => 'required|min:5|max:30',
+            'email' => 'required|unique:users,email|email',
+            'password' => 'required|min:8',
+            'confirm_password' => 'required_with:password|same:password|min:8'
+        ]);
+        $data = [
+            "name" => $request->get("name"),
+            "email" => $request->get("email"),
+            "password" => $request->get("password")
+        ];
+        $user = $this->user->create($data);
+        if ($user) {
             $data =
                 [
-                    "name" => $request->get("name"),
                     "email" => $request->get("email"),
                     "password" => $request->get("password")
                 ];
-            $user = $this->user->createUser($data);
-            if ($user['status']) {
-
-                $data =
-                    [
-                        "email" => $request->get("email"),
-                        "password" => $request->get("password")
-                    ];
-                $isAuth = $this->user->authenticate($data);
-                if ($isAuth['status']) {
-                    return redirect()->route('index')->with('success', 'You are logged in');
-                }
-                return redirect()->back()->with("warning", "Something went wrong");
+            $isAuth = Auth::guard('user')->attempt($data, true);
+            if ($isAuth) {
+                return redirect()->route('index')->with('success', 'You are logged in');
             }
-            return redirect()->back()->with("warning", "Something went wrong");
+            return redirect()->route('login')->with('success', 'You are registered');
         }
-        if ($validate->fails()) {
-            return redirect()->back()
-                ->withErrors($validate)
-                ->withInput();
-        }
+        return redirect()->back()->with("warning", "Something went wrong");
     }
 
     public function logout()
@@ -93,41 +84,6 @@ class UserController extends Controller
         Auth::guard('user')->logout();
         Session::flush();
         return redirect()->route("login")->with("success", "You're Logged Out");
-    }
-    public function test()
-    {
-        return view('test');
-        // $path = 'temp/XmONlgASaVV5iF3xzHgsVrjvbT0fpBDtjdbL9qsn.png';
-        // $data = (new ImageTag($path))
-        //     ->resize(Resize::scale()->width(1000))
-        //     ->delivery(Delivery::quality(
-        //         Quality::auto()
-        //     ))
-        //     ->delivery(Delivery::format(
-        //         Format::auto()
-        //     ));
-        // $cloudinary = Cloudinary();
-        // Configuration::instance([
-        //     'cloud' => [
-        //         'cloud_name' => 'career-vibe',
-        //         'api_key' => '465536872651195',
-        //         'api_secret' => 'NwKWjOyJe3jY91sulDGAAGtGuUM'
-        //     ],
-        //     'url' => [
-        //         'secure' => true
-        //     ]
-        // ]);
-        // $obj = $cloudinary->uploadApi()->upload(
-        //     $path
-        // );
-        // dd($obj);
-        // return $data;
-    }
-    public function testing(Request $request)
-    {
-        dd($request->all());
-        // $stored_path = $request->file('profile_image')->store('temp', ['disk' => 'local']);
-        // $public_path = asset($stored_path);
     }
 
     public function about()

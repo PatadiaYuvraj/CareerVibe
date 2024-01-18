@@ -85,10 +85,11 @@ class UserController extends Controller
             $data["headline"] = $request->headline;
         }
 
-        if ($request->get('gender')) {
+        if ($request->gender) {
             $request->validate([
                 'gender' => ['required', 'string', 'max:10', 'in:MALE,FEMALE,OTHER'],
             ]);
+            $data['gender'] = $request->gender;
         }
 
         if ($request->education) {

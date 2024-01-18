@@ -17,7 +17,6 @@
                 <div class="card-body">
                     <div class="col pt-3">
                         <h1 class="display-5">
-                            {{-- {{ $job['pr'] }} --}}
                             {{ $job['profile']['profile'] }}
                         </h1>
                         <p class="lead position-relative">
@@ -97,7 +96,14 @@
                                     Salary Package
                                 </h5>
                                 <h6 class="">
-                                    {{ $job['min_salary'] }} - {{ $job['max_salary'] }}
+                                    @if ($job['min_salary'] >= 1000)
+                                        {{ $job['min_salary'] / 1000 }}k -
+                                        {{ $job['max_salary'] / 1000 }}k
+                                    @else
+                                        {{ $job['min_salary'] }} -
+                                        {{ $job['max_salary'] }}
+                                    @endif
+
                                 </h6>
                             </div>
                         </div>
@@ -107,7 +113,49 @@
                                     Work Type
                                 </h5>
                                 <h6 class="">
-                                    {{ $job['work_type'] }}
+                                    {{-- {{ $job['work_type'] }} --}}
+                                    {{ Str::ucfirst(Str::lower($job['work_type'])) }}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    {{-- "job_type",
+        "experience_level",
+        "experience_type" --}}
+                    <div class="row">
+                        <div class="col" style="">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Job Type
+                                </h5>
+                                <h6 class="">
+                                    {{-- remove _ --}}
+                                    @foreach (explode('_', $job['job_type']) as $row)
+                                        {{ Str::ucfirst(Str::lower($row)) }}
+                                    @endforeach
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="col" style="">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Experience Level
+                                </h5>
+                                <h6 class="">
+                                    {{ Str::ucfirst(Str::lower($job['experience_level'])) }}
+                                </h6>
+                            </div>
+                        </div>
+                        <div class="col" style="">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    Experience Type
+                                </h5>
+                                <h6 class="">
+                                    {{ Str::ucfirst(Str::lower($job['experience_type'])) }}
+
+                                    {{-- {{ $job['experience_type'] }} --}}
                                 </h6>
                             </div>
                         </div>

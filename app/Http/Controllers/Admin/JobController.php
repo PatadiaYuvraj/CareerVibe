@@ -18,14 +18,21 @@ class JobController extends Controller
 
     public function __construct(AuthService $auth, Job $job)
     {
-        $this->auth = $auth;
 
+        // call parent constructor
+        parent::__construct();
+
+        $this->auth = $auth;
         $this->job = $job;
     }
 
     public function create($company_id)
     {
-        $company = Company::where('id', $company_id)->get()->toArray();
+        if (!$this->auth->isAdmin() && !$this->auth->isCompany()) {
+            return redirect()->back()->with("warning", "You are not authorized");
+        }
+
+        $company = Company::where('id', $company_id)->select('id', 'name', 'is_verified')->get()->toArray();
         if (!$company) {
             return redirect()->back()->with("warning", "Company is not found");
         }
@@ -33,25 +40,24 @@ class JobController extends Controller
         if ($company['is_verified'] == 0) {
             return redirect()->back()->with("warning", "Company is not verified");
         }
-        $job_profiles = JobProfile::all()->toArray();
-        $locations = Location::all()->toArray();
-        $qualifications = Qualification::all()->toArray();
+
+        $job_profiles = JobProfile::select('id', 'profile')->get()->toArray();
+
+        $locations = Location::select('id', 'city', 'state')->get()->toArray();
+
+        $qualifications = Qualification::select('id', 'qualification')->get()->toArray();
+
         $work_types = [
             "REMOTE",
             "WFO",
             "HYBRID"
         ];
 
-        // dd($company, $job_profiles, $locations, $qualifications);
         return view('admin.job.create', compact('company', 'job_profiles', 'locations', 'qualifications', 'work_types'));
     }
 
     public function store(Request $request, $id)
     {
-
-        // 'experience_level' => ['FRESHER', "EXPERIENCED"]
-        // 'experience_type' => ['ANY', "1-2", "2-3", "3-5", "5-8", "8-10", "10+"]
-        // 'job_type' => ['FULL_TIME', "PART_TIME", "INTERNSHIP", "CONTRACT"]
         $request->validate(
             [
                 "profile_id" =>
@@ -94,7 +100,7 @@ class JobController extends Controller
                     "integer",
                     // greater than min_salary
                     function ($attribute, $value, $fail) use ($request) {
-                        if ($value < $request->get('min_salary')) {
+                        if ($value <= $request->get('min_salary')) {
                             $fail("The $attribute must be greater than min salary.");
                         }
                     },
@@ -103,8 +109,8 @@ class JobController extends Controller
                     "required",
                     "array",
                     function ($attribute, $value, $fail) {
-                        foreach ($value as $v) {
-                            if (!Location::where('id', $v)->exists()) {
+                        foreach ($value as $id) {
+                            if (!Location::where('id', $id)->exists()) {
                                 $fail("The selected $attribute is invalid.");
                             }
                         }
@@ -114,8 +120,8 @@ class JobController extends Controller
                     "required",
                     "array",
                     function ($attribute, $value, $fail) {
-                        foreach ($value as $v) {
-                            if (!Qualification::where('id', $v)->exists()) {
+                        foreach ($value as $id) {
+                            if (!Qualification::where('id', $id)->exists()) {
                                 $fail("The selected $attribute is invalid.");
                             }
                         }
@@ -207,13 +213,28 @@ class JobController extends Controller
     public function index()
     {
         // $jobs = $this->job->with(['profile', "company"])->get()->toArray();
-        $jobs = $this->job->with(['profile', "company"])->paginate(10);
+        $jobs = $this->job->with(['profile'])->paginate(10);
         return view('admin.job.index', compact('jobs'));
     }
 
     public function show($id)
     {
-        $job = $this->job->where('id', $id)->with(['profile', "company", "qualifications", "locations"])->get()->ToArray();
+        $job = $this->job->where('id', $id)->with(
+            [
+                'profile' => function ($query) {
+                    $query->select(['job_profiles.id', 'profile']);
+                },
+                "company" => function ($query) {
+                    $query->select(['companies.id', 'name', 'email']);
+                },
+                "qualifications" => function ($query) {
+                    $query->select(['qualifications.id', 'qualification']);
+                },
+                "locations" => function ($query) {
+                    $query->select(['locations.id', 'city', 'state']);
+                }
+            ]
+        )->get()->ToArray();
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }
@@ -236,10 +257,6 @@ class JobController extends Controller
 
     public function update(Request $request, $id)
     {
-
-        // 'experience_level' => ['FRESHER', "EXPERIENCED"]
-        // 'experience_type' => ['ANY', "1-2", "2-3", "3-5", "5-8", "8-10", "10+"]
-        // 'job_type' => ['FULL_TIME', "PART_TIME", "INTERNSHIP", "CONTRACT"]
         $request->validate(
             [
                 "profile_id" =>
@@ -282,7 +299,7 @@ class JobController extends Controller
                     "integer",
                     // greater than min_salary
                     function ($attribute, $value, $fail) use ($request) {
-                        if ($value < $request->get('min_salary')) {
+                        if ($value <= $request->get('min_salary')) {
                             $fail("The $attribute must be greater than min salary.");
                         }
                     },
@@ -291,8 +308,8 @@ class JobController extends Controller
                     "required",
                     "array",
                     function ($attribute, $value, $fail) {
-                        foreach ($value as $v) {
-                            if (!Location::where('id', $v)->exists()) {
+                        foreach ($value as $id) {
+                            if (!Location::where('id', $id)->exists()) {
                                 $fail("The selected $attribute is invalid.");
                             }
                         }
@@ -302,8 +319,8 @@ class JobController extends Controller
                     "required",
                     "array",
                     function ($attribute, $value, $fail) {
-                        foreach ($value as $v) {
-                            if (!Qualification::where('id', $v)->exists()) {
+                        foreach ($value as $id) {
+                            if (!Qualification::where('id', $id)->exists()) {
                                 $fail("The selected $attribute is invalid.");
                             }
                         }
@@ -442,12 +459,6 @@ class JobController extends Controller
 
     public function toggleActive($id, $is_active)
     {
-
-        // isactice has oly two value 0 and 1 validate it
-
-
-
-
 
         if (!$this->auth->isAdmin() && !$this->auth->isCompany()) {
             return redirect()->back()->with("warning", "You are not authorized");

@@ -234,8 +234,10 @@
                             <label for="keywords" class="form-label">Keywords</label>
                             <textarea class="form-control" id="keywords" name="keywords" rows="3">{{ old('keywords', $job['keywords']) }}</textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <a href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
+                        </div>
                     </form>
                 </div>
             </div>

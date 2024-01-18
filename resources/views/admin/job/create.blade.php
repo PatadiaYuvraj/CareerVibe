@@ -17,7 +17,9 @@
                             <label class="form-control">{{ $company['name'] }}</label>
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="form-label">Select Job Profile</label>
+                            <label for="email" class="form-label">Select Job Profile
+                                <span class="text-danger">*</span>
+                            </label>
                             <div class="row row-cols-3">
                                 @forelse ($job_profiles as $profile)
                                     <div class="col">
@@ -44,14 +46,18 @@
                         </div>
                         <div class="row mb-3">
                             <div class="col">
-                                <label for="vacancy" class="form-label">Vacancy</label>
+                                <label for="vacancy" class="form-label">
+                                    Vacancy
+                                    <span class="text-danger">*</span>
+                                </label>
                                 <input type="number" name="vacancy" class="form-control" value="{{ old('vacancy') }}">
                                 @error('vacancy')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="col">
-                                <label for="min_salary" class="form-label">Min Salary</label>
+                                <label for="min_salary" class="form-label">Min Salary
+                                    <span class="text-danger">*</span></label>
                                 <input type="number" name="min_salary" class="form-control"
                                     value="{{ old('min_salary') }}">
                                 @error('min_salary')
@@ -59,7 +65,8 @@
                                 @enderror
                             </div>
                             <div class="col">
-                                <label for="max_salary" class="form-label">Max Salary</label>
+                                <label for="max_salary" class="form-label">Max Salary
+                                    <span class="text-danger">*</span></label>
                                 <input type="number" name="max_salary" class="form-control"
                                     value="{{ old('max_salary') }}">
                                 @error('max_salary')
@@ -68,7 +75,9 @@
                             </div>
                         </div>
                         <div class="mt-3">
-                            <label for="email" class="form-label">Select Work Type</label>
+                            <label for="email" class="form-label">Select Work Type
+                                <span class="text-danger">*</span>
+                            </label>
                             <div class="row row-cols-3">
                                 @foreach ($work_types as $work_type)
                                     <div class="col">
@@ -89,7 +98,9 @@
                             @enderror
                         </div>
                         <div class="mt-3">
-                            <label for="email" class="form-label">Select Qualification</label>
+                            <label for="email" class="form-label">Select Qualification
+                                <span class="text-danger">*</span>
+                            </label>
                             <div class="row row-cols-3">
                                 @forelse ($qualifications as $qualification)
                                     <div class="col">
@@ -116,7 +127,9 @@
                             @enderror
                         </div>
                         <div class="mt-3">
-                            <label for="email" class="form-label">Select Location</label>
+                            <label for="email" class="form-label">Select Location
+                                <span class="text-danger">*</span>
+                            </label>
                             <div class="row row-cols-3">
                                 @forelse ($locations as $location)
                                     <div class="col">
@@ -126,8 +139,12 @@
                                                     type="checkbox" value="{{ $location['id'] }}" name="locations[]">
                                             </div>
                                             <div class="form-control">
-                                                {{ $location['city'] }}<span
-                                                    class="small">{{ ' (' . $location['state'] . ')' }}</span>
+                                                {{ $location['city'] }}
+
+                                                @if ($location['state'])
+                                                    <span class="small">({{ $location['state'] }})</span>
+                                                @endif
+
                                             </div>
                                         </label>
                                     </div>
@@ -144,7 +161,9 @@
                         </div>
 
                         <div class="mt-3">
-                            <label for="email" class="form-label">Select Job Type</label>
+                            <label for="email" class="form-label">Select Job Type
+                                <span class="text-danger">*</span>
+                            </label>
                             <div class="row row-cols-4">
                                 @foreach (['FULL_TIME', 'PART_TIME', 'INTERNSHIP', 'CONTRACT'] as $job_type)
                                     <div class="col">
