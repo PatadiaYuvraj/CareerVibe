@@ -34,8 +34,24 @@ class UserController extends Controller
     public function doLogin(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:8'
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'min:3',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('email', $value)->first();
+                    if (!$user) {
+                        return $fail('Email does not exist');
+                    }
+                }
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+            ]
         ]);
         $data =
             [
@@ -53,16 +69,44 @@ class UserController extends Controller
     public function doRegister(Request $request)
     {
         $request->validate([
-            'name' => 'required|min:5|max:30',
-            'email' => 'required|unique:users,email|email',
-            'password' => 'required|min:8',
-            'confirm_password' => 'required_with:password|same:password|min:8'
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                'min:3',
+            ],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'min:3',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('email', $value)->first();
+                    if ($user) {
+                        return $fail('Email already exist');
+                    }
+                }
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+            ],
+            'password_confirmation' => [
+                'required',
+                'string',
+                'min:8',
+                'same:password',
+            ]
         ]);
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email"),
             "password" => $request->get("password")
         ];
+
         $user = $this->user->create($data);
         if ($user) {
             $data =
@@ -72,6 +116,7 @@ class UserController extends Controller
                 ];
             $isAuth = Auth::guard('user')->attempt($data, true);
             if ($isAuth) {
+
                 return redirect()->route('index')->with('success', 'You are logged in');
             }
             return redirect()->route('login')->with('success', 'You are registered');

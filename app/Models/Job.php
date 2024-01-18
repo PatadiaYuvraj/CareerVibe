@@ -14,7 +14,7 @@ class Job extends Model
 
     protected $required = [
         'company_id',
-        'profile_id',
+        'sub_profile_id',
     ];
 
     protected $guarded = [
@@ -25,7 +25,7 @@ class Job extends Model
 
     protected $fillable = [
         'company_id',
-        'profile_id',
+        'sub_profile_id',
         'vacancy',
         'min_salary',
         'max_salary',
@@ -43,12 +43,31 @@ class Job extends Model
         "experience_type"
     ];
 
+    protected $nullable = [
+        'vacancy',
+        'min_salary',
+        'max_salary',
+        'description',
+        'responsibility',
+        'benifits_perks',
+        'other_benifits',
+        'keywords',
+        'is_verified',
+        'is_featured',
+        'is_active',
+        'work_type',
+        "job_type",
+        "experience_level",
+        "experience_type"
+    ];
+
+    protected $timestamp = true;
+
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id', 'id');
     }
 
-    // job has many qualifications
     public function qualifications()
     {
         return $this->belongsToMany(Qualification::class, 'job_qualifications', 'jobs_id', 'qualifications_id');
@@ -59,9 +78,13 @@ class Job extends Model
         return $this->belongsToMany(Location::class, 'job_locations', 'jobs_id', 'locations_id');
     }
 
-    // job has one profile
-    public function profile()
+    public function subProfile()
     {
-        return $this->belongsTo(JobProfile::class, 'profile_id', 'id');
+        return $this->belongsTo(SubProfile::class, 'sub_profile_id', 'id');
+    }
+
+    public function profileCategory()
+    {
+        return $this->hasOneThrough(ProfileCategory::class, SubProfile::class, 'id', 'id', 'sub_profile_id', 'profile_category_id');
     }
 }

@@ -95,7 +95,7 @@
                                 <h5 class="card-title">
                                     Salary Package
                                 </h5>
-                                <h6 class="">
+                                <h6 class="Laravel">
                                     @if ($job['min_salary'] >= 1000)
                                         {{ $job['min_salary'] / 1000 }}k -
                                         {{ $job['max_salary'] / 1000 }}k

@@ -1,0 +1,132 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\ProfileCategory;
+use App\Models\SubProfile;
+use Illuminate\Http\Request;
+
+class SubProfileController extends Controller
+{
+    private SubProfile $subProfile;
+
+    public function __construct(SubProfile $subProfile)
+    {
+        $this->subProfile = $subProfile;
+    }
+
+    public function create()
+    {
+        $profileCategories = ProfileCategory::all();
+        return view('admin.sub-profile.create', compact('profileCategories'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:50',
+                'unique:sub_profiles,name',
+            ],
+            'profile_category_id' => [
+                'required',
+                'integer',
+                'exists:profile_categories,id',
+                function ($attribute, $value, $fail) {
+                    $profileCategory = ProfileCategory::where('id', $value)->first();
+                    if (!$profileCategory) {
+                        $fail('The ' . $attribute . ' is invalid.');
+                    }
+                },
+
+            ],
+        ]);
+        $data = [
+            'name' => $request->name,
+            'profile_category_id' => $request->profile_category_id,
+        ];
+        // dd($data);
+        $isCreated = $this->subProfile->create($data);
+        if ($isCreated) {
+            return redirect()->route('admin.sub-profile.index')->with('success', 'Sub Profile created successfully');
+        }
+        return redirect()->back()->with('error', 'Sub Profile creation failed');
+    }
+
+    public function index()
+    {
+        $subProfiles = $this->subProfile->withCount('jobs')->with('profileCategory')->paginate(5);
+        // how access profile category name in blade file 
+        // $subProfiles[0]->profile_category->name
+        return view('admin.sub-profile.index', compact('subProfiles'));
+    }
+
+    public function show($id)
+    {
+        $subProfile = $this->subProfile->where('id', $id)->with(['profileCategory', 'jobs'])->get()->ToArray();
+        if (!$subProfile) {
+            return redirect()->back()->with("warning", "Sub Profile is not found");
+        }
+        $subProfile =  $subProfile[0];
+        dd($subProfile);
+        return view('admin.sub-profile.show', compact('subProfile'));
+    }
+
+    public function edit($id)
+    {
+        $subProfile = $this->subProfile->where('id', $id)->with('profileCategory')->get()->ToArray();
+        if (!$subProfile) {
+            return redirect()->back()->with("warning", "Sub Profile is not found");
+        }
+        $subProfile =  $subProfile[0];
+        $profileCategories = ProfileCategory::all();
+        return view('admin.sub-profile.edit', compact('subProfile', 'profileCategories'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'name' => [
+                'required',
+                'string',
+                'max:50',
+                'unique:sub_profiles,name,' . $id,
+            ],
+            'profile_category_id' => [
+                'required',
+                'integer',
+                'exists:profile_categories,id',
+            ],
+        ]);
+        $data = [
+            'name' => $request->name,
+            'profile_category_id' => $request->profile_category_id,
+        ];
+
+        $isUpdated = $this->subProfile->where('id', $id)->update($data);
+        if ($isUpdated) {
+            return redirect()->route('admin.sub-profile.index')->with('success', 'Sub Profile is updated');
+        }
+        return redirect()->back()->with("warning", "Sub Profile is not updated");
+    }
+
+    public function delete($id)
+    {
+        $subProfile = $this->subProfile->where('id', $id)->withCount('jobs')->get()->ToArray();
+        if (!$subProfile) {
+            return redirect()->back()->with("warning", "Sub Profile is not found");
+        }
+        $subProfile =  $subProfile[0];
+        if ($subProfile['jobs_count'] == 0) {
+            $isDeleted = $this->subProfile->where('id', $id)->delete();
+            if ($isDeleted) {
+                return redirect()->route('admin.sub-profile.index')->with('success', 'Sub Profile is deleted');
+            }
+            return redirect()->back()->with("warning", "Sub Profile is not deleted");
+        }
+        return redirect()->back()->with("warning", "Sub Profile is not deleted, because it has jobs associated with it");
+    }
+}

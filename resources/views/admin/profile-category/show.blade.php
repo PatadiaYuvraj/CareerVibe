@@ -1,4 +1,6 @@
-@extends('admin.layout.app')
+@dd('Profile Category Show');Sub
+
+{{-- @extends('admin.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
     <main id="main" class="main">
@@ -13,10 +15,8 @@
                             <li class="breadcrumb-item active" aria-current="page">Show</li>
                         </ol>
                     </nav>
-                    {{-- <a href="{{ route('admin.job-profile.index') }}" class="float-end btn btn-sm btn-primary">Back</a> --}}
                 </div>
                 <div class="card-body">
-                    {{--  --}}
 
                     <div class="jumbotron">
                         <h1 class="display-5">{{ $profile['profile'] }}</h1>
@@ -56,15 +56,12 @@
                                         <h6 class="card-subtitle mb-2 text-muted">Job is
                                             {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
                                         </h6>
-                                        {{-- <a href="{{ route('admin.job.edit', $job['id']) }}" class="card-link">Edit</a>
-                                        <a href="{{ route('admin.job.delete', $job['id']) }}" class="card-link">Delete</a> --}}
                                     </div>
                                 @empty
                                     <div class="card-body">
                                         <h5 class="card-title">No Jobs Available</h5>
                                     </div>
                                 @endforelse
-                                {{--  --}}
                             </div>
                         </div>
                     </div>
@@ -73,4 +70,4 @@
         </section>
 
     </main>
-@endsection
+@endsection --}}

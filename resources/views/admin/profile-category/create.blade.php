@@ -5,26 +5,29 @@
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
-                    <span class="h3 text-black">Add Job Profile</span>
-                    <a href="{{ route('admin.job-profile.index') }}" class="float-end btn btn-sm btn-primary">
+                    <span class="h3 text-black">
+                        Add Profile Category
+                    </span>
+                    <a href="{{ route('admin.profile-category.index') }}" class="float-end btn btn-sm btn-primary">
                         Back
                     </a>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('admin.job-profile.store') }}" method="POST">
+                    <form action="{{ route('admin.profile-category.store') }}" method="POST">
                         @csrf
                         <div class="mb-3">
-                            <label for="profile" class="form-label">Job Profile
+                            <label for="name" class="form-label">
+                                Profile Category
                                 <span class="text-danger">*</span>
                             </label>
-                            <input type="text" name="profile" class="form-control" value="{{ old('profile') }}">
-                            @error('profile')
+                            <input type="text" name="name" class="form-control" value="{{ old('name') }}">
+                            @error('name')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="{{ route('admin.job-profile.index') }}" class="btn btn-danger">Cancel</a>
+                            <a href="{{ route('admin.profile-category.index') }}" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
                 </div>

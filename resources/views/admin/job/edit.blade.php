@@ -1,6 +1,6 @@
 @foreach ($job['qualifications'] as $item)
     @php
-        $qjData[] = $item['qualification'];
+        $qjData[] = $item['name'];
     @endphp
 @endforeach
 @foreach ($job['locations'] as $item)
@@ -8,6 +8,126 @@
         $ljData[] = $item['city'];
     @endphp
 @endforeach
+
+{{-- 
+    array:4 [▼ // app/Http/Controllers/Admin/JobController.php:310
+  "job" => array:23 [▼
+    "id" => 1
+    "company_id" => 1
+    "sub_profile_id" => 1
+    "vacancy" => 1
+    "min_salary" => 12
+    "max_salary" => 123
+    "description" => null
+    "responsibility" => null
+    "benifits_perks" => null
+    "other_benifits" => null
+    "is_verified" => 0
+    "is_featured" => 0
+    "is_active" => 1
+    "keywords" => null
+    "work_type" => "REMOTE"
+    "job_type" => "FULL_TIME"
+    "experience_level" => "FRESHER"
+    "experience_type" => "ANY"
+    "created_at" => "2024-01-18T13:01:29.000000Z"
+    "updated_at" => "2024-01-18T13:13:24.000000Z"
+    "sub_profile" => array:4 [▼
+      "id" => 1
+      "name" => "Laravel Developer"
+      "profile_category_id" => 1
+      "profile_category" => array:2 [▼
+        "id" => 1
+        "name" => "Web Development"
+      ]
+    ]
+    "qualifications" => array:1 [▼
+      0 => array:3 [▼
+        "id" => 3
+        "name" => "B. Tech"
+        "pivot" => array:2 [▶]
+      ]
+    ]
+    "locations" => array:1 [▼
+      0 => array:4 [▼
+        "id" => 1
+        "city" => "Rajkot"
+        "state" => "Gujarat"
+        "pivot" => array:2 [▶]
+      ]
+    ]
+  ]
+  "qualifications" => array:6 [▼
+    0 => array:2 [▼
+      "id" => 3
+      "name" => "B. Tech"
+    ]
+    1 => array:2 [▼
+      "id" => 5
+      "name" => "BBA"
+    ]
+    2 => array:2 [▼
+      "id" => 2
+      "name" => "BCA"
+    ]
+    3 => array:2 [▼
+      "id" => 4
+      "name" => "M. Tech"
+    ]
+    4 => array:2 [▼
+      "id" => 6
+      "name" => "MBA"
+    ]
+    5 => array:2 [▼
+      "id" => 1
+      "name" => "MCA"
+    ]
+  ]
+  "locations" => array:4 [▼
+    0 => array:3 [▼
+      "id" => 1
+      "city" => "Rajkot"
+      "state" => "Gujarat"
+    ]
+    1 => array:3 [▼
+      "id" => 2
+      "city" => "Ahmedabad"
+      "state" => "Gujarat"
+    ]
+    2 => array:3 [▼
+      "id" => 3
+      "city" => "Vadodara"
+      "state" => "Gujarat"
+    ]
+    3 => array:3 [▼
+      "id" => 4
+      "city" => "Surat"
+      "state" => null
+    ]
+  ]
+  "sub_profiles" => array:2 [▼
+    0 => array:4 [▼
+      "id" => 1
+      "name" => "Laravel Developer"
+      "profile_category_id" => 1
+      "profile_category" => array:2 [▼
+        "id" => 1
+        "name" => "Web Development"
+      ]
+    ]
+    1 => array:4 [▼
+      "id" => 2
+      "name" => "PhotoShop Designer"
+      "profile_category_id" => 2
+      "profile_category" => array:2 [▼
+        "id" => 2
+        "name" => "Designing"
+      ]
+    ]
+  ]
+]
+    --}}
+
 @extends('admin.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
@@ -16,7 +136,7 @@
             <div class="card">
                 <div class="card-header">
                     <span class="h3 text-black">
-                        Edit Job for {{ $job['company']['name'] }}
+                        Edit Job
                     </span>
                     <a href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
@@ -25,17 +145,21 @@
                         @csrf
                         <div class="mb-3">
                             <label for="email" class="form-label">Select Job Profile</label>
-                            <div class="row row-cols-3">
-                                @forelse ($profiles as $profile)
+                            <div class="row row-cols-2">
+                                @forelse ($sub_profiles as $profile)
                                     <div class="col">
-                                        <label for="{{ $profile['profile'] }}" class="input-group mb-3">
+                                        <label for="{{ $profile['name'] }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $profile['profile'] }}"
-                                                    type="radio" value="{{ $profile['id'] }}" name="profile_id"
-                                                    @if ($profile['id'] == $job['profile_id']) checked @endif>
+                                                <input class="form-check-input mt-0" id="{{ $profile['name'] }}"
+                                                    type="radio" value="{{ $profile['id'] }}" name="sub_profile_id"
+                                                    @if ($profile['id'] == $job['sub_profile_id']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower($profile['profile'])) }}
+                                                {{ Str::ucfirst(Str::lower($profile['name'])) }}
+                                                {{-- profile category --}}
+                                                <span class="small">
+                                                    ({{ $profile['profile_category']['name'] }})
+                                                </span>
                                             </div>
                                         </label>
                                     </div>
@@ -46,7 +170,7 @@
                                     </div>
                                 @endforelse
                             </div>
-                            @error('profile_id')
+                            @error('sub_profile_id')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -93,7 +217,7 @@
                                         </label>
                                     </div>
                                 @endforeach
-                            </div>
+                            </div>company
                             @error('work_type')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -103,15 +227,14 @@
                             <div class="row row-cols-3">
                                 @foreach ($qualifications as $qualification)
                                     <div class="col">
-                                        <label for="{{ $qualification['qualification'] }}" class="input-group mb-3">
+                                        <label for="{{ $qualification['name'] }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0"
-                                                    id="{{ $qualification['qualification'] }}" type="checkbox"
-                                                    @if (in_array($qualification['qualification'], $qjData)) checked @endif
+                                                <input class="form-check-input mt-0" id="{{ $qualification['name'] }}"
+                                                    type="checkbox" @if (in_array($qualification['name'], $qjData)) checked @endif
                                                     value="{{ $qualification['id'] }}" name="qualifications[]">
                                             </div>
                                             <div class="form-control">
-                                                {{ $qualification['qualification'] }}
+                                                {{ $qualification['name'] }}
                                             </div>
                                         </label>
                                     </div>

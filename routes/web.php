@@ -15,7 +15,8 @@
 // https://htmlcodex.com/job-portal-website-template/
 // admin panel
 // https://sneat-vuetify-admin-template.vercel.app/dashboard
-// 
+// https://themewagon.github.io/jobfinderportal/index.html
+// https://themewagon.com/themes/free-bootstrap-4-html5-job-portal-website-template-jobfinderportal/
 
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\AdminController;
@@ -24,11 +25,21 @@ use App\Http\Controllers\Front\UserController as FrontUserController;
 use App\Http\Controllers\Admin\JobController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\QualificationController;
-use App\Http\Controllers\Admin\JobProfileController;
+use App\Http\Controllers\Admin\SubProfileController;
+use App\Http\Controllers\Admin\ProfileCategoryController;
 use App\Http\Controllers\TestController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/test',  [TestController::class, "test"])->name('test');
+Route::get('/checkAuth',  function () {
+    dd([
+        "user" => Auth::guard('user')->user(),
+        "admin" => Auth::guard('admin')->user(),
+        "company" => Auth::guard('company')->user(),
+    ]);
+})->name('checkAuth');
+
+Route::get('/test', [TestController::class, "test"])->name('test');
 Route::post('/testing',  [TestController::class, "testing"])->name('testing');
 
 
@@ -84,7 +95,6 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::get('/dashboard',  [AdminController::class, "dashboard"])->name('admin.dashboard');
         Route::get('/logout',  [AdminController::class, "logout"])->name('admin.logout');
 
-        // User Routes 
         Route::prefix('user')->group(function () {
             Route::get('/create',  [AdminUserController::class, "create"])->name('admin.user.create');
             Route::post('/store',  [AdminUserController::class, "store"])->name('admin.user.store');
@@ -93,14 +103,11 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/edit/{id}',  [AdminUserController::class, "edit"])->name('admin.user.edit');
             Route::post('/update/{id}',  [AdminUserController::class, "update"])->name('admin.user.update');
             Route::get('/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
-            // Route::get('/edit-profile-image/{id}',  [AdminUserController::class, "editProfileImage"])->name('admin.user.editProfileImage');
             Route::post('/update-profile-image/{id}',  [AdminUserController::class, "updateUserProfileImage"])->name('admin.user.updateProfileImage');
-            // Route::get('/edit-resume-pdf/{id}',  [AdminUserController::class, "editResumePdf"])->name('admin.user.editResumePdf');
             Route::post('/update-resume-pdf/{id}',  [AdminUserController::class, "updateUserResume"])->name('admin.user.updateResumePdf');
-            // delete Profile image
             Route::post('/delete-profile-image/{id}',  [AdminUserController::class, "deleteProfileImage"])->name('admin.user.deleteProfileImage');
         });
-        // Company Routes 
+
         Route::prefix('company')->group(function () {
             Route::get('/create',  [CompanyController::class, "create"])->name('admin.company.create');
             Route::post('/store',  [CompanyController::class, "store"])->name('admin.company.store');
@@ -114,7 +121,7 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::post('/update-profile-image/{id}',  [CompanyController::class, "updateCompanyProfileImage"])->name('admin.company.updateProfileImage');
             Route::post('/delete-profile-image/{id}',  [CompanyController::class, "deleteProfileImage"])->name('admin.company.deleteProfileImage');
         });
-        // Job Routes 
+
         Route::prefix('job')->group(function () {
             Route::get('/create/{id}',  [JobController::class, "create"])->name('admin.job.create');
             Route::post('/store/{id}',  [JobController::class, "store"])->name('admin.job.store');
@@ -127,17 +134,27 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/toggle-featured/{id}/{is_featured}',  [JobController::class, "toggleFeatured"])->name('admin.job.toggleFeatured');
             Route::get('/toggle-active/{id}/{is_active}',  [JobController::class, "toggleActive"])->name('admin.job.toggleActive');
         });
-        // Job Profiles Routes 
-        Route::prefix('/job-profile')->group(function () {
-            Route::get('/create',  [JobProfileController::class, "create"])->name('admin.job-profile.create');
-            Route::post('/store',  [JobProfileController::class, "store"])->name('admin.job-profile.store');
-            Route::get('/',  [JobProfileController::class, "index"])->name('admin.job-profile.index');
-            Route::get('/{id}',  [JobProfileController::class, "show"])->name('admin.job-profile.show');
-            Route::get('/edit/{id}',  [JobProfileController::class, "edit"])->name('admin.job-profile.edit');
-            Route::post('/update/{id}',  [JobProfileController::class, "update"])->name('admin.job-profile.update');
-            Route::get('/delete/{id}',  [JobProfileController::class, "delete"])->name('admin.job-profile.delete');
+
+        Route::prefix('profile-category')->group(function () {
+            Route::get('/create',  [ProfileCategoryController::class, "create"])->name('admin.profile-category.create');
+            Route::post('/store',  [ProfileCategoryController::class, "store"])->name('admin.profile-category.store');
+            Route::get('/',  [ProfileCategoryController::class, "index"])->name('admin.profile-category.index');
+            Route::get('/{id}',  [ProfileCategoryController::class, "show"])->name('admin.profile-category.show');
+            Route::get('/edit/{id}',  [ProfileCategoryController::class, "edit"])->name('admin.profile-category.edit');
+            Route::post('/update/{id}',  [ProfileCategoryController::class, "update"])->name('admin.profile-category.update');
+            Route::get('/delete/{id}',  [ProfileCategoryController::class, "delete"])->name('admin.profile-category.delete');
         });
-        // Location Routes 
+
+        Route::prefix('sub-profile')->group(function () {
+            Route::get('/create',  [SubProfileController::class, "create"])->name('admin.sub-profile.create');
+            Route::post('/store',  [SubProfileController::class, "store"])->name('admin.sub-profile.store');
+            Route::get('/',  [SubProfileController::class, "index"])->name('admin.sub-profile.index');
+            Route::get('/{id}',  [SubProfileController::class, "show"])->name('admin.sub-profile.show');
+            Route::get('/edit/{id}',  [SubProfileController::class, "edit"])->name('admin.sub-profile.edit');
+            Route::post('/update/{id}',  [SubProfileController::class, "update"])->name('admin.sub-profile.update');
+            Route::get('/delete/{id}',  [SubProfileController::class, "delete"])->name('admin.sub-profile.delete');
+        });
+
         Route::prefix('location')->group(function () {
             Route::get('/create',  [LocationController::class, "create"])->name('admin.location.create');
             Route::post('/store',  [LocationController::class, "store"])->name('admin.location.store');
@@ -147,7 +164,7 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::post('/update/{id}',  [LocationController::class, "update"])->name('admin.location.update');
             Route::get('/delete/{id}',  [LocationController::class, "delete"])->name('admin.location.delete');
         });
-        // Qualification Routes
+
         Route::prefix('qualification')->group(function () {
             Route::get('/create',  [QualificationController::class, "create"])->name('admin.qualification.create');
             Route::post('/store',  [QualificationController::class, "store"])->name('admin.qualification.store');

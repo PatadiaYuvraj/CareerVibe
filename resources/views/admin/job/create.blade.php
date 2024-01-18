@@ -16,20 +16,22 @@
                             <label for="email" class="form-label">Company Name</label>
                             <label class="form-control">{{ $company['name'] }}</label>
                         </div>
+                        {{-- divide sub profiles in category wise --}}
                         <div class="mb-3">
                             <label for="email" class="form-label">Select Job Profile
                                 <span class="text-danger">*</span>
                             </label>
-                            <div class="row row-cols-3">
-                                @forelse ($job_profiles as $profile)
+                            <div class="row row-cols-2">
+                                @forelse ($sub_profiles as $sub_profile)
                                     <div class="col">
-                                        <label for="{{ $profile['profile'] }}" class="input-group mb-3">
+                                        <label for="{{ $sub_profile['name'] }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $profile['profile'] }}"
-                                                    type="radio" value="{{ $profile['id'] }}" name="profile_id">
+                                                <input class="form-check-input mt-0" id="{{ $sub_profile['name'] }}"
+                                                    type="radio" value="{{ $sub_profile['id'] }}" name="sub_profile_id">
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower($profile['profile'])) }}
+                                                {{ Str::ucfirst(Str::lower($sub_profile['name'])) }}
+                                                <span class="small">({{ $sub_profile['profile_category']['name'] }})</span>
                                             </div>
                                         </label>
                                     </div>
@@ -40,7 +42,7 @@
                                     </div>
                                 @endforelse
                             </div>
-                            @error('profile_id')
+                            @error('sub_profile_id')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -104,14 +106,14 @@
                             <div class="row row-cols-3">
                                 @forelse ($qualifications as $qualification)
                                     <div class="col">
-                                        <label for="{{ $qualification['qualification'] }}" class="input-group mb-3">
+                                        <label for="{{ $qualification['name'] }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0"
-                                                    id="{{ $qualification['qualification'] }}" type="checkbox"
-                                                    value="{{ $qualification['id'] }}" name="qualifications[]">
+                                                <input class="form-check-input mt-0" id="{{ $qualification['name'] }}"
+                                                    type="checkbox" value="{{ $qualification['id'] }}"
+                                                    name="qualifications[]">
                                             </div>
                                             <div class="form-control">
-                                                {{ $qualification['qualification'] }}
+                                                {{ $qualification['name'] }}
                                             </div>
                                         </label>
                                     </div>

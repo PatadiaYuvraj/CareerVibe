@@ -14,9 +14,9 @@
                     <table class="table table-striped text-center">
                         <thead>
                             <tr>
-                                <th class="col-2">Job Profile</th>
+                                <th class="col-3">Job Profile</th>
                                 <th class="col-2">Job Vacancy</th>
-                                <th class="col-2">Salary Range</th>
+                                <th class="col-1">Salary</th>
                                 <th class="col-2">Work Type</th>
                                 <th class="col-1">Verified</th>
                                 <th class="col-1">Featured</th>
@@ -29,7 +29,7 @@
                                 <tr>
                                     <td>
                                         <a href="{{ route('admin.job.show', $job['id']) }}">
-                                            {{ $job['profile']['profile'] }}
+                                            {{ $job['subProfile']['name'] }}
                                         </a>
                                     </td>
                                     <td>{{ $job['vacancy'] }}</td>
@@ -56,11 +56,14 @@
                                             {{ $job['is_active'] ? 'Active' : 'Not Active' }}
                                         </a>
                                     </td>
-                                    <td class="d-flex btn-group">
-                                        <a href="{{ route('admin.job.edit', $job['id']) }}"
-                                            class="btn btn-sm btn-primary">Edit</a>
-                                        <a href="{{ route('admin.job.delete', $job['id']) }}"
-                                            class="btn btn-sm btn-danger">Delete</a>
+                                    <td>
+
+                                        <div class="d-flex btn-group">
+                                            <a href="{{ route('admin.job.edit', $job['id']) }}"
+                                                class="btn btn-sm btn-primary">Edit</a>
+                                            <a href="{{ route('admin.job.delete', $job['id']) }}"
+                                                class="btn btn-sm btn-danger">Delete</a>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty

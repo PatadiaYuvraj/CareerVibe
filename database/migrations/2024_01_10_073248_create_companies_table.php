@@ -21,9 +21,9 @@ return new class extends Migration
             $table->text("profile_image_url")->nullable();
             $table->text("profile_image_public_id")->nullable();
             $table->string('website', 100)->nullable();
-            $table->string('address_line_1', 100)->nullable();
-            $table->string('address_line_2', 100)->nullable();
-            $table->string('linkedin_profile', 100)->nullable();
+            $table->string('city', 100)->nullable();
+            $table->string('address', 100)->nullable();
+            $table->string('linkedin', 100)->nullable();
             $table->text('description')->nullable();
             $table->index(['name', 'email', 'id']);
             $table->rememberToken();

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Job;
-use App\Models\JobProfile;
 use App\Models\Location;
 use App\Models\Qualification;
+use App\Models\SubProfile;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 
@@ -18,10 +18,6 @@ class JobController extends Controller
 
     public function __construct(AuthService $auth, Job $job)
     {
-
-        // call parent constructor
-        parent::__construct();
-
         $this->auth = $auth;
         $this->job = $job;
     }
@@ -32,7 +28,7 @@ class JobController extends Controller
             return redirect()->back()->with("warning", "You are not authorized");
         }
 
-        $company = Company::where('id', $company_id)->select('id', 'name', 'is_verified')->get()->toArray();
+        $company = Company::where('id', $company_id)->select(['id', 'name', 'is_verified'])->get()->toArray();
         if (!$company) {
             return redirect()->back()->with("warning", "Company is not found");
         }
@@ -41,32 +37,48 @@ class JobController extends Controller
             return redirect()->back()->with("warning", "Company is not verified");
         }
 
-        $job_profiles = JobProfile::select('id', 'profile')->get()->toArray();
+        $sub_profiles = SubProfile::select([
+            'id',
+            'name',
+            'profile_category_id'
+        ])->with([
+            'profileCategory' =>
+            function ($query) {
+                $query->select(['id', 'name']);
+            }
+        ])->get()->toArray();
 
-        $locations = Location::select('id', 'city', 'state')->get()->toArray();
+        $locations = Location::select(['id', 'city', 'state'])->get()->toArray();
 
-        $qualifications = Qualification::select('id', 'qualification')->get()->toArray();
+        $qualifications = Qualification::select(['id', 'name'])->get()->toArray();
 
         $work_types = [
             "REMOTE",
             "WFO",
             "HYBRID"
         ];
+        // dd([
+        //     "company" => $company,
+        //     "sub_profiles" => $sub_profiles,
+        //     "locations" => $locations,
+        //     "qualifications" => $qualifications,
+        //     "work_types" => $work_types,
 
-        return view('admin.job.create', compact('company', 'job_profiles', 'locations', 'qualifications', 'work_types'));
+        // ]);
+        return view('admin.job.create', compact('company', 'sub_profiles', 'locations', 'qualifications', 'work_types'));
     }
 
     public function store(Request $request, $id)
     {
         $request->validate(
             [
-                "profile_id" =>
+                "sub_profile_id" =>
                 [
                     "required",
                     "string",
                     "max:100",
                     function ($attribute, $value, $fail) {
-                        if (!JobProfile::where('id', $value)->exists()) {
+                        if (!SubProfile::where('id', $value)->exists()) {
                             $fail("The selected $attribute is invalid.");
                         }
                     },
@@ -131,7 +143,7 @@ class JobController extends Controller
         );
         $data = [
             "company_id" => $id,
-            "profile_id" => $request->get("profile_id"),
+            "sub_profile_id" => $request->get("sub_profile_id"),
             "vacancy" => $request->get("vacancy"),
             "min_salary" => $request->get("min_salary"),
             "max_salary" => $request->get("max_salary"),
@@ -212,8 +224,20 @@ class JobController extends Controller
 
     public function index()
     {
-        // $jobs = $this->job->with(['profile', "company"])->get()->toArray();
-        $jobs = $this->job->with(['profile'])->paginate(10);
+        $jobs = $this->job->with([
+            'subProfile' => function ($query) {
+                $query->select(
+                    ['id', 'name', 'profile_category_id']
+                );
+                $query->with(
+                    [
+                        'profileCategory' => function ($query) {
+                            $query->select(['id', 'name']);
+                        }
+                    ]
+                );
+            },
+        ])->paginate(10);
         return view('admin.job.index', compact('jobs'));
     }
 
@@ -228,7 +252,7 @@ class JobController extends Controller
                     $query->select(['companies.id', 'name', 'email']);
                 },
                 "qualifications" => function ($query) {
-                    $query->select(['qualifications.id', 'qualification']);
+                    $query->select(['qualifications.id', 'name']);
                 },
                 "locations" => function ($query) {
                     $query->select(['locations.id', 'city', 'state']);
@@ -244,28 +268,62 @@ class JobController extends Controller
 
     public function edit($id)
     {
-        $job = $this->job->where('id', $id)->with(['profile', "company", "qualifications", "locations"])->get()->ToArray();
-        $qualifications = Qualification::all()->toArray();
-        $locations = Location::all()->toArray();
-        $profiles = JobProfile::all()->toArray();
+        $job = $this->job->where('id', $id)->with([
+            'subProfile' => function ($query) {
+                $query->select(['id', 'name', 'profile_category_id']);
+                $query->with(['profileCategory' => function ($query) {
+                    $query->select(['id', 'name']);
+                }]);
+            }, "qualifications" => function ($query) {
+                $query->select(['qualifications.id', 'name']);
+            }, "locations" => function ($query) {
+                $query->select(['locations.id', 'city', 'state']);
+            }
+        ])->get()->toArray();
+        $qualifications = Qualification::select([
+            'id',
+            'name'
+        ])->get()->toArray();
+        $locations = Location::select([
+            'id',
+            'city',
+            'state'
+        ])->get()->toArray();
+        $sub_profiles = SubProfile::select([
+            'id',
+            'name',
+            'profile_category_id'
+
+        ])->with([
+            'profileCategory' => function ($query) {
+                $query->select(['id', 'name']);
+            }
+        ])->get()->toArray();
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }
         $job  =  $job[0];
-        return view('admin.job.edit', compact('job', 'qualifications', 'locations', 'profiles'));
+        // dd([
+        //     "job" => $job,
+        //     "qualifications" => $qualifications,
+        //     "locations" => $locations,
+        //     "sub_profiles" => $sub_profiles,
+
+        // ]);
+        return view('admin.job.edit', compact('job', 'qualifications', 'locations', 'sub_profiles'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate(
             [
-                "profile_id" =>
+                "sub_profile_id" =>
                 [
                     "required",
                     "string",
                     "max:100",
                     function ($attribute, $value, $fail) {
-                        if (!JobProfile::where('id', $value)->exists()) {
+                        if (!SubProfile::where('id', $value)->exists()) {
                             $fail("The selected $attribute is invalid.");
                         }
                     },
@@ -329,7 +387,7 @@ class JobController extends Controller
             ]
         );
         $data = [
-            "profile_id" => $request->get("profile_id"),
+            "sub_profile_id" => $request->get("sub_profile_id"),
             "vacancy" => $request->get("vacancy"),
             "min_salary" => $request->get("min_salary"),
             "max_salary" => $request->get("max_salary"),

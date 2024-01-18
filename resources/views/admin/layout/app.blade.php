@@ -13,12 +13,6 @@
     <link href="{{ asset('admin/img/favicon.png') }}" rel="icon">
     <link href="{{ asset('admin/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
 
-    {{-- <!-- Google Fonts -->
-    <link href="https://fonts.gstatic.com" rel="preconnect">
-    <link
-        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
-        rel="stylesheet"> --}}
-
     <link href="{{ asset('admin/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('admin/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
     <link href="{{ asset('admin/vendor/boxicons/css/boxicons.min.css') }}" rel="stylesheet">
@@ -94,20 +88,6 @@
     <aside id="sidebar" class="sidebar">
 
         <ul class="sidebar-nav" id="sidebar-nav">
-            {{-- <li class="nav-item">
-                <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse"
-                    href="{{ route('admin.company.index') }}">
-                    <span>Company</span><i class="bi bi-chevron-down ms-auto"></i>
-                </a>
-                <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
-                    <li>
-                        <a class="nav-link " href="{{ route('admin.job.index') }}">
-                            <span>Job</span>
-                        </a>
-                    </li>
-                </ul>
-            </li> --}}
-            {{-- <hr /> --}}
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('admin.dashboard') }}">
                     <span>Dashboard</span>
@@ -133,32 +113,35 @@
             </li>
             <hr>
             <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('admin.job-profile.index') }}">
-                    <span>Job Profile</span>
+                <a class="nav-link collapsed" href="{{ route('admin.profile-category.index') }}">
+                    <span>Profile Category</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('admin.sub-profile.index') }}">
+                    <span>Sub Profile</span>
+                </a>
+            </li>
+            <hr>
+
+            <li class="nav-item">
                 <a class="nav-link collapsed     " href="{{ route('admin.location.index') }}">
-                    {{-- <i class="bi bi-grid"></i> --}}
                     <span>Location</span>
                 </a>
             </li>
             <hr>
             <li class="nav-item">
                 <a class="nav-link  collapsed   " href="{{ route('admin.qualification.index') }}">
-                    {{-- <i class="bi bi-grid"></i> --}}
                     <span>Qualification</span>
                 </a>
             </li>
         </ul>
 
-    </aside><!-- End Sidebar-->
+    </aside>
 
     @yield('content')
 
-
-    <!-- ======= Footer ======= -->
     <footer id="footer" class="footer">
         <div class="copyright">
             &copy; Copyright <strong><span>CareerVibe</span></strong>. All Rights Reserved
@@ -168,7 +151,6 @@
         </div>
     </footer>
 
-    <!-- Vendor JS Files -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js "></script>
     <script src="{{ asset('admin/vendor/apexcharts/apexcharts.min.js') }}"></script>
@@ -180,7 +162,6 @@
     <script src="{{ asset('admin/vendor/tinymce/tinymce.min.js') }}"></script>
     <script src="{{ asset('admin/vendor/php-email-form/validate.js') }}"></script>
 
-    <!-- Template Main JS File -->
     <script src="{{ asset('admin/js/main.js') }}"></script>
     <script>
         toastr.options = {

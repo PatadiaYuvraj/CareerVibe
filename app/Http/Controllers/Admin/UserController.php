@@ -27,10 +27,37 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:25'],
-            'email' => ['required', 'string', 'email', 'max:50', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'max:100'],
-            'password_confirmation' => ['required', 'string', 'min:8', 'max:100', 'same:password'],
+            'name' => [
+                'required',
+                'string',
+                'max:25'
+            ],
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:50',
+                function ($attribute, $value, $fail) {
+                    $user = User::where('email', $value)->first();
+                    if ($user) {
+                        return $fail('Email already exist');
+                    }
+                }
+            ],
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'max:100',
+                'confirmed'
+            ],
+            'password_confirmation' => [
+                'required',
+                'string',
+                'min:8',
+                'max:100',
+                'same:password'
+            ],
         ]);
         $data = [
             "name" => $request->name,

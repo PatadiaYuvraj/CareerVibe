@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id')->unsigned();
-            $table->bigInteger('profile_id')->unsigned();
+            $table->bigInteger('sub_profile_id')->unsigned();
             $table->tinyInteger("vacancy")->nullable();
             $table->mediumInteger("min_salary")->nullable();
             $table->mediumInteger("max_salary")->nullable();
@@ -32,7 +32,7 @@ return new class extends Migration
             $table->enum('experience_type', ['ANY', "1-2", "2-3", "3-5", "5-8", "8-10", "10+"])->nullable();
             $table->index(['keywords', 'id']);
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            $table->foreign('profile_id')->references('id')->on('job_profiles')->onDelete('cascade');
+            $table->foreign('sub_profile_id')->references('id')->on('sub_profiles')->onDelete('cascade');
             $table->timestamps();
         });
     }

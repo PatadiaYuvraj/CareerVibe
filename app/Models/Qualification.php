@@ -14,7 +14,7 @@ class Qualification extends Model
     protected $primaryKey = "id";
 
     protected $fillable = [
-        'qualification',
+        'name',
     ];
 
     protected $guarded = [
@@ -24,7 +24,7 @@ class Qualification extends Model
     ];
 
     protected $required = [
-        'qualification',
+        'name',
     ];
 
     protected $timestamp = true;

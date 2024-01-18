@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('job_profiles', function (Blueprint $table) {
+        Schema::create('sub_profiles', function (Blueprint $table) {
             $table->id();
-            $table->string('profile', 30)->unique();
-            $table->index(['profile', 'id']);
+            $table->bigInteger("profile_category_id")->unsigned()->index();
+            $table->string("name", 50);
+            $table->index(['name', 'id']);
+            $table->foreign('profile_category_id')->references('id')->on('profile_categories')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('job_profiles');
+        Schema::dropIfExists('sub_profiles');
     }
 };

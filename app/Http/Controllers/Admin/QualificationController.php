@@ -24,15 +24,15 @@ class QualificationController extends Controller
     {
         // custom validation
         $request->validate([
-            "qualification" => [
+            "name" => [
                 "required",
                 "string",
                 "max:100",
-                "unique:qualifications,qualification",
+                "unique:qualifications,name",
             ]
         ]);
         $data = [
-            "qualification" => $request->get("qualification"),
+            "name" => $request->get("name"),
         ];
         $isCreated = $this->qualification->create($data);
         if ($isCreated) {
@@ -78,15 +78,15 @@ class QualificationController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            "qualification" => [
+            "name" => [
                 "required",
                 "string",
                 "max:100",
-                "unique:qualifications,qualification" . $id,
+                "unique:qualifications,name," . $id,
             ]
         ]);
         $data = [
-            "qualification" => $request->get("qualification"),
+            "name" => $request->get("name"),
         ];
         $isUpdated = $this->qualification->where('id', $id)->update($data);
         if ($isUpdated) {
