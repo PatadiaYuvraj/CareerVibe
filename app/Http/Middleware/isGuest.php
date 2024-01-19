@@ -25,7 +25,7 @@ class isGuest
         }
         // compay
         if (Auth::guard('company')->check()) {
-            return redirect()->route("dmin.dashboard")->with("warning", "you're logged in ");
+            return redirect()->route("company.dashboard")->with("warning", "you're logged in ");
         }
         return $next($request);
     }

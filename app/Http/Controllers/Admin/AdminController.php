@@ -44,7 +44,7 @@ class AdminController extends Controller
             "password" => $request->get("password")
         ];
 
-        if (Auth::guard('admin')->attempt($data)) {
+        if (Auth::guard('admin')->attempt($data, true)) {
             return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
         }
         return redirect()->back()->with("warning", "Invalid Credentials");

@@ -27,6 +27,8 @@ use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\QualificationController;
 use App\Http\Controllers\Admin\SubProfileController;
 use App\Http\Controllers\Admin\ProfileCategoryController;
+use App\Http\Controllers\Company\CompanyController as CompanyCompanyController;
+use App\Http\Controllers\Company\JobController as CompanyJobController;
 use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -57,6 +59,14 @@ Route::group(['middleware' => "isGuest"], function () {
         Route::get('/register', [AdminController::class, "register"])->name('admin.register');
         Route::post('/login', [AdminController::class, "doLogin"])->name('admin.doLogin');
         Route::post('/register', [AdminController::class, "doRegister"])->name('admin.doRegister');
+    });
+
+    // Company Routes
+    Route::prefix('/company')->group(function () {
+        Route::get('/login',  [CompanyCompanyController::class, "login"])->name('company.login');
+        Route::get('/register', [CompanyCompanyController::class, "register"])->name('company.register');
+        Route::post('/login', [CompanyCompanyController::class, "doLogin"])->name('company.doLogin');
+        Route::post('/register', [CompanyCompanyController::class, "doRegister"])->name('company.doRegister');
     });
 });
 
@@ -181,6 +191,41 @@ Route::group(['middleware' => "isAdmin"], function () {
             });
         });
     } catch (Throwable $exception) {
+        abort(404, $exception->getMessage());
+    }
+});
+
+Route::group(['middleware' => "isCompany"], function () {
+    try {
+        Route::prefix('/company')->group(function () {
+
+            // dd(auth()->guard('company')->user());
+            // admins only can verify companies, companies can't verify themselves, they can only toggle active and featured status, and can't toggle verified status
+            Route::get('/edit-profile',  [CompanyCompanyController::class, "editProfile"])->name('company.editProfile');
+            Route::post('/update-profile',  [CompanyCompanyController::class, "updateProfile"])->name('company.updateProfile');
+            Route::get('/change-password',  [CompanyCompanyController::class, "changePassword"])->name('company.changePassword');
+            Route::post('/change-password',  [CompanyCompanyController::class, "doChangePassword"])->name('company.doChangePassword');
+            Route::get('/edit-profile-image',  [CompanyCompanyController::class, "editProfileImage"])->name('company.editProfileImage');
+            Route::post('/update-profile-image',  [CompanyCompanyController::class, "updateProfileImage"])->name('company.updateProfileImage');
+            Route::post('/delete-profile-image',  [CompanyCompanyController::class, "deleteProfileImage"])->name('company.deleteProfileImage');
+            Route::get('/dashboard',  [CompanyCompanyController::class, "dashboard"])->name('company.dashboard');
+            Route::get('/logout',  [CompanyCompanyController::class, "logout"])->name('company.logout');
+
+            Route::prefix('job')->group(function () {
+                Route::get('/create',  [CompanyJobController::class, "create"])->name('company.job.create');
+                Route::post('/store',  [CompanyJobController::class, "store"])->name('company.job.store');
+                Route::get('/',  [CompanyJobController::class, "index"])->name('company.job.index');
+                Route::get('/{id}',  [CompanyJobController::class, "show"])->name('company.job.show');
+                Route::get('/edit/{id}',  [CompanyJobController::class, "edit"])->name('company.job.edit');
+                Route::post('/update/{id}',  [CompanyJobController::class, "update"])->name('company.job.update');
+                Route::get('/delete/{id}',  [CompanyJobController::class, "delete"])->name('company.job.delete');
+                Route::get('/toggle-featured/{id}/{is_featured}',  [CompanyJobController::class, "toggleFeatured"])->name('company.job.toggleFeatured');
+                Route::get('/toggle-active/{id}/{is_active}',  [CompanyJobController::class, "toggleActive"])->name('company.job.toggleActive');
+            });
+        });
+    } catch (
+        Throwable $exception
+    ) {
         abort(404, $exception->getMessage());
     }
 });
