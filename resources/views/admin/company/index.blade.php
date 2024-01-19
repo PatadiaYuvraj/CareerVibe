@@ -2,7 +2,8 @@
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
     <main id="main" class="main">
-
+        {{-- {{ abort(403) }} --}}
+        {{-- <h2>{{ $exception->getMessage() }}</h2> --}}
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
