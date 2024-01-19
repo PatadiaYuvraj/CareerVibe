@@ -59,19 +59,51 @@ class SubProfileController extends Controller
     public function index()
     {
         $subProfiles = $this->subProfile->withCount('jobs')->with('profileCategory')->paginate(5);
-        // how access profile category name in blade file 
-        // $subProfiles[0]->profile_category->name
         return view('admin.sub-profile.index', compact('subProfiles'));
     }
 
     public function show($id)
     {
-        $subProfile = $this->subProfile->where('id', $id)->with(['profileCategory', 'jobs'])->get()->ToArray();
+        $subProfile = $this->subProfile
+            ->where('id', $id)
+            ->with(
+                [
+                    'profileCategory' => function ($query) {
+                        $query->select(['profile_categories.id', 'name', 'created_at']);
+                    },
+                    'jobs' => function ($query) {
+                        $query->select([
+                            'jobs.id',
+                            'company_id',
+                            'sub_profile_id',
+                            'vacancy',
+                            'min_salary',
+                            'max_salary',
+                            'work_type',
+                            'job_type',
+                            'experience_level',
+                            'is_active',
+                            'is_verified',
+                            'is_featured',
+                            'created_at'
+                        ]);
+                        $query->with([
+                            'company' => function ($query) {
+                                $query->select([
+                                    'companies.id',
+                                    'name',
+                                ]);
+                            }
+                        ]);
+                    }
+                ]
+            )
+            ->get()
+            ->ToArray();
         if (!$subProfile) {
             return redirect()->back()->with("warning", "Sub Profile is not found");
         }
         $subProfile =  $subProfile[0];
-        dd($subProfile);
         return view('admin.sub-profile.show', compact('subProfile'));
     }
 

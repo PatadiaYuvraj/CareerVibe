@@ -17,7 +17,7 @@
                 <div class="card-body">
                     <div class="col pt-3">
                         <h1 class="display-5">
-                            {{ $job['profile']['profile'] }}
+                            {{ $job['sub_profile']['name'] }}
                         </h1>
                         <p class="lead position-relative">
                             <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
@@ -60,7 +60,7 @@
                                 </h5>
                                 <h6 class="">
                                     @foreach ($job['qualifications'] as $qualification)
-                                        <span class="badge bg-primary">{{ $qualification['qualification'] }}</span>
+                                        <span class="badge bg-primary">{{ $qualification['name'] }}</span>
                                     @endforeach
                                 </h6>
                             </div>

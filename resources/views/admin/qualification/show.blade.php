@@ -41,7 +41,7 @@
                                             Offered by {{ $job['company']['name'] }}
                                         </h6>
                                         <h6 class="card-subtitle mb-2 text-muted">Job Title :
-                                            {{ $job['profile']['profile'] }}
+                                            {{ $job['sub_profile']['name'] }}
                                         </h6>
                                         <h6 class="card-subtitle mb-2 text-muted">Vacancy :
                                             {{ $job['vacancy'] }}
@@ -80,12 +80,10 @@
                                         <h5 class="card-title">No Jobs Available</h5>
                                     </div>
                                 @endforelse
-                                {{--  --}}
                             </div>
                         </div>
                     </div>
                 </div>
-                {{--  --}}
             </div>
         </section>
 

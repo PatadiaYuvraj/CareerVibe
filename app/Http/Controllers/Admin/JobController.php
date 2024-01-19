@@ -245,8 +245,8 @@ class JobController extends Controller
     {
         $job = $this->job->where('id', $id)->with(
             [
-                'profile' => function ($query) {
-                    $query->select(['job_profiles.id', 'profile']);
+                'subProfile' => function ($query) {
+                    $query->select(['sub_profiles.id', 'name']);
                 },
                 "company" => function ($query) {
                     $query->select(['companies.id', 'name', 'email']);
@@ -303,13 +303,6 @@ class JobController extends Controller
             return redirect()->back()->with("warning", "Job is not found");
         }
         $job  =  $job[0];
-        // dd([
-        //     "job" => $job,
-        //     "qualifications" => $qualifications,
-        //     "locations" => $locations,
-        //     "sub_profiles" => $sub_profiles,
-
-        // ]);
         return view('admin.job.edit', compact('job', 'qualifications', 'locations', 'sub_profiles'));
     }
 
@@ -393,6 +386,8 @@ class JobController extends Controller
             "max_salary" => $request->get("max_salary"),
         ];
 
+
+        $data['description'] = $data['responsibility'] = $data['benifits_perks'] = $data['other_benifits'] = $data['keywords'] = $data['work_type'] = $data['job_type'] = $data['experience_level'] = $data['experience_type'] = null;
         if ($request->get('description')) {
             $request->validate([
                 "description" => "required|string",

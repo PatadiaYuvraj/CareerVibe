@@ -31,6 +31,6 @@ class Qualification extends Model
 
     public function jobs()
     {
-        return $this->belongsToMany(Job::class, 'job_qualifications', 'qualifications_id', 'jobs_id')->with(['company', 'profile', 'qualifications', 'locations']);
+        return $this->belongsToMany(Job::class, 'job_qualifications', 'qualifications_id', 'jobs_id');
     }
 }

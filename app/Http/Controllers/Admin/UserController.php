@@ -250,6 +250,7 @@ class UserController extends Controller
             $data["resume_pdf_public_id"] = null;
         }
 
+        $data['contact'] =  $data['city'] = $data['headline'] = $data['gender'] = $data['education'] = $data['interest'] = $data['hobby'] = $data['about'] = $data['experience'] = null;
         if ($request->contact) {
             $request->validate([
                 "contact" => [

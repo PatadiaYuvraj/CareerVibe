@@ -9,6 +9,7 @@ use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\CssSelector\Node\FunctionNode;
 
 class CompanyController extends Controller
 {
@@ -91,37 +92,37 @@ class CompanyController extends Controller
             $data['website'] = $request->get("website");
         }
 
-        if ($request->get('address_line_1')) {
+        if ($request->get('city')) {
             $request->validate([
-                "address_line_1" => [
+                "city" => [
                     "required",
                     "string",
                     "max:100",
                 ],
             ]);
-            $data['address_line_1'] = $request->get("address_line_1");
+            $data['city'] = $request->get("city");
         }
 
-        if ($request->get('address_line_2')) {
+        if ($request->get('address')) {
             $request->validate([
-                "address_line_2" => [
+                "address" => [
                     "required",
                     "string",
                     "max:100",
                 ],
             ]);
-            $data['address_line_2'] = $request->get("address_line_2");
+            $data['address'] = $request->get("address");
         }
 
-        if ($request->get('linkedin_profile')) {
+        if ($request->get('linkedin')) {
             $request->validate([
-                "linkedin_profile" => [
+                "linkedin" => [
                     "required",
                     "string",
                     "max:100",
                 ],
             ]);
-            $data['linkedin_profile'] = $request->get("linkedin_profile");
+            $data['linkedin'] = $request->get("linkedin");
         }
 
         if ($request->get('description')) {
@@ -152,7 +153,11 @@ class CompanyController extends Controller
 
     public function show($id)
     {
-        $company = $this->company->where('id', $id)->with('jobs')->get()->ToArray();
+        $company = $this->company->where('id', $id)->with([
+            'jobs' => function ($query) {
+                $query->with('subProfile');
+            }
+        ])->get()->ToArray();
         if (!$company) {
             return redirect()->back()->with("warning", "Company is not found");
         }
@@ -167,11 +172,13 @@ class CompanyController extends Controller
             return redirect()->back()->with("warning", "Company is not found");
         }
         $company = $company[0];
+        // dd($company);
         return view('admin.company.edit', compact('company'));
     }
 
     public function update(Request $request, $id)
     {
+
         $company = $this->company->where('id', $id)->get()->ToArray();
         if (!$company) {
             return redirect()->back()->with("warning", "Company is not found");
@@ -213,6 +220,7 @@ class CompanyController extends Controller
             unlink($stored_path);
         }
 
+        $data['website'] = $data['city'] = $data['address'] = $data['linkedin'] = $data['description'] = null;
         if ($request->get('website')) {
             $request->validate([
                 "website" => [
@@ -224,37 +232,37 @@ class CompanyController extends Controller
             $data['website'] = $request->get("website");
         }
 
-        if ($request->get('address_line_1')) {
+        if ($request->get('city')) {
             $request->validate([
-                "address_line_1" => [
+                "city" => [
                     "required",
                     "string",
                     "max:100",
                 ],
             ]);
-            $data['address_line_1'] = $request->get("address_line_1");
+            $data['city'] = $request->get("city");
         }
 
-        if ($request->get('address_line_2')) {
+        if ($request->get('address')) {
             $request->validate([
-                "address_line_2" => [
+                "address" => [
                     "required",
                     "string",
                     "max:100",
                 ],
             ]);
-            $data['address_line_2'] = $request->get("address_line_2");
+            $data['address'] = $request->get("address");
         }
 
-        if ($request->get('linkedin_profile')) {
+        if ($request->get('linkedin')) {
             $request->validate([
-                "linkedin_profile" => [
+                "linkedin" => [
                     "required",
                     "string",
                     "max:100",
                 ],
             ]);
-            $data['linkedin_profile'] = $request->get("linkedin_profile");
+            $data['linkedin'] = $request->get("linkedin");
         }
 
         if ($request->get('description')) {
@@ -267,7 +275,7 @@ class CompanyController extends Controller
             ]);
             $data['description'] = $request->get("description");
         }
-
+        // dd($data);
         $isUpdated = $this->company->where('id', $id)->update($data);
 
         if ($isUpdated) {

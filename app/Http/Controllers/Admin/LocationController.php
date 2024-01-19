@@ -81,7 +81,42 @@ class LocationController extends Controller
 
     public function show($id)
     {
-        $location = $this->location->where('id', $id)->with('jobs')->get()->ToArray();
+        $location = $this->location
+            ->select(['id', 'city', 'state', 'locations.created_at'])
+            ->where('id', $id)
+            ->with([
+                'jobs' => function ($query) {
+                    $query->select([
+                        'jobs.id',
+                        'company_id',
+                        'sub_profile_id',
+                        'vacancy',
+                        'min_salary',
+                        'max_salary',
+                        'work_type',
+                        'job_type',
+                        'experience_level',
+                        'is_active',
+                        'is_verified',
+                        'is_featured',
+                        'jobs.created_at'
+                    ]);
+                    $query->with([
+                        'company' => function ($query) {
+                            $query->select(['companies.id', 'name',]);
+                        },
+                        'qualifications' => function ($query) {
+                            $query->select(['qualifications.id', 'name',]);
+                        },
+                        'locations' => function ($query) {
+                            $query->select(['locations.id', 'city', 'state']);
+                        },
+                    ]);
+                }
+            ])
+            ->get()
+            ->ToArray();
+        // dd($location);
         if (!$location) {
             return redirect()->back()->with("warning", "Location is not found");
         }
@@ -113,6 +148,7 @@ class LocationController extends Controller
             "city" => $request->get("city"),
         ];
 
+        $data['state'] = $data['country'] = $data['pincode'] = null;
         if ($request->get("state")) {
             $request->validate([
                 "state" => [

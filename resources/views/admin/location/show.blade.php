@@ -53,7 +53,7 @@
                                             Offered by {{ $job['company']['name'] }}
                                         </h6>
                                         <h6 class="card-subtitle mb-2 text-muted">Job Title :
-                                            {{ $job['profile']['profile'] }}
+                                            {{-- {{ $job['profile']['profile'] }} --}}
                                         </h6>
                                         <h6 class="card-subtitle mb-2 text-muted">Vacancy :
                                             {{ $job['vacancy'] }}
@@ -73,7 +73,7 @@
                                         <h6 class="card-subtitle mb-2 text-muted">Qualifications :
                                             @forelse ($job['qualifications'] as $qualification)
                                                 <span
-                                                    class="badge rounded-pill bg-primary">{{ $qualification['qualification'] }}</span>
+                                                    class="badge rounded-pill bg-primary">{{ $qualification['name'] }}</span>
                                             @empty
                                                 {{ 'N/A' }}
                                             @endforelse

@@ -1,17 +1,15 @@
-@dd('Sub Profile Show');
-
-{{-- @extends('admin.layout.app')
+@extends('admin.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
     <main id="main" class="main">
-
+        {{-- @dd ($subProfile) --}}
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header">
                     <nav aria-label="breadcrumb" class="">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.job-profile.index') }}">Profile</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.sub-profile.index') }}">Profile</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Show</li>
                         </ol>
                     </nav>
@@ -19,24 +17,25 @@
                 <div class="card-body">
 
                     <div class="jumbotron">
-                        <h1 class="display-5">{{ $profile['profile'] }}</h1>
+                        <h1 class="display-5">{{ $subProfile['name'] }}</h1>
+                        <p class="lead">Parent Category : {{ $subProfile['profile_category']['name'] }}</p>
                         <p class="lead">Created At :
-                            @if ($profile['created_at'])
-                                {{ date('d-m-Y', strtotime($profile['created_at'])) }}
+                            @if ($subProfile['created_at'])
+                                {{ date('d-m-Y', strtotime($subProfile['created_at'])) }}
                             @else
                                 {{ 'N/A' }}
                             @endif
                         </p>
                         <p class="lead">
                             <a class="btn btn-outline-primary btn"
-                                href="{{ route('admin.job-profile.edit', $profile['id']) }}">Edit</a>
+                                href="{{ route('admin.sub-profile.edit', $subProfile['id']) }}">Edit</a>
                         </p>
                     </div>
                     <div class="card shadow-none">
-                        <div class="card-header h3">Jobs({{ count($profile['jobs']) }})</div>
+                        <div class="card-header h3">Jobs({{ count($subProfile['jobs']) }})</div>
                         <div class="card-body">
                             <div class="row row-cols-3">
-                                @forelse ($profile['jobs'] as $job)
+                                @forelse ($subProfile['jobs'] as $job)
                                     <div class="card-body shadow-none mt-3 col-4">
                                         <h6 class="card-subtitle mb-2  h5 text-decoration-underline">
                                             Offered by {{ $job['company']['name'] }}
@@ -70,4 +69,4 @@
         </section>
 
     </main>
-@endsection --}}
+@endsection

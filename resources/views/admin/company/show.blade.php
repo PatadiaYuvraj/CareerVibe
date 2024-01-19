@@ -47,19 +47,21 @@
                             <thead>
                                 <tr>
                                     <th>#</th>
-                                    <th>Job</th>
-                                    {{-- <th>Job Profile</th> --}}
+                                    <th>Job Profile</th>
+                                    <th>Vacancy</th>
+                                    <th>Salary</th>
                                     <th>Is Verified</th>
                                     <th>Is Featured</th>
                                     <th>Is Active</th>
-                                    {{-- <th>Action</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($company['jobs'] as $job)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        {{-- <td>{{ $job['job_profile'] }}</td> --}}
+                                        <td>{{ $job['sub_profile']['name'] }}</td>
+                                        <td>{{ $job['vacancy'] }}</td>
+                                        <td>{{ $job['min_salary'] . ' - ' . $job['min_salary'] }}</td>
                                         <td>
                                             <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
                                                 class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
@@ -78,12 +80,6 @@
                                                 {{ $job['is_active'] ? 'Active' : 'Not Active' }}
                                             </a>
                                         </td>
-                                        {{-- <td>
-                                                <a href="{{ route('admin.job.edit', $job['id']) }}"
-                                                    class="btn btn-sm btn-primary">Edit</a>
-                                                <a href="{{ route('admin.job.delete', $job['id']) }}"
-                                                    class="btn btn-sm btn-danger">Delete</a>
-                                            </td> --}}
                                     </tr>
                                 @endforeach
                             </tbody>

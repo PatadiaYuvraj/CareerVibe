@@ -17,7 +17,7 @@ class Company extends Authenticatable
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'is_verified',
+        // 'is_verified',
         'name',
         'email',
         'password',
@@ -39,6 +39,7 @@ class Company extends Authenticatable
     protected $guarded = [
         'id',
         'userType',
+        'is_verified',
         'created_at',
         'updated_at',
         'remember_token',
@@ -49,6 +50,7 @@ class Company extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
+        'userType',
     ];
 
     protected $casts = [

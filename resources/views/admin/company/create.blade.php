@@ -72,28 +72,25 @@
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="linkedin_profile" class="form-label">Add Linkedin Profile</label>
-                                <input type="text" name="linkedin_profile" class="form-control"
-                                    value="{{ old('linkedin_profile') }}">
-                                @error('linkedin_profile')
+                                <label for="linkedin" class="form-label">Add Linkedin Profile</label>
+                                <input type="text" name="linkedin" class="form-control" value="{{ old('linkedin') }}">
+                                @error('linkedin')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
                         </div>
                         <div class="row row-cols-2">
                             <div class="mb-3">
-                                <label for="address_line_1" class="form-label">Address Line 1</label>
-                                <input type="text" name="address_line_1" class="form-control"
-                                    value="{{ old('address_line_1') }}">
-                                @error('address_line_1')
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" name="city" class="form-control" value="{{ old('city') }}">
+                                @error('city')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="address_line_2" class="form-label">Address Line 2</label>
-                                <input type="text" name="address_line_2" class="form-control"
-                                    value="{{ old('address_line_2') }}">
-                                @error('address_line_2')
+                                <label for="address" class="form-label">Address</label>
+                                <input type="text" name="address" class="form-control" value="{{ old('address') }}">
+                                @error('address')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>

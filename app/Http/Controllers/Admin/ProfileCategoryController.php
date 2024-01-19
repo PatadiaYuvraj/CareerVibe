@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ProfileCategory;
 use Illuminate\Http\Request;
 
+use function Laravel\Prompts\select;
+
 class ProfileCategoryController extends Controller
 {
     private ProfileCategory $profileCategory;
@@ -49,15 +51,13 @@ class ProfileCategoryController extends Controller
 
     public function show($id)
     {
-
-        // profile category with sub profiles and jobs
         $profileCategory = $this->profileCategory
+            ->select(['id', 'name', 'created_at'])
             ->where('id', $id)
-            ->with([
-                'subProfiles' => function ($query) {
-                    $query->withCount('jobs');
-                }
-            ])
+            ->with(['subProfiles' => function ($query) {
+                $query->select(['id', 'name', 'profile_category_id']);
+                $query->withCount(['jobs']);
+            }])
             ->get()
             ->ToArray();
         if (!$profileCategory) {
@@ -100,12 +100,11 @@ class ProfileCategoryController extends Controller
 
     public function delete($id)
     {
-        $profileCategory = $this->profileCategory->where('id', $id)->withCount('subProfiles')->get()->ToArray();
+        $profileCategory = $this->profileCategory->find($id)->withCount('subProfiles')->first();
         if (!$profileCategory) {
             return redirect()->back()->with("warning", "Profile Category is not found");
         }
-        $profileCategory =  $profileCategory[0];
-        if ($profileCategory->sub_profiles_count > 0) {
+        if ($profileCategory['sub_profiles_count'] > 0) {
             return redirect()->back()->with("warning", "Profile Category is not deleted because it has sub profiles");
         }
         $isDeleted = $this->profileCategory->where('id', $id)->delete();
