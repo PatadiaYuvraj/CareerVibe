@@ -36,8 +36,27 @@ class AdminController extends Controller
     public function doLogin(Request $request)
     {
         $request->validate([
-            "email" => "required|email",
-            "password" => "required|min:6|max:20"
+            "email" => [
+                "required",
+                "email",
+                function ($attribute, $value, $fail) {
+                    $user = $this->admin->where('email', $value)->first();
+                    if (!$user) {
+                        return $fail(__('The email is not registered.'));
+                    }
+                }
+            ],
+            "password" => [
+                "required",
+                "min:6",
+                "max:20",
+                function ($attribute, $value, $fail) {
+                    $user = $this->admin->where('email', request()->get('email'))->first();
+                    if ($user && !Hash::check($value, $user->password)) {
+                        return $fail(__('The password is incorrect.'));
+                    }
+                }
+            ]
         ]);
         $data = [
             "email" => $request->get("email"),
@@ -58,9 +77,42 @@ class AdminController extends Controller
     public function doRegister(Request $request)
     {
         $request->validate([
-            "name" => "required|min:3|max:50",
-            "email" => "required|email|unique:admins,email",
-            "password" => "required|min:6|max:20",
+            "name" => [
+                "required",
+                "string",
+                "max:100",
+                function ($attribute, $value, $fail) {
+                    $isExist = $this->admin->where('name', $value)->get()->ToArray();
+                    if ($isExist) {
+                        $fail($attribute . ' is already exist.');
+                    }
+                },
+            ],
+            "email" => [
+                "required",
+                "email",
+                function ($attribute, $value, $fail) {
+                    $isExist = $this->admin->where('email', $value)->get()->ToArray();
+                    if ($isExist) {
+                        $fail($attribute . ' is already exist.');
+                    }
+                },
+            ],
+            "password" => [
+                "required",
+                "min:6",
+                "max:20",
+                function ($attribute, $value, $fail) {
+                    $name = $this->admin->where('name', request()->get('name'))->first();
+                    $email = $this->admin->where('email', request()->get('email'))->first();
+                    if ($name && Hash::check($value, $name->password)) {
+                        return $fail(__('The password should not be same as name.'));
+                    }
+                    if ($email && Hash::check($value, $email->password)) {
+                        return $fail(__('The password should not be same as email.'));
+                    }
+                }
+            ],
             "confirm_password" => "required|min:6|max:20|same:password"
         ]);
 
@@ -119,8 +171,13 @@ class AdminController extends Controller
                     if (!Hash::check($value, $user->password)) {
                         return $fail(__('The current password is incorrect.'));
                     }
-                }
-
+                },
+                function ($attribute, $value, $fail) use ($id) {
+                    $user = $this->admin->find($id);
+                    if (Hash::check($value, $user->password)) {
+                        return $fail(__('The new password must be different from current password.'));
+                    }
+                },
             ],
             "newPassword" => [
                 "required",
@@ -168,8 +225,27 @@ class AdminController extends Controller
         $id = auth()->guard('admin')->user()->id;
 
         $request->validate([
-            "name" => "required|min:3|max:50",
-            "email" => "required|email|unique:admins,email," . $id
+            "name" => [
+                "required",
+                "string",
+                "max:100",
+                function ($attribute, $value, $fail) use ($id) {
+                    $isExist = $this->admin->where('id', '!=', $id)->where('name', $value)->get()->ToArray();
+                    if ($isExist) {
+                        $fail($attribute . ' is already exist.');
+                    }
+                },
+            ],
+            "email" => [
+                "required",
+                "email",
+                function ($attribute, $value, $fail) use ($id) {
+                    $isExist = $this->admin->where('id', '!=', $id)->where('email', $value)->get()->ToArray();
+                    if ($isExist) {
+                        $fail($attribute . ' is already exist.');
+                    }
+                },
+            ]
         ]);
 
         $data = [
@@ -282,9 +358,17 @@ class AdminController extends Controller
     // public function doForgetPassword(Request $request)
     // {
     //     $request->validate([
-    //         "email" => "required|email"
+    //         "email" => [
+    //             "required",
+    //             "email",
+    //       function ($attribute, $value, $fail) {
+    //         $user = $this->admin->where('email', $value)->first();
+    //         if (!$user) {
+    //             return $fail(__('The email is not registered.'));
+    //         }
+    //      }
+    //      ]
     //     ]);
-
     //     $user = $this->admin->where('email', $request->get('email'))->first();
 
     //     if (!$user) {

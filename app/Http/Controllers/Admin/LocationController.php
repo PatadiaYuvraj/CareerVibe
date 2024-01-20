@@ -90,7 +90,13 @@ class LocationController extends Controller
     public function show($id)
     {
         $location = $this->location
-            ->select(['id', 'city', 'state', 'locations.created_at'])
+            ->select([
+                'id',
+                'city',
+                'state',
+                'country',
+                'locations.created_at'
+            ])
             ->where('id', $id)
             ->with([
                 'jobs' => function ($query) {

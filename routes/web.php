@@ -1,52 +1,29 @@
 <?php
 
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-// frontend template 
-// https://htmlcodex.com/job-portal-website-template/
-// admin panel
-// https://sneat-vuetify-admin-template.vercel.app/dashboard
-// https://themewagon.github.io/jobfinderportal/index.html
-// https://themewagon.com/themes/free-bootstrap-4-html5-job-portal-website-template-jobfinderportal/
-
-
+// Admin 
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\CompanyController;
-use App\Http\Controllers\Front\UserController as FrontUserController;
-use App\Http\Controllers\Admin\JobController;
+use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
+use App\Http\Controllers\Admin\JobController as AdminJobController;
 use App\Http\Controllers\Admin\LocationController;
 use App\Http\Controllers\Admin\QualificationController;
 use App\Http\Controllers\Admin\SubProfileController;
 use App\Http\Controllers\Admin\ProfileCategoryController;
+// Company
 use App\Http\Controllers\Company\CompanyController as CompanyCompanyController;
 use App\Http\Controllers\Company\JobController as CompanyJobController;
+// User
+use App\Http\Controllers\User\JobController as UserJobController;
+use App\Http\Controllers\User\UserController as UserUserController;
 use App\Http\Controllers\TestController;
-use App\Models\Company;
-use App\Models\Job;
-use App\Models\Location;
-use App\Models\ProfileCategory;
-use App\Models\Qualification;
-use App\Models\SubProfile;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/checkAuth',  function () {
     dd([
-        "user" => auth()->guard('user'),
-        // "user" => auth()->guard('user')->user(),
-        // "admin" => auth()->guard('admin')->user(),
-        // "company" => auth()->guard('company')->user(),
+        "isUser"    => auth()->guard('user')->check(),
+        "isCompany" => auth()->guard('company')->check(),
+        "isAdmin"   => auth()->guard('admin')->check(),
     ]);
 })->name('checkAuth');
 
@@ -56,11 +33,18 @@ Route::post('/testing',  [TestController::class, "testing"])->name('testing');
 
 Route::group(['middleware' => "isGuest"], function () {
 
-    Route::get('/login',  [FrontUserController::class, "login"])->name('login');
-    Route::get('/register', [FrontUserController::class, "register"])->name('register');
-    Route::post('/login', [FrontUserController::class, "doLogin"])->name('doLogin');
-    Route::post('/register', [FrontUserController::class, "doRegister"])->name('doRegister');
+    // Route::get('/login',  [FrontUserController::class, "login"])->name('login');
+    // Route::get('/register', [FrontUserController::class, "register"])->name('register');
+    // Route::post('/login', [FrontUserController::class, "doLogin"])->name('doLogin');
+    // Route::post('/register', [FrontUserController::class, "doRegister"])->name('doRegister');
 
+    // User Routes
+    Route::prefix('/user')->group(function () {
+        Route::get('/login',  [UserUserController::class, "login"])->name('user.login');
+        Route::get('/register', [UserUserController::class, "register"])->name('user.register');
+        Route::post('/login', [UserUserController::class, "doLogin"])->name('user.doLogin');
+        Route::post('/register', [UserUserController::class, "doRegister"])->name('user.doRegister');
+    });
 
     // Admin Routes 
     Route::prefix('/admin')->group(function () {
@@ -81,110 +65,16 @@ Route::group(['middleware' => "isGuest"], function () {
 
 
 
-Route::group(['middleware' => "isUser"], function () {
-    Route::get('/', [FrontUserController::class, "index"])->name('index');
-    Route::get("/logout", [FrontUserController::class, 'logout'])->name('logout');
-    Route::get('/about', [FrontUserController::class, "about"])->name('about');
-    Route::get('/blog-single', [FrontUserController::class, "blog_single"])->name('blog-single');
-    Route::get('/blog', [FrontUserController::class, "blog"])->name('blog');
-    Route::get('/contact', [FrontUserController::class, "contact"])->name('contact');
-    Route::get('/faq', [FrontUserController::class, "faq"])->name('faq');
-    Route::get('/gallery', [FrontUserController::class, "gallery"])->name('gallery');
-    Route::get('/job-listings', [FrontUserController::class, "job_listings"])->name('job-listings');
-    Route::get('/job-single', [FrontUserController::class, "job_single"])->name('job-single');
-    Route::get('/portfolio-single', [FrontUserController::class, "portfolio_single"])->name('portfolio-single');
-    Route::get('/portfolio', [FrontUserController::class, "portfolio"])->name('portfolio');
-    Route::get('/post-job', [FrontUserController::class, "post_job"])->name('post-job');
-    Route::get('/service-sinlge', [FrontUserController::class, "service_sinlge"])->name('service-sinlge');
-    Route::get('/services', [FrontUserController::class, "services"])->name('services');
-    Route::get('/testimonials', [FrontUserController::class, "testimonials"])->name('testimonials');
-});
-
 Route::group(['middleware' => "isAdmin"], function () {
     Route::prefix('/admin')->group(function () {
 
-        Route::get('/search', function () {
-            return redirect()->route('admin.dashboard')->with('warning', 'Invalid Search');
+        Route::get('search', function (Request $request) {
+
+            return redirect()->route('admin.dashboard')->with('info', 'Search is not implemented yet');
         })->name('admin.search');
         Route::post('search', function (Request $request) {
-            // $path = $request->path;
-            // $search = $request->search;
 
-            // if (!$path) {
-            //     return redirect()->back();
-            // }
-
-            // if (!$search) {
-            //     return redirect()->back()->with('warning', 'Invalid Search');
-            // }
             return redirect()->route('admin.dashboard')->with('info', 'Search is not implemented yet');
-            // switch ($path) {
-            //     case "admin/company":
-            //         $data = Company::where('name', 'LIKE', "%{$search}%")->first();
-            //         if (!$data) {
-            //             return redirect()->back()->with('warning', 'No Record Found');
-            //         }
-            //         $data['path'] = $path;
-            //         dd($data);
-            //         return view('admin.company.search', compact('data'));
-            //         break;
-            //     case "admin/job":
-            //         $data = Job::where('title', 'LIKE', "%{$search}%")->get();
-            //         if (!$data) {
-            //             return redirect()->back()->with('warning', 'No Record Found');
-            //         }
-            //         $data['path'] = $path;
-            //         dd($data);
-            //         return view('admin.job.search', compact('data'));
-            //         break;
-            //     case "admin/user":
-            //         $data = User::where('name', 'LIKE', "%{$search}%")->get();
-            //         if (!$data) {
-            //             return redirect()->back()->with('warning', 'No Record Found');
-            //         }
-            //         $data['path'] = $path;
-            //         dd($data);
-            //         return view('admin.user.search', compact('data'));
-            //         break;
-            //     case "admin/profile-category":
-            //         $data = ProfileCategory::where('name', 'LIKE', "%{$search}%")->get();
-            //         if (!$data) {
-            //             return redirect()->back()->with('warning', 'No Record Found');
-            //         }
-            //         $data['path'] = $path;
-            //         dd($data);
-            //         return view('admin.profile-category.search', compact('data'));
-            //         break;
-            //     case "admin/sub-profile":
-            //         $data = SubProfile::where('name', 'LIKE', "%{$search}%")->get();
-            //         if (!$data) {
-            //             return redirect()->back()->with('warning', 'No Record Found');
-            //         }
-            //         $data['path'] = $path;
-            //         dd($data);
-            //         return view('admin.sub-profile.search', compact('data'));
-            //         break;
-            //     case "admin/location":
-            //         $data = Location::where('city', 'LIKE', "%{$search}%")->get();
-            //         if (!$data) {
-            //             return redirect()->back()->with('warning', 'No Record Found');
-            //         }
-            //         $data['path'] = $path;
-            //         dd($data);
-            //         return view('admin.location.search', compact('data'));
-            //         break;
-            //     case "admin/qualification":
-            //         $data = Qualification::where('name', 'LIKE', "%{$search}%")->get();
-            //         if (!$data) {
-            //             return redirect()->back()->with('warning', 'No Record Found');
-            //         }
-            //         $data['path'] = $path;
-            //         dd($data);
-            //         return view('admin.qualification.search', compact('data'));
-            //         break;
-            //     default:
-            //         return redirect()->back()->with('warning', 'Invalid Search');
-            // }
         })->name('admin.search');
 
 
@@ -214,30 +104,30 @@ Route::group(['middleware' => "isAdmin"], function () {
         });
 
         Route::prefix('company')->group(function () {
-            Route::get('/create',  [CompanyController::class, "create"])->name('admin.company.create');
-            Route::post('/store',  [CompanyController::class, "store"])->name('admin.company.store');
-            Route::get('/',  [CompanyController::class, "index"])->name('admin.company.index');
-            Route::get('/{id}',  [CompanyController::class, "show"])->name('admin.company.show');
-            Route::get('/edit/{id}',  [CompanyController::class, "edit"])->name('admin.company.edit');
-            Route::post('/update/{id}',  [CompanyController::class, "update"])->name('admin.company.update');
-            Route::get('/delete/{id}',  [CompanyController::class, "delete"])->name('admin.company.delete');
-            Route::get('/toggle-verified/{id}/{is_verified}',  [CompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
-            Route::post('/store-profile-image/{id}',  [CompanyController::class, "storeProfileImage"])->name('admin.company.storeProfileImage');
-            Route::post('/update-profile-image/{id}',  [CompanyController::class, "updateCompanyProfileImage"])->name('admin.company.updateProfileImage');
-            Route::post('/delete-profile-image/{id}',  [CompanyController::class, "deleteProfileImage"])->name('admin.company.deleteProfileImage');
+            Route::get('/create',  [AdminCompanyController::class, "create"])->name('admin.company.create');
+            Route::post('/store',  [AdminCompanyController::class, "store"])->name('admin.company.store');
+            Route::get('/',  [AdminCompanyController::class, "index"])->name('admin.company.index');
+            Route::get('/{id}',  [AdminCompanyController::class, "show"])->name('admin.company.show');
+            Route::get('/edit/{id}',  [AdminCompanyController::class, "edit"])->name('admin.company.edit');
+            Route::post('/update/{id}',  [AdminCompanyController::class, "update"])->name('admin.company.update');
+            Route::get('/delete/{id}',  [AdminCompanyController::class, "delete"])->name('admin.company.delete');
+            Route::get('/toggle-verified/{id}/{is_verified}',  [AdminCompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
+            Route::post('/store-profile-image/{id}',  [AdminCompanyController::class, "storeProfileImage"])->name('admin.company.storeProfileImage');
+            Route::post('/update-profile-image/{id}',  [AdminCompanyController::class, "updateCompanyProfileImage"])->name('admin.company.updateProfileImage');
+            Route::post('/delete-profile-image/{id}',  [AdminCompanyController::class, "deleteProfileImage"])->name('admin.company.deleteProfileImage');
         });
 
         Route::prefix('job')->group(function () {
-            Route::get('/create/{id}',  [JobController::class, "create"])->name('admin.job.create');
-            Route::post('/store/{id}',  [JobController::class, "store"])->name('admin.job.store');
-            Route::get('/',  [JobController::class, "index"])->name('admin.job.index');
-            Route::get('/{id}',  [JobController::class, "show"])->name('admin.job.show');
-            Route::get('/edit/{id}',  [JobController::class, "edit"])->name('admin.job.edit');
-            Route::post('/update/{id}',  [JobController::class, "update"])->name('admin.job.update');
-            Route::get('/delete/{id}',  [JobController::class, "delete"])->name('admin.job.delete');
-            Route::get('/toggle-verified/{id}/{is_verified}',  [JobController::class, "toggleVerified"])->name('admin.job.toggleVerified');
-            Route::get('/toggle-featured/{id}/{is_featured}',  [JobController::class, "toggleFeatured"])->name('admin.job.toggleFeatured');
-            Route::get('/toggle-active/{id}/{is_active}',  [JobController::class, "toggleActive"])->name('admin.job.toggleActive');
+            Route::get('/create/{id}',  [AdminJobController::class, "create"])->name('admin.job.create');
+            Route::post('/store/{id}',  [AdminJobController::class, "store"])->name('admin.job.store');
+            Route::get('/',  [AdminJobController::class, "index"])->name('admin.job.index');
+            Route::get('/{id}',  [AdminJobController::class, "show"])->name('admin.job.show');
+            Route::get('/edit/{id}',  [AdminJobController::class, "edit"])->name('admin.job.edit');
+            Route::post('/update/{id}',  [AdminJobController::class, "update"])->name('admin.job.update');
+            Route::get('/delete/{id}',  [AdminJobController::class, "delete"])->name('admin.job.delete');
+            Route::get('/toggle-verified/{id}/{is_verified}',  [AdminJobController::class, "toggleVerified"])->name('admin.job.toggleVerified');
+            Route::get('/toggle-featured/{id}/{is_featured}',  [AdminJobController::class, "toggleFeatured"])->name('admin.job.toggleFeatured');
+            Route::get('/toggle-active/{id}/{is_active}',  [AdminJobController::class, "toggleActive"])->name('admin.job.toggleActive');
         });
 
         Route::prefix('profile-category')->group(function () {
@@ -285,9 +175,6 @@ Route::group(['middleware' => "isAdmin"], function () {
 Route::group(['middleware' => "isCompany"], function () {
 
     Route::prefix('/company')->group(function () {
-
-        // dd(auth()->guard('company')->user());
-        // admins only can verify companies, companies can't verify themselves, they can only toggle active and featured status, and can't toggle verified status
         Route::get('/edit-profile',  [CompanyCompanyController::class, "editProfile"])->name('company.editProfile');
         Route::post('/update-profile',  [CompanyCompanyController::class, "updateProfile"])->name('company.updateProfile');
         Route::get('/change-password',  [CompanyCompanyController::class, "changePassword"])->name('company.changePassword');
@@ -308,6 +195,59 @@ Route::group(['middleware' => "isCompany"], function () {
             Route::get('/delete/{id}',  [CompanyJobController::class, "delete"])->name('company.job.delete');
             Route::get('/toggle-featured/{id}/{is_featured}',  [CompanyJobController::class, "toggleFeatured"])->name('company.job.toggleFeatured');
             Route::get('/toggle-active/{id}/{is_active}',  [CompanyJobController::class, "toggleActive"])->name('company.job.toggleActive');
+        });
+    });
+});
+
+// Route::group(['middleware' => "isUser"], function () {
+//     // Route::get('/', [FrontUserController::class, "index"])->name('index');
+//     // Route::get("/logout", [FrontUserController::class, 'logout'])->name('logout');
+//     // Route::get('/about', [FrontUserController::class, "about"])->name('about');
+//     // Route::get('/blog-single', [FrontUserController::class, "blog_single"])->name('blog-single');
+//     // Route::get('/blog', [FrontUserController::class, "blog"])->name('blog');
+//     // Route::get('/contact', [FrontUserController::class, "contact"])->name('contact');
+//     // Route::get('/faq', [FrontUserController::class, "faq"])->name('faq');
+//     // Route::get('/gallery', [FrontUserController::class, "gallery"])->name('gallery');
+//     // Route::get('/job-listings', [FrontUserController::class, "job_listings"])->name('job-listings');
+//     // Route::get('/job-single', [FrontUserController::class, "job_single"])->name('job-single');
+//     // Route::get('/portfolio-single', [FrontUserController::class, "portfolio_single"])->name('portfolio-single');
+//     // Route::get('/portfolio', [FrontUserController::class, "portfolio"])->name('portfolio');
+//     // Route::get('/post-job', [FrontUserController::class, "post_job"])->name('post-job');
+//     // Route::get('/service-sinlge', [FrontUserController::class, "service_sinlge"])->name('service-sinlge');
+//     // Route::get('/services', [FrontUserController::class, "services"])->name('services');
+//     // Route::get('/testimonials', [FrontUserController::class, "testimonials"])->name('testimonials');
+
+// });
+
+
+Route::group(['middleware' => "isUser"], function () {
+    Route::prefix('/user')->group(function () {
+        Route::get('/edit-profile',  [UserUserController::class, "editProfile"])->name('user.editProfile');
+        Route::post('/update-profile',  [UserUserController::class, "updateProfile"])->name('user.updateProfile');
+        Route::get('/change-password',  [UserUserController::class, "changePassword"])->name('user.changePassword');
+        Route::post('/change-password',  [UserUserController::class, "doChangePassword"])->name('user.doChangePassword');
+        Route::get('/edit-profile-image',  [UserUserController::class, "editProfileImage"])->name('user.editProfileImage');
+        Route::post('/update-profile-image',  [UserUserController::class, "updateProfileImage"])->name('user.updateProfileImage');
+        Route::post('/delete-profile-image',  [UserUserController::class, "deleteProfileImage"])->name('user.deleteProfileImage');
+        Route::get('/dashboard',  [UserUserController::class, "dashboard"])->name('user.dashboard');
+        Route::get('/logout',  [UserUserController::class, "logout"])->name('user.logout');
+
+        Route::prefix('job')->group(function () {
+            Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
+            // Route::get('/search',  [UserJobController::class, "search"])->name('user.job.search');
+            // Route::post('/search',  [UserJobController::class, "doSearch"])->name('user.job.doSearch'); 
+            Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
+            Route::post('/apply/{id}',  [UserJobController::class, "apply"])->name('user.job.apply');
+            Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
+            Route::get('/cancel-applied-job/{id}',  [UserJobController::class, "cancelAppliedJob"])->name('user.job.cancelAppliedJob');
+            Route::get('/save-job/{id}',  [UserJobController::class, "saveJob"])->name('user.job.saveJob');
+            Route::get('/unsave-job/{id}',  [UserJobController::class, "unsaveJob"])->name('user.job.unsaveJob');
+            Route::get('/saved-jobs',  [UserJobController::class, "savedJobs"])->name('user.job.savedJobs');
+            Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
+            Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
+            Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
+            Route::get('/profile-category/{id}',  [UserJobController::class, "jobByProfileCategory"])->name('user.job.jobByProfileCategory');
+            Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
         });
     });
 });

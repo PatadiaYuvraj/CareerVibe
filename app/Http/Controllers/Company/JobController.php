@@ -120,77 +120,75 @@ class JobController extends Controller
         if (auth()->guard('company')->user()->is_verified == 0) {
             return redirect()->route('company.job.index')->with("warning", "Company is not verified");
         }
-        $request->validate(
+        $request->validate([
+            "sub_profile_id" =>
             [
-                "sub_profile_id" =>
-                [
-                    "required",
-                    "string",
-                    "max:100",
-                    function ($attribute, $value, $fail) {
-                        if (!SubProfile::where('id', $value)->exists()) {
+                "required",
+                "string",
+                "max:100",
+                function ($attribute, $value, $fail) {
+                    if (!SubProfile::where('id', $value)->exists()) {
+                        $fail("The selected $attribute is invalid.");
+                    }
+                },
+
+            ],
+            "vacancy" => [
+                "required",
+                "integer",
+                function ($attribute, $value, $fail) {
+                    if ($value <= 0) {
+                        $fail("The $attribute must be greater than 0.");
+                    }
+                },
+            ],
+            "min_salary" => [
+                "required",
+                "integer",
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value <= 0) {
+                        $fail("The minimum salary must be greater than 0.");
+                    }
+
+                    if ($value > $request->get('max_salary')) {
+                        $fail("The minimum salary must be less than max salary.");
+                    }
+                },
+
+            ],
+            "max_salary" => [
+                "required",
+                "integer",
+                // greater than min_salary
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value <= $request->get('min_salary')) {
+                        $fail("The $attribute must be greater than min salary.");
+                    }
+                },
+            ],
+            "locations" => [
+                "required",
+                "array",
+                function ($attribute, $value, $fail) {
+                    foreach ($value as $id) {
+                        if (!Location::where('id', $id)->exists()) {
                             $fail("The selected $attribute is invalid.");
                         }
-                    },
-
-                ],
-                "vacancy" => [
-                    "required",
-                    "integer",
-                    function ($attribute, $value, $fail) {
-                        if ($value <= 0) {
-                            $fail("The $attribute must be greater than 0.");
+                    }
+                },
+            ],
+            "qualifications" => [
+                "required",
+                "array",
+                function ($attribute, $value, $fail) {
+                    foreach ($value as $id) {
+                        if (!Qualification::where('id', $id)->exists()) {
+                            $fail("The selected $attribute is invalid.");
                         }
-                    },
-                ],
-                "min_salary" => [
-                    "required",
-                    "integer",
-                    function ($attribute, $value, $fail) use ($request) {
-                        if ($value <= 0) {
-                            $fail("The minimum salary must be greater than 0.");
-                        }
-
-                        if ($value > $request->get('max_salary')) {
-                            $fail("The minimum salary must be less than max salary.");
-                        }
-                    },
-
-                ],
-                "max_salary" => [
-                    "required",
-                    "integer",
-                    // greater than min_salary
-                    function ($attribute, $value, $fail) use ($request) {
-                        if ($value <= $request->get('min_salary')) {
-                            $fail("The $attribute must be greater than min salary.");
-                        }
-                    },
-                ],
-                "locations" => [
-                    "required",
-                    "array",
-                    function ($attribute, $value, $fail) {
-                        foreach ($value as $id) {
-                            if (!Location::where('id', $id)->exists()) {
-                                $fail("The selected $attribute is invalid.");
-                            }
-                        }
-                    },
-                ],
-                "qualifications" => [
-                    "required",
-                    "array",
-                    function ($attribute, $value, $fail) {
-                        foreach ($value as $id) {
-                            if (!Qualification::where('id', $id)->exists()) {
-                                $fail("The selected $attribute is invalid.");
-                            }
-                        }
-                    },
-                ],
-            ]
-        );
+                    }
+                },
+            ],
+        ]);
         $data = [
             "company_id" => $id,
             "sub_profile_id" => $request->get("sub_profile_id"),
@@ -342,77 +340,75 @@ class JobController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate(
+        $request->validate([
+            "sub_profile_id" =>
             [
-                "sub_profile_id" =>
-                [
-                    "required",
-                    "string",
-                    "max:100",
-                    function ($attribute, $value, $fail) {
-                        if (!SubProfile::where('id', $value)->exists()) {
+                "required",
+                "string",
+                "max:100",
+                function ($attribute, $value, $fail) {
+                    if (!SubProfile::where('id', $value)->exists()) {
+                        $fail("The selected $attribute is invalid.");
+                    }
+                },
+
+            ],
+            "vacancy" => [
+                "required",
+                "integer",
+                function ($attribute, $value, $fail) {
+                    if ($value <= 0) {
+                        $fail("The $attribute must be greater than 0.");
+                    }
+                },
+            ],
+            "min_salary" => [
+                "required",
+                "integer",
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value <= 0) {
+                        $fail("The minimum salary must be greater than 0.");
+                    }
+
+                    if ($value > $request->get('max_salary')) {
+                        $fail("The minimum salary must be less than max salary.");
+                    }
+                },
+
+            ],
+            "max_salary" => [
+                "required",
+                "integer",
+                // greater than min_salary
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value <= $request->get('min_salary')) {
+                        $fail("The $attribute must be greater than min salary.");
+                    }
+                },
+            ],
+            "locations" => [
+                "required",
+                "array",
+                function ($attribute, $value, $fail) {
+                    foreach ($value as $id) {
+                        if (!Location::where('id', $id)->exists()) {
                             $fail("The selected $attribute is invalid.");
                         }
-                    },
-
-                ],
-                "vacancy" => [
-                    "required",
-                    "integer",
-                    function ($attribute, $value, $fail) {
-                        if ($value <= 0) {
-                            $fail("The $attribute must be greater than 0.");
+                    }
+                },
+            ],
+            "qualifications" => [
+                "required",
+                "array",
+                function ($attribute, $value, $fail) {
+                    foreach ($value as $id) {
+                        if (!Qualification::where('id', $id)->exists()) {
+                            $fail("The selected $attribute is invalid.");
                         }
-                    },
-                ],
-                "min_salary" => [
-                    "required",
-                    "integer",
-                    function ($attribute, $value, $fail) use ($request) {
-                        if ($value <= 0) {
-                            $fail("The minimum salary must be greater than 0.");
-                        }
-
-                        if ($value > $request->get('max_salary')) {
-                            $fail("The minimum salary must be less than max salary.");
-                        }
-                    },
-
-                ],
-                "max_salary" => [
-                    "required",
-                    "integer",
-                    // greater than min_salary
-                    function ($attribute, $value, $fail) use ($request) {
-                        if ($value <= $request->get('min_salary')) {
-                            $fail("The $attribute must be greater than min salary.");
-                        }
-                    },
-                ],
-                "locations" => [
-                    "required",
-                    "array",
-                    function ($attribute, $value, $fail) {
-                        foreach ($value as $id) {
-                            if (!Location::where('id', $id)->exists()) {
-                                $fail("The selected $attribute is invalid.");
-                            }
-                        }
-                    },
-                ],
-                "qualifications" => [
-                    "required",
-                    "array",
-                    function ($attribute, $value, $fail) {
-                        foreach ($value as $id) {
-                            if (!Qualification::where('id', $id)->exists()) {
-                                $fail("The selected $attribute is invalid.");
-                            }
-                        }
-                    },
-                ],
-            ]
-        );
+                    }
+                },
+            ],
+        ]);
         $data = [
             "sub_profile_id" => $request->get("sub_profile_id"),
             "vacancy" => $request->get("vacancy"),
