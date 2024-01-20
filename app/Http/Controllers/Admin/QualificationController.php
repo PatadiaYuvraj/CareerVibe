@@ -10,10 +10,12 @@ use Illuminate\Http\Request;
 class QualificationController extends Controller
 {
     private Qualification $qualification;
+    private int $paginate;
 
     public function __construct(Qualification $qualification)
     {
         $this->qualification = $qualification;
+        $this->paginate = env('PAGINATEVALUE');
     }
 
     public function create()
@@ -53,7 +55,7 @@ class QualificationController extends Controller
     public function index()
     {
         try {
-            $qualifications = $this->qualification->withCount('jobs')->paginate(5);
+            $qualifications = $this->qualification->withCount('jobs')->paginate($this->paginate);
             return view('admin.qualification.index', compact('qualifications'));
         } catch (\Throwable $th) {
             dd($th->getMessage());

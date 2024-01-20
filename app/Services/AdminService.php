@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Admin as User;
 use App\Repository\AdminRepo;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Validator as ValidationValidator;
@@ -21,7 +20,7 @@ class AdminService implements AdminRepo
     {
         if (!$data) return ["status" => false, "msg" => "Data not found", "data" => null];
         $user = ["email" => $data['email'], "password" => $data['password']];
-        if (Auth::guard('admin')->attempt($user, true)) {
+        if (auth()->guard('admin')->attempt($user, true)) {
             return ["status" => true, "msg" => "User is Authenticated", "data" => null];
         } else {
             return ["status" => false, "msg" => "User is not Authenticated", "data" => null];

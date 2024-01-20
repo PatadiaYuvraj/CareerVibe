@@ -10,10 +10,12 @@ use Illuminate\Http\Request;
 class SubProfileController extends Controller
 {
     private SubProfile $subProfile;
+    private int $paginate;
 
     public function __construct(SubProfile $subProfile)
     {
         $this->subProfile = $subProfile;
+        $this->paginate = env('PAGINATEVALUE');
     }
 
     public function create()
@@ -58,7 +60,8 @@ class SubProfileController extends Controller
 
     public function index()
     {
-        $subProfiles = $this->subProfile->withCount('jobs')->with('profileCategory')->paginate(5);
+        // dd($this->paginate);
+        $subProfiles = $this->subProfile->withCount('jobs')->with('profileCategory')->paginate($this->paginate);
         return view('admin.sub-profile.index', compact('subProfiles'));
     }
 

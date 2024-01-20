@@ -36,9 +36,9 @@
                                         <div class="col col-lg-3 col-md-4 label">
                                             Profile Image
                                         </div>
-                                        @if (Auth::guard('admin')->user()->profile_image_url)
+                                        @if (auth()->guard('admin')->user()->profile_image_url)
                                             <div class="col row row-cols-2">
-                                                <img src="{{ Auth::guard('admin')->user()->profile_image_url }}"
+                                                <img src="{{ auth()->guard('admin')->user()->profile_image_url }}"
                                                     alt="Profile Image" class="col p-1 img-thumbnail" width="100"
                                                     height="100">
                                                 <form class="col" action="{{ route('admin.deleteProfileImage') }}"
@@ -60,7 +60,7 @@
                                             Full Name
                                         </div>
                                         <div class="col col-lg-9 col-md-8">
-                                            {{ Auth::guard('admin')->user()->name }}
+                                            {{ auth()->guard('admin')->user()->name }}
                                         </div>
                                     </div>
                                     <div class="row">
@@ -68,7 +68,7 @@
                                             Email
                                         </div>
                                         <div class="col-lg-9 col-md-8">
-                                            {{ Auth::guard('admin')->user()->email }}
+                                            {{ auth()->guard('admin')->user()->email }}
                                         </div>
                                     </div>
                                 </div>

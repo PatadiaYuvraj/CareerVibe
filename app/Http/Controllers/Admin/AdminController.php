@@ -7,7 +7,6 @@ use App\Jobs\DeleteFromCloudinary;
 use App\Models\Admin;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
@@ -17,10 +16,11 @@ class AdminController extends Controller
     private Admin $admin;
     private string $user_type = 'admin';
     private string $folder = 'career-vibe/admins/profile_image';
-
+    private int $paginate;
     public function __construct(Admin $admin)
     {
         $this->admin = $admin;
+        $this->paginate = env('PAGINATEVALUE');
     }
 
     public function dashboard()
@@ -44,7 +44,7 @@ class AdminController extends Controller
             "password" => $request->get("password")
         ];
 
-        if (Auth::guard('admin')->attempt($data, true)) {
+        if (auth()->guard($this->user_type)->attempt($data, true)) {
             return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
         }
         return redirect()->back()->with("warning", "Invalid Credentials");
@@ -73,7 +73,7 @@ class AdminController extends Controller
         $isCreated = $this->admin->create($data);
 
         if ($isCreated) {
-            $isAuth = Auth::guard('admin')->attempt([
+            $isAuth = auth()->guard('admin')->attempt([
                 "email" => $request->get("email"),
                 "password" => $request->get("password")
             ]);
@@ -90,7 +90,7 @@ class AdminController extends Controller
 
     public function logout()
     {
-        Auth::guard('admin')->logout();
+        auth()->guard('admin')->logout();
         Session::flush();
         return redirect()->route('admin.login')->with("success", "You're Logged Out");
     }
@@ -105,11 +105,11 @@ class AdminController extends Controller
 
         // currentPassword newPassword confirmPassword
 
-        if (!Auth::guard('admin')->check()) {
+        if (!auth()->guard('admin')->check()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
 
-        $id = Auth::guard('admin')->user()->id;
+        $id = auth()->guard('admin')->user()->id;
 
         $request->validate([
             "currentPassword" => [
@@ -161,11 +161,11 @@ class AdminController extends Controller
 
     public function updateProfile(Request $request)
     {
-        if (!Auth::guard('admin')->check()) {
+        if (!auth()->guard('admin')->check()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
 
-        $id = Auth::guard('admin')->user()->id;
+        $id = auth()->guard('admin')->user()->id;
 
         $request->validate([
             "name" => "required|min:3|max:50",
@@ -188,11 +188,11 @@ class AdminController extends Controller
 
     public function updateProfileImage(Request $request)
     {
-        if (!Auth::guard('admin')->check()) {
+        if (!auth()->guard('admin')->check()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
 
-        $id = Auth::guard('admin')->user()->id;
+        $id = auth()->guard('admin')->user()->id;
 
         $request->validate([
             "profile_image_url" => [
@@ -241,11 +241,11 @@ class AdminController extends Controller
 
     public function deleteProfileImage()
     {
-        if (!Auth::guard('admin')->check()) {
+        if (!auth()->guard('admin')->check()) {
             return redirect()->back()->with("warning", "You are not authorized");
         }
 
-        $id = Auth::guard('admin')->user()->id;
+        $id = auth()->guard('admin')->user()->id;
 
         $user = $this->admin->find($id);
 

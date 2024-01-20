@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
@@ -58,7 +57,7 @@ class UserController extends Controller
                 "email" => $request->get("email"),
                 "password" => $request->get("password")
             ];
-        $isAuth = Auth::guard('user')->attempt($data, true);
+        $isAuth = auth()->guard('user')->attempt($data, true);
         if ($isAuth) {
             return redirect()->route('index')->with('success', 'You are logged in');
         }
@@ -114,7 +113,7 @@ class UserController extends Controller
                     "email" => $request->get("email"),
                     "password" => $request->get("password")
                 ];
-            $isAuth = Auth::guard('user')->attempt($data, true);
+            $isAuth = auth()->guard('user')->attempt($data, true);
             if ($isAuth) {
 
                 return redirect()->route('index')->with('success', 'You are logged in');
@@ -126,7 +125,7 @@ class UserController extends Controller
 
     public function logout()
     {
-        Auth::guard('user')->logout();
+        auth()->guard('user')->logout();
         Session::flush();
         return redirect()->route("login")->with("success", "You're Logged Out");
     }

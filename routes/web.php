@@ -18,6 +18,7 @@
 // https://themewagon.github.io/jobfinderportal/index.html
 // https://themewagon.com/themes/free-bootstrap-4-html5-job-portal-website-template-jobfinderportal/
 
+
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\CompanyController;
@@ -30,14 +31,21 @@ use App\Http\Controllers\Admin\ProfileCategoryController;
 use App\Http\Controllers\Company\CompanyController as CompanyCompanyController;
 use App\Http\Controllers\Company\JobController as CompanyJobController;
 use App\Http\Controllers\TestController;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Company;
+use App\Models\Job;
+use App\Models\Location;
+use App\Models\ProfileCategory;
+use App\Models\Qualification;
+use App\Models\SubProfile;
+use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/checkAuth',  function () {
     dd([
-        "user" => Auth::guard('user')->user(),
-        "admin" => Auth::guard('admin')->user(),
-        "company" => Auth::guard('company')->user(),
+        "user" => auth()->guard('user')->user(),
+        "admin" => auth()->guard('admin')->user(),
+        "company" => auth()->guard('company')->user(),
     ]);
 })->name('checkAuth');
 
@@ -98,6 +106,92 @@ Route::group(['middleware' => "isUser"], function () {
 Route::group(['middleware' => "isAdmin"], function () {
     try {
         Route::prefix('/admin')->group(function () {
+
+            Route::get('/search', function () {
+                return redirect()->route('admin.dashboard')->with('warning', 'Invalid Search');
+            })->name('admin.search');
+            Route::post('search', function (Request $request) {
+                $path = $request->path;
+                $search = $request->search;
+
+                if (!$path) {
+                    return redirect()->back();
+                }
+
+                if (!$search) {
+                    return redirect()->back()->with('warning', 'Invalid Search');
+                }
+
+                switch ($path) {
+                    case "admin/company":
+                        $data = Company::where('name', 'LIKE', "%{$search}%")->first();
+                        if (!$data) {
+                            return redirect()->back()->with('warning', 'No Record Found');
+                        }
+                        $data['path'] = $path;
+                        dd($data);
+                        return view('admin.company.search', compact('data'));
+                        break;
+                    case "admin/job":
+                        $data = Job::where('title', 'LIKE', "%{$search}%")->get();
+                        if (!$data) {
+                            return redirect()->back()->with('warning', 'No Record Found');
+                        }
+                        $data['path'] = $path;
+                        dd($data);
+                        return view('admin.job.search', compact('data'));
+                        break;
+                    case "admin/user":
+                        $data = User::where('name', 'LIKE', "%{$search}%")->get();
+                        if (!$data) {
+                            return redirect()->back()->with('warning', 'No Record Found');
+                        }
+                        $data['path'] = $path;
+                        dd($data);
+                        return view('admin.user.search', compact('data'));
+                        break;
+                    case "admin/profile-category":
+                        $data = ProfileCategory::where('name', 'LIKE', "%{$search}%")->get();
+                        if (!$data) {
+                            return redirect()->back()->with('warning', 'No Record Found');
+                        }
+                        $data['path'] = $path;
+                        dd($data);
+                        return view('admin.profile-category.search', compact('data'));
+                        break;
+                    case "admin/sub-profile":
+                        $data = SubProfile::where('name', 'LIKE', "%{$search}%")->get();
+                        if (!$data) {
+                            return redirect()->back()->with('warning', 'No Record Found');
+                        }
+                        $data['path'] = $path;
+                        dd($data);
+                        return view('admin.sub-profile.search', compact('data'));
+                        break;
+                    case "admin/location":
+                        $data = Location::where('city', 'LIKE', "%{$search}%")->get();
+                        if (!$data) {
+                            return redirect()->back()->with('warning', 'No Record Found');
+                        }
+                        $data['path'] = $path;
+                        dd($data);
+                        return view('admin.location.search', compact('data'));
+                        break;
+                    case "admin/qualification":
+                        $data = Qualification::where('name', 'LIKE', "%{$search}%")->get();
+                        if (!$data) {
+                            return redirect()->back()->with('warning', 'No Record Found');
+                        }
+                        $data['path'] = $path;
+                        dd($data);
+                        return view('admin.qualification.search', compact('data'));
+                        break;
+                    default:
+                        return redirect()->back()->with('warning', 'Invalid Search');
+                }
+            })->name('admin.search');
+
+
             Route::get('/edit-profile',  [AdminController::class, "editProfile"])->name('admin.editProfile');
             Route::post('/update-profile',  [AdminController::class, "updateProfile"])->name('admin.updateProfile');
             Route::get('/change-password',  [AdminController::class, "changePassword"])->name('admin.changePassword');

@@ -15,9 +15,10 @@ class JobController extends Controller
 {
     private AuthService $auth;
     private Job $job;
-
+    private int $paginate;
     public function __construct(AuthService $auth, Job $job)
     {
+        $this->paginate = env('PAGINATEVALUE');
         $this->auth = $auth;
         $this->job = $job;
     }
@@ -57,19 +58,17 @@ class JobController extends Controller
             "WFO",
             "HYBRID"
         ];
-        // dd([
-        //     "company" => $company,
-        //     "sub_profiles" => $sub_profiles,
-        //     "locations" => $locations,
-        //     "qualifications" => $qualifications,
-        //     "work_types" => $work_types,
-
-        // ]);
         return view('admin.job.create', compact('company', 'sub_profiles', 'locations', 'qualifications', 'work_types'));
     }
 
     public function store(Request $request, $id)
     {
+
+        $is_verified = Company::where('id', $id)->select(['is_verified'])->first();
+        if (!$is_verified->is_verified) {
+            return redirect()->route('admin.company.index')->with("warning", "Company is not verified");
+        }
+
         $request->validate(
             [
                 "sub_profile_id" =>
@@ -237,7 +236,7 @@ class JobController extends Controller
                     ]
                 );
             },
-        ])->paginate(10);
+        ])->paginate($this->paginate);
         return view('admin.job.index', compact('jobs'));
     }
 

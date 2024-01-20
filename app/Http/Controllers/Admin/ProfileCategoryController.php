@@ -11,10 +11,12 @@ use function Laravel\Prompts\select;
 class ProfileCategoryController extends Controller
 {
     private ProfileCategory $profileCategory;
+    private int $paginate;
 
     public function __construct(ProfileCategory $profileCategory)
     {
         $this->profileCategory = $profileCategory;
+        $this->paginate = env('PAGINATEVALUE');
     }
 
     public function create()
@@ -45,7 +47,7 @@ class ProfileCategoryController extends Controller
 
     public function index()
     {
-        $profileCategories = $this->profileCategory->withCount('subProfiles', 'jobs')->paginate(5);
+        $profileCategories = $this->profileCategory->withCount('subProfiles', 'jobs')->paginate($this->paginate);
         return view('admin.profile-category.index', compact('profileCategories'));
     }
 

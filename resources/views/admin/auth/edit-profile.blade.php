@@ -60,7 +60,7 @@
                                             </label>
                                             <div class="col-md-8 col-lg-9">
                                                 <input name="name" type="text" class="form-control" id="name"
-                                                    value="{{ Auth::guard('admin')->user()->name }}" />
+                                                    value="{{ auth()->guard('admin')->user()->name }}" />
                                                 @error('name')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
@@ -72,7 +72,7 @@
                                             </label>
                                             <div class="col-md-8 col-lg-9">
                                                 <input name="email" type="text" class="form-control" id="email"
-                                                    value="{{ Auth::guard('admin')->user()->email }}" />
+                                                    value="{{ auth()->guard('admin')->user()->email }}" />
                                                 @error('email')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror

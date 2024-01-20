@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class isCompany
@@ -16,8 +15,8 @@ class isCompany
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard('company')->check() && Auth::guard('company')->user()->userType === "COMPANY") {
-            // dd(Auth::guard('company')->check());
+        if (auth()->guard('company')->check() && auth()->guard('company')->user()->userType === "COMPANY") {
+            // dd(auth()->guard('company')->check());
             return $next($request);
         } else {
             return redirect()->route("company.login")->with("warning", "you're logged out ");

@@ -15,6 +15,8 @@ class JobController extends Controller
     private Company $company;
     private Job $job;
     private $current_company;
+    private int $paginate;
+
 
     public function __construct(Company $company, Job $job)
     {
@@ -29,6 +31,7 @@ class JobController extends Controller
         );
         $this->job = $job;
         $this->company = $company;
+        $this->paginate = env('PAGINATEVALUE');
     }
 
     public function index()
@@ -56,7 +59,7 @@ class JobController extends Controller
                 'is_active',
                 'is_featured'
             ])
-            ->paginate(10);
+            ->paginate($this->paginate);
 
 
 

@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class isUser
@@ -16,7 +15,7 @@ class isUser
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard('user')->check() && Auth::guard('user')->user()->userType === "USER") {
+        if (auth()->guard('user')->check() && auth()->guard('user')->user()->userType === "USER") {
             return $next($request);
         } else {
             return redirect()->route("login")->with("warning", "you're logged out ");

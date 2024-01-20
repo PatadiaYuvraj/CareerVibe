@@ -16,14 +16,12 @@ class CompanyController extends Controller
 {
 
     private Company $company;
+    private int $paginate;
 
     public function __construct(Company $company)
     {
-        try {
-            $this->company = $company;
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
-        }
+        $this->paginate = env('PAGINATEVALUE');
+        $this->company = $company;
     }
 
     public function create()
@@ -38,130 +36,126 @@ class CompanyController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                "name" => [
-                    "required",
-                    "string",
-                    "max:60",
-                    "min:3"
-                ],
-                "email" => [
-                    "required",
-                    "email",
-                    "max:100",
-                    "unique:companies",
-                ],
-                "password" => [
-                    "required",
-                    "string",
-                    "max:100",
-                    "min:8",
+        $request->validate([
+            "name" => [
+                "required",
+                "string",
+                "max:60",
+                "min:3"
+            ],
+            "email" => [
+                "required",
+                "email",
+                "max:100",
+                "unique:companies",
+            ],
+            "password" => [
+                "required",
+                "string",
+                "max:100",
+                "min:8",
 
-                ],
-                "password_confirmation" => [
+            ],
+            "password_confirmation" => [
+                "required",
+                "string",
+                "max:100",
+                "min:8",
+                "same:password",
+            ],
+        ]);
+
+        $data = [
+            "name" => $request->get("name"),
+            "email" => $request->get("email"),
+            "password" => Hash::make($request->get("password")),
+        ];
+
+        if ($request->hasFile('profile_image_url')) {
+            $request->validate([
+                "profile_image_url" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
+            ]);
+            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
+            $obj = (new UploadApi())->upload(
+                $stored_path,
+                [
+                    'folder' => 'career-vibe/companies/profile_image',
+                    'resource_type' => 'image'
+                ]
+            );
+            $data["profile_image_public_id"] = $obj['public_id'];
+            $data["profile_image_url"] = $obj['secure_url'];
+            unlink($stored_path);
+        }
+
+        if ($request->get('website')) {
+            $request->validate([
+                "website" => [
                     "required",
                     "string",
                     "max:100",
-                    "min:8",
-                    "same:password",
                 ],
             ]);
-
-            $data = [
-                "name" => $request->get("name"),
-                "email" => $request->get("email"),
-                "password" => Hash::make($request->get("password")),
-            ];
-
-            if ($request->hasFile('profile_image_url')) {
-                $request->validate([
-                    "profile_image_url" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
-                ]);
-                $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-                $obj = (new UploadApi())->upload(
-                    $stored_path,
-                    [
-                        'folder' => 'career-vibe/companies/profile_image',
-                        'resource_type' => 'image'
-                    ]
-                );
-                $data["profile_image_public_id"] = $obj['public_id'];
-                $data["profile_image_url"] = $obj['secure_url'];
-                unlink($stored_path);
-            }
-
-            if ($request->get('website')) {
-                $request->validate([
-                    "website" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['website'] = $request->get("website");
-            }
-
-            if ($request->get('city')) {
-                $request->validate([
-                    "city" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['city'] = $request->get("city");
-            }
-
-            if ($request->get('address')) {
-                $request->validate([
-                    "address" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['address'] = $request->get("address");
-            }
-
-            if ($request->get('linkedin')) {
-                $request->validate([
-                    "linkedin" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['linkedin'] = $request->get("linkedin");
-            }
-
-            if ($request->get('description')) {
-                $request->validate([
-                    "description" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['description'] = $request->get("description");
-            }
-
-            $isCreated = $this->company->create($data);
-
-            if ($isCreated) {
-                return redirect()->route('admin.company.index')->with('success', 'Company is created');
-            }
-
-            return redirect()->back()->with("warning", "Company is not created");
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
+            $data['website'] = $request->get("website");
         }
+
+        if ($request->get('city')) {
+            $request->validate([
+                "city" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data['city'] = $request->get("city");
+        }
+
+        if ($request->get('address')) {
+            $request->validate([
+                "address" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data['address'] = $request->get("address");
+        }
+
+        if ($request->get('linkedin')) {
+            $request->validate([
+                "linkedin" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data['linkedin'] = $request->get("linkedin");
+        }
+
+        if ($request->get('description')) {
+            $request->validate([
+                "description" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data['description'] = $request->get("description");
+        }
+
+        $isCreated = $this->company->create($data);
+
+        if ($isCreated) {
+            return redirect()->route('admin.company.index')->with('success', 'Company is created');
+        }
+
+        return redirect()->back()->with("warning", "Company is not created");
     }
 
     public function index()
     {
         try {
-            $companies = $this->company->withCount('jobs')->paginate(5);
+            $companies = $this->company->withCount('jobs')->paginate($this->paginate);
             return view('admin.company.index', compact('companies'));
         } catch (Throwable $exception) {
             abort(404, $exception->getMessage());
@@ -202,114 +196,108 @@ class CompanyController extends Controller
 
     public function update(Request $request, $id)
     {
-        try {
-            $company = $this->company->where('id', $id)->get()->ToArray();
-            if (!$company) {
-                return redirect()->back()->with("warning", "Company is not found");
-            }
-            $company = $company[0];
+        $company = $this->company->where('id', $id)->get()->ToArray();
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $company = $company[0];
+        $request->validate([
+            "name" => [
+                "required",
+                "string",
+                "max:60",
+                "min:3"
+            ],
+            "email" => [
+                "required",
+                "email",
+                "max:100",
+            ],
+        ]);
+
+        $data = [
+            "name" => $request->get("name"),
+            "email" => $request->get("email"),
+        ];
+
+        if ($request->hasFile('profile_image_url')) {
             $request->validate([
-                "name" => [
+                "profile_image_url" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
+            ]);
+            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
+            $obj = (new UploadApi())->upload(
+                $stored_path,
+                [
+                    'folder' => 'career-vibe/companies/profile_image',
+                    'resource_type' => 'image'
+                ]
+            );
+            $data["profile_image_public_id"] = $obj['public_id'];
+            $data["profile_image_url"] = $obj['secure_url'];
+            unlink($stored_path);
+        }
+
+        $data['website'] = $data['city'] = $data['address'] = $data['linkedin'] = $data['description'] = null;
+        if ($request->get('website')) {
+            $request->validate([
+                "website" => [
                     "required",
                     "string",
-                    "max:60",
-                    "min:3"
-                ],
-                "email" => [
-                    "required",
-                    "email",
                     "max:100",
                 ],
             ]);
-
-            $data = [
-                "name" => $request->get("name"),
-                "email" => $request->get("email"),
-            ];
-
-            if ($request->hasFile('profile_image_url')) {
-                $request->validate([
-                    "profile_image_url" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
-                ]);
-                $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-                $obj = (new UploadApi())->upload(
-                    $stored_path,
-                    [
-                        'folder' => 'career-vibe/companies/profile_image',
-                        'resource_type' => 'image'
-                    ]
-                );
-                $data["profile_image_public_id"] = $obj['public_id'];
-                $data["profile_image_url"] = $obj['secure_url'];
-                unlink($stored_path);
-            }
-
-            $data['website'] = $data['city'] = $data['address'] = $data['linkedin'] = $data['description'] = null;
-            if ($request->get('website')) {
-                $request->validate([
-                    "website" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['website'] = $request->get("website");
-            }
-
-            if ($request->get('city')) {
-                $request->validate([
-                    "city" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['city'] = $request->get("city");
-            }
-
-            if ($request->get('address')) {
-                $request->validate([
-                    "address" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['address'] = $request->get("address");
-            }
-
-            if ($request->get('linkedin')) {
-                $request->validate([
-                    "linkedin" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['linkedin'] = $request->get("linkedin");
-            }
-
-            if ($request->get('description')) {
-                $request->validate([
-                    "description" => [
-                        "required",
-                        "string",
-                        "max:100",
-                    ],
-                ]);
-                $data['description'] = $request->get("description");
-            }
-            // dd($data);
-            $isUpdated = $this->company->where('id', $id)->update($data);
-
-            if ($isUpdated) {
-                return redirect()->route('admin.company.index')->with('success', 'Company is updated');
-            }
-
-            return redirect()->back()->with("warning", "Company is not updated");
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
+            $data['website'] = $request->get("website");
         }
+
+        if ($request->get('city')) {
+            $request->validate([
+                "city" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data['city'] = $request->get("city");
+        }
+
+        if ($request->get('address')) {
+            $request->validate([
+                "address" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data['address'] = $request->get("address");
+        }
+
+        if ($request->get('linkedin')) {
+            $request->validate([
+                "linkedin" => [
+                    "required",
+                    "string",
+                    "max:100",
+                ],
+            ]);
+            $data['linkedin'] = $request->get("linkedin");
+        }
+
+        if ($request->get('description')) {
+            $request->validate([
+                "description" => [
+                    "required",
+                    "string",
+                ],
+            ]);
+            $data['description'] = $request->get("description");
+        }
+        $isUpdated = $this->company->where('id', $id)->update($data);
+
+        if ($isUpdated) {
+            return redirect()->route('admin.company.index')->with('success', 'Company is updated');
+        }
+
+        return redirect()->back()->with("warning", "Company is not updated");
     }
 
     public function delete($id)

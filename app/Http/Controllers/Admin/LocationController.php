@@ -9,10 +9,12 @@ use Illuminate\Http\Request;
 class LocationController extends Controller
 {
     private Location $location;
+    private int $paginate;
 
     public function __construct(Location $location)
     {
         $this->location = $location;
+        $this->paginate = env('PAGINATEVALUE');
     }
 
     public function create()
@@ -75,7 +77,7 @@ class LocationController extends Controller
 
     public function index()
     {
-        $locations = $this->location->withCount('jobs')->paginate(5);
+        $locations = $this->location->withCount('jobs')->paginate($this->paginate);
         return view('admin.location.index', compact('locations'));
     }
 

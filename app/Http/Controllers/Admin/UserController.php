@@ -13,10 +13,12 @@ use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
     private User $user;
+    private int $paginate;
 
     public function __construct(User $user)
     {
         $this->user = $user;
+        $this->paginate = env('PAGINATEVALUE');
     }
 
     public function create()
@@ -163,7 +165,7 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = $this->user->paginate(5);
+        $users = $this->user->paginate($this->paginate);
         return view('admin.user.index', compact('users'));
     }
 

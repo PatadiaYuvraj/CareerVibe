@@ -1,4 +1,3 @@
-{{-- @dd (auth()->guard('company')->user()) --}}
 @extends('company.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
@@ -76,6 +75,18 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-3 col-md-4 label">
+                                            Verified
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            @if (auth()->guard('company')->user()->is_verified)
+                                                <span class="text-success">Yes</span>
+                                            @else
+                                                <span class="text-danger">No</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
                                             Website
                                         </div>
                                         <div class="col-lg-9 col-md-8">
@@ -105,7 +116,6 @@
                                             Address
                                         </div>
                                         <div class="col-lg-9 col-md-8">
-                                            {{-- {{ auth()->guard('company')->user()->address }} --}}
                                             @if (auth()->guard('company')->user()->address)
                                                 {{ auth()->guard('company')->user()->address }}
                                             @else
@@ -118,7 +128,6 @@
                                             LinkedIn Profile
                                         </div>
                                         <div class="col-lg-9 col-md-8">
-                                            {{-- {{ auth()->guard('company')->user()->linkedin }} --}}
                                             @if (auth()->guard('company')->user()->linkedin)
                                                 <a href="{{ auth()->guard('company')->user()->linkedin }}" target="_blank">
                                                     {{ auth()->guard('company')->user()->linkedin }}
@@ -133,7 +142,6 @@
                                             Description
                                         </div>
                                         <div class="col-lg-9 col-md-8">
-                                            {{-- if description contains \n then it will print from new line --}}
                                             @if (auth()->guard('company')->user()->description)
                                                 {!! nl2br(
                                                     e(

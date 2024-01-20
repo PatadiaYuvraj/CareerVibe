@@ -40,7 +40,7 @@
                                 @forelse ($profileCategory['sub_profiles'] as $sub_profile)
                                     <div class="card-body shadow-none mt-3 col-4">
                                         <h6 class="card-subtitle mb-2 h5">
-                                            Name {{ $sub_profile['name'] }}
+                                            {{ $sub_profile['name'] }}
                                         </h6>
                                         <h6 class="card-subtitle mb-2 text-muted">
                                             No. of Jobs Available

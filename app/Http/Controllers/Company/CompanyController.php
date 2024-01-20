@@ -16,6 +16,7 @@ class CompanyController extends Controller
 
     private Company $company;
     private $current_company;
+    private int $paginate;
 
     public function __construct(Company $company)
     {
@@ -27,6 +28,7 @@ class CompanyController extends Controller
             return $next($request);
         });
         $this->company = $company;
+        $this->paginate = env('PAGINATEVALUE');
     }
 
     public function login()
@@ -201,16 +203,110 @@ class CompanyController extends Controller
     public function updateProfile(Request $request)
     {
         $id = $this->current_company->id;
-
         $request->validate([
-            "name" => "required|min:3|max:50",
-            "email" => "required|email|unique:companies,email," . $id
+            "name" => [
+                "required",
+                "min:3",
+                "max:50",
+                function ($attribute, $value, $fail) use ($id) {
+                    $user = $this->company->where("name", $value)->where("id", "!=", $id)->first();
+                    if ($user) {
+                        $fail("Name already exist");
+                    }
+                }
+            ],
+            "email" => [
+                "required",
+                "email",
+                function ($attribute, $value, $fail) use ($id) {
+                    $user = $this->company->where("email", $value)->where("id", "!=", $id)->first();
+                    if ($user) {
+                        $fail("Email already exist");
+                    }
+                }
+            ]
         ]);
 
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email")
         ];
+
+        $data["website"] = $data["city"] = $data["address"] = $data["linkedin"] = $data["description"] = null;
+
+        if ($request->get("website")) {
+            $request->validate([
+                "website" => [
+                    "required",
+                    "url",
+                    "max:255",
+                    function ($attribute, $value, $fail) {
+                        $url = parse_url($value);
+                        if (!isset($url['scheme'])) {
+                            return $fail("The website format is invalid.");
+                        }
+                        if (!in_array($url['scheme'], ['http', 'https'])) {
+                            return $fail("The website format is invalid.");
+                        }
+                    }
+
+                ]
+            ]);
+            $data["website"] = $request->get("website");
+        }
+
+        if ($request->get("city")) {
+            $request->validate([
+                "city" => [
+                    "required",
+                    "string",
+                    "max:255",
+                ]
+            ]);
+            $data["city"] = $request->get("city");
+        }
+
+        if ($request->get("address")) {
+            $request->validate([
+                "address" => [
+                    "required",
+                    "string",
+                    "max:255",
+                ]
+            ]);
+            $data["address"] = $request->get("address");
+        }
+
+        if ($request->get("linkedin")) {
+            $request->validate([
+                "linkedin" => [
+                    "required",
+                    "url",
+                    "max:255",
+                    function ($attribute, $value, $fail) {
+                        $url = parse_url($value);
+                        if (!isset($url['scheme'])) {
+                            return $fail("The linkedin format is invalid.");
+                        }
+                        if (!in_array($url['scheme'], ['http', 'https'])) {
+                            return $fail("The linkedin format is invalid.");
+                        }
+                    }
+
+                ]
+            ]);
+            $data["linkedin"] = $request->get("linkedin");
+        }
+
+        if ($request->get("description")) {
+            $request->validate([
+                "description" => [
+                    "required",
+                    "string",
+                ]
+            ]);
+            $data["description"] = $request->get("description");
+        }
 
         $isUpdated = $this->company->where('id', $id)->update($data);
 

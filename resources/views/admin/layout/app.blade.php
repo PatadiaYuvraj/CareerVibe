@@ -42,9 +42,14 @@
 
             <ul class="d-flex align-items-center">
                 <li class="nav-item me-3">
-                    <form class="search-form d-flex align-items-center">
-                        <input type="text" placeholder="Search" title="Enter search keyword">
-                        <button type="submit" title="Search"><i class="bi bi-search"></i></button>
+                    <form class="search-form d-flex align-items-center" method="POST"
+                        action="{{ route('admin.search') }}">
+                        @csrf
+                        <input type="text" placeholder="Search" name='search' title="Enter search keyword">
+                        <input type="hidden" name="path" value="{{ Request::path() }}">
+                        <button type="submit" title="Search">
+                            <i class="bi bi-search"></i>
+                        </button>
                     </form>
                 </li><!-- End Search Icon-->
 

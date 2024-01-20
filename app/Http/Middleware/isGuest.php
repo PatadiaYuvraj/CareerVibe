@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class isGuest
@@ -16,15 +15,15 @@ class isGuest
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::guard('user')->check()) {
+        if (auth()->guard('user')->check()) {
             return redirect()->route("index")->with("warning", "you're logged in ");
         }
         //admin
-        if (Auth::guard('admin')->check()) {
+        if (auth()->guard('admin')->check()) {
             return redirect()->route("admin.dashboard")->with("warning", "you're logged in ");
         }
         // compay
-        if (Auth::guard('company')->check()) {
+        if (auth()->guard('company')->check()) {
             return redirect()->route("company.dashboard")->with("warning", "you're logged in ");
         }
         return $next($request);

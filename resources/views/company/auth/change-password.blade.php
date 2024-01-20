@@ -27,54 +27,59 @@
                                 </li>
                             </ul>
 
-                            <div class="mt-4">
-                                <form action="{{ route('company.doChangePassword') }}" method="POST">
-                                    @csrf
-                                    <div class="row mb-3">
-                                        <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label">
-                                            Current Password
-                                        </label>
-                                        <div class="col-md-8 col-lg-9">
-                                            <input name="currentPassword" type="password" class="form-control"
-                                                id="currentPassword" />
-                                            @error('currentPassword')
-                                                <div class="text-danger mt-1">{{ $message }}</div>
-                                            @enderror
+                            <div class="tab-content pt-2">
+                                <div class="profile-overview">
+                                    <h5 class="card-title">
+                                        Change Password
+                                    </h5>
+                                    <form action="{{ route('company.doChangePassword') }}" method="POST">
+                                        @csrf
+                                        <div class="row">
+                                            <div class="col col-lg-3 col-md-4 label">
+                                                Old Password
+                                            </div>
+                                            <div class="col col-lg-9 col-md-8">
+                                                <input name="currentPassword" type="password" class="form-control"
+                                                    id="currentPassword" />
+                                                @error('currentPassword')
+                                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div>
-                                    </div>
-
-
-                                    <div class="row mb-3">
-                                        <label for="newPassword" class="col-md-4 col-lg-3 col-form-label">
-                                            New Password
-                                        </label>
-                                        <div class="col-md-8 col-lg-9">
-                                            <input name="newPassword" type="password" class="form-control"
-                                                id="newPassword" />
-                                            @error('newPassword')
-                                                <div class="text-danger mt-1">{{ $message }}</div>
-                                            @enderror
+                                        <div class="row">
+                                            <div class="col col-lg-3 col-md-4 label">
+                                                New Password
+                                            </div>
+                                            <div class="col col-lg-9 col-md-8">
+                                                <input name="newPassword" type="password" class="form-control"
+                                                    id="newPassword" />
+                                                @error('newPassword')
+                                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <label for="confirmPassword" class="col-md-4 col-lg-3 col-form-label">
-                                            Confirm Password
-                                        </label>
-                                        <div class="col-md-8 col-lg-9">
-                                            <input name="confirmPassword" type="password" class="form-control"
-                                                id="confirmPassword" />
-                                            @error('confirmPassword')
-                                                <div class="text-danger mt-1">{{ $message }}</div>
-                                            @enderror
+                                        <div class="row">
+                                            <div class="col col-lg-3 col-md-4 label">
+                                                Confirm Password
+                                            </div>
+                                            <div class="col col-lg-9 col-md-8">
+                                                <input name="confirmPassword" type="password" class="form-control"
+                                                    id="confirmPassword" />
+                                                @error('confirmPassword')
+                                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="text-center">
-                                        <button type="submit" class="btn btn-primary">
-                                            Save Changes
-                                        </button>
-                                    </div>
-                                </form>
+                                        <div class="btn-group">
+                                            <button type="submit" class="btn btn-primary">
+                                                Update
+                                            </button>
+                                            <a href="{{ route('company.dashboard') }}" class="btn btn-danger">
+                                                Cancel
+                                            </a>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
