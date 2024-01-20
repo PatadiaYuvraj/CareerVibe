@@ -36,7 +36,7 @@
                                 href="{{ route('company.job.edit', $job['id']) }}">Edit</a>
                         </p>
                     </div>
-                    <hr />
+                    {{-- <hr />
                     <div class="col" style="">
                         <div class="card-body">
                             <h5 class="card-title">
@@ -45,12 +45,11 @@
                             <h6 class="">
                                 {{ $job['company']['name'] }}
                             </h6>
-                            {{-- email --}}
                             <h6 class="">
                                 {{ $job['company']['email'] }}
                             </h6>
                         </div>
-                    </div>
+                    </div> --}}
                     <hr />
                     <div class="row">
                         <div class="col" style="">
@@ -153,7 +152,13 @@
                                     Experience Type
                                 </h5>
                                 <h6 class="">
-                                    {{ Str::ucfirst(Str::lower($job['experience_type'])) }}
+                                    @if ($job['experience_type'] == null)
+                                        N/A
+                                    @elseif($job['experience_type'] == 'ANY')
+                                        {{ Str::ucfirst(Str::lower($job['experience_type'])) }}
+                                    @else
+                                        {{ Str::replaceFirst('-', ' to ', $job['experience_type']) }} Years
+                                    @endif
 
                                     {{-- {{ $job['experience_type'] }} --}}
                                 </h6>

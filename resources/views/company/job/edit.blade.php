@@ -39,9 +39,9 @@
                                             <div class="form-control">
                                                 {{ Str::ucfirst(Str::lower($profile['name'])) }}
                                                 {{-- profile category --}}
-                                                <span class="small">
+                                                {{-- <span class="small">
                                                     ({{ $profile['profile_category']['name'] }})
-                                                </span>
+                                                </span> --}}
                                             </div>
                                         </label>
                                     </div>

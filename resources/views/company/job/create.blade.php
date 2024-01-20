@@ -31,7 +31,7 @@
                                             </div>
                                             <div class="form-control">
                                                 {{ Str::ucfirst(Str::lower($sub_profile['name'])) }}
-                                                <span class="small">({{ $sub_profile['profile_category']['name'] }})</span>
+                                                {{-- <span class="small">({{ $sub_profile['profile_category']['name'] }})</span> --}}
                                             </div>
                                         </label>
                                     </div>

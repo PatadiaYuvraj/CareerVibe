@@ -147,7 +147,8 @@
             &copy; Copyright <strong><span>CareerVibe</span></strong>. All Rights Reserved
         </div>
         <div class="credits">
-            Designed by <a href="https://linkedin.com/in/patadiayuvraj">PatadiaYuvraj</a>
+            Designed by <a href="https://linkedin.com/in/patadiayuvraj" target="_blank"
+                rel="noopener noreferrer">PatadiaYuvraj</a>
         </div>
     </footer>
 

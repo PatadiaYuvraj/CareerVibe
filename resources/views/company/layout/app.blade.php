@@ -99,48 +99,12 @@
                 </a>
             </li>
             <hr>
-            {{-- <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('company.company.index') }}">
-                    <span>Company</span>
-                </a>
-            </li>
-            <hr> --}}
-            {{-- <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('company.user.index') }}">
-                    <span>User</span>
-                </a>
-            </li>
-            <hr> --}}
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('company.job.index') }}">
                     <span>Job</span>
                 </a>
             </li>
             <hr>
-            {{-- <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('company.profile-category.index') }}">
-                    <span>Profile Category</span>
-                </a>
-            </li>
-            <hr>
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('company.sub-profile.index') }}">
-                    <span>Sub Profile</span>
-                </a>
-            </li>
-            <hr>
-
-            <li class="nav-item">
-                <a class="nav-link collapsed     " href="{{ route('company.location.index') }}">
-                    <span>Location</span>
-                </a>
-            </li>
-            <hr>
-            <li class="nav-item">
-                <a class="nav-link  collapsed   " href="{{ route('company.qualification.index') }}">
-                    <span>Qualification</span>
-                </a>
-            </li> --}}
         </ul>
 
     </aside>
@@ -152,7 +116,8 @@
             &copy; Copyright <strong><span>CareerVibe</span></strong>. All Rights Reserved
         </div>
         <div class="credits">
-            Designed by <a href="https://linkedin.com/in/patadiayuvraj">PatadiaYuvraj</a>
+            Designed by <a href="https://linkedin.com/in/patadiayuvraj" target="_blank"
+                rel="noopener noreferrer">PatadiaYuvraj</a>
         </div>
     </footer>
 

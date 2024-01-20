@@ -2,7 +2,6 @@
 @extends('company.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
-
     <main id="main" class="main">
         <section class="section profile">
             <div class="row">
@@ -37,9 +36,10 @@
                                         <div class="col col-lg-3 col-md-4 label">
                                             Profile Image
                                         </div>
-                                        @if (Auth::guard('company')->check() && Auth::guard('company')->user()->profile_image_url)
+                                        @if (auth()->guard('company')->check() &&
+                                                auth()->guard('company')->user()->profile_image_url)
                                             <div class="col row row-cols-2">
-                                                <img src="{{ Auth::guard('company')->user()->profile_image_url }}"
+                                                <img src="{{ auth()->guard('company')->user()->profile_image_url }}"
                                                     alt="Profile Image" class="col p-1 img-thumbnail" width="100"
                                                     height="100">
                                                 <form class="col" action="{{ route('company.deleteProfileImage') }}"
@@ -61,8 +61,8 @@
                                             Full Name
                                         </div>
                                         <div class="col col-lg-9 col-md-8">
-                                            @if (Auth::guard('company')->check())
-                                                {{ Auth::guard('company')->user()->name }}
+                                            @if (auth()->guard('company')->check())
+                                                {{ auth()->guard('company')->user()->name }}
                                             @endif
                                         </div>
                                     </div>
@@ -71,7 +71,78 @@
                                             Email
                                         </div>
                                         <div class="col-lg-9 col-md-8">
-                                            {{ Auth::guard('company')->user()->email }}
+                                            {{ auth()->guard('company')->user()->email }}
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            Website
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            @if (auth()->guard('company')->user()->website)
+                                                <a href="{{ auth()->guard('company')->user()->website }}" target="_blank">
+                                                    {{ auth()->guard('company')->user()->website }}
+                                                </a>
+                                            @else
+                                                <span class="text-danger">No Website</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            City
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            @if (auth()->guard('company')->user()->city)
+                                                {{ auth()->guard('company')->user()->city }}
+                                            @else
+                                                <span class="text-danger">No City</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            Address
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            {{-- {{ auth()->guard('company')->user()->address }} --}}
+                                            @if (auth()->guard('company')->user()->address)
+                                                {{ auth()->guard('company')->user()->address }}
+                                            @else
+                                                <span class="text-danger">No Address</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            LinkedIn Profile
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            {{-- {{ auth()->guard('company')->user()->linkedin }} --}}
+                                            @if (auth()->guard('company')->user()->linkedin)
+                                                <a href="{{ auth()->guard('company')->user()->linkedin }}" target="_blank">
+                                                    {{ auth()->guard('company')->user()->linkedin }}
+                                                </a>
+                                            @else
+                                                <span class="text-danger">No LinkedIn Profile</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            Description
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            {{-- if description contains \n then it will print from new line --}}
+                                            @if (auth()->guard('company')->user()->description)
+                                                {!! nl2br(
+                                                    e(
+                                                        auth()->guard('company')->user()->description,
+                                                    ),
+                                                ) !!}
+                                            @else
+                                                <span class="text-danger">No Description</span>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

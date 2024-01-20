@@ -9,7 +9,6 @@ use App\Models\Location;
 use App\Models\Qualification;
 use App\Models\SubProfile;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class JobController extends Controller
 {
@@ -35,6 +34,7 @@ class JobController extends Controller
     public function index()
     {
         $company_id = $this->current_company->id;
+
         $jobs = $this->job
             ->where('company_id', $company_id)
             ->with([
@@ -57,6 +57,9 @@ class JobController extends Controller
                 'is_featured'
             ])
             ->paginate(10);
+
+
+
         return view('company.job.index', compact('jobs'));
     }
 
@@ -76,12 +79,14 @@ class JobController extends Controller
             'id',
             'name',
             'profile_category_id'
-        ])->with([
-            'profileCategory' =>
-            function ($query) {
-                $query->select(['id', 'name']);
-            }
-        ])->get()->toArray();
+        ])
+            // ->with([
+            //     'profileCategory' =>
+            //     function ($query) {
+            //         $query->select(['id', 'name']);
+            //     }
+            // ])
+            ->get()->toArray();
 
         $locations = Location::select(['id', 'city', 'state'])->get()->toArray();
 
@@ -106,6 +111,12 @@ class JobController extends Controller
     public function store(Request $request)
     {
         $id = $this->current_company->id;
+        if (!$id) {
+            return redirect()->route('company.job.index')->with("warning", "Company is not found");
+        }
+        if (auth()->guard('company')->user()->is_verified == 0) {
+            return redirect()->route('company.job.index')->with("warning", "Company is not verified");
+        }
         $request->validate(
             [
                 "sub_profile_id" =>
@@ -298,10 +309,7 @@ class JobController extends Controller
         }
         $job = $this->job->where('id', $id)->with([
             'subProfile' => function ($query) {
-                $query->select(['id', 'name', 'profile_category_id']);
-                $query->with(['profileCategory' => function ($query) {
-                    $query->select(['id', 'name']);
-                }]);
+                $query->select(['id', 'name']);
             }, "qualifications" => function ($query) {
                 $query->select(['qualifications.id', 'name']);
             }, "locations" => function ($query) {
@@ -320,13 +328,8 @@ class JobController extends Controller
         $sub_profiles = SubProfile::select([
             'id',
             'name',
-            'profile_category_id'
-
-        ])->with([
-            'profileCategory' => function ($query) {
-                $query->select(['id', 'name']);
-            }
-        ])->get()->toArray();
+        ])
+            ->get()->toArray();
         if (!$job) {
             return redirect()->back()->with("warning", "Job is not found");
         }

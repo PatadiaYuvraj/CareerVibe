@@ -62,7 +62,8 @@
 
 
                             <div class="credits">
-                                Designed by <a href="https://linkedin.com/in/patadiayuvraj">PatadiaYuvraj</a>
+                                Designed by <a href="https://linkedin.com/in/patadiayuvraj" target="_blank"
+                                    rel="noopener noreferrer">PatadiaYuvraj</a>
                             </div>
 
                         </div>
