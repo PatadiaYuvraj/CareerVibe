@@ -29,6 +29,12 @@ class LocationController extends Controller
                 "required",
                 "string",
                 "max:100",
+                function ($attribute, $value, $fail) {
+                    $isExist = $this->location->where('city', $value)->get()->ToArray();
+                    if ($isExist) {
+                        $fail($attribute . ' is already exist.');
+                    }
+                },
             ],
         ]);
         // validate request data 
@@ -143,6 +149,12 @@ class LocationController extends Controller
                 "required",
                 "string",
                 "max:100",
+                function ($attribute, $value, $fail) use ($id) {
+                    $isExist = $this->location->where('id', '!=', $id)->where('city', $value)->get()->ToArray();
+                    if ($isExist) {
+                        $fail($attribute . ' is already exist.');
+                    }
+                },
             ],
         ]);
 

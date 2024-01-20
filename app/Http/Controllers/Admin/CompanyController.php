@@ -26,12 +26,7 @@ class CompanyController extends Controller
 
     public function create()
     {
-
-        try {
-            return view('admin.company.create');
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
-        }
+        return view('admin.company.create');
     }
 
     public function store(Request $request)
@@ -154,44 +149,32 @@ class CompanyController extends Controller
 
     public function index()
     {
-        try {
-            $companies = $this->company->withCount('jobs')->paginate($this->paginate);
-            return view('admin.company.index', compact('companies'));
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
-        }
+        $companies = $this->company->withCount('jobs')->paginate($this->paginate);
+        return view('admin.company.index', compact('companies'));
     }
 
     public function show($id)
     {
-        try {
-            $company = $this->company->where('id', $id)->with([
-                'jobs' => function ($query) {
-                    $query->with('subProfile');
-                }
-            ])->get()->ToArray();
-            if (!$company) {
-                return redirect()->back()->with("warning", "Company is not found");
+        $company = $this->company->where('id', $id)->with([
+            'jobs' => function ($query) {
+                $query->with('subProfile');
             }
-            $company = $company[0];
-            return view('admin.company.show', compact('company'));
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
+        ])->get()->ToArray();
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
         }
+        $company = $company[0];
+        return view('admin.company.show', compact('company'));
     }
 
     public function edit($id)
     {
-        try {
-            $company = $this->company->where('id', $id)->get()->ToArray();
-            if (!$company) {
-                return redirect()->back()->with("warning", "Company is not found");
-            }
-            $company = $company[0];
-            return view('admin.company.edit', compact('company'));
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
+        $company = $this->company->where('id', $id)->get()->ToArray();
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
         }
+        $company = $company[0];
+        return view('admin.company.edit', compact('company'));
     }
 
     public function update(Request $request, $id)
@@ -302,136 +285,120 @@ class CompanyController extends Controller
 
     public function delete($id)
     {
-        try {
-            $company = $this->company->where('id', $id)->withCount('jobs')->get()->ToArray();
-            if (!$company) {
-                return redirect()->back()->with("warning", "Company is not found");
-            }
-            $company = $company[0];
-            if ($company['jobs_count'] > 0) {
-                return redirect()->back()->with("warning", "Company has jobs cannot be deleted");
-            }
-            if ($company['profile_image_url']) {
-                $public_ids = $company['profile_image_public_id'];
-                DeleteFromCloudinary::dispatch($public_ids);
-            }
-
-            $isDeleted = $this->company->where('id', $id)->delete();
-            if ($isDeleted) {
-                return redirect()->route('admin.company.index')->with('success', 'Company is deleted');
-            }
-            return redirect()->back()->with("warning", "Company is not deleted");
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
+        $company = $this->company->where('id', $id)->withCount('jobs')->get()->ToArray();
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
         }
+        $company = $company[0];
+        if ($company['jobs_count'] > 0) {
+            return redirect()->back()->with("warning", "Company has jobs cannot be deleted");
+        }
+        if ($company['profile_image_url']) {
+            $public_ids = $company['profile_image_public_id'];
+            DeleteFromCloudinary::dispatch($public_ids);
+        }
+
+        $isDeleted = $this->company->where('id', $id)->delete();
+        if ($isDeleted) {
+            return redirect()->route('admin.company.index')->with('success', 'Company is deleted');
+        }
+        return redirect()->back()->with("warning", "Company is not deleted");
     }
 
     public function toggleVerified($id, $is_verified)
     {
-        try {
-            // $auth = new AuthService();
-            // if (!$auth->isAdmin()) {
-            //     return redirect()->back()->with("warning", "You are not authorized");
-            // }
-            $company = $this->company->find($id);
-            if (!$company) {
-                return redirect()->back()->with("warning", "Company is not found");
-            }
-            if ($is_verified == 1) {
-                $company->is_verified = 0;
-                $company->save();
-                return redirect()->back()->with('success', 'Company is unverified');
-            } else {
-                $company->is_verified = 1;
-                $company->save();
-                return redirect()->back()->with('success', 'Company is verified');
-            }
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
+        // $auth = new AuthService();
+        // if (!$auth->isAdmin()) {
+        //     return redirect()->back()->with("warning", "You are not authorized");
+        // }
+        $company = $this->company->find($id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        if ($is_verified == 1) {
+            $company->is_verified = 0;
+            $company->save();
+            return redirect()->back()->with('success', 'Company is unverified');
+        } else {
+            $company->is_verified = 1;
+            $company->save();
+            return redirect()->back()->with('success', 'Company is verified');
         }
     }
 
     public function updateCompanyProfileImage(Request $request, $id)
     {
-        try {
-            $request->validate([
-                "profile_image_url" => [
-                    "required",
-                    "image",
-                    "mimes:jpeg,png,jpg",
-                    "max:2048",
-                ],
-            ]);
+        $request->validate([
+            "profile_image_url" => [
+                "required",
+                "image",
+                "mimes:jpeg,png,jpg",
+                "max:2048",
+            ],
+        ]);
 
-            $company = $this->company->find($id);
-            if (!$company) {
-                return redirect()->back()->with("warning", "Company is not found");
-            }
-
-            if ($company->profile_image_url) {
-                $public_ids = $company->profile_image_public_id;
-                DeleteFromCloudinary::dispatch($public_ids);
-            }
-
-            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-
-            $obj = (new UploadApi())->upload(
-                $stored_path,
-                [
-                    'folder' => 'career-vibe/companies/profile_image',
-                    'resource_type' => 'image'
-                ]
-            );
-
-            $data = [
-                "profile_image_public_id" => $obj['public_id'],
-                "profile_image_url" => $obj['secure_url'],
-            ];
-
-            $isUpdated = $company->update($data);
-
-            if ($isUpdated) {
-                unlink($stored_path);
-                return redirect()->back()->with('success', 'Company profile image is updated');
-            }
-
-            return redirect()->back()->with("warning", "Company profile image is not updated");
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
+        $company = $this->company->find($id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
         }
+
+        if ($company->profile_image_url) {
+            $public_ids = $company->profile_image_public_id;
+            DeleteFromCloudinary::dispatch($public_ids);
+        }
+
+        $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
+
+        $obj = (new UploadApi())->upload(
+            $stored_path,
+            [
+                'folder' => 'career-vibe/companies/profile_image',
+                'resource_type' => 'image'
+            ]
+        );
+
+        $data = [
+            "profile_image_public_id" => $obj['public_id'],
+            "profile_image_url" => $obj['secure_url'],
+        ];
+
+        $isUpdated = $company->update($data);
+
+        if ($isUpdated) {
+            unlink($stored_path);
+            return redirect()->back()->with('success', 'Company profile image is updated');
+        }
+
+        return redirect()->back()->with("warning", "Company profile image is not updated");
     }
 
     public function deleteProfileImage($id)
     {
-        try {
-            $company = $this->company->find($id);
-            if (!$company) {
-                return redirect()->back()->with("warning", "Company is not found");
-            }
-            if ($company->profile_image_url) {
-                $public_ids = $company->profile_image_public_id;
-                DeleteFromCloudinary::dispatch($public_ids);
-
-                $data = [
-                    "profile_image_public_id" => null,
-                    "profile_image_url" => null,
-                ];
-            }
+        $company = $this->company->find($id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        if ($company->profile_image_url) {
+            $public_ids = $company->profile_image_public_id;
+            DeleteFromCloudinary::dispatch($public_ids);
 
             $data = [
                 "profile_image_public_id" => null,
                 "profile_image_url" => null,
             ];
-
-            $isUpdated = $company->update($data);
-
-            if ($isUpdated) {
-                return redirect()->back()->with('success', 'Company profile image is deleted');
-            }
-
-            return redirect()->back()->with("warning", "Company profile image is not deleted");
-        } catch (Throwable $exception) {
-            abort(404, $exception->getMessage());
         }
+
+        $data = [
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
+        ];
+
+        $isUpdated = $company->update($data);
+
+        if ($isUpdated) {
+            return redirect()->back()->with('success', 'Company profile image is deleted');
+        }
+
+        return redirect()->back()->with("warning", "Company profile image is not deleted");
     }
 }

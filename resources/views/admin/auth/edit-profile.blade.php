@@ -26,19 +26,20 @@
                                     </a>
                                 </li>
                             </ul>
-
                             <div class="tab-content pt-2">
-                                <div class="card-body pt-3">
-                                    <div class="row mb-3">
-                                        <label for="profile_image_url" class="col-md-4 col-lg-3 col-form-label">
+                                <div class="profile-overview">
+                                    <h5 class="card-title">
+                                        Profile Details
+                                    </h5>
+                                    <div class="row row-cols-3 mb-3">
+                                        <div class="col col-lg-3 col-md-4 label">
                                             Profile Image
-                                        </label>
-                                        <div class="col-md-8 col-lg-9">
-
+                                        </div>
+                                        <div class=" col col-lg-9 col-md-8">
                                             <form action="{{ route('admin.updateProfileImage') }}" method="POST"
                                                 enctype="multipart/form-data">
                                                 @csrf
-                                                <div class="input-group">
+                                                <div class="input-group col">
                                                     <input name="profile_image_url" type="file" class="form-control"
                                                         id="profile_image_url" />
                                                     <button type="submit" class="btn btn-primary">
@@ -49,41 +50,41 @@
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
                                             </form>
-
                                         </div>
                                     </div>
                                     <form action="{{ route('admin.updateProfile') }}" method="POST">
                                         @csrf
-                                        <div class="row mb-3">
-                                            <label for="name" class="col-md-4 col-lg-3 col-form-label">
-                                                Name
-                                            </label>
-                                            <div class="col-md-8 col-lg-9">
+                                        <div class="row">
+                                            <div class="col col-lg-3 col-md-4 label">
+                                                Full Name
+                                            </div>
+                                            <div class="col col-lg-9 col-md-8">
                                                 <input name="name" type="text" class="form-control" id="name"
-                                                    value="{{ auth()->guard('admin')->user()->name }}" />
+                                                    value="{{ old('name') ??auth()->guard('admin')->user()->name }}" />
                                                 @error('name')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
-                                        <div class="row mb-3">
-                                            <label for="email" class="col-md-4 col-lg-3 col-form-label">
+                                        <div class="row">
+                                            <div class="col-lg-3 col-md-4 label">
                                                 Email
-                                            </label>
-                                            <div class="col-md-8 col-lg-9">
+                                            </div>
+                                            <div class="col col-lg-9 col-md-8">
                                                 <input name="email" type="text" class="form-control" id="email"
-                                                    value="{{ auth()->guard('admin')->user()->email }}" />
+                                                    value="{{ old('email') ??auth()->guard('admin')->user()->email }}" />
                                                 @error('email')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                         </div>
-
-
-                                        <div class="text-center">
+                                        <div class="btn-group">
                                             <button type="submit" class="btn btn-primary">
-                                                Save Changes
+                                                Update
                                             </button>
+                                            <a href="{{ route('admin.dashboard') }}" type="submit" class="btn btn-danger">
+                                                Cancel
+                                            </a>
                                         </div>
                                     </form>
                                 </div>
