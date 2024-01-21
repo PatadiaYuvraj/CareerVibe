@@ -295,6 +295,7 @@ class UserController extends Controller
                     'in:MALE,FEMALE,OTHER'
                 ],
             ]);
+            $data['gender'] = $request->gender;
         }
 
 

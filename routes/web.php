@@ -84,8 +84,8 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::post('/change-password',  [AdminController::class, "doChangePassword"])->name('admin.doChangePassword');
         Route::get('/edit-profile-image',  [AdminController::class, "editProfileImage"])->name('admin.editProfileImage');
         Route::post('/update-profile-image',  [AdminController::class, "updateProfileImage"])->name('admin.updateProfileImage');
-        Route::get('/edit-resume-pdf',  [AdminController::class, "editResumePdf"])->name('admin.editResumePdf');
-        Route::post('/update-resume-pdf',  [AdminController::class, "updateResumePdf"])->name('admin.updateResumePdf');
+        // Route::get('/edit-resume-pdf',  [AdminController::class, "editResumePdf"])->name('admin.editResumePdf');
+        // Route::post('/update-resume-pdf',  [AdminController::class, "updateResumePdf"])->name('admin.updateResumePdf');
         Route::post('/delete-profile-image',  [AdminController::class, "deleteProfileImage"])->name('admin.deleteProfileImage');
         Route::get('/dashboard',  [AdminController::class, "dashboard"])->name('admin.dashboard');
         Route::get('/logout',  [AdminController::class, "logout"])->name('admin.logout');
@@ -222,6 +222,20 @@ Route::group(['middleware' => "isCompany"], function () {
 
 Route::group(['middleware' => "isUser"], function () {
     Route::prefix('/user')->group(function () {
+
+
+        Route::get('search', function (Request $request) {
+
+            return redirect()->route('user.dashboard')->with('info', 'Search is not implemented yet');
+        })->name('user.search');
+        Route::post('search', function (Request $request) {
+
+            return redirect()->route('user.dashboard')->with('info', 'Search is not implemented yet');
+        })->name('user.search');
+
+
+        Route::get('/dashboard',  [UserUserController::class, "dashboard"])->name('user.dashboard');
+        Route::get('/logout',  [UserUserController::class, "logout"])->name('user.logout');
         Route::get('/edit-profile',  [UserUserController::class, "editProfile"])->name('user.editProfile');
         Route::post('/update-profile',  [UserUserController::class, "updateProfile"])->name('user.updateProfile');
         Route::get('/change-password',  [UserUserController::class, "changePassword"])->name('user.changePassword');
@@ -229,8 +243,9 @@ Route::group(['middleware' => "isUser"], function () {
         Route::get('/edit-profile-image',  [UserUserController::class, "editProfileImage"])->name('user.editProfileImage');
         Route::post('/update-profile-image',  [UserUserController::class, "updateProfileImage"])->name('user.updateProfileImage');
         Route::post('/delete-profile-image',  [UserUserController::class, "deleteProfileImage"])->name('user.deleteProfileImage');
-        Route::get('/dashboard',  [UserUserController::class, "dashboard"])->name('user.dashboard');
-        Route::get('/logout',  [UserUserController::class, "logout"])->name('user.logout');
+        Route::get('/edit-resume-pdf',  [UserUserController::class, "editResumePdf"])->name('user.editResumePdf');
+        Route::post('/update-resume-pdf',  [UserUserController::class, "updateResumePdf"])->name('user.updateResumePdf');
+        Route::get('/delete-resume-pdf',  [UserUserController::class, "deleteResumePdf"])->name('user.deleteResumePdf');
 
         Route::prefix('job')->group(function () {
             Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');

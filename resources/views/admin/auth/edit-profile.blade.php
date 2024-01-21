@@ -25,13 +25,18 @@
                                         Change Password
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('admin.editProfileImage') }}">
+                                        Change Profile Image
+                                    </a>
+                                </li>
                             </ul>
                             <div class="tab-content pt-2">
                                 <div class="profile-overview">
                                     <h5 class="card-title">
                                         Profile Details
                                     </h5>
-                                    <div class="row row-cols-3 mb-3">
+                                    {{-- <div class="row row-cols-3 mb-3">
                                         <div class="col col-lg-3 col-md-4 label">
                                             Profile Image
                                         </div>
@@ -51,7 +56,7 @@
                                                 @enderror
                                             </form>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     <form action="{{ route('admin.updateProfile') }}" method="POST">
                                         @csrf
                                         <div class="row">

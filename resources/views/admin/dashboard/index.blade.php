@@ -25,6 +25,11 @@
                                         Change Password
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('admin.editProfileImage') }}">
+                                        Change Profile Image
+                                    </a>
+                                </li>
                             </ul>
 
                             <div class="tab-content pt-2">

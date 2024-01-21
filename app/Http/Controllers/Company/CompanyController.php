@@ -317,6 +317,11 @@ class CompanyController extends Controller
         return redirect()->back()->with("warning", "Profile Not Updated");
     }
 
+    public function editProfileImage()
+    {
+        return view('company.auth.edit-profile-image');
+    }
+
     public function updateProfileImage(Request $request)
     {
         $id = $this->current_company->id;

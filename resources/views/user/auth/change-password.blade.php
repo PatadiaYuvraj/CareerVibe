@@ -1,4 +1,4 @@
-@extends('admin.layout.app')
+@extends('user.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
 
@@ -10,29 +10,34 @@
                         <div class="card-body pt-3">
                             <ul class="nav nav-tabs nav-tabs-bordered">
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.dashboard') }}" class="nav-link ">
+                                    <a href="{{ route('user.dashboard') }}" class="nav-link ">
                                         Overview
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.editProfile') }}">
+                                    <a class="nav-link" href="{{ route('user.editProfile') }}">
                                         Edit Profile
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" href="{{ route('admin.doChangePassword') }}">
+                                    <a class="nav-link active" href="{{ route('user.doChangePassword') }}">
                                         Change Password
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.editProfileImage') }}">
+                                    <a class="nav-link" href="{{ route('user.editProfileImage') }}">
                                         Change Profile Image
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{{ route('user.editResumePdf') }}">
+                                        Change Resume PDF
                                     </a>
                                 </li>
                             </ul>
                             <div class="tab-content pt-2">
-                                <form action="{{ route('admin.doChangePassword') }}" method="POST">
+                                <form action="{{ route('user.doChangePassword') }}" method="POST">
                                     @csrf
                                     <div class="profile-overview">
                                         <h5 class="card-title">
@@ -78,7 +83,7 @@
                                             <button type="submit" class="btn btn-primary">
                                                 Update
                                             </button>
-                                            <a href="{{ route('admin.dashboard') }}" type="submit" class="btn btn-danger">
+                                            <a href="{{ route('user.dashboard') }}" type="submit" class="btn btn-danger">
                                                 Cancel
                                             </a>
                                         </div>

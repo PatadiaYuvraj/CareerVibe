@@ -262,6 +262,11 @@ class AdminController extends Controller
         return redirect()->back()->with("warning", "Profile Not Updated");
     }
 
+    public function editProfileImage()
+    {
+        return view('admin.auth.edit-profile-image');
+    }
+
     public function updateProfileImage(Request $request)
     {
         if (!auth()->guard('admin')->check()) {

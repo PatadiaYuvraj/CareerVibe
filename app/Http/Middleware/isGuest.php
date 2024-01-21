@@ -16,7 +16,8 @@ class isGuest
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->guard('user')->check()) {
-            return redirect()->route("index")->with("warning", "you're logged in ");
+            // return redirect()->route("index")->with("warning", "you're logged in ");
+            return redirect()->route("user.dashboard")->with("warning", "you're logged in ");
         }
         //admin
         if (auth()->guard('admin')->check()) {
