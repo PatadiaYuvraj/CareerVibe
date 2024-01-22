@@ -248,13 +248,14 @@ Route::group(['middleware' => "isUser"], function () {
         Route::get('/delete-resume-pdf',  [UserUserController::class, "deleteResumePdf"])->name('user.deleteResumePdf');
 
         Route::prefix('job')->group(function () {
+            Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
             Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
             // Route::get('/search',  [UserJobController::class, "search"])->name('user.job.search');
             // Route::post('/search',  [UserJobController::class, "doSearch"])->name('user.job.doSearch'); 
-            Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
-            Route::post('/apply/{id}',  [UserJobController::class, "apply"])->name('user.job.apply');
-            Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
-            Route::get('/cancel-applied-job/{id}',  [UserJobController::class, "cancelAppliedJob"])->name('user.job.cancelAppliedJob');
+            // Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
+            Route::get('/apply/{id}',  [UserJobController::class, "apply"])->name('user.job.apply');
+            Route::get('/unapply/{id}',  [UserJobController::class, "unapply"])->name('user.job.unapply');
+            // Route::get('/cancel-applied-job/{id}',  [UserJobController::class, "cancelAppliedJob"])->name('user.job.cancelAppliedJob');
             Route::get('/save-job/{id}',  [UserJobController::class, "saveJob"])->name('user.job.saveJob');
             Route::get('/unsave-job/{id}',  [UserJobController::class, "unsaveJob"])->name('user.job.unsaveJob');
             Route::get('/saved-jobs',  [UserJobController::class, "savedJobs"])->name('user.job.savedJobs');

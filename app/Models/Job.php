@@ -87,4 +87,14 @@ class Job extends Model
     {
         return $this->hasOneThrough(ProfileCategory::class, SubProfile::class, 'id', 'id', 'sub_profile_id', 'profile_category_id');
     }
+
+    public function applyByUsers()
+    {
+        return $this->belongsToMany(User::class, 'job_user')->withTimestamps();
+    }
+
+    public function savedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'saved_jobs')->withTimestamps();
+    }
 }

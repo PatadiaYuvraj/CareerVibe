@@ -12,38 +12,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-
-
-    /*
-        $table->id();
-        $table->string("name", 25);
-        $table->string("email", 50)->unique()->index();
-        $table->string("password", 100);
-        $table->string("userType", 10)->default("USER");
-        $table->text("profile_image_url")->nullable();
-        $table->text("profile_image_public_id")->nullable();
-        $table->text("resume_pdf_url")->nullable();
-        $table->string("contact", 15)->nullable();
-        $table->enum("gender", ["MALE", "FEMALE", "OTHER"])->nullable();
-        $table->boolean('is_active')->default(true);
-        $table->string("headline", 200)->nullable();
-        $table->string("education", 200)->nullable();
-        $table->string("interest", 100)->nullable();
-        $table->string("hobby", 100)->nullable();
-        $table->string("city", 30)->nullable();
-        $table->text("about")->nullable();
-        $table->string("experience", 200)->nullable();
-        $table->rememberToken();
-        $table->index(['name', 'email', 'id']);
-        $table->timestamps();
-    */
-    // $table, $primaryKey, $fillable, $guarded, $timestamp, $nullable, $required
-
     protected $table = 'users';
 
     protected $primaryKey = 'id';
@@ -108,4 +76,24 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function appliedJobs()
+    {
+        return $this->belongsToMany(Job::class, 'job_user')->withTimestamps();
+    }
+
+    public function savedJobs()
+    {
+        return $this->belongsToMany(Job::class, 'saved_jobs')->withTimestamps();
+    }
+
+    public function getIsAppliedAttribute()
+    {
+        return $this->applyByUsers()->where('user_id', auth()->user()->id)->exists();
+    }
+
+    public function getIsSavedAttribute()
+    {
+        return $this->savedByUsers()->where('user_id', auth()->user()->id)->exists();
+    }
 }
