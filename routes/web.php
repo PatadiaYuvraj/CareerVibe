@@ -95,14 +95,14 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::post('/store',  [AdminUserController::class, "store"])->name('admin.user.store');
             Route::get('/',  [AdminUserController::class, "index"])->name('admin.user.index');
             Route::get('/{id}',  [AdminUserController::class, "show"])->name('admin.user.show');
-            Route::get('/edit/{id}',  [AdminUserController::class, "edit"])->name('admin.user.edit');
+            Route::post('/edit/{id}',  [AdminUserController::class, "edit"])->name('admin.user.edit');
             Route::post('/update/{id}',  [AdminUserController::class, "update"])->name('admin.user.update');
-            Route::get('/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
+            Route::delete('/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
             Route::post('/update-profile-image/{id}',  [AdminUserController::class, "updateUserProfileImage"])->name('admin.user.updateProfileImage');
             Route::post('/update-resume-pdf/{id}',  [AdminUserController::class, "updateUserResume"])->name('admin.user.updateResumePdf');
-            Route::post('/delete-profile-image/{id}',  [AdminUserController::class, "deleteProfileImage"])->name('admin.user.deleteProfileImage');
+            Route::delete('/delete-profile-image/{id}',  [AdminUserController::class, "deleteUserProfileImage"])->name('admin.user.deleteProfileImage');
+            Route::delete('/delete-resume-pdf/{id}',  [AdminUserController::class, "deleteUserResume"])->name('admin.user.deleteResumePdf');
         });
-
         Route::prefix('company')->group(function () {
             Route::get('/create',  [AdminCompanyController::class, "create"])->name('admin.company.create');
             Route::post('/store',  [AdminCompanyController::class, "store"])->name('admin.company.store');
@@ -247,23 +247,49 @@ Route::group(['middleware' => "isUser"], function () {
         Route::post('/update-resume-pdf',  [UserUserController::class, "updateResumePdf"])->name('user.updateResumePdf');
         Route::get('/delete-resume-pdf',  [UserUserController::class, "deleteResumePdf"])->name('user.deleteResumePdf');
 
-        Route::prefix('job')->group(function () {
-            Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
-            Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
-            // Route::get('/search',  [UserJobController::class, "search"])->name('user.job.search');
-            // Route::post('/search',  [UserJobController::class, "doSearch"])->name('user.job.doSearch'); 
-            // Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
-            Route::get('/apply/{id}',  [UserJobController::class, "apply"])->name('user.job.apply');
-            Route::get('/unapply/{id}',  [UserJobController::class, "unapply"])->name('user.job.unapply');
-            // Route::get('/cancel-applied-job/{id}',  [UserJobController::class, "cancelAppliedJob"])->name('user.job.cancelAppliedJob');
-            Route::get('/save-job/{id}',  [UserJobController::class, "saveJob"])->name('user.job.saveJob');
-            Route::get('/unsave-job/{id}',  [UserJobController::class, "unsaveJob"])->name('user.job.unsaveJob');
-            Route::get('/saved-jobs',  [UserJobController::class, "savedJobs"])->name('user.job.savedJobs');
-            Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
-            Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
-            Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
-            Route::get('/profile-category/{id}',  [UserJobController::class, "jobByProfileCategory"])->name('user.job.jobByProfileCategory');
-            Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
-        });
+        // Route::prefix('job')->group(function () {
+        Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
+        Route::get('/saved-jobs',  [UserJobController::class, "savedJobs"])->name('user.job.savedJobs');
+        Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
+        // Route::get('/search',  [UserJobController::class, "search"])->name('user.job.search');
+        // Route::post('/search',  [UserJobController::class, "doSearch"])->name('user.job.doSearch'); 
+        Route::get('/apply/{id}',  [UserJobController::class, "apply"])->name('user.job.apply');
+        Route::get('/unapply/{id}',  [UserJobController::class, "unapply"])->name('user.job.unapply');
+        // Route::get('/cancel-applied-job/{id}',  [UserJobController::class, "cancelAppliedJob"])->name('user.job.cancelAppliedJob');
+        Route::get('/save-job/{id}',  [UserJobController::class, "saveJob"])->name('user.job.saveJob');
+        Route::get('/unsave-job/{id}',  [UserJobController::class, "unsaveJob"])->name('user.job.unsaveJob');
+        Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
+        Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
+        Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
+        Route::get('/profile-category/{id}',  [UserJobController::class, "jobByProfileCategory"])->name('user.job.jobByProfileCategory');
+        Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
+        Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
+        // });
     });
 });
+
+// TODO:
+
+// When to send email
+
+// When user apply for job -> ['user', 'company']
+// When company post new job -> ['user'=> 'New job available', 'company'=> 'Your job is posted']
+// When admin post job -> ['admin']
+// When user save job -> ['user']
+// When user unsave job -> ['user']
+// When user cancel applied job -> ['user', 'company']
+// When user update profile -> ['user']
+// When user update profile image -> ['user']
+// When user update resume pdf -> ['user']
+// When company update profile -> ['company']
+// When company update profile image -> ['company']
+// When admin update profile -> ['admin']
+// When admin update profile image -> ['admin']
+// When admin verify company -> ['company']
+// When admin verify job -> ['company']
+// When admin verify user -> ['user']
+// When company post new job -> ['user'=> 'New job available', 'company'=> 'Your job is posted']
+
+
+
+// email verification annd forgot password

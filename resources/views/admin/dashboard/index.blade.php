@@ -50,6 +50,7 @@
                                                     method="POST">
                                                     @csrf
                                                     <button type="submit"
+                                                        onclick="return confirm('Are you sure you want to delete this profile image?')"
                                                         class="btn btn-danger btn-sm mt-2">Delete</button>
                                                 </form>
 

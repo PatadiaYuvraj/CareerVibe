@@ -87,13 +87,13 @@ class User extends Authenticatable
         return $this->belongsToMany(Job::class, 'saved_jobs')->withTimestamps();
     }
 
-    public function getIsAppliedAttribute()
-    {
-        return $this->applyByUsers()->where('user_id', auth()->user()->id)->exists();
-    }
+    // public function getIsAppliedAttribute()
+    // {
+    //     return $this->applyByUsers()->where('user_id', auth()->user()->id)->exists();
+    // }
 
-    public function getIsSavedAttribute()
-    {
-        return $this->savedByUsers()->where('user_id', auth()->user()->id)->exists();
-    }
+    // public function getIsSavedAttribute()
+    // {
+    //     return $this->savedByUsers()->where('user_id', auth()->user()->id)->exists();
+    // }
 }

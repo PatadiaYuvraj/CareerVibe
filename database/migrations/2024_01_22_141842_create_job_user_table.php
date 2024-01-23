@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('job_id')->constrained()->onDelete('cascade');
             $table->unique(['user_id', 'job_id']);
+            $table->index(['user_id', 'job_id']);
             $table->timestamps();
         });
     }

@@ -28,9 +28,13 @@
                 <div class="col-12">
                     <button class="btn btn-primary w-100" type="submit">Login</button>
                 </div>
-                <div class="col-12">
+                <div class="col-12 text-center">
                     <p class="small mb-0">Don't have account?
                         <a href="{{ route('company.register') }}">Create an account</a>
+                    </p>
+                    <p class="small mb-0">
+                        <a href="{{ route('user.register') }}">User</a> |
+                        <a href="{{ route('admin.register') }}">Admin</a>
                     </p>
                 </div>
             </form>

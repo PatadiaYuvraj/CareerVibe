@@ -46,7 +46,14 @@ class JobController extends Controller
                         'id',
                         'name'
                     ]);
-                }
+                },
+                'applyByUsers' => function ($query) {
+                    $query->select([
+                        'users.id',
+                        'name',
+                        'email'
+                    ]);
+                },
             ])
             ->select([
                 'id',
@@ -59,9 +66,10 @@ class JobController extends Controller
                 'is_active',
                 'is_featured'
             ])
+            // ->get()->toArray();
             ->paginate($this->paginate);
 
-
+        // dd($jobs);
 
         return view('company.job.index', compact('jobs'));
     }
@@ -100,14 +108,6 @@ class JobController extends Controller
             "WFO",
             "HYBRID"
         ];
-        // dd([
-        //     "company" => $company,
-        //     "sub_profiles" => $sub_profiles,
-        //     "locations" => $locations,
-        //     "qualifications" => $qualifications,
-        //     "work_types" => $work_types,
-
-        // ]);
         return view('company.job.create', compact('company', 'sub_profiles', 'locations', 'qualifications', 'work_types'));
     }
 

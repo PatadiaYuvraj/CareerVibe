@@ -14,14 +14,14 @@
                     <table class="table table-striped text-center">
                         <thead>
                             <tr>
-                                <th class="col-3">Job Profile</th>
-                                <th class="col-2">Job Vacancy</th>
-                                <th class="col-1">Salary</th>
-                                <th class="col-2">Work Type</th>
-                                <th class="col-1">Verified</th>
-                                <th class="col-1">Featured</th>
-                                <th class="col-1">Active</th>
-                                <th class="col-1">Action</th>
+                                <th>Job Profile</th>
+                                <th>Job Vacancy</th>
+                                <th>Salary</th>
+                                <th>Work Type</th>
+                                <th>Verified</th>
+                                <th>Featured</th>
+                                <th>Active</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -34,8 +34,13 @@
                                     </td>
                                     <td>{{ $job['vacancy'] }}</td>
                                     <td>
-                                        {{ $job['min_salary'] }} -
-                                        {{ $job['max_salary'] }}
+                                        @if ($job['min_salary'] >= 1000)
+                                            {{ $job['min_salary'] / 1000 }}k -
+                                            {{ $job['max_salary'] / 1000 }}k
+                                        @else
+                                            {{ $job['min_salary'] }} -
+                                            {{ $job['max_salary'] }}
+                                        @endif
                                     </td>
                                     <td>{{ $job['work_type'] }}</td>
                                     <td>

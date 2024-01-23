@@ -104,6 +104,18 @@
                     <span>Job</span>
                 </a>
             </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('user.job.appliedJobs') }}">
+                    <span>Applied Jobs</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('user.job.savedJobs') }}">
+                    <span>Saved Jobs</span>
+                </a>
+            </li>
         </ul>
 
     </aside>

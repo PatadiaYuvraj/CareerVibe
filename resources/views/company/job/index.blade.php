@@ -23,6 +23,7 @@
                                 <th>Verified</th>
                                 <th>Featured</th>
                                 <th>Active</th>
+                                <th>Applied</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -61,6 +62,9 @@
                                             class="badge bg-{{ $job['is_active'] ? 'success' : 'danger' }}">
                                             {{ $job['is_active'] ? 'Active' : 'Not Active' }}
                                         </a>
+                                    </td>
+                                    <td>
+                                        {{ count($job['applyByUsers']) }}
                                     </td>
                                     <td>
 

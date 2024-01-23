@@ -7,7 +7,7 @@
             <div class="card">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">
-                        Job
+                        Saved Job
                     </span>
                 </div>
                 <div class="card-body">
@@ -15,31 +15,25 @@
                         <thead>
                             <tr>
                                 <th>Job Profile</th>
-                                <th class="col-1">Vacancy</th>
+                                <th>Job Vacancy</th>
                                 <th>Salary</th>
-                                <th class="col-1">Type</th>
-                                <th class="col-1">Verified</th>
-                                <th class="col-1">Featured</th>
-                                <th class="col-1">Active</th>
-                                <th class="col-1">Applied</th>
-                                <th class="col-1">Saved</th>
+                                <th>Work Type</th>
+                                <th>Verified</th>
+                                <th>Featured</th>
+                                <th>Active</th>
+                                <th>Unsave</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($jobs as $job)
+                            @forelse ($jobs['saved_jobs'] as $job)
                                 <tr>
                                     <td>
-                                        {{ $job['subProfile']['name'] }}
+                                        {{ $job['sub_profile']['name'] }}
                                     </td>
                                     <td>{{ $job['vacancy'] }}</td>
                                     <td>
-                                        @if ($job['min_salary'] >= 1000)
-                                            {{ $job['min_salary'] / 1000 }}k -
-                                            {{ $job['max_salary'] / 1000 }}k
-                                        @else
-                                            {{ $job['min_salary'] }} -
-                                            {{ $job['max_salary'] }}
-                                        @endif
+                                        {{ $job['min_salary'] }} -
+                                        {{ $job['max_salary'] }}
                                     </td>
                                     <td>{{ $job['work_type'] }}</td>
                                     <td>
@@ -58,34 +52,22 @@
                                         </a>
                                     </td>
                                     <td>
-                                        @if ($job->is_applied)
-                                            <a href="{{ route('user.job.unapply', $job['id']) }}"
-                                                class="badge bg-success">Applied</a>
-                                        @else
-                                            <a href="{{ route('user.job.apply', $job['id']) }}" class="badge bg-info">Apply
-                                                Now</a>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($job->is_saved)
-                                            <a href="{{ route('user.job.unsaveJob', $job['id']) }}"
-                                                class="badge bg-success">Saved</a>
-                                        @else
-                                            <a href="{{ route('user.job.saveJob', $job['id']) }}"
-                                                class="badge bg-info">Save Now</a>
-                                        @endif
+                                        <a href="{{ route('user.job.unsaveJob', $job['id']) }}"
+                                            class="btn btn-danger btn-sm">
+                                            Unsave
+                                        </a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="20" class="text-center">No Job Found</td>
+                                    <td colspan="20" class="text-center">No Saved Job Found</td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
-                    <div class="justify-content-center">
+                    {{-- <div class="justify-content-center">
                         {{ $jobs->links('pagination::bootstrap-5') }}
-                    </div>
+                    </div> --}}
                 </div>
             </div>
         </section>
