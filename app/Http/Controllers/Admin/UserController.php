@@ -165,7 +165,11 @@ class UserController extends Controller
 
     public function index()
     {
-        $users = $this->user->paginate($this->paginate);
+        $users = $this->user
+            ->with(['followers', 'follows'])
+            ->get()->ToArray();
+        // $users = $this->user->paginate($this->paginate);
+        dd($users);
         return view('admin.user.index', compact('users'));
     }
 
@@ -520,5 +524,89 @@ class UserController extends Controller
             return redirect()->route('admin.user.index')->with("success", "User resume is deleted");
         }
         return redirect()->back()->with("warning", "User resume is not deleted");
+    }
+
+    // follow a user
+
+    public function follow($id)
+    {
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        $isFollowed = $user->followers()->attach(auth()->user()->id);
+        if ($isFollowed) {
+            return redirect()->back()->with("success", "User is followed");
+        }
+        return redirect()->back()->with("warning", "User is not followed");
+    }
+
+    // unfollow a user
+
+    public function unfollow($id)
+    {
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        $isUnfollowed = $user->followers()->detach(auth()->user()->id);
+        if ($isUnfollowed) {
+            return redirect()->back()->with("success", "User is unfollowed");
+        }
+        return redirect()->back()->with("warning", "User is not unfollowed");
+    }
+
+    // follow a company
+
+    // public function followCompany($id)
+    // {
+    //     $user = $this->user->find($id);
+    //     if (!$user) {
+    //         return redirect()->back()->with("warning", "Company is not found");
+    //     }
+    //     $isFollowed = $user->followers()->attach(auth()->user()->id);
+    //     if ($isFollowed) {
+    //         return redirect()->back()->with("success", "Company is followed");
+    //     }
+    //     return redirect()->back()->with("warning", "Company is not followed");
+    // }
+
+    // unfollow a company
+
+    // public function unfollowCompany($id)
+    // {
+    //     $user = $this->user->find($id);
+    //     if (!$user) {
+    //         return redirect()->back()->with("warning", "Company is not found");
+    //     }
+    //     $isUnfollowed = $user->followers()->detach(auth()->user()->id);
+    //     if ($isUnfollowed) {
+    //         return redirect()->back()->with("success", "Company is unfollowed");
+    //     }
+    //     return redirect()->back()->with("warning", "Company is not unfollowed");
+    // }
+
+    // following and followers
+
+    public function following($id)
+    {
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+
+        $following = $user->following()->paginate($this->paginate);
+        return view('admin.user.following', compact('following'));
+    }
+
+    public function followers($id)
+    {
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+
+        $followers = $user->followers()->paginate($this->paginate);
+        return view('admin.user.followers', compact('followers'));
     }
 }

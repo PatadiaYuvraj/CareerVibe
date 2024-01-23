@@ -77,6 +77,22 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function following()
+    {
+        return $this->morphedByMany(User::class, 'followable', 'follows');
+    }
+
+    public function followers()
+    {
+        return $this->morphToMany(User::class, 'followable', 'follows');
+    }
+
+    // followingCompanies
+    public function followingCompanies()
+    {
+        return $this->morphedByMany(Company::class, 'followable', 'follows');
+    }
+
     public function appliedJobs()
     {
         return $this->belongsToMany(Job::class, 'job_user')->withTimestamps();

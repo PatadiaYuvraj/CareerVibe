@@ -13,30 +13,6 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    /*
-    Route::prefix('/user')->group(function () {
-        Route::get('/login',  [UserUserController::class, "login"])->name('user.login');
-        Route::get('/register', [UserUserController::class, "register"])->name('user.register');
-        Route::post('/login', [UserUserController::class, "doLogin"])->name('user.doLogin');
-        Route::post('/register', [UserUserController::class, "doRegister"])->name('user.doRegister');
-    });
-    Route::group(['middleware' => "isUser"], function () {
-        Route::get('/edit-profile',  [UserUserController::class, "editProfile"])->name('user.editProfile');
-        Route::post('/update-profile',  [UserUserController::class, "updateProfile"])->name('user.updateProfile');
-        Route::get('/change-password',  [UserUserController::class, "changePassword"])->name('user.changePassword');
-        Route::post('/change-password',  [UserUserController::class, "doChangePassword"])->name('user.doChangePassword');
-        Route::get('/edit-profile-image',  [UserUserController::class, "editProfileImage"])->name('user.editProfileImage');
-        Route::post('/update-profile-image',  [UserUserController::class, "updateProfileImage"])->name('user.updateProfileImage');
-        Route::post('/delete-profile-image',  [UserUserController::class, "deleteProfileImage"])->name('user.deleteProfileImage');
-        Route::get('/edit-resume-pdf',  [UserUserController::class, "editResumePdf"])->name('user.editResumePdf');
-        Route::post('/update-resume-pdf',  [UserUserController::class, "updateResumePdf"])->name('user.updateResumePdf');
-        Route::get('/delete-resume-pdf',  [UserUserController::class, "deleteResumePdf"])->name('user.deleteResumePdf');
-        Route::get('/dashboard',  [UserUserController::class, "dashboard"])->name('user.dashboard');
-        Route::get('/logout',  [UserUserController::class, "logout"])->name('user.logout');
-        });
-    });
-    */
-
     private User $user;
     private string $user_type = 'user';
     private string $folder = 'career-vibe/users/profile_image';
@@ -545,5 +521,80 @@ class UserController extends Controller
         }
 
         return redirect()->back()->with("warning", "Resume Pdf Not Deleted");
+    }
+
+    // get all user other than logged in user
+    public function allUsers()
+    {
+        $current_user_id = auth()->guard('user')->user()->id;
+        $users = $this->user
+            ->where('id', '!=', $current_user_id)
+            ->with(['followers', 'following'])
+            ->paginate($this->paginate);
+        return view('user.dashboard.all-users', compact('users'));
+    }
+
+    public function follow($id)
+    {
+        $current_user_id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($id);
+
+        if (!$user || $current_user_id == $id) {
+            return redirect()->back()->with("warning", "Invalid operation");
+        }
+
+        $isAlreadyFollowed = $user->followers()->where('user_id', $current_user_id)->exists();
+
+        if ($isAlreadyFollowed) {
+            return redirect()->back()->with("warning", "User is already followed");
+        }
+
+        $user->followers()->syncWithoutDetaching($current_user_id);
+
+        return redirect()->back()->with("success", "User is followed");
+    }
+
+    public function unfollow($id)
+    {
+        $current_user_id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($id);
+
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+
+        $isAlreadyFollowed = $user->followers()->where('user_id', $current_user_id)->exists();
+
+        if (!$isAlreadyFollowed) {
+            return redirect()->back()->with("warning", "User is not followed");
+        }
+
+        $user->followers()->detach($current_user_id);
+
+        return redirect()->back()->with("success", "User is unfollowed");
+    }
+
+    // following and followers
+
+    public function following()
+    {
+        $id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        $users = $user->load(['following', 'followingCompanies'])->toArray();
+        return view('user.dashboard.following', compact('users'));
+    }
+    public function followers()
+    {
+        $id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+
+        $users = $user->followers()->paginate($this->paginate);
+        return view('user.dashboard.followers', compact('users'));
     }
 }

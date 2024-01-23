@@ -15,6 +15,7 @@ use App\Http\Controllers\Company\JobController as CompanyJobController;
 // User
 use App\Http\Controllers\User\JobController as UserJobController;
 use App\Http\Controllers\User\UserController as UserUserController;
+use App\Http\Controllers\User\CompanyController as UserCompanyController;
 use App\Http\Controllers\TestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -247,24 +248,39 @@ Route::group(['middleware' => "isUser"], function () {
         Route::post('/update-resume-pdf',  [UserUserController::class, "updateResumePdf"])->name('user.updateResumePdf');
         Route::get('/delete-resume-pdf',  [UserUserController::class, "deleteResumePdf"])->name('user.deleteResumePdf');
 
-        // Route::prefix('job')->group(function () {
-        Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
-        Route::get('/saved-jobs',  [UserJobController::class, "savedJobs"])->name('user.job.savedJobs');
-        Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
-        // Route::get('/search',  [UserJobController::class, "search"])->name('user.job.search');
-        // Route::post('/search',  [UserJobController::class, "doSearch"])->name('user.job.doSearch'); 
-        Route::get('/apply/{id}',  [UserJobController::class, "apply"])->name('user.job.apply');
-        Route::get('/unapply/{id}',  [UserJobController::class, "unapply"])->name('user.job.unapply');
-        // Route::get('/cancel-applied-job/{id}',  [UserJobController::class, "cancelAppliedJob"])->name('user.job.cancelAppliedJob');
-        Route::get('/save-job/{id}',  [UserJobController::class, "saveJob"])->name('user.job.saveJob');
-        Route::get('/unsave-job/{id}',  [UserJobController::class, "unsaveJob"])->name('user.job.unsaveJob');
-        Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
-        Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
-        Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
-        Route::get('/profile-category/{id}',  [UserJobController::class, "jobByProfileCategory"])->name('user.job.jobByProfileCategory');
-        Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
-        Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
-        // });
+        Route::get('/follow/{id}',  [UserUserController::class, "follow"])->name('user.follow');
+        Route::get('/unfollow/{id}',  [UserUserController::class, "unfollow"])->name('user.unfollow');
+        Route::get('/followers',  [UserUserController::class, "followers"])->name('user.followers');
+        Route::get('/following',  [UserUserController::class, "following"])->name('user.following');
+        Route::get('/all-users',  [UserUserController::class, "allUsers"])->name('user.allUsers');
+
+        Route::prefix('job')->group(function () {
+            Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
+            Route::get('/saved-jobs',  [UserJobController::class, "savedJobs"])->name('user.job.savedJobs');
+            Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
+            // Route::get('/search',  [UserJobController::class, "search"])->name('user.job.search');
+            // Route::post('/search',  [UserJobController::class, "doSearch"])->name('user.job.doSearch'); 
+            Route::get('/apply/{id}',  [UserJobController::class, "apply"])->name('user.job.apply');
+            Route::get('/unapply/{id}',  [UserJobController::class, "unapply"])->name('user.job.unapply');
+            // Route::get('/cancel-applied-job/{id}',  [UserJobController::class, "cancelAppliedJob"])->name('user.job.cancelAppliedJob');
+            Route::get('/save-job/{id}',  [UserJobController::class, "saveJob"])->name('user.job.saveJob');
+            Route::get('/unsave-job/{id}',  [UserJobController::class, "unsaveJob"])->name('user.job.unsaveJob');
+        });
+        //  all Company
+        Route::prefix('company')->group(function () {
+            Route::get('/',  [UserCompanyController::class, "allCompany"])->name('user.company.index');
+            Route::get('/{id}',  [UserCompanyController::class, "showCompany"])->name('user.company.show');
+            Route::get('/followers/{id}',  [UserCompanyController::class, "followers"])->name('user.company.followers');
+            http: //127.0.0.1:8000/user/unfollow/1
+            Route::get('/follow/{id}',  [UserCompanyController::class, "followCompany"])->name('user.company.follow');
+            Route::get('/unfollow/{id}',  [UserCompanyController::class, "unfollowCompany"])->name('user.company.unfollow');
+        });
+        // Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
+        // Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
+        // Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
+        // Route::get('/profile-category/{id}',  [UserJobController::class, "jobByProfileCategory"])->name('user.job.jobByProfileCategory');
+        // Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
+        // Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
     });
 });
 

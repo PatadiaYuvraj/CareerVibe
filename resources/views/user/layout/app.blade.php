@@ -100,6 +100,32 @@
             </li>
             <hr>
             <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('user.allUsers') }}">
+                    <span>
+                        All Users
+                    </span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('user.followers') }}">
+                    <span>Followers</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('user.following') }}">
+                    <span>Following</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('user.company.index') }}">
+                    <span>Company</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('user.job.index') }}">
                     <span>Job</span>
                 </a>

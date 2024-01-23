@@ -62,4 +62,9 @@ class Company extends Authenticatable
     {
         return $this->hasMany(Job::class, "company_id", "id");
     }
+
+    public function followers()
+    {
+        return $this->morphToMany(User::class, 'followable', 'follows');
+    }
 }
