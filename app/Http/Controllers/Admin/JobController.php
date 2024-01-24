@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendMailJob;
 use App\Models\Company;
 use App\Models\Job;
 use App\Models\Location;
@@ -481,10 +482,12 @@ class JobController extends Controller
         if ($is_verified == 1) {
             $job->is_verified = 0;
             $job->save();
+            // MAIL: send mail to company that job is unverified
             return redirect()->back()->with('success', 'Company is unverified');
         } else {
             $job->is_verified = 1;
             $job->save();
+            // MAIL: send mail to company that job is verified
             return redirect()->back()->with('success', 'Company is verified');
         }
     }

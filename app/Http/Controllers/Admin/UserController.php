@@ -166,10 +166,16 @@ class UserController extends Controller
     public function index()
     {
         $users = $this->user
-            ->with(['followers', 'follows'])
-            ->get()->ToArray();
-        // $users = $this->user->paginate($this->paginate);
-        dd($users);
+            ->withCount([
+                'followers',
+                'following',
+                'followingCompanies',
+                'savedJobs',
+                'appliedJobs'
+            ])
+            // ->get()->toArray();
+            ->paginate($this->paginate);
+        // dd($users);
         return view('admin.user.index', compact('users'));
     }
 
@@ -526,8 +532,6 @@ class UserController extends Controller
         return redirect()->back()->with("warning", "User resume is not deleted");
     }
 
-    // follow a user
-
     public function follow($id)
     {
         $user = $this->user->find($id);
@@ -540,8 +544,6 @@ class UserController extends Controller
         }
         return redirect()->back()->with("warning", "User is not followed");
     }
-
-    // unfollow a user
 
     public function unfollow($id)
     {

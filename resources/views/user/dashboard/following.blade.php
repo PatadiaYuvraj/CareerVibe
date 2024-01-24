@@ -16,45 +16,41 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Type</th>
                                 <th>Following</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @php
-                                $i = 1;
-                            @endphp
-                            @if ($users)
-                                @foreach ($users['following'] as $user)
-                                    <tr>
-                                        <td>{{ $i++ }}</td>
-                                        <td>{{ $user['name'] }}</td>
-                                        <td>{{ $user['email'] }}</td>
-                                        <td>
-                                            <a href="{{ route('user.unfollow', $user['id']) }}"
-                                                class="btn btn-success btn-sm">
-                                                Following
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                @foreach ($users['following_companies'] as $user)
-                                    <tr>
-                                        <td>{{ $i++ }}</td>
-                                        <td>{{ $user['name'] }}</td>
-                                        <td>{{ $user['email'] }}</td>
-                                        <td>
-                                            <a href="{{ route('user.company.unfollow', $user['id']) }}"
-                                                class="btn btn-success btn-sm">Following</a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @else
+                            @foreach ($users as $user)
                                 <tr>
-                                    <td colspan='6' class="text-center">No User Found</td>
+                                    <td scope="row">{{ $loop->iteration }}</td>
+                                    <td>{{ $user->followable->name }}</td>
+                                    <td>{{ $user->followable->email }}</td>
+                                    <td>
+                                        @if ($user->followable_type == 'App\Models\User')
+                                            <span class="badge bg-primary">User</span>
+                                        @endif
+                                        @if ($user->followable_type == 'App\Models\Company')
+                                            <span class="badge bg-success">Company</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($user->followable_type == 'App\Models\User')
+                                            <a href="{{ route('user.unfollow', $user->followable->id) }}"
+                                                class="btn btn-success btn-sm">Following</a>
+                                        @endif
+                                        @if ($user->followable_type == 'App\Models\Company')
+                                            <a href="{{ route('user.company.unfollow', $user->followable->id) }}"
+                                                class="btn btn-success btn-sm">Following</a>
+                                        @endif
+                                    </td>
                                 </tr>
-                            @endif
+                            @endforeach
                         </tbody>
                     </table>
+                    <div class="justify-content-center">
+                        {{ $users->links('pagination::bootstrap-5') }}
+                    </div>
                 </div>
             </div>
         </section>

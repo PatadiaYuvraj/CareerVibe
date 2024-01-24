@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\DeleteFromCloudinary;
+use App\Jobs\SendMailJob;
+use App\Mail\SendMail;
 use App\Models\Admin;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
@@ -124,6 +126,21 @@ class AdminController extends Controller
 
         $isCreated = $this->admin->create($data);
 
+        // MAIL: when admin is created then send mail to other admins that new admin is created
+
+        $admins = $this->admin->where('id', '!=', $isCreated->id)->get();
+        if (count($admins) > 0) {
+            foreach ($admins as $admin) {
+                $email = $admin->email;
+                $details = [
+                    'title' => 'New Admin Created',
+                    'body' => 'New Admin Created with name ' . $isCreated->name . ' and email ' . $isCreated->email,
+                ];
+                SendMailJob::dispatch($email, $details);
+            }
+        }
+
+
         if ($isCreated) {
             $isAuth = auth()->guard('admin')->attempt([
                 "email" => $request->get("email"),
@@ -172,12 +189,6 @@ class AdminController extends Controller
                         return $fail(__('The current password is incorrect.'));
                     }
                 },
-                function ($attribute, $value, $fail) use ($id) {
-                    $user = $this->admin->find($id);
-                    if (Hash::check($value, $user->password)) {
-                        return $fail(__('The new password must be different from current password.'));
-                    }
-                },
             ],
             "newPassword" => [
                 "required",
@@ -203,6 +214,15 @@ class AdminController extends Controller
         ];
 
         $isUpdated = $this->admin->where('id', $id)->update($data);
+
+        // MAIL: send mail to admin that password is changed
+        $admin = $this->admin->find($id);
+        $email = $admin->email;
+        $details = [
+            'title' => 'Password Changed',
+            'body' => 'This mail is to inform you that your password is changed',
+        ];
+        SendMailJob::dispatch($email, $details);
 
         if ($isUpdated) {
             return redirect()->route('admin.dashboard')->with("success", "Password Updated Successfully");

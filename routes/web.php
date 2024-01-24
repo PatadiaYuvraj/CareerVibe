@@ -253,6 +253,8 @@ Route::group(['middleware' => "isUser"], function () {
         Route::get('/followers',  [UserUserController::class, "followers"])->name('user.followers');
         Route::get('/following',  [UserUserController::class, "following"])->name('user.following');
         Route::get('/all-users',  [UserUserController::class, "allUsers"])->name('user.allUsers');
+        // user.removeFollower
+        Route::get('/remove-follower/{id}',  [UserUserController::class, "removeFollower"])->name('user.removeFollower');
 
         Route::prefix('job')->group(function () {
             Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');

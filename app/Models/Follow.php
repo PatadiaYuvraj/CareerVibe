@@ -12,4 +12,19 @@ class Follow extends Model
     protected $table = 'follows';
 
     protected $timestamp = true;
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function followable()
+    {
+        return $this->morphTo();
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'followable_id');
+    }
 }

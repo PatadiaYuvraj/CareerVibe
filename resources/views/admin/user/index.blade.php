@@ -11,21 +11,23 @@
                     <a href="{{ route('admin.user.create') }}" class="float-end btn btn-sm btn-primary">Add User</a>
                 </div>
                 <div class="card-body">
-                    <table class="table table-striped">
+                    <table class="table text-center table-striped">
                         <thead>
                             <tr>
-                                <th>#</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Profile Image</th>
                                 <th>Resume</th>
+                                <th>Applied Job</th>
+                                <th>Saved Job</th>
+                                <th>Followers</th>
+                                <th>Following</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($users as $user)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
                                     <td>{{ $user['name'] }}</td>
                                     <td>{{ $user['email'] }}</td>
                                     <td>
@@ -62,6 +64,10 @@
                                             @endif
                                         </div>
                                     </td>
+                                    <td>{{ $user->applied_jobs_count }}</td>
+                                    <td>{{ $user->saved_jobs_count }}</td>
+                                    <td>{{ $user->followers_count }}</td>
+                                    <td>{{ $user->following_count + $user->following_companies_count }}</td>
                                     <td>
                                         <div class="btn-group">
                                             <form action="{{ route('admin.user.edit', $user['id']) }}" method="POST">

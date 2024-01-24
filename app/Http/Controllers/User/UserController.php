@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Jobs\DeleteFromCloudinary;
+use App\Models\Follow;
 use App\Models\User;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Support\Facades\Hash;
@@ -523,7 +524,6 @@ class UserController extends Controller
         return redirect()->back()->with("warning", "Resume Pdf Not Deleted");
     }
 
-    // get all user other than logged in user
     public function allUsers()
     {
         $current_user_id = auth()->guard('user')->user()->id;
@@ -574,18 +574,33 @@ class UserController extends Controller
         return redirect()->back()->with("success", "User is unfollowed");
     }
 
-    // following and followers
-
-    public function following()
+    public function removeFollower($id)
     {
-        $id = auth()->guard('user')->user()->id;
+        $current_user_id = auth()->guard('user')->user()->id;
+        $current_user = $this->user->find($current_user_id);
         $user = $this->user->find($id);
         if (!$user) {
             return redirect()->back()->with("warning", "User is not found");
         }
-        $users = $user->load(['following', 'followingCompanies'])->toArray();
+        $isAlreadyFollowed = $current_user->followers()->where('user_id', $id)->exists();
+        if (!$isAlreadyFollowed) {
+            return redirect()->back()->with("warning", "User is not followed");
+        }
+        $current_user->followers()->detach($user->id);
+        return redirect()->back()->with("success", "User is unfollowed");
+    }
+
+    public function following()
+    {
+        $user_id = auth()->guard('user')->user()->id;
+        $users = Follow::where('user_id', $user_id)
+            ->with('followable')
+            // ->get()->toArray();
+            ->paginate($this->paginate);
+        // dd($users[0]);
         return view('user.dashboard.following', compact('users'));
     }
+
     public function followers()
     {
         $id = auth()->guard('user')->user()->id;

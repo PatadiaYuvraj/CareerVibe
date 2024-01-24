@@ -59,20 +59,25 @@
                                     </td>
                                     <td>
                                         @if ($job->is_applied)
-                                            <a href="{{ route('user.job.unapply', $job['id']) }}"
-                                                class="badge bg-success">Applied</a>
+                                            <a href="{{ route('user.job.unapply', $job['id']) }}" class="badge bg-success">
+                                                Applied
+                                            </a>
                                         @else
-                                            <a href="{{ route('user.job.apply', $job['id']) }}" class="badge bg-info">Apply
-                                                Now</a>
+                                            <a href="{{ route('user.job.apply', $job['id']) }}" class="badge bg-info">
+                                                Apply Now
+                                            </a>
                                         @endif
                                     </td>
                                     <td>
                                         @if ($job->is_saved)
                                             <a href="{{ route('user.job.unsaveJob', $job['id']) }}"
-                                                class="badge bg-success">Saved</a>
+                                                class="badge bg-success">
+                                                Saved
+                                            </a>
                                         @else
-                                            <a href="{{ route('user.job.saveJob', $job['id']) }}"
-                                                class="badge bg-info">Save Now</a>
+                                            <a href="{{ route('user.job.saveJob', $job['id']) }}" class="badge bg-info">
+                                                Save Now
+                                            </a>
                                         @endif
                                     </td>
                                 </tr>

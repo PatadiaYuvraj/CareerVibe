@@ -58,20 +58,10 @@ class JobController extends Controller
     public function apply($job_id)
     {
         $user_id = auth()->guard('user')->user()->id;
-        $job = Job::find($job_id)
-            ->with([
-                'company' => function ($query) {
-                    $query->select([
-                        'id',
-                        'name',
-                        'email',
-                    ]);
-                },
-                'subProfile'
-            ])
-            ->first();
+        $job = Job::find($job_id);
         // TODO: Send email to company to notify that user has applied for job
         // TODO: Send email to user to notify that user has applied for job
+        // 
 
 
         $check = $job->applyByUsers()->where('user_id', $user_id)->exists();

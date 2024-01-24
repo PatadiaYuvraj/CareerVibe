@@ -16,6 +16,7 @@
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Remove Follower</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -24,6 +25,10 @@
                                     <td>{{ $loop->iteration }}</td>
                                     <td>{{ $user['name'] }}</td>
                                     <td>{{ $user['email'] }}</td>
+                                    <td>
+                                        <a href="{{ route('user.removeFollower', $user['id']) }}"
+                                            class="btn btn-danger btn-sm">Remove Follower</a>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>

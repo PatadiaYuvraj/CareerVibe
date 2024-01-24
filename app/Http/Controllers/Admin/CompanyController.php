@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Jobs\DeleteFromCloudinary;
+use App\Jobs\SendMailJob;
 use App\Models\Company;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
@@ -141,6 +142,7 @@ class CompanyController extends Controller
         $isCreated = $this->company->create($data);
 
         if ($isCreated) {
+            // MAIL: when company is created send mail to company and admin
             return redirect()->route('admin.company.index')->with('success', 'Company is created');
         }
 
@@ -307,19 +309,32 @@ class CompanyController extends Controller
 
     public function toggleVerified($id, $is_verified)
     {
-        // $auth = new AuthService();
-        // if (!$auth->isAdmin()) {
-        //     return redirect()->back()->with("warning", "You are not authorized");
-        // }
+        if (!auth()->guard('admin')->check()) {
+            return redirect()->back()->with("warning", "You are not authorized");
+        }
         $company = $this->company->find($id);
         if (!$company) {
             return redirect()->back()->with("warning", "Company is not found");
         }
         if ($is_verified == 1) {
             $company->is_verified = 0;
+            // MAIL: send mail to company when admin unverify company
+            $email = $company->email;
+            $details = [
+                'title' => 'Company is unverified',
+                'body' => 'Your company is unverified by admin, now you are not eligible to post jobs',
+            ];
+            SendMailJob::dispatch($email, $details);
             $company->save();
             return redirect()->back()->with('success', 'Company is unverified');
         } else {
+            // MAIL: send mail to company when admin verify company
+            $email = $company->email;
+            $details = [
+                'title' => 'Company is verified',
+                'body' => 'Your company is verified by admin, now you are eligible to post jobs',
+            ];
+            SendMailJob::dispatch($email, $details);
             $company->is_verified = 1;
             $company->save();
             return redirect()->back()->with('success', 'Company is verified');

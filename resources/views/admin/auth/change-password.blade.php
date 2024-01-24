@@ -44,8 +44,8 @@
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
                                                 <div class="input-group">
-                                                    <input type="password" class="form-control" id="oldPassword"
-                                                        name="oldPassword" placeholder="Old Password" value="">
+                                                    <input type="password" class="form-control" id="currentPassword"
+                                                        name="currentPassword" placeholder="Old Password" value="">
                                                     <span id="toggleOldPassword"
                                                         class="bi-eye-slash input-group-text"></span>
                                                 </div>
