@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Jobs\DeleteFromCloudinary;
 use App\Models\Follow;
 use App\Models\User;
+use App\Services\SendMailService;
+use App\Services\SendNotificationService;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -15,13 +17,18 @@ use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
     private User $user;
+    private SendNotificationService $sendNotificationService;
+    private SendMailService $sendMailService;
     private string $user_type = 'user';
     private string $folder = 'career-vibe/users/profile_image';
     private int $paginate;
 
-    public function __construct(User $user)
+    public function __construct(User $user, SendNotificationService $sendNotificationService, SendMailService $sendMailService)
     {
+
         $this->user = $user;
+        $this->sendNotificationService = $sendNotificationService;
+        $this->sendMailService = $sendMailService;
         $this->paginate = env('PAGINATEVALUE');
     }
 
@@ -171,12 +178,6 @@ class UserController extends Controller
                         return $fail(__('The current password is incorrect.'));
                     }
                 },
-                function ($attribute, $value, $fail) use ($id) {
-                    $user = $this->user->find($id);
-                    if (Hash::check($value, $user->password)) {
-                        return $fail(__('The new password must be different from current password.'));
-                    }
-                },
             ],
             "newPassword" => [
                 "required",
@@ -202,6 +203,14 @@ class UserController extends Controller
         ];
 
         $isUpdated = $this->user->where('id', $id)->update($data);
+
+        $user = $this->user->find(auth()->guard('user')->user()->id);
+        $details = [
+            'title' => 'Password Changed',
+            'body' => 'Your password is changed'
+        ];
+        $this->sendNotificationService->sendNotification($user, $details['body']);
+        $this->sendMailService->sendMail($user->email, $details);
 
         if ($isUpdated) {
             return redirect()->route('user.dashboard')->with("success", "Password Updated Successfully");
@@ -357,6 +366,14 @@ class UserController extends Controller
         $isUpdated = $this->user->where('id', $id)->update($data);
 
         if ($isUpdated) {
+
+            $user = $this->user->find(auth()->guard('user')->user()->id);
+            $details = [
+                'title' => 'Profile Updated',
+                'body' => 'Your profile is updated'
+            ];
+            $this->sendNotificationService->sendNotification($user, $details['body']);
+            $this->sendMailService->sendMail($user->email, $details);
             return redirect()->route('user.dashboard')->with("success", "Profile Updated Successfully");
         }
 
@@ -415,6 +432,15 @@ class UserController extends Controller
 
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
+
+            $user = $this->user->find(auth()->guard('user')->user()->id);
+            $details = [
+                'title' => 'Profile Image Updated',
+                'body' => 'Your profile image is updated'
+            ];
+            $this->sendNotificationService->sendNotification($user, $details['body']);
+            $this->sendMailService->sendMail($user->email, $details);
+
             return redirect()->route('user.dashboard')->with("success", "Profile Image Updated Successfully");
         }
 
@@ -448,6 +474,15 @@ class UserController extends Controller
         $isUpdated = $this->user->where('id', $id)->update($data);
 
         if ($isUpdated) {
+
+            $user = $this->user->find(auth()->guard('user')->user()->id);
+            $details = [
+                'title' => 'Profile Image Deleted',
+                'body' => 'Your profile image is deleted'
+            ];
+            $this->sendNotificationService->sendNotification($user, $details['body']);
+            $this->sendMailService->sendMail($user->email, $details);
+
             return redirect()->route('user.dashboard')->with("success", "Profile Image Deleted Successfully");
         }
 
@@ -487,6 +522,16 @@ class UserController extends Controller
         ];
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
+
+            $user = $this->user->find(auth()->guard('user')->user()->id);
+            $details = [
+                'title' => 'Resume Updated',
+                'body' => 'Your resume is updated'
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($user, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($user->email, $details);
             return redirect()->route('user.dashboard')->with("success", "User resume is updated");
         }
         return redirect()->back()->with("warning", "User resume is not updated");
@@ -518,6 +563,13 @@ class UserController extends Controller
         $isUpdated = $this->user->where('id', $id)->update($data);
 
         if ($isUpdated) {
+
+            $user = $this->user->find(auth()->guard('user')->user()->id);
+            $details = [
+                'title' => 'Profile Image Deleted',
+                'body' => 'Your profile image is deleted'
+            ];
+
             return redirect()->route('user.dashboard')->with("success", "Resume Pdf Deleted Successfully");
         }
 
@@ -550,6 +602,9 @@ class UserController extends Controller
         }
 
         $user->followers()->syncWithoutDetaching($current_user_id);
+        $msg = auth()->guard('user')->user()->name . " is started following you";
+        // UNCOMMENT: To send notification
+        $this->sendNotificationService->sendNotification($user, $msg);
 
         return redirect()->back()->with("success", "User is followed");
     }
@@ -611,5 +666,74 @@ class UserController extends Controller
 
         $users = $user->followers()->paginate($this->paginate);
         return view('user.dashboard.followers', compact('users'));
+    }
+
+    public function notifications()
+    {
+        $user_id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($user_id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        $notifications = $user->notifications()->paginate($this->paginate);
+
+        $notifications = $notifications->unique('data');
+
+        return view('user.dashboard.notifications', compact('notifications'));
+    }
+
+    public function markAsRead($id)
+    {
+        $user_id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($user_id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        $user->notifications()->where('id', $id)->update(['read_at' => now()]);
+        return redirect()->back()->with("success", "Notification is marked as read");
+    }
+
+    public function markAllAsRead()
+    {
+        $user_id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($user_id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        $user->unreadNotifications->markAsRead();
+        return redirect()->back()->with("success", "All notifications are marked as read");
+    }
+
+    public function markAsUnread($id)
+    {
+        $user_id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($user_id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        $user->notifications()->where('id', $id)->update(['read_at' => null]);
+        return redirect()->back()->with("success", "Notification is marked as unread");
+    }
+
+    public function deleteNotification($id)
+    {
+        $user_id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($user_id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        $user->notifications()->where('id', $id)->delete();
+        return redirect()->back()->with("success", "Notification is deleted");
+    }
+
+    public function deleteAllNotification()
+    {
+        $user_id = auth()->guard('user')->user()->id;
+        $user = $this->user->find($user_id);
+        if (!$user) {
+            return redirect()->back()->with("warning", "User is not found");
+        }
+        $user->notifications()->delete();
+        return redirect()->back()->with("success", "All notifications are deleted");
     }
 }

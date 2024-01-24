@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Exceptions\CustomException;
 use App\Http\Controllers\Controller;
 use App\Jobs\DeleteFromCloudinary;
-use App\Jobs\SendMailJob;
 use App\Models\Company;
+use App\Services\SendMailService;
+use App\Services\SendNotificationService;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Throwable;
 
 class CompanyController extends Controller
 {
-
+    private SendNotificationService $sendNotificationService;
+    private SendMailService $sendMailService;
     private Company $company;
     private int $paginate;
 
-    public function __construct(Company $company)
+    public function __construct(Company $company, SendNotificationService $sendNotificationService, SendMailService $sendMailService)
     {
         $this->paginate = env('PAGINATEVALUE');
         $this->company = $company;
+        $this->sendNotificationService = $sendNotificationService;
+        $this->sendMailService = $sendMailService;
     }
 
     public function create()
@@ -318,25 +320,28 @@ class CompanyController extends Controller
         }
         if ($is_verified == 1) {
             $company->is_verified = 0;
-            // MAIL: send mail to company when admin unverify company
-            $email = $company->email;
+            $company->save();
+
             $details = [
                 'title' => 'Company is unverified',
-                'body' => 'Your company is unverified by admin, now you are not eligible to post jobs',
+                'body' => "Your company is unverified by admin, please contact admin"
             ];
-            SendMailJob::dispatch($email, $details);
-            $company->save();
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($company, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($company->email, $details);
             return redirect()->back()->with('success', 'Company is unverified');
         } else {
-            // MAIL: send mail to company when admin verify company
-            $email = $company->email;
-            $details = [
-                'title' => 'Company is verified',
-                'body' => 'Your company is verified by admin, now you are eligible to post jobs',
-            ];
-            SendMailJob::dispatch($email, $details);
             $company->is_verified = 1;
             $company->save();
+            $details = [
+                'title' => 'Company is verified',
+                'body' => "Your company is verified by admin, now you can post jobs"
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($company, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($company->email, $details);
             return redirect()->back()->with('success', 'Company is verified');
         }
     }

@@ -170,10 +170,23 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::post('/update/{id}',  [QualificationController::class, "update"])->name('admin.qualification.update');
             Route::get('/delete/{id}',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
         });
+
+        // notifications
+        Route::prefix('notifications')->group(function () {
+            Route::get('/',  [AdminController::class, "notifications"])->name('admin.notifications');
+            Route::get('/mark-all-as-read',  [AdminController::class, "markAllAsRead"])->name('admin.notification.readAll');
+            Route::get('/mark-as-read/{id}',  [AdminController::class, "markAsRead"])->name('admin.notification.read');
+            Route::get('/mark-as-unread/{id}',  [AdminController::class, "markAsUnread"])->name('admin.notification.unread');
+            Route::get('/delete-notification/{id}',  [AdminController::class, "deleteNotification"])->name('admin.notification.delete');
+            Route::get('/delete-all-notification',  [AdminController::class, "deleteAllNotification"])->name('admin.notification.deleteAll');
+        });
     });
 });
 
 Route::group(['middleware' => "isCompany"], function () {
+
+
+
 
     Route::prefix('/company')->group(function () {
         Route::get('/edit-profile',  [CompanyCompanyController::class, "editProfile"])->name('company.editProfile');
@@ -185,6 +198,16 @@ Route::group(['middleware' => "isCompany"], function () {
         Route::post('/delete-profile-image',  [CompanyCompanyController::class, "deleteProfileImage"])->name('company.deleteProfileImage');
         Route::get('/dashboard',  [CompanyCompanyController::class, "dashboard"])->name('company.dashboard');
         Route::get('/logout',  [CompanyCompanyController::class, "logout"])->name('company.logout');
+
+        // notifications
+        Route::prefix('notifications')->group(function () {
+            Route::get('/',  [CompanyCompanyController::class, "notifications"])->name('company.notifications');
+            Route::get('/mark-all-as-read',  [CompanyCompanyController::class, "markAllAsRead"])->name('company.notification.readAll');
+            Route::get('/mark-as-read/{id}',  [CompanyCompanyController::class, "markAsRead"])->name('company.notification.read');
+            Route::get('/mark-as-unread/{id}',  [CompanyCompanyController::class, "markAsUnread"])->name('company.notification.unread');
+            Route::get('/delete-notification/{id}',  [CompanyCompanyController::class, "deleteNotification"])->name('company.notification.delete');
+            Route::get('/delete-all-notification',  [CompanyCompanyController::class, "deleteAllNotification"])->name('company.notification.deleteAll');
+        });
 
         Route::prefix('job')->group(function () {
             Route::get('/create',  [CompanyJobController::class, "create"])->name('company.job.create');
@@ -248,12 +271,21 @@ Route::group(['middleware' => "isUser"], function () {
         Route::post('/update-resume-pdf',  [UserUserController::class, "updateResumePdf"])->name('user.updateResumePdf');
         Route::get('/delete-resume-pdf',  [UserUserController::class, "deleteResumePdf"])->name('user.deleteResumePdf');
 
+        // notification
+        Route::prefix('notifications')->group(function () {
+            Route::get('/',  [UserUserController::class, "notifications"])->name('user.notifications');
+            Route::get('/mark-all-as-read',  [UserUserController::class, "markAllAsRead"])->name('user.notification.readAll');
+            Route::get('/mark-as-read/{id}',  [UserUserController::class, "markAsRead"])->name('user.notification.read');
+            Route::get('/mark-as-unread/{id}',  [UserUserController::class, "markAsUnread"])->name('user.notification.unread');
+            Route::get('/delete-notification/{id}',  [UserUserController::class, "deleteNotification"])->name('user.notification.delete');
+            Route::get('/delete-all-notification',  [UserUserController::class, "deleteAllNotification"])->name('user.notification.deleteAll');
+        });
+
         Route::get('/follow/{id}',  [UserUserController::class, "follow"])->name('user.follow');
         Route::get('/unfollow/{id}',  [UserUserController::class, "unfollow"])->name('user.unfollow');
         Route::get('/followers',  [UserUserController::class, "followers"])->name('user.followers');
         Route::get('/following',  [UserUserController::class, "following"])->name('user.following');
         Route::get('/all-users',  [UserUserController::class, "allUsers"])->name('user.allUsers');
-        // user.removeFollower
         Route::get('/remove-follower/{id}',  [UserUserController::class, "removeFollower"])->name('user.removeFollower');
 
         Route::prefix('job')->group(function () {

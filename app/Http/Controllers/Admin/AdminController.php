@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\DeleteFromCloudinary;
-use App\Jobs\SendMailJob;
-use App\Mail\SendMail;
 use App\Models\Admin;
+use App\Services\SendMailService;
+use App\Services\SendNotificationService;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -19,10 +19,15 @@ class AdminController extends Controller
     private string $user_type = 'admin';
     private string $folder = 'career-vibe/admins/profile_image';
     private int $paginate;
-    public function __construct(Admin $admin)
+    private SendMailService $sendMailService;
+    private SendNotificationService $sendNotificationService;
+
+    public function __construct(Admin $admin, SendMailService $sendMailService, SendNotificationService $sendNotificationService)
     {
         $this->admin = $admin;
         $this->paginate = env('PAGINATEVALUE');
+        $this->sendMailService = $sendMailService;
+        $this->sendNotificationService = $sendNotificationService;
     }
 
     public function dashboard()
@@ -130,13 +135,16 @@ class AdminController extends Controller
 
         $admins = $this->admin->where('id', '!=', $isCreated->id)->get();
         if (count($admins) > 0) {
+            $details = [
+                'title' => 'New Admin Created',
+                'body' => 'New Admin Created with name ' . $isCreated->name . ' and email ' . $isCreated->email,
+            ];
             foreach ($admins as $admin) {
                 $email = $admin->email;
-                $details = [
-                    'title' => 'New Admin Created',
-                    'body' => 'New Admin Created with name ' . $isCreated->name . ' and email ' . $isCreated->email,
-                ];
-                SendMailJob::dispatch($email, $details);
+                // UNCOMMENT: To send notification
+                $this->sendNotificationService->sendNotification($admin, $details['body']);
+                // UNCOMMENT: To send mail
+                $this->sendMailService->sendMail($email, $details);
             }
         }
 
@@ -215,14 +223,16 @@ class AdminController extends Controller
 
         $isUpdated = $this->admin->where('id', $id)->update($data);
 
-        // MAIL: send mail to admin that password is changed
-        $admin = $this->admin->find($id);
-        $email = $admin->email;
+        $admin = $this->admin->find(auth()->guard('admin')->user()->id);
         $details = [
             'title' => 'Password Changed',
-            'body' => 'This mail is to inform you that your password is changed',
+            'body' => "Your password has been changed successfully"
         ];
-        SendMailJob::dispatch($email, $details);
+        // UNCOMMENT: To send notification
+        $this->sendNotificationService->sendNotification($admin, $details['body']);
+        // UNCOMMENT: To send mail
+        $this->sendMailService->sendMail($admin->email, $details);
+
 
         if ($isUpdated) {
             return redirect()->route('admin.dashboard')->with("success", "Password Updated Successfully");
@@ -276,6 +286,17 @@ class AdminController extends Controller
         $isUpdated = $this->admin->where('id', $id)->update($data);
 
         if ($isUpdated) {
+            $admin = $this->admin->find(auth()->guard('admin')->user()->id);
+
+            $details = [
+                'title' => 'Profile Updated',
+                'body' => "Your profile has been updated successfully"
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($admin, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($admin->email, $details);
+
             return redirect()->route('admin.dashboard')->with("success", "Profile Updated Successfully");
         }
 
@@ -334,6 +355,15 @@ class AdminController extends Controller
 
         $isUpdated = $this->admin->where('id', $id)->update($data);
         if ($isUpdated) {
+            $admin = $this->admin->find(auth()->guard('admin')->user()->id);
+            $details = [
+                'title' => 'Profile Image Updated',
+                'body' => "Your profile image has been updated successfully"
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($admin, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($admin->email, $details);
             return redirect()->route('admin.dashboard')->with("success", "Profile Image Updated Successfully");
         }
 
@@ -367,6 +397,16 @@ class AdminController extends Controller
         $isUpdated = $this->admin->where('id', $id)->update($data);
 
         if ($isUpdated) {
+            $admin = $this->admin->find(auth()->guard('admin')->user()->id);
+            $details = [
+                'title' => 'Profile Image Deleted',
+                'body' => "Your profile image has been deleted successfully"
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($admin, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($admin->email, $details);
+
             return redirect()->route('admin.dashboard')->with("success", "Profile Image Deleted Successfully");
         }
 
@@ -454,5 +494,73 @@ class AdminController extends Controller
     //     return redirect()->back()->with("warning", "Password Not Reset");
     // }
 
+    // notificatons
+    public function notifications()
+    {
+        $admin_id = auth()->guard('admin')->user()->id;
+        $admin = $this->admin->find($admin_id);
+        if (!$admin) {
+            return redirect()->back()->with("warning", "Admin is not found");
+        }
+        $notifications = $admin->notifications()->paginate($this->paginate);
 
+        $notifications = $notifications->unique('data');
+
+        return view('admin.dashboard.notifications', compact('notifications'));
+    }
+
+    public function markAsRead($id)
+    {
+        $admin_id = auth()->guard('admin')->user()->id;
+        $admin = $this->admin->find($admin_id);
+        if (!$admin) {
+            return redirect()->back()->with("warning", "Admin is not found");
+        }
+        $admin->notifications()->where('id', $id)->update(['read_at' => now()]);
+        return redirect()->back()->with("success", "Notification is marked as read");
+    }
+
+    public function markAllAsRead()
+    {
+        $admin_id = auth()->guard('admin')->user()->id;
+        $admin = $this->admin->find($admin_id);
+        if (!$admin) {
+            return redirect()->back()->with("warning", "Admin is not found");
+        }
+        $admin->unreadNotifications->markAsRead();
+        return redirect()->back()->with("success", "All notifications are marked as read");
+    }
+
+    public function markAsUnread($id)
+    {
+        $admin_id = auth()->guard('admin')->user()->id;
+        $admin = $this->admin->find($admin_id);
+        if (!$admin) {
+            return redirect()->back()->with("warning", "Admin is not found");
+        }
+        $admin->notifications()->where('id', $id)->update(['read_at' => null]);
+        return redirect()->back()->with("success", "Notification is marked as unread");
+    }
+
+    public function deleteNotification($id)
+    {
+        $admin_id = auth()->guard('admin')->user()->id;
+        $admin = $this->admin->find($admin_id);
+        if (!$admin) {
+            return redirect()->back()->with("warning", "Admin is not found");
+        }
+        $admin->notifications()->where('id', $id)->delete();
+        return redirect()->back()->with("success", "Notification is deleted");
+    }
+
+    public function deleteAllNotification()
+    {
+        $admin_id = auth()->guard('admin')->user()->id;
+        $admin = $this->admin->find($admin_id);
+        if (!$admin) {
+            return redirect()->back()->with("warning", "Admin is not found");
+        }
+        $admin->notifications()->delete();
+        return redirect()->back()->with("success", "All notifications are deleted");
+    }
 }

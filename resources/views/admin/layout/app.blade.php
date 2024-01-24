@@ -141,6 +141,14 @@
                     <span>Qualification</span>
                 </a>
             </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link  collapsed   " href="{{ route('admin.notifications') }}">
+                    <span>
+                        Notifications
+                    </span>
+                </a>
+            </li>
         </ul>
 
     </aside>

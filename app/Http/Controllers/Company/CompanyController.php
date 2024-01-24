@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\DeleteFromCloudinary;
+use App\Jobs\SendMailJob;
+use App\Models\Admin;
 use App\Models\Company;
+use App\Services\SendMailService;
+use App\Services\SendNotificationService;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,13 +18,14 @@ class CompanyController extends Controller
 {
     private string $folder = 'career-vibe/companies/profile_image';
 
+    private SendNotificationService $sendNotificationService;
+    private SendMailService $sendMailService;
     private Company $company;
     private $current_company;
     private int $paginate;
 
-    public function __construct(Company $company)
+    public function __construct(Company $company, SendNotificationService $sendNotificationService, SendMailService $sendMailService)
     {
-        parent::__construct();
         $this->middleware(function ($request, $next) {
             if (auth()->guard('company')->check()) {
                 $this->current_company = auth()->guard('company')->user();
@@ -29,6 +34,8 @@ class CompanyController extends Controller
         });
         $this->company = $company;
         $this->paginate = env('PAGINATEVALUE');
+        $this->sendNotificationService = $sendNotificationService;
+        $this->sendMailService = $sendMailService;
     }
 
     public function login()
@@ -111,6 +118,32 @@ class CompanyController extends Controller
         $isCreated = $this->company->create($data);
 
         if ($isCreated) {
+
+            $company = $this->company->find($isCreated->id);
+            $companyName = $isCreated->name;
+
+            $details = [
+                'title' => 'Account Created',
+                'body' => "Your account is created successfully."
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($company, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($company->email, $details);
+
+
+            $admins = Admin::all();
+            $details = [
+                'title' => 'New Company Registered',
+                'body' => "New company $companyName is registered. Please verify it."
+            ];
+            foreach ($admins as $admin) {
+                // UNCOMMENT: To send notification
+                $this->sendNotificationService->sendNotification($admin, $details['body']);
+                // UNCOMMENT: To send mail
+                $this->sendMailService->sendMail($admin->email, $details);
+            }
+
             $isAuth = auth()->guard('company')->attempt([
                 "email" => $request->get("email"),
                 "password" => $request->get("password")
@@ -189,6 +222,15 @@ class CompanyController extends Controller
         $isUpdated = $this->company->where('id', $id)->update($data);
 
         if ($isUpdated) {
+            $company = $this->company->find(auth()->guard('company')->user()->id);
+            $details = [
+                'title' => 'Password Changed',
+                'body' => "Your password has been changed successfully"
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($company, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($company->email, $details);
             return redirect()->route('company.dashboard')->with("success", "Password Updated Successfully");
         }
 
@@ -311,6 +353,15 @@ class CompanyController extends Controller
         $isUpdated = $this->company->where('id', $id)->update($data);
 
         if ($isUpdated) {
+            $company = $this->company->find(auth()->guard('company')->user()->id);
+            $details = [
+                'title' => 'Profile Updated',
+                'body' => "Your profile has been updated successfully"
+            ];
+            $this->sendNotificationService->sendNotification($company, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($company->email, $details);
+
             return redirect()->route('company.dashboard')->with("success", "Profile Updated Successfully");
         }
 
@@ -368,6 +419,15 @@ class CompanyController extends Controller
         $isUpdated = $this->company->where('id', $id)->update($data);
         if ($isUpdated) {
 
+            $company = $this->company->find(auth()->guard('company')->user()->id);
+            $details = [
+                'title' => 'Profile Image Updated',
+                'body' => "Your profile image has been updated successfully"
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($company, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($company->email, $details);
 
             return redirect()->route('company.dashboard')->with("success", "Profile Image Updated Successfully");
         }
@@ -398,9 +458,87 @@ class CompanyController extends Controller
         $isUpdated = $this->company->where('id', $id)->update($data);
 
         if ($isUpdated) {
+            $company = $this->company->find(auth()->guard('company')->user()->id);
+            $details = [
+                'title' => 'Profile Image Deleted',
+                'body' => "Your profile image has been deleted successfully"
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($company, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($company->email, $details);
             return redirect()->route('company.dashboard')->with("success", "Profile Image Deleted Successfully");
         }
 
         return redirect()->back()->with("warning", "Profile Image Not Deleted");
+    }
+
+    public function notifications()
+    {
+        $company_id = auth()->guard('company')->user()->id;
+        $company = $this->company->find($company_id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $notifications = $company->notifications()->paginate($this->paginate);
+
+        $notifications = $notifications->unique('data');
+
+        return view('company.dashboard.notifications', compact('notifications'));
+    }
+
+    public function markAsRead($id)
+    {
+        $company_id = auth()->guard('company')->user()->id;
+        $company = $this->company->find($company_id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $company->notifications()->where('id', $id)->update(['read_at' => now()]);
+        return redirect()->back()->with("success", "Notification is marked as read");
+    }
+
+    public function markAllAsRead()
+    {
+        $company_id = auth()->guard('company')->user()->id;
+        $company = $this->company->find($company_id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $company->unreadNotifications->markAsRead();
+        return redirect()->back()->with("success", "All notifications are marked as read");
+    }
+
+    public function markAsUnread($id)
+    {
+        $company_id = auth()->guard('company')->user()->id;
+        $company = $this->company->find($company_id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $company->notifications()->where('id', $id)->update(['read_at' => null]);
+        return redirect()->back()->with("success", "Notification is marked as unread");
+    }
+
+    public function deleteNotification($id)
+    {
+        $company_id = auth()->guard('company')->user()->id;
+        $company = $this->company->find($company_id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $company->notifications()->where('id', $id)->delete();
+        return redirect()->back()->with("success", "Notification is deleted");
+    }
+
+    public function deleteAllNotification()
+    {
+        $company_id = auth()->guard('company')->user()->id;
+        $company = $this->company->find($company_id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $company->notifications()->delete();
+        return redirect()->back()->with("success", "All notifications are deleted");
     }
 }

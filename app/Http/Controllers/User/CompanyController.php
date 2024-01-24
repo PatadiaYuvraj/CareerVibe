@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Job;
 use App\Models\User;
+use App\Services\SendMailService;
+use App\Services\SendNotificationService;
 use Illuminate\Http\Request;
 
 class CompanyController extends Controller
@@ -13,12 +15,16 @@ class CompanyController extends Controller
     private Company $company;
     private Job $job;
     private User $user;
+    private SendMailService $sendMailService;
+    private SendNotificationService $sendNotificationService;
 
-    public function __construct(Company $company, Job $job, User $user)
+    public function __construct(Company $company, Job $job, User $user, SendMailService $sendMailService, SendNotificationService $sendNotificationService)
     {
         $this->company = $company;
         $this->job = $job;
         $this->user = $user;
+        $this->sendMailService = $sendMailService;
+        $this->sendNotificationService = $sendNotificationService;
     }
 
 
@@ -48,6 +54,12 @@ class CompanyController extends Controller
 
         $company->followers()->syncWithoutDetaching($current_user_id);
 
+        $msg = auth()->guard('user')->user()->name . " is started following you";
+
+        // UNCOMMENT: To send notification
+        $this->sendNotificationService->sendNotification($company, $msg);
+
+
         return redirect()->back()->with("success", "User is followed");
     }
 
@@ -60,7 +72,6 @@ class CompanyController extends Controller
         if (!$company) {
             return redirect()->back()->with("warning", "Company not found");
         }
-
         $isAlreadyFollowed = $company->followers()->where('user_id', $current_user_id)->exists();
 
         if (!$isAlreadyFollowed) {

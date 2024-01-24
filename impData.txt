@@ -1,0 +1,20 @@
+// $notifications = $notifications->groupBy(function ($item, $key) {
+//     return $item['data'];
+// })->map(function ($item, $key) {
+//     return $item->first();
+// });
+
+is same as
+// $notifications = $notifications->unique('data');
+
+run specific job 
+php artisan queue:work --queue=SendNotification 
+
+$details = [
+'title' => 'Password Changed',
+'body' => "Your password has been changed successfully"
+];
+// UNCOMMENT: To send notification
+$this->sendNotificationService->sendNotification($company, $details['body']);
+// UNCOMMENT: To send mail
+$this->sendMailService->sendMail($company->email, $details);

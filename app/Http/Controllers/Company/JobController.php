@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Company;
 use App\Models\Job;
 use App\Models\Location;
 use App\Models\Qualification;
 use App\Models\SubProfile;
+use App\Services\SendMailService;
+use App\Services\SendNotificationService;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
@@ -16,11 +19,12 @@ class JobController extends Controller
     private Job $job;
     private $current_company;
     private int $paginate;
+    private SendMailService $sendMailService;
+    private SendNotificationService $sendNotificationService;
 
 
-    public function __construct(Company $company, Job $job)
+    public function __construct(Company $company, Job $job, SendMailService $sendMailService, SendNotificationService $sendNotificationService)
     {
-        parent::__construct();
         $this->middleware(
             function ($request, $next) {
                 if (auth()->guard('company')->check()) {
@@ -32,6 +36,8 @@ class JobController extends Controller
         $this->job = $job;
         $this->company = $company;
         $this->paginate = env('PAGINATEVALUE');
+        $this->sendMailService = $sendMailService;
+        $this->sendNotificationService = $sendNotificationService;
     }
 
     public function index()
@@ -260,11 +266,36 @@ class JobController extends Controller
         $data['is_active'] = 1;
         $isCreated = $this->job->create($data);
 
-        // dd($isCreated);
-
         if ($isCreated) {
             $isCreated->locations()->attach($request->get('locations'));
             $isCreated->qualifications()->attach($request->get('qualifications'));
+
+            $company = $this->company->find(auth()->guard('company')->user()->id);
+            $profileName = $isCreated->subProfile->name;
+
+            $msg = "Your job for $profileName profile is created successfully";
+            $details = [
+                'title' => 'Job Created',
+                'body' => "Your job for $profileName profile is created successfully. Admin will verify it."
+            ];
+            // UNCOMMENT: To send notification
+            $this->sendNotificationService->sendNotification($company, $msg);
+            // UNCOMMENT: To send mail
+            $this->sendMailService->sendMail($company->email, $details);
+
+            $admins = Admin::all();
+            $details = [
+                'title' => 'New Job Created',
+                'body' => "New job for $profileName profile is created by $company->name company. Please verify it."
+            ];
+            foreach ($admins as $admin) {
+                // UNCOMMENT: To send notification
+                $this->sendNotificationService->sendNotification($admin, $details['body']);
+                // UNCOMMENT: To send mail
+                $this->sendMailService->sendMail($admin->email, $details);
+            }
+
+
             return redirect()->route('company.job.index')->with('success', 'Job is created');
         }
         return redirect()->back()->with("warning", "Job is not created");
@@ -548,5 +579,16 @@ class JobController extends Controller
             return redirect()->back()->with('success', 'Company is active');
         }
         return redirect()->route('company.job.index')->with('success', 'Job updated successfully');
+
+        // $company = $this->company->find(auth()->guard('company')->user()->id);
+        // $msg = "Your profile image has been deleted successfully";
+        // Notification::send($company, new SendNotification($msg));
+
+        // // UNCOMMENT: To send mail
+        // $details = [
+        //     'title' => 'Profile Image Deleted',
+        //     'body' => "Your profile image has been deleted successfully"
+        // ];
+        // SendMailJob::dispatch($company->email, $details);
     }
 }
