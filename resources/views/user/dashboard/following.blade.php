@@ -1,5 +1,5 @@
 @extends('user.layout.app')
-@section('pageTitle', 'Dashboard | Admin')
+@section('pageTitle', 'Yours Following | ' . env('APP_NAME'))
 @section('content')
     <main id="main" class="main">
         <section class="section dashboard">
@@ -21,7 +21,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $user)
+                            @forelse ($users as $user)
                                 <tr>
                                     <td scope="row">{{ $loop->iteration }}</td>
                                     <td>{{ $user->followable->name }}</td>
@@ -45,7 +45,11 @@
                                         @endif
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="20" class="text-center">No data found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                     <div class="justify-content-center">

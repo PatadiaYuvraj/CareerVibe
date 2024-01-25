@@ -148,6 +148,18 @@
                     <span>Notifications</span>
                 </a>
             </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('user.post.all') }}">
+                    <span>All Posts</span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('user.post.index') }}">
+                    <span>Your Posts</span>
+                </a>
+            </li>
         </ul>
 
     </aside>

@@ -1,5 +1,5 @@
 @extends('user.layout.app')
-@section('pageTitle', 'Dashboard | Admin')
+@section('pageTitle', 'Edit Profile Details | ' . env('APP_NAME'))
 @section('content')
 
     <main id="main" class="main">

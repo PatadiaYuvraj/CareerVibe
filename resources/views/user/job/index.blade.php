@@ -1,5 +1,5 @@
 @extends('user.layout.app')
-@section('pageTitle', 'Dashboard | user')
+@section('pageTitle', 'Available Jobs | ' . env('APP_NAME'))
 @section('content')
     <main id="main" class="main">
 

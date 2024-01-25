@@ -1,5 +1,5 @@
 @extends('user.layout.app')
-@section('pageTitle', 'Dashboard | Admin')
+@section('pageTitle', 'List of Users | ' . env('APP_NAME'))
 @section('content')
     <main id="main" class="main">
         @php
@@ -12,7 +12,7 @@
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
-                    <span class="h3 text-black">All Users</span>
+                    <span class="h3 text-black">Users</span>
                 </div>
                 <div class="card-body">
                     <table class="table text-center table-striped">
@@ -50,7 +50,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan='6' class="text-center">No User Found</td>
+                                    <td colspan="20" class="text-center">No data found</td>
                                 </tr>
                             @endforelse
                         </tbody>

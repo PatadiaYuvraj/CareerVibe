@@ -112,13 +112,18 @@ class User extends Authenticatable
         return $this->belongsToMany(Job::class, 'saved_jobs')->withTimestamps();
     }
 
-    // public function getIsAppliedAttribute()
-    // {
-    //     return $this->applyByUsers()->where('user_id', auth()->user()->id)->exists();
-    // }
+    public function posts()
+    {
+        return $this->morphMany(Post::class, 'postable');
+    }
 
-    // public function getIsSavedAttribute()
-    // {
-    //     return $this->savedByUsers()->where('user_id', auth()->user()->id)->exists();
-    // }
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'postable');
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'postable');
+    }
 }

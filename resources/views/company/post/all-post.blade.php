@@ -1,34 +1,36 @@
-@extends('user.layout.app')
-@section('pageTitle', 'Your Followers | ' . env('APP_NAME'))
+@extends('company.layout.app')
+@section('pageTitle', 'All Posts | ' . env('APP_NAME'))
 @section('content')
     <main id="main" class="main">
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">
-                        Followers
+                        All Posts
                     </span>
                 </div>
                 <div class="card-body">
-                    <table class="table table-striped">
+                    <table class="table table-striped text-center">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Remove Follower</th>
+                                <th>Created By</th>
+                                <th>Title</th>
+                                <th>Content</th>
+                                <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($users as $user)
+                            @forelse ($posts as $post)
                                 <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $user['name'] }}</td>
-                                    <td>{{ $user['email'] }}</td>
                                     <td>
-                                        <a href="{{ route('user.removeFollower', $user['id']) }}"
-                                            class="btn btn-danger btn-sm">Remove Follower</a>
+                                        {{ $post['postable']['name'] }}
+                                    <td>
+                                        <a href="{{ route('company.post.show', $post['id']) }}">
+                                            {{ $post['title'] }}
+                                        </a>
                                     </td>
+                                    <td>{{ $post['content'] }}</td>
+                                    <td>{{ $post['created_at']->diffForHumans() }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -38,11 +40,10 @@
                         </tbody>
                     </table>
                     <div class="justify-content-center">
-                        {{ $users->links('pagination::bootstrap-5') }}
+                        {{ $posts->links('pagination::bootstrap-5') }}
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 @endsection

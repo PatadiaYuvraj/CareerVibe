@@ -1,5 +1,5 @@
 @extends('user.layout.app')
-@section('pageTitle', 'Dashboard | Admin')
+@section('pageTitle', 'Notifications | ' . env('APP_NAME'))
 @section('content')
     <main id="main" class="main">
         <section class="section dashboard">
@@ -51,7 +51,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan='6' class="text-center">No User Found</td>
+                                    <td colspan="20" class="text-center">No data found</td>
                                 </tr>
                             @endforelse
                         </tbody>

@@ -18,3 +18,7 @@ $details = [
 $this->sendNotificationService->sendNotification($company, $details['body']);
 // UNCOMMENT: To send mail
 $this->sendMailService->sendMail($company->email, $details);
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.all.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.min.css">

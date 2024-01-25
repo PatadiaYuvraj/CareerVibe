@@ -35,13 +35,24 @@ class JobController extends Controller
         return view('user.job.index', compact('jobs'));
     }
 
-    // public function show($job_id)
-    // {
-    //     $job = Job::find($job_id);
+    public function show($job_id)
+    {
+        $job = Job::find($job_id)
+            ->with([
+                'company',
+                'locations',
+                'qualifications',
+                'subProfile',
+                'applyByUsers' => function ($query) {
+                    $query->where('user_id', auth()->guard('user')->user()->id);
+                },
+            ])
+            ->first()
+            ->toArray();
 
-    //     dd($job);
-    //     return view('user.job.show', compact('job'));
-    // }
+        // dd($job);
+        return view('user.job.show', compact('job'));
+    }
 
     public function appliedJobs()
     {

@@ -1,5 +1,5 @@
-@extends('admin.layout.app')
-@section('pageTitle', 'Dashboard | Admin')
+@extends('user.layout.app')
+@section('pageTitle', $job['sub_profile']['name'] . ' by ' . $job['company']['name'] . ' | ' . env('APP_NAME'))
 @section('content')
     <main id="main" class="main">
 
@@ -8,8 +8,8 @@
                 <div class="card-header ">
                     <nav aria-label="breadcrumb" class="">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.job.index') }}">Jobs</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('user.dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('user.job.index') }}">Jobs</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Show</li>
                         </ol>
                     </nav>
@@ -19,12 +19,6 @@
                         <h1 class="display-5">
                             {{ $job['sub_profile']['name'] }}
                         </h1>
-                        <p class="lead position-relative">
-                            <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
-                                class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
-                                {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
-                            </a>
-                        </p>
                         <p class="lead">Created At :
                             @if ($job['created_at'])
                                 {{ date('d-m-Y', strtotime($job['created_at'])) }}
@@ -32,8 +26,17 @@
                                 {{ 'N/A' }}
                             @endif
                         </p>
-                        <p class="lead">
-                            <a class="btn btn-outline-primary btn" href="{{ route('admin.job.edit', $job['id']) }}">Edit</a>
+                        <p class="">
+                            @if (count($job['apply_by_users']) > 0)
+                                <span class="badge bg-success">
+                                    You have applied this job on
+                                    {{ Illuminate\Support\Carbon::parse($job['apply_by_users'][0]['created_at'])->diffForHumans() }}
+                                </span>
+                            @else
+                                <span class="badge bg-info">
+                                    You have not applied this job yet
+                                </span>
+                            @endif
                         </p>
                     </div>
                     <hr />
