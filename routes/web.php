@@ -199,6 +199,10 @@ Route::group(['middleware' => "isCompany"], function () {
         Route::get('/dashboard',  [CompanyCompanyController::class, "dashboard"])->name('company.dashboard');
         Route::get('/logout',  [CompanyCompanyController::class, "logout"])->name('company.logout');
 
+        Route::get('/followers',  [CompanyCompanyController::class, "followers"])->name('company.followers');
+        Route::get('/all-users',  [CompanyCompanyController::class, "allUsers"])->name('company.allUsers');
+        Route::get('/remove-follower/{id}',  [CompanyCompanyController::class, "removeFollower"])->name('company.removeFollower');
+
         // notifications
         Route::prefix('notifications')->group(function () {
             Route::get('/',  [CompanyCompanyController::class, "notifications"])->name('company.notifications');

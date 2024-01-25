@@ -124,6 +124,22 @@
                     <span>Your Posts</span>
                 </a>
             </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('company.allUsers') }}">
+                    <span>
+                        All Users
+                    </span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('company.followers') }}">
+                    <span>
+                        Followers
+                    </span>
+                </a>
+            </li>
 
         </ul>
 

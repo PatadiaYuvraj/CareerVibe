@@ -8,6 +8,7 @@ use App\Jobs\SendMailJob;
 use App\Models\Admin;
 use App\Models\Company;
 use App\Models\Post;
+use App\Models\User;
 use App\Services\SendMailService;
 use App\Services\SendNotificationService;
 use Cloudinary\Api\Upload\UploadApi;
@@ -587,7 +588,6 @@ class CompanyController extends Controller
         return redirect()->back()->with("warning", "Post Not Created");
     }
 
-    // allPost
     public function allPost()
     {
         // get al posts with user details
@@ -672,5 +672,48 @@ class CompanyController extends Controller
             return redirect()->route('company.post.index')->with("success", "Post Deleted Successfully");
         }
         return redirect()->back()->with("warning", "Post Not Deleted");
+    }
+
+    public function followers()
+    {
+        $company_id = auth()->guard('company')->user()->id;
+        $company = $this->company->find($company_id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $followers = $company->followers()->paginate($this->paginate);
+        return view('company.dashboard.followers', compact('followers'));
+    }
+
+    public function removeFollower($id)
+    {
+        $company_id = auth()->guard('company')->user()->id;
+        $company = $this->company->find($company_id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $isAlreadyFollowed = $company->followers()->where('user_id', $id)->exists();
+        if (!$isAlreadyFollowed) {
+            return redirect()->back()->with("warning", "User is not followed");
+        }
+        $company->followers()->detach($id);
+        return redirect()->back()->with("success", "User is unfollowed");
+    }
+
+    // all user with following and followers
+    //     Route::get('/all-users',  [CompanyCompanyController::class, "allUsers"])->name('company.allUsers');
+    public function allUsers()
+    {
+        $company_id = auth()->guard('company')->user()->id;
+        $company = $this->company->find($company_id);
+        if (!$company) {
+            return redirect()->back()->with("warning", "Company is not found");
+        }
+        $users = User::with([
+            'followers',
+            'following',
+            'followingCompanies'
+        ])->paginate($this->paginate);
+        return view('company.dashboard.all-users', compact('users'));
     }
 }

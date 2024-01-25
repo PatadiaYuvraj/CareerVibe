@@ -582,8 +582,13 @@ class UserController extends Controller
         $current_user_id = auth()->guard('user')->user()->id;
         $users = $this->user
             ->where('id', '!=', $current_user_id)
-            ->with(['followers', 'following'])
+            ->with([
+                'followers',
+                'following',
+                'followingCompanies'
+            ])
             ->paginate($this->paginate);
+        // dd($users);
         return view('user.dashboard.all-users', compact('users'));
     }
 

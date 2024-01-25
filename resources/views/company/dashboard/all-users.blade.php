@@ -1,14 +1,7 @@
-@extends('user.layout.app')
+@extends('company.layout.app')
 @section('pageTitle', 'List of Users | ' . env('APP_NAME'))
 @section('content')
     <main id="main" class="main">
-        @php
-            $authUser = Auth::guard('user')->user();
-            $authUserFollows = [];
-            foreach ($authUser['following'] as $follow) {
-                $authUserFollows[] = $follow['id'];
-            }
-        @endphp
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
@@ -23,7 +16,6 @@
                                 <th>Email</th>
                                 <th class="col-1">Followers</th>
                                 <th class="col-1">Following</th>
-                                <th class="col-1">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -34,20 +26,6 @@
                                     <td>{{ $user['email'] }}</td>
                                     <td>{{ count($user['followers']) }}</td>
                                     <td>{{ count($user['following']) + count($user['followingCompanies']) }}</td>
-
-                                    <td>
-                                        @if (in_array($user['id'], $authUserFollows))
-                                            <a href="{{ route('user.unfollow', $user['id']) }}"
-                                                class="btn btn-sm btn-danger">
-                                                Following
-                                            </a>
-                                        @else
-                                            <a href="{{ route('user.follow', $user['id']) }}"
-                                                class="btn btn-sm btn-primary">
-                                                Follow
-                                            </a>
-                                        @endif
-                                    </td>
                                 </tr>
                             @empty
                                 <tr>

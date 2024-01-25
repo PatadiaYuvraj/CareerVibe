@@ -94,10 +94,10 @@ class User extends Authenticatable
 
     public function followingBoth()
     {
-        return $this->morphedByMany(User::class, 'followable', 'follows');
+        $user =  $this->morphedByMany(User::class, 'followable', 'follows');
         $company = $this->morphedByMany(Company::class, 'followable', 'follows');
 
-        // return $user->merge($company);
+        return $user->union($company);
     }
 
 
