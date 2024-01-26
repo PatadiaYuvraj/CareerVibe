@@ -12,9 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('likes', function (Blueprint $table) {
+
             $table->id();
-            $table->morphs('postable');
-            $table->foreignId('post_id')->constrained()->onDelete('cascade');
+            $table->morphs('likeable');
+            $table->morphs('authorable');
+            $table->unique(['authorable_id', 'authorable_type']);
+            // $table->softDeletes();
             $table->timestamps();
         });
     }

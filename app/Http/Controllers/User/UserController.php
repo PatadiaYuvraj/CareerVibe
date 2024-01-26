@@ -5,7 +5,9 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Jobs\DeleteFromCloudinary;
+use App\Models\Comment;
 use App\Models\Follow;
+use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\SendMailService;
@@ -743,45 +745,38 @@ class UserController extends Controller
         return redirect()->back()->with("success", "All notifications are deleted");
     }
 
-    /*
-    Schema::create('posts', function (Blueprint $table) {
-        $table->id();
-        $table->morphs('postable');
-        $table->string('title');
-        $table->text('content');
-        $table->timestamps();
-    });
+    public function indexPost()
+    {
+        $user_id = auth()->guard('user')->user()->id;
+        $posts = Post::where([
+            ['authorable_id', $user_id],
+            ['authorable_type', 'App\Models\User']
+        ])
+            ->with([
+                'authorable',
+                // 'comments',
+                // 'likes'
+            ])
+            ->paginate($this->paginate);
+        return view('user.post.index', compact('posts'));
+    }
 
-    Schema::create('comments', function (Blueprint $table) {
-        $table->id();
-        $table->morphs('postable');
-        $table->foreignId('post_id')->constrained()->onDelete('cascade');
-        $table->text('content');
-        $table->timestamps();
-    });
-
-    Schema::create('likes', function (Blueprint $table) {
-        $table->id();
-        $table->morphs('postable');
-        $table->foreignId('post_id')->constrained()->onDelete('cascade');
-        $table->timestamps();
-    });
-    */
-
-    // posts comments likes
-    // Route::prefix('post')->group(function () {
-    //     Route::get('/create',  [UserUserController::class, "createPost"])->name('user.post.create');
-    //     Route::post('/store',  [UserUserController::class, "storePost"])->name('user.post.store');
-    //     Route::get('/',  [UserUserController::class, "indexPost"])->name('user.post.index');
-    //     Route::get('/{id}',  [UserUserController::class, "showPost"])->name('user.post.show');
-    //     Route::get('/edit/{id}',  [UserUserController::class, "editPost"])->name('user.post.edit');
-    //     Route::post('/update/{id}',  [UserUserController::class, "updatePost"])->name('user.post.update');
-    //     Route::get('/delete/{id}',  [UserUserController::class, "deletePost"])->name('user.post.delete');
-    //     Route::get('/like/{id}',  [UserUserController::class, "likePost"])->name('user.post.like');
-    //     Route::get('/unlike/{id}',  [UserUserController::class, "unlikePost"])->name('user.post.unlike');
-    //     Route::get('/comment/{id}',  [UserUserController::class, "commentPost"])->name('user.post.comment');
-    //     Route::get('/uncomment/{id}',  [UserUserController::class, "uncommentPost"])->name('user.post.uncomment');
-    // });
+    public function allPost()
+    {
+        $user_id = auth()->guard('user')->user()->id;
+        $posts =
+            Post::with([
+                'authorable',
+            ])
+            ->withCount([
+                'comments',
+                'likes'
+            ])
+            // ->get()->toArray();
+            ->paginate($this->paginate);
+        // dd($posts);
+        return view('user.post.all-post', compact('posts'));
+    }
 
     public function createPost()
     {
@@ -790,7 +785,6 @@ class UserController extends Controller
 
     public function storePost(Request $request)
     {
-        $current_user_id = auth()->guard('user')->user()->id;
         $request->validate([
             "title" => [
                 "required",
@@ -804,73 +798,53 @@ class UserController extends Controller
             ],
         ]);
 
+        $user_id = auth()->guard('user')->user()->id;
+
         $data = [
             "title" => $request->get("title"),
             "content" => $request->get("content"),
+            "authorable_id" => $user_id,
+            "authorable_type" => "App\Models\User"
         ];
 
-        $isCreated = $this->user->find($current_user_id)->posts()->create($data);
+        $isCreated = Post::create($data);
 
         if ($isCreated) {
-            $user = $this->user->find(auth()->guard('user')->user()->id);
-            $title = $request->get("title");
-            $details = [
-                'title' => 'Post Created',
-                'body' => 'Your post ' . $title . ' is created'
-            ];
-            $this->sendNotificationService->sendNotification($user, $details['body']);
-            $this->sendMailService->sendMail($user->email, $details);
-
             return redirect()->route('user.post.index')->with("success", "Post Created Successfully");
         }
 
         return redirect()->back()->with("warning", "Post Not Created");
     }
 
-    // allPost
-    public function allPost()
-    {
-        // get al posts with user details
-        $posts = Post::with('postable')
-            ->paginate($this->paginate);
-        // dd($posts);
-        return view('user.post.all-post', compact('posts'));
-    }
-
-    public function indexPost()
-    {
-        $current_user_id = auth()->guard('user')->user()->id;
-        $posts = Post::where([
-            'postable_id' => $current_user_id,
-            'postable_type' => 'App\Models\User'
-        ])
-            ->paginate($this->paginate);
-        return view('user.post.index', compact('posts'));
-    }
-
     public function showPost($id)
     {
-        $current_user_id = auth()->guard('user')->user()->id;
-        $post = Post::where('postable_id', $current_user_id)->where('id', $id)->first();
+        // only authorised user can see the post
+        $post = Post::find($id);
         if (!$post) {
             return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('user')->user()->id;
+        if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
+            return redirect()->back()->with("warning", "You are not authorized to see this post");
         }
         return view('user.post.show', compact('post'));
     }
 
     public function editPost($id)
     {
-        $current_user_id = auth()->guard('user')->user()->id;
-        $post = Post::where('postable_id', $current_user_id)->where('id', $id)->first();
+        $post = Post::find($id);
         if (!$post) {
             return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('user')->user()->id;
+        if ($post->authorable_id != $user_id) {
+            return redirect()->back()->with("warning", "This post is not created by you");
         }
         return view('user.post.edit', compact('post'));
     }
 
     public function updatePost(Request $request, $id)
     {
-        $current_user_id = auth()->guard('user')->user()->id;
         $request->validate([
             "title" => [
                 "required",
@@ -883,92 +857,118 @@ class UserController extends Controller
                 "max:500",
             ],
         ]);
-
+        $post = Post::find($id);
+        if (!$post) {
+            return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('user')->user()->id;
+        if ($post->authorable_id != $user_id) {
+            return redirect()->back()->with("warning", "This post is not created by you");
+        }
         $data = [
             "title" => $request->get("title"),
             "content" => $request->get("content"),
         ];
-
-        $isUpdated = $this->user->find($current_user_id)->posts()->where('id', $id)->update($data);
-
+        $isUpdated = $post->update($data);
         if ($isUpdated) {
             return redirect()->route('user.post.index')->with("success", "Post Updated Successfully");
         }
-
         return redirect()->back()->with("warning", "Post Not Updated");
     }
 
     public function deletePost($id)
     {
-        $current_user_id = auth()->guard('user')->user()->id;
-        $post = $this->user->find($current_user_id)->posts()->where('id', $id)->first();
+        $post = Post::find($id);
         if (!$post) {
             return redirect()->back()->with("warning", "Post is not found");
         }
-        $isDeleted = $this->user->find($current_user_id)->posts()->where('id', $id)->delete();
+        $user_id = auth()->guard('user')->user()->id;
+        if ($post->authorable_id != $user_id) {
+            return redirect()->back()->with("warning", "This post is not created by you");
+        }
+        $post->comments()->detach();
+        $post->likes()->detach();
+        $isDeleted = $post->delete();
         if ($isDeleted) {
             return redirect()->route('user.post.index')->with("success", "Post Deleted Successfully");
         }
         return redirect()->back()->with("warning", "Post Not Deleted");
     }
 
-    // public function likePost($id)
-    // {
-    //     $current_user_id = auth()->guard('user')->user()->id;
-    //     $post = $this->user->find($current_user_id)->posts()->where('id', $id)->first();
-    //     if (!$post) {
-    //         return redirect()->back()->with("warning", "Post is not found");
-    //     }
-    //     $isAlreadyLiked = $post->likes()->where('user_id', $current_user_id)->exists();
-    //     if ($isAlreadyLiked) {
-    //         return redirect()->back()->with("warning", "Post is already liked");
-    //     }
-    //     $post->likes()->syncWithoutDetaching($current_user_id);
-    //     return redirect()->back()->with("success", "Post is liked");
-    // }
+    public function likePost($id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
+            return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('user')->user()->id;
+        $isAlreadyLiked = $post->likes()->where('authorable_id', $user_id)->exists();
+        if ($isAlreadyLiked) {
+            return redirect()->back()->with("warning", "Post is already liked");
+        }
+        $data = [
+            "authorable_id" => $user_id,
+            "authorable_type" => "App\Models\User"
+        ];
+        $post->likes()->create($data);
+        return redirect()->back()->with("success", "Post is liked");
+    }
 
-    // public function unlikePost($id)
-    // {
-    //     $current_user_id = auth()->guard('user')->user()->id;
-    //     $post = $this->user->find($current_user_id)->posts()->where('id', $id)->first();
-    //     if (!$post) {
-    //         return redirect()->back()->with("warning", "Post is not found");
-    //     }
-    //     $isAlreadyLiked = $post->likes()->where('user_id', $current_user_id)->exists();
-    //     if (!$isAlreadyLiked) {
-    //         return redirect()->back()->with("warning", "Post is not liked");
-    //     }
-    //     $post->likes()->detach($current_user_id);
-    //     return redirect()->back()->with("success", "Post is unliked");
-    // }
+    public function unlikePost($id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
+            return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('user')->user()->id;
+        $isAlreadyLiked = $post->likes()->where('authorable_id', $user_id)->exists();
+        if (!$isAlreadyLiked) {
+            return redirect()->back()->with("warning", "Post is not liked");
+        }
+        $post->likes()->where('authorable_id', $user_id)->delete();
+        return redirect()->back()->with("success", "Post is unliked");
+    }
 
-    // public function commentPost($id)
+    // public function commentPost(Request $request, $id)
     // {
-    //     $current_user_id = auth()->guard('user')->user()->id;
-    //     $post = $this->user->find($current_user_id)->posts()->where('id', $id)->first();
+    //     $request->validate([
+    //         "content" => [
+    //             "required",
+    //             "string",
+    //             "max:500",
+    //         ],
+    //     ]);
+    //     $post = Post::find($id);
     //     if (!$post) {
     //         return redirect()->back()->with("warning", "Post is not found");
     //     }
-    //     $isAlreadyCommented = $post->comments()->where('user_id', $current_user_id)->exists();
-    //     if ($isAlreadyCommented) {
-    //         return redirect()->back()->with("warning", "Post is already commented");
+    //     $user_id = auth()->guard('user')->user()->id;
+    //     $data = [
+    //         "content" => $request->get("content"),
+    //         "authorable_id" => $user_id,
+    //         "authorable_type" => "App\Models\User"
+    //     ];
+    //     $isCreated = $post->comments()->create($data);
+    //     if ($isCreated) {
+    //         return redirect()->back()->with("success", "Post is commented");
     //     }
-    //     $post->comments()->syncWithoutDetaching($current_user_id);
-    //     return redirect()->back()->with("success", "Post is commented");
+    //     return redirect()->back()->with("warning", "Post is not commented");
     // }
 
     // public function uncommentPost($id)
     // {
-    //     $current_user_id = auth()->guard('user')->user()->id;
-    //     $post = $this->user->find($current_user_id)->posts()->where('id', $id)->first();
-    //     if (!$post) {
-    //         return redirect()->back()->with("warning", "Post is not found");
+    //     $comment = Comment::find($id);
+    //     if (!$comment) {
+    //         return redirect()->back()->with("warning", "Comment is not found");
     //     }
-    //     $isAlreadyCommented = $post->comments()->where('user_id', $current_user_id)->exists();
-    //     if (!$isAlreadyCommented) {
-    //         return redirect()->back()->with("warning", "Post is not commented");
+    //     $user_id = auth()->guard('user')->user()->id;
+    //     if ($comment->authorable_id != $user_id) {
+    //         return redirect()->back()->with("warning", "This comment is not created by you");
     //     }
-    //     $post->comments()->detach($current_user_id);
-    //     return redirect()->back()->with("success", "Post is uncommented");
+    //     $isDeleted = $comment->delete();
+    //     if ($isDeleted) {
+    //         return redirect()->back()->with("success", "Comment is deleted");
+    //     }
+    //     return redirect()->back()->with("warning", "Comment is not deleted");
     // }
 }

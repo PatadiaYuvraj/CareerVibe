@@ -20,6 +20,7 @@
                                 <th>Title</th>
                                 <th>Content</th>
                                 <th>Date</th>
+                                <th>Like</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -33,6 +34,19 @@
                                     </td>
                                     <td>{{ $post['content'] }}</td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>
+                                    <td>
+                                        @if ($post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', auth()->id())->count() > 0)
+                                            <a href="{{ route('user.post.unlike', $post['id']) }}" class="btn btn-sm">
+                                                <i class="bi-hand-thumbs-up-fill"></i>
+                                                {{-- Unlike --}}
+                                            </a>
+                                        @else
+                                            <a href="{{ route('user.post.like', $post['id']) }}" class="btn btn-sm">
+                                                <i class="bi-hand-thumbs-up"></i>
+                                                {{-- Like --}}
+                                            </a>
+                                        @endif
+                                    </td>
                                     <td>
 
                                         <div class="d-flex btn-group">

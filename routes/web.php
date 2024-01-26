@@ -223,10 +223,10 @@ Route::group(['middleware' => "isCompany"], function () {
             Route::get('/edit/{id}',  [CompanyCompanyController::class, "editPost"])->name('company.post.edit');
             Route::post('/update/{id}',  [CompanyCompanyController::class, "updatePost"])->name('company.post.update');
             Route::get('/delete/{id}',  [CompanyCompanyController::class, "deletePost"])->name('company.post.delete');
-            // Route::get('/like/{id}',  [CompanyCompanyController::class, "likePost"])->name('company.post.like');
-            // Route::get('/unlike/{id}',  [CompanyCompanyController::class, "unlikePost"])->name('company.post.unlike');
-            // Route::get('/comment/{id}',  [CompanyCompanyController::class, "commentPost"])->name('company.post.comment');
-            // Route::get('/uncomment/{id}',  [CompanyCompanyController::class, "uncommentPost"])->name('company.post.uncomment');
+            Route::get('/like/{id}',  [CompanyCompanyController::class, "likePost"])->name('company.post.like');
+            Route::get('/unlike/{id}',  [CompanyCompanyController::class, "unlikePost"])->name('company.post.unlike');
+            Route::get('/comment/{id}',  [CompanyCompanyController::class, "commentPost"])->name('company.post.comment');
+            Route::get('/uncomment/{id}',  [CompanyCompanyController::class, "uncommentPost"])->name('company.post.uncomment');
         });
 
         Route::prefix('job')->group(function () {
@@ -353,36 +353,10 @@ Route::group(['middleware' => "isUser"], function () {
             Route::get('/edit/{id}',  [UserUserController::class, "editPost"])->name('user.post.edit');
             Route::post('/update/{id}',  [UserUserController::class, "updatePost"])->name('user.post.update');
             Route::get('/delete/{id}',  [UserUserController::class, "deletePost"])->name('user.post.delete');
-            // Route::get('/like/{id}',  [UserUserController::class, "likePost"])->name('user.post.like');
-            // Route::get('/unlike/{id}',  [UserUserController::class, "unlikePost"])->name('user.post.unlike');
-            // Route::get('/comment/{id}',  [UserUserController::class, "commentPost"])->name('user.post.comment');
-            // Route::get('/uncomment/{id}',  [UserUserController::class, "uncommentPost"])->name('user.post.uncomment');
+            Route::get('/like/{id}',  [UserUserController::class, "likePost"])->name('user.post.like');
+            Route::get('/unlike/{id}',  [UserUserController::class, "unlikePost"])->name('user.post.unlike');
+            Route::get('/comment/{id}',  [UserUserController::class, "commentPost"])->name('user.post.comment');
+            Route::get('/uncomment/{id}',  [UserUserController::class, "uncommentPost"])->name('user.post.uncomment');
         });
     });
 });
-
-// TODO:
-
-// When to send email
-
-// When user apply for job -> ['user', 'company']
-// When company post new job -> ['user'=> 'New job available', 'company'=> 'Your job is posted']
-// When admin post job -> ['admin']
-// When user save job -> ['user']
-// When user unsave job -> ['user']
-// When user cancel applied job -> ['user', 'company']
-// When user update profile -> ['user']
-// When user update profile image -> ['user']
-// When user update resume pdf -> ['user']
-// When company update profile -> ['company']
-// When company update profile image -> ['company']
-// When admin update profile -> ['admin']
-// When admin update profile image -> ['admin']
-// When admin verify company -> ['company']
-// When admin verify job -> ['company']
-// When admin verify user -> ['user']
-// When company post new job -> ['user'=> 'New job available', 'company'=> 'Your job is posted']
-
-
-
-// email verification annd forgot password

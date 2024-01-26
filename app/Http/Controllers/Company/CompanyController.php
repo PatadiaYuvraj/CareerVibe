@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\DeleteFromCloudinary;
-use App\Jobs\SendMailJob;
 use App\Models\Admin;
 use App\Models\Company;
 use App\Models\Post;
@@ -544,136 +543,6 @@ class CompanyController extends Controller
         return redirect()->back()->with("success", "All notifications are deleted");
     }
 
-    public function createPost()
-    {
-        return view('company.post.create');
-    }
-
-    public function storePost(Request $request)
-    {
-        $company_id = auth()->guard('company')->user()->id;
-        $request->validate([
-            "title" => [
-                "required",
-                "string",
-                "max:100",
-            ],
-            "content" => [
-                "required",
-                "string",
-                "max:500",
-            ],
-        ]);
-
-        $data = [
-            "title" => $request->get("title"),
-            "content" => $request->get("content"),
-        ];
-
-        $isCreated = $this->company->find($company_id)->posts()->create($data);
-
-        if ($isCreated) {
-            $company = $this->company->find(auth()->guard('company')->user()->id);
-            $title = $request->get("title");
-            $details = [
-                'title' => 'Post Created',
-                'body' => 'Your post "' . $title . '" has been created successfully'
-            ];
-            $this->sendNotificationService->sendNotification($company, $details['body']);
-            $this->sendMailService->sendMail($company->email, $details);
-
-            return redirect()->route('company.post.index')->with("success", "Post Created Successfully");
-        }
-
-        return redirect()->back()->with("warning", "Post Not Created");
-    }
-
-    public function allPost()
-    {
-        // get al posts with user details
-        $posts = Post::with('postable')->latest()
-            ->paginate($this->paginate);
-        // dd($posts);
-        return view('company.post.all-post', compact('posts'));
-    }
-
-    public function indexPost()
-    {
-        $company_id = auth()->guard('company')->user()->id;
-        $posts = Post::where([
-            'postable_id' => $company_id,
-            'postable_type' => 'App\Models\Company'
-        ])
-            ->latest()
-            ->paginate($this->paginate);
-        // $posts = $this->company->find($company_id)->posts()->latest()->paginate($this->paginate);
-        return view('company.post.index', compact('posts'));
-    }
-
-    public function showPost($id)
-    {
-        $company_id = auth()->guard('company')->user()->id;
-        $post = Post::where('postable_id', $company_id)->where('id', $id)->first();
-        if (!$post) {
-            return redirect()->back()->with("warning", "Post is not found");
-        }
-        return view('company.post.show', compact('post'));
-    }
-
-    public function editPost($id)
-    {
-        $company_id = auth()->guard('company')->user()->id;
-        $post = Post::where('postable_id', $company_id)->where('id', $id)->first();
-        if (!$post) {
-            return redirect()->back()->with("warning", "Post is not found");
-        }
-        return view('company.post.edit', compact('post'));
-    }
-
-    public function updatePost(Request $request, $id)
-    {
-        $company_id = auth()->guard('company')->user()->id;
-        $request->validate([
-            "title" => [
-                "required",
-                "string",
-                "max:100",
-            ],
-            "content" => [
-                "required",
-                "string",
-                "max:500",
-            ],
-        ]);
-
-        $data = [
-            "title" => $request->get("title"),
-            "content" => $request->get("content"),
-        ];
-
-        $isUpdated = $this->company->find($company_id)->posts()->where('id', $id)->update($data);
-
-        if ($isUpdated) {
-            return redirect()->route('company.post.index')->with("success", "Post Updated Successfully");
-        }
-
-        return redirect()->back()->with("warning", "Post Not Updated");
-    }
-
-    public function deletePost($id)
-    {
-        $company_id = auth()->guard('company')->user()->id;
-        $post = $this->company->find($company_id)->posts()->where('id', $id)->first();
-        if (!$post) {
-            return redirect()->back()->with("warning", "Post is not found");
-        }
-        $isDeleted = $this->company->find($company_id)->posts()->where('id', $id)->delete();
-        if ($isDeleted) {
-            return redirect()->route('company.post.index')->with("success", "Post Deleted Successfully");
-        }
-        return redirect()->back()->with("warning", "Post Not Deleted");
-    }
-
     public function followers()
     {
         $company_id = auth()->guard('company')->user()->id;
@@ -700,8 +569,6 @@ class CompanyController extends Controller
         return redirect()->back()->with("success", "User is unfollowed");
     }
 
-    // all user with following and followers
-    //     Route::get('/all-users',  [CompanyCompanyController::class, "allUsers"])->name('company.allUsers');
     public function allUsers()
     {
         $company_id = auth()->guard('company')->user()->id;
@@ -715,5 +582,200 @@ class CompanyController extends Controller
             'followingCompanies'
         ])->paginate($this->paginate);
         return view('company.dashboard.all-users', compact('users'));
+    }
+
+    public function indexPost()
+    {
+        $user_id = auth()->guard('company')->user()->id;
+        $posts = Post::where([
+            ['authorable_id', $user_id],
+            ['authorable_type', 'App\Models\Company']
+        ])
+            ->with([
+                'authorable',
+                // 'comments',
+                // 'likes'
+            ])
+            ->paginate($this->paginate);
+        return view('company.post.index', compact('posts'));
+    }
+
+    public function allPost()
+    {
+        $user_id = auth()->guard('company')->user()->id;
+        $posts =
+            Post::with([
+                'authorable',
+            ])
+            ->withCount([
+                'comments',
+                'likes'
+            ])
+            // ->get()->toArray();
+            ->paginate($this->paginate);
+        // dd($posts);
+        return view('company.post.all-post', compact('posts'));
+    }
+
+    public function createPost()
+    {
+        return view('company.post.create');
+    }
+
+    public function storePost(Request $request)
+    {
+        $request->validate([
+            "title" => [
+                "required",
+                "string",
+                "max:100",
+            ],
+            "content" => [
+                "required",
+                "string",
+                "max:500",
+            ],
+        ]);
+
+        $user_id = auth()->guard('company')->user()->id;
+
+        $data = [
+            "title" => $request->get("title"),
+            "content" => $request->get("content"),
+            "authorable_id" => $user_id,
+            "authorable_type" => "App\Models\Company"
+        ];
+
+        $isCreated = Post::create($data);
+
+        if ($isCreated) {
+            return redirect()->route('company.post.index')->with("success", "Post Created Successfully");
+        }
+
+        return redirect()->back()->with("warning", "Post Not Created");
+    }
+
+    public function showPost($id)
+    {
+        $post = Post::with([
+            'authorable',
+            'comments' => function ($query) {
+                $query->with([
+                    'authorable'
+                ]);
+            },
+            'likes' => function ($query) {
+                $query->with([
+                    'authorable'
+                ]);
+            }
+        ])->find($id);
+        if (!$post) {
+            return redirect()->back()->with("warning", "Post is not found");
+        }
+        // $user_id = auth()->guard('company')->user()->id;
+        // if ($post->authorable_type != "App\Models\Company" || $post->authorable_id != $user_id) {
+        //     return redirect()->back()->with("warning", "This post is not created by you");
+        // }
+        return view('company.post.show', compact('post'));
+    }
+
+    public function editPost($id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
+            return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('company')->user()->id;
+        if ($post->authorable_id != $user_id) {
+            return redirect()->back()->with("warning", "This post is not created by you");
+        }
+        return view('company.post.edit', compact('post'));
+    }
+    // not done
+    public function updatePost(Request $request, $id)
+    {
+        $request->validate([
+            "title" => [
+                "required",
+                "string",
+                "max:100",
+            ],
+            "content" => [
+                "required",
+                "string",
+                "max:500",
+            ],
+        ]);
+        $post = Post::find($id);
+        if (!$post) {
+            return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('user')->user()->id;
+        if ($post->authorable_id != $user_id) {
+            return redirect()->back()->with("warning", "This post is not created by you");
+        }
+        $data = [
+            "title" => $request->get("title"),
+            "content" => $request->get("content"),
+        ];
+        $isUpdated = $post->update($data);
+        if ($isUpdated) {
+            return redirect()->route('user.post.index')->with("success", "Post Updated Successfully");
+        }
+        return redirect()->back()->with("warning", "Post Not Updated");
+    }
+    // not done
+    public function deletePost($id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
+            return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('company')->user()->id;
+        if ($post->authorable_id != $user_id) {
+            return redirect()->back()->with("warning", "This post is not created by you");
+        }
+        $post->comments()->detach();
+        $post->likes()->detach();
+        $isDeleted = $post->delete();
+        if ($isDeleted) {
+            return redirect()->route('company.post.index')->with("success", "Post Deleted Successfully");
+        }
+        return redirect()->back()->with("warning", "Post Not Deleted");
+    }
+    // not done
+    public function likePost($id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
+            return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('user')->user()->id;
+        $isAlreadyLiked = $post->likes()->where('authorable_id', $user_id)->exists();
+        if ($isAlreadyLiked) {
+            return redirect()->back()->with("warning", "Post is already liked");
+        }
+        $data = [
+            "authorable_id" => $user_id,
+            "authorable_type" => "App\Models\User"
+        ];
+        $post->likes()->create($data);
+        return redirect()->back()->with("success", "Post is liked");
+    }
+    // not done
+    public function unlikePost($id)
+    {
+        $post = Post::find($id);
+        if (!$post) {
+            return redirect()->back()->with("warning", "Post is not found");
+        }
+        $user_id = auth()->guard('user')->user()->id;
+        $isAlreadyLiked = $post->likes()->where('authorable_id', $user_id)->exists();
+        if (!$isAlreadyLiked) {
+            return redirect()->back()->with("warning", "Post is not liked");
+        }
+        $post->likes()->where('authorable_id', $user_id)->delete();
+        return redirect()->back()->with("success", "Post is unliked");
     }
 }

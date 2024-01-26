@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->morphs('postable');
+            $table->morphs('authorable');
             $table->string('title');
-            $table->text('content')->nullable();
+            $table->enum('type', ['text', 'image', 'video'])->default('text');
+            $table->text('content');
+            $table->unique(['authorable_id', 'authorable_type']);
+            // $table->softDeletes();
             $table->timestamps();
         });
     }
