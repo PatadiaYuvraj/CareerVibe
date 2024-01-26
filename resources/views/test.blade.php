@@ -21,7 +21,10 @@
                 <textarea class="tinymce-editor" name="name"></textarea>
             </div>
         </div> --}}
-        <input type="file" name="file" id="file">
+        <input type="file" name="profile_image_url">
+        @error('profile_image_url')
+            <div class="alert alert-danger">{{ $message }}</div>
+        @enderror
         <br>
         <button class="btn btn-primary" type="submit">Send</button>
     </form>
