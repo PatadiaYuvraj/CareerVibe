@@ -17,6 +17,9 @@ return new class extends Migration
             $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
             $table->morphs('authorable');
             $table->text('content');
+            $table->unique([
+                'id', 'authorable_id', 'authorable_type'
+            ]);
             // $table->softDeletes();
             $table->timestamps();
         });

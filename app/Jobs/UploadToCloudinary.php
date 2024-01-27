@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Models\Admin;
+use App\Models\Company;
+use App\Models\User;
 use Cloudinary\Api\Upload\UploadApi;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -17,14 +19,14 @@ class UploadToCloudinary implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
 
-    private $filepath;
+    private array $user_data;
 
     /**
      * Create a new job instance.
      */
-    public function __construct($filepath)
+    public function __construct(array $user_data)
     {
-        $this->filepath = $filepath;
+        $this->user_data = $user_data;
     }
 
     /**
@@ -33,28 +35,47 @@ class UploadToCloudinary implements ShouldQueue
     public function handle(): void
     {
         try {
-            // Upload file to Cloudinary
+
+            /*
+        $user_data = [
+            "stored_path" => $storedPath,
+            "user_type" => "USER",
+            "user_id" => 1,
+            "folder" => 'career-vibe/users/profile_image'
+        ];
+    */
+
+            if ($this->user_data['user_type']  == "USER") {
+                $user = USER::find($this->user_data['user_id']);
+                $folder = 'career-vibe/users/profile_image';
+            }
+            if ($this->user_data['user_type']  == "ADMIN") {
+                $user = Admin::find($this->user_data['user_id']);
+                $folder = 'career-vibe/admins/profile_image';
+            }
+            if ($this->user_data['user_type']  == "COMPANY") {
+                $user = Company::find($this->user_data['user_id']);
+                $folder = 'career-vibe/companies/profile_image';
+            }
+
             $response = (new UploadApi())->upload(
-                Storage::path($this->filepath),
+                Storage::path($this->user_data['stored_path']),
                 [
-                    'folder' => 'temp',
+                    'folder' => $folder,
                     'resource_type' => 'image'
                 ]
             );
 
-            unlink(Storage::path($this->filepath));
+            unlink(Storage::path($this->user_data['stored_path']));
 
-            Log::info('File upload response:', [$response]);
 
-            // Additional processing after successful upload
-            // - Store Cloudinary URL in database
-            // - Update user profile with image information
-            // - Send notifications, etc.
+            $user->profile_image_url = $response['secure_url'];
+            $user->profile_image_public_id = $response['public_id'];
+            $user->save();
 
+            Log::info('File upload response:', [$user, $response]);
         } catch (\Exception $e) {
-            // Handle other unexpected errors
             Log::error('Unexpected error during upload:', [$e->getMessage()]);
-            // Handle appropriately
         }
     }
 }

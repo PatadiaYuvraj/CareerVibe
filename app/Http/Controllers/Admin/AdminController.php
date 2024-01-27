@@ -3,31 +3,33 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\DeleteFromCloudinary;
 use App\Models\Admin;
+use App\Services\StorageManagerService;
 use App\Services\SendMailService;
 use App\Services\SendNotificationService;
-use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
     private Admin $admin;
-    private string $user_type = 'admin';
-    private string $folder = 'career-vibe/admins/profile_image';
     private int $paginate;
     private SendMailService $sendMailService;
     private SendNotificationService $sendNotificationService;
+    private StorageManagerService $StorageManagerService;
 
-    public function __construct(Admin $admin, SendMailService $sendMailService, SendNotificationService $sendNotificationService)
-    {
+    public function __construct(
+        Admin $admin,
+        SendMailService $sendMailService,
+        SendNotificationService $sendNotificationService,
+        StorageManagerService $StorageManagerService
+    ) {
         $this->admin = $admin;
         $this->paginate = env('PAGINATEVALUE');
         $this->sendMailService = $sendMailService;
         $this->sendNotificationService = $sendNotificationService;
+        $this->StorageManagerService = $StorageManagerService;
     }
 
     public function dashboard()
@@ -70,7 +72,7 @@ class AdminController extends Controller
             "password" => $request->get("password")
         ];
 
-        if (auth()->guard($this->user_type)->attempt($data, true)) {
+        if (auth()->guard('admin')->attempt($data, true)) {
             return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
         }
         return redirect()->back()->with("warning", "Invalid Credentials");
@@ -333,24 +335,16 @@ class AdminController extends Controller
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->StorageManagerService->uploadToCloudinary($request, "ADMIN", $user->id);
         }
 
-
-        $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-        $obj = (new UploadApi())->upload(
-            $stored_path,
-            [
-                'folder' => $this->folder,
-                'resource_type' => 'image'
-            ]
-        );
 
 
 
         $data = [
-            "profile_image_public_id" => $obj['public_id'],
-            "profile_image_url" => $obj['secure_url'],
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
         ];
 
         $isUpdated = $this->admin->where('id', $id)->update($data);
@@ -386,7 +380,7 @@ class AdminController extends Controller
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
         }
 
         $data = [

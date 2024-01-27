@@ -4,37 +4,31 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
-use App\Models\Job;
-use App\Models\User;
-use App\Services\SendMailService;
+use App\Services\NavigationManagerService;
 use App\Services\SendNotificationService;
-use Illuminate\Http\Request;
 
 class CompanyController extends Controller
 {
     private Company $company;
-    private Job $job;
-    private User $user;
-    private SendMailService $sendMailService;
     private SendNotificationService $sendNotificationService;
+    private NavigationManagerService $navigationManagerService;
 
-    public function __construct(Company $company, Job $job, User $user, SendMailService $sendMailService, SendNotificationService $sendNotificationService)
-    {
+    public function __construct(
+        Company $company,
+        SendNotificationService $sendNotificationService,
+        NavigationManagerService $navigationManagerService
+    ) {
         $this->company = $company;
-        $this->job = $job;
-        $this->user = $user;
-        $this->sendMailService = $sendMailService;
         $this->sendNotificationService = $sendNotificationService;
+        $this->navigationManagerService = $navigationManagerService;
     }
 
 
 
     public function allCompany()
     {
-        $companies = $this->company->with('followers')
-            // ->get()->toArray();
-            ->paginate(10);
-        return view('user.company.index', compact('companies'));
+        $companies = $this->company->with('followers')->paginate(10);
+        $navigation = $this->navigationManagerService->loadView('user.company.index', compact('companies'));
     }
 
     public function followCompany($company_id)
@@ -43,24 +37,20 @@ class CompanyController extends Controller
         $company = $this->company->find($company_id);
 
         if (!$company) {
-            return redirect()->back()->with("warning", "Company not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company not found"]);
         }
 
         $isAlreadyFollowed = $company->followers()->where('user_id', $current_user_id)->exists();
 
         if ($isAlreadyFollowed) {
-            return redirect()->back()->with("warning", "User is already followed");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is already followed"]);
         }
 
         $company->followers()->syncWithoutDetaching($current_user_id);
 
         $msg = auth()->guard('user')->user()->name . " is started following you";
-
-        // UNCOMMENT: To send notification
         $this->sendNotificationService->sendNotification($company, $msg);
-
-
-        return redirect()->back()->with("success", "User is followed");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "User is followed"]);
     }
 
 
@@ -68,18 +58,14 @@ class CompanyController extends Controller
     {
         $current_user_id = auth()->guard('user')->user()->id;
         $company = $this->company->find($id);
-
         if (!$company) {
-            return redirect()->back()->with("warning", "Company not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company not found"]);
         }
         $isAlreadyFollowed = $company->followers()->where('user_id', $current_user_id)->exists();
-
         if (!$isAlreadyFollowed) {
-            return redirect()->back()->with("warning", "User is not followed");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not followed"]);
         }
-
         $company->followers()->detach($current_user_id);
-
-        return redirect()->back()->with("success", "User is unfollowed");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "User is unfollowed"]);
     }
 }

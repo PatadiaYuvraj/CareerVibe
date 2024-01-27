@@ -3,14 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\DeleteFromCloudinary;
 use App\Models\Company;
+use App\Services\StorageManagerService;
 use App\Services\SendMailService;
 use App\Services\SendNotificationService;
-use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
@@ -18,13 +16,19 @@ class CompanyController extends Controller
     private SendMailService $sendMailService;
     private Company $company;
     private int $paginate;
+    private StorageManagerService $StorageManagerService;
 
-    public function __construct(Company $company, SendNotificationService $sendNotificationService, SendMailService $sendMailService)
-    {
+    public function __construct(
+        Company $company,
+        SendNotificationService $sendNotificationService,
+        SendMailService $sendMailService,
+        StorageManagerService $StorageManagerService
+    ) {
         $this->paginate = env('PAGINATEVALUE');
         $this->company = $company;
         $this->sendNotificationService = $sendNotificationService;
         $this->sendMailService = $sendMailService;
+        $this->StorageManagerService = $StorageManagerService;
     }
 
     public function create()
@@ -34,6 +38,7 @@ class CompanyController extends Controller
 
     public function store(Request $request)
     {
+        $hasFile = false;
         $request->validate([
             "name" => [
                 "required",
@@ -73,17 +78,9 @@ class CompanyController extends Controller
             $request->validate([
                 "profile_image_url" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
             ]);
-            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-            $obj = (new UploadApi())->upload(
-                $stored_path,
-                [
-                    'folder' => 'career-vibe/companies/profile_image',
-                    'resource_type' => 'image'
-                ]
-            );
-            $data["profile_image_public_id"] = $obj['public_id'];
-            $data["profile_image_url"] = $obj['secure_url'];
-            unlink($stored_path);
+            $data["profile_image_public_id"] = null;
+            $data["profile_image_url"] = null;
+            $hasFile = true;
         }
 
         if ($request->get('website')) {
@@ -144,8 +141,12 @@ class CompanyController extends Controller
         $isCreated = $this->company->create($data);
 
         if ($isCreated) {
+            $msg = "Company is created";
+            if ($hasFile) {
+                $this->StorageManagerService->uploadToCloudinary($request, "COMPANY", $isCreated->id);
+            }
             // MAIL: when company is created send mail to company and admin
-            return redirect()->route('admin.company.index')->with('success', 'Company is created');
+            return redirect()->route('admin.company.index')->with('success', $msg);
         }
 
         return redirect()->back()->with("warning", "Company is not created");
@@ -211,17 +212,10 @@ class CompanyController extends Controller
             $request->validate([
                 "profile_image_url" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
             ]);
-            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-            $obj = (new UploadApi())->upload(
-                $stored_path,
-                [
-                    'folder' => 'career-vibe/companies/profile_image',
-                    'resource_type' => 'image'
-                ]
-            );
-            $data["profile_image_public_id"] = $obj['public_id'];
-            $data["profile_image_url"] = $obj['secure_url'];
-            unlink($stored_path);
+            $data["profile_image_public_id"] = null;
+            $data["profile_image_url"] = null;
+            // ClouadStorageManager : To upload image to cloudinary
+            $this->StorageManagerService->uploadToCloudinary($request, "COMPANY", $company['id']);
         }
 
         $data['website'] = $data['city'] = $data['address'] = $data['linkedin'] = $data['description'] = null;
@@ -299,7 +293,7 @@ class CompanyController extends Controller
         }
         if ($company['profile_image_url']) {
             $public_ids = $company['profile_image_public_id'];
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
         }
 
         $isDeleted = $this->company->where('id', $id)->delete();
@@ -364,28 +358,19 @@ class CompanyController extends Controller
 
         if ($company->profile_image_url) {
             $public_ids = $company->profile_image_public_id;
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
         }
-
-        $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-
-        $obj = (new UploadApi())->upload(
-            $stored_path,
-            [
-                'folder' => 'career-vibe/companies/profile_image',
-                'resource_type' => 'image'
-            ]
-        );
+        // CloudStorageManager : To upload image to cloudinary
+        $this->StorageManagerService->uploadToCloudinary($request, "COMPANY", $company->id);
 
         $data = [
-            "profile_image_public_id" => $obj['public_id'],
-            "profile_image_url" => $obj['secure_url'],
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
         ];
 
         $isUpdated = $company->update($data);
 
         if ($isUpdated) {
-            unlink($stored_path);
             return redirect()->back()->with('success', 'Company profile image is updated');
         }
 
@@ -400,7 +385,7 @@ class CompanyController extends Controller
         }
         if ($company->profile_image_url) {
             $public_ids = $company->profile_image_public_id;
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
 
             $data = [
                 "profile_image_public_id" => null,

@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\DeleteFromCloudinary;
 use App\Models\User;
-use Cloudinary\Api\Upload\UploadApi;
+use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     private User $user;
     private int $paginate;
+    private StorageManagerService $StorageManagerService;
 
-    public function __construct(User $user)
+    public function __construct(User $user, StorageManagerService $StorageManagerService)
     {
+        $this->StorageManagerService = $StorageManagerService;
         $this->user = $user;
         $this->paginate = env('PAGINATEVALUE');
     }
@@ -28,6 +28,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+        $hasFile = false;
         $request->validate([
             'name' => [
                 'required',
@@ -71,24 +72,17 @@ class UserController extends Controller
             $request->validate([
                 "profile_image_url" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
             ]);
-            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-            $obj = (new UploadApi())->upload(
-                $stored_path,
-                [
-                    'folder' => 'career-vibe/users/profile_image',
-                    'resource_type' => 'image'
-                ]
-            );
-            $data["profile_image_public_id"] = $obj['public_id'];
-            $data["profile_image_url"] = $obj['secure_url'];
-            unlink($stored_path);
+
+            $data["profile_image_public_id"] = null;
+            $data["profile_image_url"] = null;
+            $hasFile = true;
         }
 
         if ($request->file('resume_pdf_url')) {
             $request->validate([
                 "resume_pdf_url" => ["required", "mimes:pdf", "max:2048",],
             ]);
-            $stored_path = Storage::putFile('temp', $request->file('resume_pdf_url'));
+            $stored_path = $this->StorageManagerService->uploadToLocal($request, "resume_pdf_url");
             $data["resume_pdf_url"] = $stored_path;
             $data["resume_pdf_public_id"] = null;
         }
@@ -158,7 +152,11 @@ class UserController extends Controller
 
         $isCreated = $this->user->create($data);
         if ($isCreated) {
-            return redirect()->route('admin.user.index')->with("success", "User is created");
+            $msg = "User is created";
+            if ($hasFile) {
+                $this->StorageManagerService->uploadToCloudinary($request, "USER", $isCreated->id);
+            }
+            return redirect()->route('admin.user.index')->with("success", $msg);
         }
         return redirect()->back()->with("warning", "User is not created");
     }
@@ -228,20 +226,13 @@ class UserController extends Controller
 
             if ($user->profile_image_url) {
                 $public_ids = $user->profile_image_public_id;
-                DeleteFromCloudinary::dispatch($public_ids);
+                $this->StorageManagerService->deleteFromCloudinary($public_ids);
             }
 
-            $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-            $obj = (new UploadApi())->upload(
-                $stored_path,
-                [
-                    'folder' => 'career-vibe/users/profile_image',
-                    'resource_type' => 'image'
-                ]
-            );
-            $data["profile_image_public_id"] = $obj['public_id'];
-            $data["profile_image_url"] = $obj['secure_url'];
-            unlink($stored_path);
+            $this->StorageManagerService->uploadToCloudinary($request, "USER", $user->id);
+
+            $data["profile_image_public_id"] = null;
+            $data["profile_image_url"] = null;
         }
 
         if ($request->file('resume_pdf_url')) {
@@ -254,10 +245,10 @@ class UserController extends Controller
             ]);
 
             if ($user->resume_pdf_url) {
-                Storage::delete($user->resume_pdf_url);
+                $this->StorageManagerService->deleteFromLocal($user->resume_pdf_url);
             }
 
-            $stored_path = Storage::putFile('temp', $request->file('resume_pdf_url'));
+            $stored_path = $this->StorageManagerService->uploadToLocal($request, "resume_pdf_url");
             $data["resume_pdf_url"] = $stored_path;
             $data["resume_pdf_public_id"] = null;
         }
@@ -379,10 +370,10 @@ class UserController extends Controller
         }
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
         }
         if ($user->resume_pdf_url) {
-            Storage::delete($user->resume_pdf_url);
+            $this->StorageManagerService->deleteFromLocal($user->resume_pdf_url);
         }
         $isDeleted = $this->user->where('id', $id)->delete();
         if ($isDeleted) {
@@ -443,23 +434,16 @@ class UserController extends Controller
         }
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
         }
-        $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-        $obj = (new UploadApi())->upload(
-            $stored_path,
-            [
-                'folder' => 'career-vibe/users/profile_image',
-                'resource_type' => 'image'
-            ]
-        );
+        $this->StorageManagerService->uploadToCloudinary($request, "USER", $user->id);
+
         $data = [
-            "profile_image_public_id" => $obj['public_id'],
-            "profile_image_url" => $obj['secure_url'],
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
         ];
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
-            unlink($stored_path);
             return redirect()->route('admin.user.index')->with("success", "User profile image is updated");
         }
         return redirect()->back()->with("warning", "User profile image is not updated");
@@ -473,7 +457,7 @@ class UserController extends Controller
         }
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
         }
         $data = [
             "profile_image_public_id" => null,
@@ -500,9 +484,9 @@ class UserController extends Controller
             return redirect()->back()->with("warning", "User is not found");
         }
         if ($user->resume_pdf_url) {
-            Storage::delete($user->resume_pdf_url);
+            $this->StorageManagerService->deleteFromLocal($user->resume_pdf_url);
         }
-        $stored_path = Storage::putFile('temp', $request->file('resume_pdf_url'));
+        $stored_path = $this->StorageManagerService->uploadToLocal($request, "resume_pdf_url");
         $data = [
             "resume_pdf_url" => $stored_path,
         ];
@@ -520,7 +504,7 @@ class UserController extends Controller
             return redirect()->back()->with("warning", "User is not found");
         }
         if ($user->resume_pdf_url) {
-            Storage::delete($user->resume_pdf_url);
+            $this->StorageManagerService->deleteFromLocal($user->resume_pdf_url);
         }
         $data = [
             "resume_pdf_url" => null,

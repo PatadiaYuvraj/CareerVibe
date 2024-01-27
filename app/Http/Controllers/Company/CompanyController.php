@@ -3,30 +3,32 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\DeleteFromCloudinary;
 use App\Models\Admin;
 use App\Models\Company;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\StorageManagerService;
 use App\Services\SendMailService;
 use App\Services\SendNotificationService;
-use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
-    private string $folder = 'career-vibe/companies/profile_image';
 
+    private StorageManagerService $StorageManagerService;
     private SendNotificationService $sendNotificationService;
     private SendMailService $sendMailService;
     private Company $company;
     private $current_company;
     private int $paginate;
 
-    public function __construct(Company $company, SendNotificationService $sendNotificationService, SendMailService $sendMailService)
-    {
+    public function __construct(
+        Company $company,
+        SendNotificationService $sendNotificationService,
+        SendMailService $sendMailService,
+        StorageManagerService $StorageManagerService
+    ) {
         $this->middleware(function ($request, $next) {
             if (auth()->guard('company')->check()) {
                 $this->current_company = auth()->guard('company')->user();
@@ -37,6 +39,7 @@ class CompanyController extends Controller
         $this->paginate = env('PAGINATEVALUE');
         $this->sendNotificationService = $sendNotificationService;
         $this->sendMailService = $sendMailService;
+        $this->StorageManagerService = $StorageManagerService;
     }
 
     public function login()
@@ -395,26 +398,14 @@ class CompanyController extends Controller
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
         }
 
-        // delete local file after uploading to cloudinary
-
-        $stored_path = Storage::putFile('temp', $request->file('profile_image_url'));
-        $obj = (new UploadApi())->upload(
-            $stored_path,
-            [
-                'folder' => $this->folder,
-                'resource_type' => 'image'
-            ]
-        );
-
-        Storage::delete($stored_path);
-
+        $this->StorageManagerService->uploadToCloudinary($request, "COMPANY", $user->id);
 
         $data = [
-            "profile_image_public_id" => $obj['public_id'],
-            "profile_image_url" => $obj['secure_url'],
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
         ];
 
         $isUpdated = $this->company->where('id', $id)->update($data);
@@ -448,7 +439,7 @@ class CompanyController extends Controller
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            DeleteFromCloudinary::dispatch($public_ids);
+            $this->StorageManagerService->deleteFromCloudinary($public_ids);
         }
 
         $data = [
@@ -687,7 +678,7 @@ class CompanyController extends Controller
             return redirect()->back()->with("warning", "Post is not found");
         }
         $user_id = auth()->guard('company')->user()->id;
-        if ($post->authorable_id != $user_id) {
+        if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
             return redirect()->back()->with("warning", "This post is not created by you");
         }
         return view('company.post.edit', compact('post'));
@@ -712,7 +703,7 @@ class CompanyController extends Controller
             return redirect()->back()->with("warning", "Post is not found");
         }
         $user_id = auth()->guard('user')->user()->id;
-        if ($post->authorable_id != $user_id) {
+        if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
             return redirect()->back()->with("warning", "This post is not created by you");
         }
         $data = [
@@ -733,7 +724,7 @@ class CompanyController extends Controller
             return redirect()->back()->with("warning", "Post is not found");
         }
         $user_id = auth()->guard('company')->user()->id;
-        if ($post->authorable_id != $user_id) {
+        if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
             return redirect()->back()->with("warning", "This post is not created by you");
         }
         $post->comments()->detach();
@@ -752,13 +743,18 @@ class CompanyController extends Controller
             return redirect()->back()->with("warning", "Post is not found");
         }
         $user_id = auth()->guard('user')->user()->id;
-        $isAlreadyLiked = $post->likes()->where('authorable_id', $user_id)->exists();
+        $isAlreadyLiked = $post->likes()->where(
+            [
+                ['authorable_id', $user_id],
+                ['authorable_type', 'App\Models\Company']
+            ]
+        )->exists();
         if ($isAlreadyLiked) {
             return redirect()->back()->with("warning", "Post is already liked");
         }
         $data = [
             "authorable_id" => $user_id,
-            "authorable_type" => "App\Models\User"
+            "authorable_type" => "App\Models\Company"
         ];
         $post->likes()->create($data);
         return redirect()->back()->with("success", "Post is liked");
@@ -771,11 +767,21 @@ class CompanyController extends Controller
             return redirect()->back()->with("warning", "Post is not found");
         }
         $user_id = auth()->guard('user')->user()->id;
-        $isAlreadyLiked = $post->likes()->where('authorable_id', $user_id)->exists();
+        $isAlreadyLiked = $post->likes()->where(
+            [
+                ['authorable_id', $user_id],
+                ['authorable_type', 'App\Models\Company']
+            ]
+        )->exists();
         if (!$isAlreadyLiked) {
             return redirect()->back()->with("warning", "Post is not liked");
         }
-        $post->likes()->where('authorable_id', $user_id)->delete();
+        $post->likes()->where(
+            [
+                ['authorable_id', $user_id],
+                ['authorable_type', 'App\Models\Company']
+            ]
+        )->delete();
         return redirect()->back()->with("success", "Post is unliked");
     }
 }

@@ -209,6 +209,76 @@
                                             @endif
                                         </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            Your Posts
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            You have {{ auth()->guard('user')->user()->posts->count() }}
+                                            @if (auth()->guard('user')->user()->posts->count() <= 1)
+                                                post
+                                            @else
+                                                posts
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            Your Followers
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            You have {{ auth()->guard('user')->user()->followers->count() }}
+                                            @if (auth()->guard('user')->user()->followers->count() <= 1)
+                                                follower
+                                            @else
+                                                followers
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            Users Following
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            You are following {{ auth()->guard('user')->user()->following->count() }}
+                                            @if (auth()->guard('user')->user()->following->count() <= 1)
+                                                user
+                                            @else
+                                                users
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            Companies Following
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            You are following
+                                            {{ auth()->guard('user')->user()->followingCompanies->count() }}
+                                            @if (auth()->guard('user')->user()->followingCompanies->count() <= 1)
+                                                company
+                                            @else
+                                                companies
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            Total Following
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            You are following
+                                            {{ auth()->guard('user')->user()->following->count() +auth()->guard('user')->user()->followingCompanies->count() }}
+                                            @if (auth()->guard('user')->user()->following->count() +
+                                                    auth()->guard('user')->user()->followingCompanies->count() <=
+                                                    1)
+                                                user/company
+                                            @else
+                                                users/companies
+                                            @endif
+
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

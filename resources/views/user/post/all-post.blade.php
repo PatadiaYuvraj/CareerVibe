@@ -21,6 +21,7 @@
                                 <th>Like by you</th>
                                 <th>No of likes</th>
                                 <th>No of comments</th>
+                                <th>See Comments</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
@@ -74,6 +75,12 @@
                                     </td>
                                     <td>
                                         {{ $post->comments->count() }}
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('user.post.commentIndex', $post['id']) }}" class="btn btn-sm">
+                                            <i class="bi-chat-left-text-fill"></i>
+                                            {{-- See Comments --}}
+                                        </a>
                                     </td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>
                                 </tr>

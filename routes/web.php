@@ -355,8 +355,15 @@ Route::group(['middleware' => "isUser"], function () {
             Route::get('/delete/{id}',  [UserUserController::class, "deletePost"])->name('user.post.delete');
             Route::get('/like/{id}',  [UserUserController::class, "likePost"])->name('user.post.like');
             Route::get('/unlike/{id}',  [UserUserController::class, "unlikePost"])->name('user.post.unlike');
-            Route::get('/comment/{id}',  [UserUserController::class, "commentPost"])->name('user.post.comment');
-            Route::get('/uncomment/{id}',  [UserUserController::class, "uncommentPost"])->name('user.post.uncomment');
+            //comment view page
+            Route::get('/comment/{id}',  [UserUserController::class, "commentPostIndex"])->name('user.post.commentIndex');  // comment index page
+            Route::get('/comment/{id}/create',  [UserUserController::class, "commentPostCreate"])->name('user.post.commentCreate');  // comment create page
+            Route::post('/comment/{id}/store',  [UserUserController::class, "commentPostStore"])->name('user.post.commentStore');  // comment store page
+            Route::get('/comment/{id}/edit/{comment_id}',  [UserUserController::class, "commentPostEdit"])->name('user.post.commentEdit');  // comment edit page
+            Route::post('/comment/{id}/update/{comment_id}',  [UserUserController::class, "commentPostUpdate"])->name('user.post.commentUpdate');  // comment update page
+            Route::get('/comment/{id}/delete/{comment_id}',  [UserUserController::class, "commentPostDelete"])->name('user.post.commentDelete');  // comment delete page
+            Route::get('/comment/{id}/like/{comment_id}',  [UserUserController::class, "commentPostLike"])->name('user.post.commentLike');  // comment like page
+            Route::get('/comment/{id}/unlike/{comment_id}',  [UserUserController::class, "commentPostUnlike"])->name('user.post.commentUnlike');  // comment unlike page
         });
     });
 });

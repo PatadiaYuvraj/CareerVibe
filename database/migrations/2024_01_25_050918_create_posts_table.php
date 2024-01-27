@@ -17,7 +17,9 @@ return new class extends Migration
             $table->string('title');
             $table->enum('type', ['text', 'image', 'video'])->default('text');
             $table->text('content');
-            $table->unique(['authorable_id', 'authorable_type']);
+            $table->unique([
+                'id', 'authorable_id', 'authorable_type'
+            ]);
             // $table->softDeletes();
             $table->timestamps();
         });
