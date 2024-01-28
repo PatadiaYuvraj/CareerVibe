@@ -3,10 +3,9 @@
 namespace App\Services;
 
 use App\Jobs\SendNotificationJob;
-use App\Repository\SendNotificationRepository;
-use Illuminate\Database\Eloquent\Model;
+use App\Repository\NotifiableRepository;
 
-class SendNotificationService implements SendNotificationRepository
+class NotifiableService implements NotifiableRepository
 {
     public function sendNotification(mixed $user, string $msg): void
     {

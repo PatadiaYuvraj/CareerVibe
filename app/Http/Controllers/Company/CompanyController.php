@@ -7,27 +7,31 @@ use App\Models\Admin;
 use App\Models\Company;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\MailableService;
+use App\Services\NavigationManagerService;
+use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
-use App\Services\SendMailService;
-use App\Services\SendNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 
 class CompanyController extends Controller
 {
 
-    private StorageManagerService $StorageManagerService;
-    private SendNotificationService $sendNotificationService;
-    private SendMailService $sendMailService;
+    private StorageManagerService $storageManagerService;
+    private NotifiableService $notifiableService;
+    private MailableService $mailableService;
+    private NavigationManagerService $navigationManagerService;
     private Company $company;
     private $current_company;
     private int $paginate;
 
     public function __construct(
         Company $company,
-        SendNotificationService $sendNotificationService,
-        SendMailService $sendMailService,
-        StorageManagerService $StorageManagerService
+        NotifiableService $notifiableService,
+        MailableService $mailableService,
+        StorageManagerService $storageManagerService,
+        NavigationManagerService $navigationManagerService
     ) {
         $this->middleware(function ($request, $next) {
             if (auth()->guard('company')->check()) {
@@ -37,20 +41,20 @@ class CompanyController extends Controller
         });
         $this->company = $company;
         $this->paginate = env('PAGINATEVALUE');
-        $this->sendNotificationService = $sendNotificationService;
-        $this->sendMailService = $sendMailService;
-        $this->StorageManagerService = $StorageManagerService;
+        $this->notifiableService = $notifiableService;
+        $this->mailableService = $mailableService;
+        $this->storageManagerService = $storageManagerService;
+        $this->navigationManagerService = $navigationManagerService;
     }
 
     public function login()
     {
-        // dd(auth()->guard('company')->check());
-        return view('company.auth.login');
+        return $this->navigationManagerService->loadView('company.auth.login');
     }
 
     public function register()
     {
-        return view('company.auth.register');
+        return $this->navigationManagerService->loadView('company.auth.register');
     }
 
     public function doLogin(Request $request)
@@ -84,9 +88,9 @@ class CompanyController extends Controller
         ];
         if (auth()->guard('company')->attempt($data, true)) {
             auth()->login(auth()->guard('company')->user(), true);
-            return redirect()->route('company.dashboard')->with("success", "You're Logged In");
+            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
         }
-        return redirect()->back()->with("warning", "Invalid Credentials");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
     }
 
     public function doRegister(Request $request)
@@ -131,9 +135,9 @@ class CompanyController extends Controller
                 'body' => "Your account is created successfully."
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($company, $details['body']);
+            $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($company->email, $details);
+            $this->mailableService->sendMail($company->email, $details);
 
 
             $admins = Admin::all();
@@ -143,9 +147,9 @@ class CompanyController extends Controller
             ];
             foreach ($admins as $admin) {
                 // UNCOMMENT: To send notification
-                $this->sendNotificationService->sendNotification($admin, $details['body']);
+                $this->notifiableService->sendNotification($admin, $details['body']);
                 // UNCOMMENT: To send mail
-                $this->sendMailService->sendMail($admin->email, $details);
+                $this->mailableService->sendMail($admin->email, $details);
             }
 
             $isAuth = auth()->guard('company')->attempt([
@@ -154,37 +158,35 @@ class CompanyController extends Controller
             ]);
 
             if ($isAuth) {
-                return redirect()->route('company.dashboard')->with("success", "You're Logged In");
+                auth()->login(auth()->guard('company')->user(), true);
+                return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
             }
-            return redirect()->back()->with("warning", "Invalid Credentials");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
         }
-        return redirect()->back()->with("warning", "Something went wrong");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Something went wrong"]);
     }
 
     public function logout()
     {
         auth()->guard('company')->logout();
-        session()->flush();
-        return redirect()->route('company.login')->with("success", "You're Logged Out");
+        Session::flush();
+        return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "You're Logged Out"]);
     }
 
     public function dashboard()
     {
-        return view('company.dashboard.index');
+        return $this->navigationManagerService->loadView('company.dashboard.index');
     }
 
     public function changePassword()
     {
-        return view('company.auth.change-password');
+        return $this->navigationManagerService->loadView('company.auth.change-password');
     }
 
     public function doChangePassword(Request $request)
     {
-
-        // currentPassword newPassword confirmPassword
-
         if (!auth()->guard('company')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = $this->current_company->id;
@@ -207,7 +209,7 @@ class CompanyController extends Controller
                 function ($attribute, $value, $fail) use ($id) {
                     $user = $this->company->find($id);
                     if (Hash::check($value, $user->password)) {
-                        return $fail(__('The new password must be different from current password.'));
+                        return $fail(__('The new password cannot be same as current password.'));
                     }
                 }
             ],
@@ -232,18 +234,17 @@ class CompanyController extends Controller
                 'body' => "Your password has been changed successfully"
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($company, $details['body']);
+            $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($company->email, $details);
-            return redirect()->route('company.dashboard')->with("success", "Password Updated Successfully");
+            $this->mailableService->sendMail($company->email, $details);
+            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "Password Updated Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Password Not Updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Password Not Updated"]);
     }
 
     public function editProfile()
     {
-        return view('company.auth.edit-profile');
+        return $this->navigationManagerService->loadView('company.auth.edit-profile');
     }
 
     public function updateProfile(Request $request)
@@ -362,19 +363,17 @@ class CompanyController extends Controller
                 'title' => 'Profile Updated',
                 'body' => "Your profile has been updated successfully"
             ];
-            $this->sendNotificationService->sendNotification($company, $details['body']);
+            $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($company->email, $details);
-
-            return redirect()->route('company.dashboard')->with("success", "Profile Updated Successfully");
+            $this->mailableService->sendMail($company->email, $details);
+            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "Profile Updated Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Profile Not Updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Not Updated"]);
     }
 
     public function editProfileImage()
     {
-        return view('company.auth.edit-profile-image');
+        return $this->navigationManagerService->loadView('company.auth.edit-profile-image');
     }
 
     public function updateProfileImage(Request $request)
@@ -393,15 +392,15 @@ class CompanyController extends Controller
         $user = $this->company->find($id);
 
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
-        $this->StorageManagerService->uploadToCloudinary($request, "COMPANY", $user->id);
+        $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $user->id);
 
         $data = [
             "profile_image_public_id" => null,
@@ -417,14 +416,13 @@ class CompanyController extends Controller
                 'body' => "Your profile image has been updated successfully"
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($company, $details['body']);
+            $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($company->email, $details);
+            $this->mailableService->sendMail($company->email, $details);
 
-            return redirect()->route('company.dashboard')->with("success", "Profile Image Updated Successfully");
+            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "Profile Image Updated Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Profile Image Not Updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Updated"]);
     }
 
     public function deleteProfileImage()
@@ -434,12 +432,12 @@ class CompanyController extends Controller
         $user = $this->company->find($id);
 
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
         $data = [
@@ -456,13 +454,12 @@ class CompanyController extends Controller
                 'body' => "Your profile image has been deleted successfully"
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($company, $details['body']);
+            $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($company->email, $details);
-            return redirect()->route('company.dashboard')->with("success", "Profile Image Deleted Successfully");
+            $this->mailableService->sendMail($company->email, $details);
+            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "Profile Image Deleted Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Profile Image Not Deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Deleted"]);
     }
 
     public function notifications()
@@ -470,13 +467,12 @@ class CompanyController extends Controller
         $company_id = auth()->guard('company')->user()->id;
         $company = $this->company->find($company_id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $notifications = $company->notifications()->paginate($this->paginate);
 
         $notifications = $notifications->unique('data');
-
-        return view('company.dashboard.notifications', compact('notifications'));
+        return $this->navigationManagerService->loadView('company.dashboard.notifications', compact('notifications'));
     }
 
     public function markAsRead($id)
@@ -484,10 +480,10 @@ class CompanyController extends Controller
         $company_id = auth()->guard('company')->user()->id;
         $company = $this->company->find($company_id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company->notifications()->where('id', $id)->update(['read_at' => now()]);
-        return redirect()->back()->with("success", "Notification is marked as read");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Notification is marked as read"]);
     }
 
     public function markAllAsRead()
@@ -495,10 +491,10 @@ class CompanyController extends Controller
         $company_id = auth()->guard('company')->user()->id;
         $company = $this->company->find($company_id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company->unreadNotifications->markAsRead();
-        return redirect()->back()->with("success", "All notifications are marked as read");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "All notifications are marked as read"]);
     }
 
     public function markAsUnread($id)
@@ -506,10 +502,10 @@ class CompanyController extends Controller
         $company_id = auth()->guard('company')->user()->id;
         $company = $this->company->find($company_id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company->notifications()->where('id', $id)->update(['read_at' => null]);
-        return redirect()->back()->with("success", "Notification is marked as unread");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Notification is marked as unread"]);
     }
 
     public function deleteNotification($id)
@@ -517,10 +513,10 @@ class CompanyController extends Controller
         $company_id = auth()->guard('company')->user()->id;
         $company = $this->company->find($company_id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company->notifications()->where('id', $id)->delete();
-        return redirect()->back()->with("success", "Notification is deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Notification is deleted"]);
     }
 
     public function deleteAllNotification()
@@ -528,10 +524,10 @@ class CompanyController extends Controller
         $company_id = auth()->guard('company')->user()->id;
         $company = $this->company->find($company_id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company->notifications()->delete();
-        return redirect()->back()->with("success", "All notifications are deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "All notifications are deleted"]);
     }
 
     public function followers()
@@ -539,10 +535,10 @@ class CompanyController extends Controller
         $company_id = auth()->guard('company')->user()->id;
         $company = $this->company->find($company_id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $followers = $company->followers()->paginate($this->paginate);
-        return view('company.dashboard.followers', compact('followers'));
+        return $this->navigationManagerService->loadView('company.dashboard.followers', compact('followers'));
     }
 
     public function removeFollower($id)
@@ -550,14 +546,14 @@ class CompanyController extends Controller
         $company_id = auth()->guard('company')->user()->id;
         $company = $this->company->find($company_id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $isAlreadyFollowed = $company->followers()->where('user_id', $id)->exists();
         if (!$isAlreadyFollowed) {
-            return redirect()->back()->with("warning", "User is not followed");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not followed"]);
         }
         $company->followers()->detach($id);
-        return redirect()->back()->with("success", "User is unfollowed");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "User is unfollowed"]);
     }
 
     public function allUsers()
@@ -565,14 +561,14 @@ class CompanyController extends Controller
         $company_id = auth()->guard('company')->user()->id;
         $company = $this->company->find($company_id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $users = User::with([
             'followers',
             'following',
             'followingCompanies'
         ])->paginate($this->paginate);
-        return view('company.dashboard.all-users', compact('users'));
+        return $this->navigationManagerService->loadView('company.dashboard.all-users', compact('users'));
     }
 
     public function indexPost()
@@ -584,11 +580,9 @@ class CompanyController extends Controller
         ])
             ->with([
                 'authorable',
-                // 'comments',
-                // 'likes'
             ])
             ->paginate($this->paginate);
-        return view('company.post.index', compact('posts'));
+        return $this->navigationManagerService->loadView('company.post.index', compact('posts'));
     }
 
     public function allPost()
@@ -602,15 +596,13 @@ class CompanyController extends Controller
                 'comments',
                 'likes'
             ])
-            // ->get()->toArray();
             ->paginate($this->paginate);
-        // dd($posts);
-        return view('company.post.all-post', compact('posts'));
+        return $this->navigationManagerService->loadView('company.post.all-post', compact('posts'));
     }
 
     public function createPost()
     {
-        return view('company.post.create');
+        return $this->navigationManagerService->loadView('company.post.create');
     }
 
     public function storePost(Request $request)
@@ -640,10 +632,9 @@ class CompanyController extends Controller
         $isCreated = Post::create($data);
 
         if ($isCreated) {
-            return redirect()->route('company.post.index')->with("success", "Post Created Successfully");
+            return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Created Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Post Not Created");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Created"]);
     }
 
     public function showPost($id)
@@ -662,28 +653,28 @@ class CompanyController extends Controller
             }
         ])->find($id);
         if (!$post) {
-            return redirect()->back()->with("warning", "Post is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
         // $user_id = auth()->guard('company')->user()->id;
         // if ($post->authorable_type != "App\Models\Company" || $post->authorable_id != $user_id) {
-        //     return redirect()->back()->with("warning", "This post is not created by you");
+        //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         // }
-        return view('company.post.show', compact('post'));
+        return $this->navigationManagerService->loadView('company.post.show', compact('post'));
     }
 
     public function editPost($id)
     {
         $post = Post::find($id);
         if (!$post) {
-            return redirect()->back()->with("warning", "Post is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
         $user_id = auth()->guard('company')->user()->id;
         if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
-            return redirect()->back()->with("warning", "This post is not created by you");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
-        return view('company.post.edit', compact('post'));
+        return $this->navigationManagerService->loadView('company.post.edit', compact('post'));
     }
-    // not done
+
     public function updatePost(Request $request, $id)
     {
         $request->validate([
@@ -700,11 +691,11 @@ class CompanyController extends Controller
         ]);
         $post = Post::find($id);
         if (!$post) {
-            return redirect()->back()->with("warning", "Post is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
         $user_id = auth()->guard('user')->user()->id;
         if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
-            return redirect()->back()->with("warning", "This post is not created by you");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
         $data = [
             "title" => $request->get("title"),
@@ -712,35 +703,35 @@ class CompanyController extends Controller
         ];
         $isUpdated = $post->update($data);
         if ($isUpdated) {
-            return redirect()->route('user.post.index')->with("success", "Post Updated Successfully");
+            return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Updated Successfully"]);
         }
-        return redirect()->back()->with("warning", "Post Not Updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Updated"]);
     }
-    // not done
+
     public function deletePost($id)
     {
         $post = Post::find($id);
         if (!$post) {
-            return redirect()->back()->with("warning", "Post is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
         $user_id = auth()->guard('company')->user()->id;
         if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
-            return redirect()->back()->with("warning", "This post is not created by you");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
         $post->comments()->detach();
         $post->likes()->detach();
         $isDeleted = $post->delete();
         if ($isDeleted) {
-            return redirect()->route('company.post.index')->with("success", "Post Deleted Successfully");
+            return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Deleted Successfully"]);
         }
-        return redirect()->back()->with("warning", "Post Not Deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Deleted"]);
     }
-    // not done
+
     public function likePost($id)
     {
         $post = Post::find($id);
         if (!$post) {
-            return redirect()->back()->with("warning", "Post is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
         $user_id = auth()->guard('user')->user()->id;
         $isAlreadyLiked = $post->likes()->where(
@@ -750,21 +741,21 @@ class CompanyController extends Controller
             ]
         )->exists();
         if ($isAlreadyLiked) {
-            return redirect()->back()->with("warning", "Post is already liked");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is already liked"]);
         }
         $data = [
             "authorable_id" => $user_id,
             "authorable_type" => "App\Models\Company"
         ];
         $post->likes()->create($data);
-        return redirect()->back()->with("success", "Post is liked");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Post is liked"]);
     }
-    // not done
+
     public function unlikePost($id)
     {
         $post = Post::find($id);
         if (!$post) {
-            return redirect()->back()->with("warning", "Post is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
         $user_id = auth()->guard('user')->user()->id;
         $isAlreadyLiked = $post->likes()->where(
@@ -774,7 +765,7 @@ class CompanyController extends Controller
             ]
         )->exists();
         if (!$isAlreadyLiked) {
-            return redirect()->back()->with("warning", "Post is not liked");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not liked"]);
         }
         $post->likes()->where(
             [
@@ -782,6 +773,6 @@ class CompanyController extends Controller
                 ['authorable_type', 'App\Models\Company']
             ]
         )->delete();
-        return redirect()->back()->with("success", "Post is unliked");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Post is unliked"]);
     }
 }

@@ -4,36 +4,43 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Services\MailableService;
+use App\Services\NavigationManagerService;
+use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
-use App\Services\SendMailService;
-use App\Services\SendNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class CompanyController extends Controller
 {
-    private SendNotificationService $sendNotificationService;
-    private SendMailService $sendMailService;
+    private NotifiableService $notifiableService;
+    private MailableService $mailableService;
     private Company $company;
     private int $paginate;
-    private StorageManagerService $StorageManagerService;
+    private StorageManagerService $storageManagerService;
+    private NavigationManagerService $navigationManagerService;
 
     public function __construct(
         Company $company,
-        SendNotificationService $sendNotificationService,
-        SendMailService $sendMailService,
-        StorageManagerService $StorageManagerService
+        NotifiableService $notifiableService,
+        MailableService $mailableService,
+        StorageManagerService $storageManagerService,
+        NavigationManagerService $navigationManagerService,
     ) {
         $this->paginate = env('PAGINATEVALUE');
         $this->company = $company;
-        $this->sendNotificationService = $sendNotificationService;
-        $this->sendMailService = $sendMailService;
-        $this->StorageManagerService = $StorageManagerService;
+        $this->notifiableService = $notifiableService;
+        $this->mailableService = $mailableService;
+        $this->storageManagerService = $storageManagerService;
+        $this->navigationManagerService = $navigationManagerService;
     }
 
     public function create()
     {
-        return view('admin.company.create');
+        // return $this->navigationManagerService->loadView('view-name');
+        // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
+        // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
+        return $this->navigationManagerService->loadView('admin.company.create');
     }
 
     public function store(Request $request)
@@ -143,19 +150,19 @@ class CompanyController extends Controller
         if ($isCreated) {
             $msg = "Company is created";
             if ($hasFile) {
-                $this->StorageManagerService->uploadToCloudinary($request, "COMPANY", $isCreated->id);
+                $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $isCreated->id);
             }
             // MAIL: when company is created send mail to company and admin
-            return redirect()->route('admin.company.index')->with('success', $msg);
+            return $this->navigationManagerService->redirectRoute('admin.company.index', [], 302, [], false, ["success" => $msg]);
         }
 
-        return redirect()->back()->with("warning", "Company is not created");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not created"]);
     }
 
     public function index()
     {
         $companies = $this->company->withCount('jobs')->paginate($this->paginate);
-        return view('admin.company.index', compact('companies'));
+        return $this->navigationManagerService->loadView('admin.company.index', compact('companies'));
     }
 
     public function show($id)
@@ -166,27 +173,27 @@ class CompanyController extends Controller
             }
         ])->get()->ToArray();
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company = $company[0];
-        return view('admin.company.show', compact('company'));
+        return $this->navigationManagerService->loadView('admin.company.show', compact('company'));
     }
 
     public function edit($id)
     {
         $company = $this->company->where('id', $id)->get()->ToArray();
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company = $company[0];
-        return view('admin.company.edit', compact('company'));
+        return $this->navigationManagerService->loadView('admin.company.edit', compact('company'));
     }
 
     public function update(Request $request, $id)
     {
         $company = $this->company->where('id', $id)->get()->ToArray();
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company = $company[0];
         $request->validate([
@@ -215,7 +222,7 @@ class CompanyController extends Controller
             $data["profile_image_public_id"] = null;
             $data["profile_image_url"] = null;
             // ClouadStorageManager : To upload image to cloudinary
-            $this->StorageManagerService->uploadToCloudinary($request, "COMPANY", $company['id']);
+            $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $company['id']);
         }
 
         $data['website'] = $data['city'] = $data['address'] = $data['linkedin'] = $data['description'] = null;
@@ -275,42 +282,41 @@ class CompanyController extends Controller
         $isUpdated = $this->company->where('id', $id)->update($data);
 
         if ($isUpdated) {
-            return redirect()->route('admin.company.index')->with('success', 'Company is updated');
+            return $this->navigationManagerService->redirectRoute('admin.company.index', [], 302, [], false, ["success" => "Company is updated"]);
         }
-
-        return redirect()->back()->with("warning", "Company is not updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not updated"]);
     }
 
     public function delete($id)
     {
         $company = $this->company->where('id', $id)->withCount('jobs')->get()->ToArray();
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company = $company[0];
         if ($company['jobs_count'] > 0) {
-            return redirect()->back()->with("warning", "Company has jobs cannot be deleted");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company has jobs cannot be deleted"]);
         }
         if ($company['profile_image_url']) {
             $public_ids = $company['profile_image_public_id'];
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
         $isDeleted = $this->company->where('id', $id)->delete();
         if ($isDeleted) {
-            return redirect()->route('admin.company.index')->with('success', 'Company is deleted');
+            return $this->navigationManagerService->redirectRoute('admin.company.index', [], 302, [], false, ["success" => "Company is deleted"]);
         }
-        return redirect()->back()->with("warning", "Company is not deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not deleted"]);
     }
 
     public function toggleVerified($id, $is_verified)
     {
         if (!auth()->guard('admin')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
         $company = $this->company->find($id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         if ($is_verified == 1) {
             $company->is_verified = 0;
@@ -321,10 +327,10 @@ class CompanyController extends Controller
                 'body' => "Your company is unverified by admin, please contact admin"
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($company, $details['body']);
+            $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($company->email, $details);
-            return redirect()->back()->with('success', 'Company is unverified');
+            $this->mailableService->sendMail($company->email, $details);
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is unverified"]);
         } else {
             $company->is_verified = 1;
             $company->save();
@@ -333,10 +339,10 @@ class CompanyController extends Controller
                 'body' => "Your company is verified by admin, now you can post jobs"
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($company, $details['body']);
+            $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($company->email, $details);
-            return redirect()->back()->with('success', 'Company is verified');
+            $this->mailableService->sendMail($company->email, $details);
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is verified"]);
         }
     }
 
@@ -353,15 +359,15 @@ class CompanyController extends Controller
 
         $company = $this->company->find($id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
 
         if ($company->profile_image_url) {
             $public_ids = $company->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
         // CloudStorageManager : To upload image to cloudinary
-        $this->StorageManagerService->uploadToCloudinary($request, "COMPANY", $company->id);
+        $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $company->id);
 
         $data = [
             "profile_image_public_id" => null,
@@ -371,21 +377,21 @@ class CompanyController extends Controller
         $isUpdated = $company->update($data);
 
         if ($isUpdated) {
-            return redirect()->back()->with('success', 'Company profile image is updated');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company profile image is updated"]);
         }
 
-        return redirect()->back()->with("warning", "Company profile image is not updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company profile image is not updated"]);
     }
 
     public function deleteProfileImage($id)
     {
         $company = $this->company->find($id);
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         if ($company->profile_image_url) {
             $public_ids = $company->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
 
             $data = [
                 "profile_image_public_id" => null,
@@ -401,9 +407,8 @@ class CompanyController extends Controller
         $isUpdated = $company->update($data);
 
         if ($isUpdated) {
-            return redirect()->back()->with('success', 'Company profile image is deleted');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company profile image is deleted"]);
         }
-
-        return redirect()->back()->with("warning", "Company profile image is not deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company profile image is not deleted"]);
     }
 }

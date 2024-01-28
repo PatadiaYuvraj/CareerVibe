@@ -34,4 +34,8 @@ class NavigationManagerService implements NavigationManagerRepository
     ): RedirectResponse {
         return redirect()->route($route, $parameters, $status, $headers, $secure)->with($with);
     }
+
+    // return $this->navigationManagerService->loadView('view-name');
+    // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
+    // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\NavigationManagerService;
 use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -12,18 +13,23 @@ class UserController extends Controller
 {
     private User $user;
     private int $paginate;
-    private StorageManagerService $StorageManagerService;
+    private StorageManagerService $storageManagerService;
+    private NavigationManagerService $navigationManagerService;
 
-    public function __construct(User $user, StorageManagerService $StorageManagerService)
-    {
-        $this->StorageManagerService = $StorageManagerService;
+    public function __construct(
+        User $user,
+        StorageManagerService $storageManagerService,
+        NavigationManagerService $navigationManagerService,
+    ) {
+        $this->storageManagerService = $storageManagerService;
+        $this->navigationManagerService = $navigationManagerService;
         $this->user = $user;
         $this->paginate = env('PAGINATEVALUE');
     }
 
     public function create()
     {
-        return view('admin.user.create');
+        return $this->navigationManagerService->loadView('admin.user.create');
     }
 
     public function store(Request $request)
@@ -43,7 +49,7 @@ class UserController extends Controller
                 function ($attribute, $value, $fail) {
                     $user = User::where('email', $value)->first();
                     if ($user) {
-                        return $fail('Email already exist');
+                        $fail('Email is already exist');
                     }
                 }
             ],
@@ -82,7 +88,7 @@ class UserController extends Controller
             $request->validate([
                 "resume_pdf_url" => ["required", "mimes:pdf", "max:2048",],
             ]);
-            $stored_path = $this->StorageManagerService->uploadToLocal($request, "resume_pdf_url");
+            $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
             $data["resume_pdf_url"] = $stored_path;
             $data["resume_pdf_public_id"] = null;
         }
@@ -154,11 +160,11 @@ class UserController extends Controller
         if ($isCreated) {
             $msg = "User is created";
             if ($hasFile) {
-                $this->StorageManagerService->uploadToCloudinary($request, "USER", $isCreated->id);
+                $this->storageManagerService->uploadToCloudinary($request, "USER", $isCreated->id);
             }
-            return redirect()->route('admin.user.index')->with("success", $msg);
+            return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => $msg]);
         }
-        return redirect()->back()->with("warning", "User is not created");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not created"]);
     }
 
     public function index()
@@ -171,38 +177,36 @@ class UserController extends Controller
                 'savedJobs',
                 'appliedJobs'
             ])
-            // ->get()->toArray();
             ->paginate($this->paginate);
-        // dd($users);
-        return view('admin.user.index', compact('users'));
+        return $this->navigationManagerService->loadView('admin.user.index', compact('users'));
     }
 
     public function show($id)
     {
         $user = $this->user->where('id', $id)->get()->ToArray();
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         $user  =  $user[0];
         dd($user);
-        return view('admin.user.show', compact('user'));
+        return $this->navigationManagerService->loadView('admin.user.show', compact('user'));
     }
 
     public function edit($id)
     {
         $user = $this->user->where('id', $id)->get()->ToArray();
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         $user  =  $user[0];
-        return view('admin.user.edit', compact('user'));
+        return $this->navigationManagerService->loadView('admin.user.edit', compact('user'));
     }
 
     public function update(Request $request, $id)
     {
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         $request->validate([
             'name' => ['required', 'string', 'max:25'],
@@ -213,7 +217,6 @@ class UserController extends Controller
             "email" => $request->email,
         ];
 
-        // if profile_image_url is already exist then delete it from cloudinary
         if ($request->file('profile_image_url')) {
             $request->validate([
                 "profile_image_url" => [
@@ -226,10 +229,10 @@ class UserController extends Controller
 
             if ($user->profile_image_url) {
                 $public_ids = $user->profile_image_public_id;
-                $this->StorageManagerService->deleteFromCloudinary($public_ids);
+                $this->storageManagerService->deleteFromCloudinary($public_ids);
             }
 
-            $this->StorageManagerService->uploadToCloudinary($request, "USER", $user->id);
+            $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
 
             $data["profile_image_public_id"] = null;
             $data["profile_image_url"] = null;
@@ -245,10 +248,10 @@ class UserController extends Controller
             ]);
 
             if ($user->resume_pdf_url) {
-                $this->StorageManagerService->deleteFromLocal($user->resume_pdf_url);
+                $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
             }
 
-            $stored_path = $this->StorageManagerService->uploadToLocal($request, "resume_pdf_url");
+            $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
             $data["resume_pdf_url"] = $stored_path;
             $data["resume_pdf_public_id"] = null;
         }
@@ -357,38 +360,38 @@ class UserController extends Controller
 
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.user.index')->with("success", "User is updated");
+            return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => "User is updated"]);
         }
-        return redirect()->back()->with("warning", "User is not updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not updated"]);
     }
 
     public function delete($id)
     {
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
         if ($user->resume_pdf_url) {
-            $this->StorageManagerService->deleteFromLocal($user->resume_pdf_url);
+            $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
         }
         $isDeleted = $this->user->where('id', $id)->delete();
         if ($isDeleted) {
-            return redirect()->route('admin.user.index')->with("success", "User is deleted");
+            return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => "User is deleted"]);
         }
-        return redirect()->back()->with("warning", "User is not deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not deleted"]);
     }
 
     public function passwordReset($id)
     {
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
-        return view('admin.user.password-reset', compact('user'));
+        return $this->navigationManagerService->loadView('admin.user.password-reset', compact('user'));
     }
 
     public function updateUserPassword(Request $request, $id)
@@ -400,11 +403,11 @@ class UserController extends Controller
         ]);
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         if (!Hash::check($request->old_password, $user->password)) {
-            return redirect()->back()->with("warning", "Old password is not matched");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Old password is not matched"]);
         }
 
         $data = [
@@ -413,9 +416,9 @@ class UserController extends Controller
 
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.user.index')->with("success", "User password is updated");
+            return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => "User password is updated"]);
         }
-        return redirect()->back()->with("warning", "User password is not updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User password is not updated"]);
     }
 
     public function updateUserProfileImage(Request $request, $id)
@@ -430,13 +433,13 @@ class UserController extends Controller
         ]);
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
-        $this->StorageManagerService->uploadToCloudinary($request, "USER", $user->id);
+        $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
 
         $data = [
             "profile_image_public_id" => null,
@@ -444,20 +447,20 @@ class UserController extends Controller
         ];
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.user.index')->with("success", "User profile image is updated");
+            return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => "User profile image is updated"]);
         }
-        return redirect()->back()->with("warning", "User profile image is not updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User profile image is not updated"]);
     }
 
     public function deleteUserProfileImage($id)
     {
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
         $data = [
             "profile_image_public_id" => null,
@@ -465,9 +468,9 @@ class UserController extends Controller
         ];
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.user.index')->with("success", "User profile image is deleted");
+            return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => "User profile image is deleted"]);
         }
-        return redirect()->back()->with("warning", "User profile image is not deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User profile image is not deleted"]);
     }
 
     public function updateUserResume(Request $request, $id)
@@ -481,65 +484,65 @@ class UserController extends Controller
         ]);
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         if ($user->resume_pdf_url) {
-            $this->StorageManagerService->deleteFromLocal($user->resume_pdf_url);
+            $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
         }
-        $stored_path = $this->StorageManagerService->uploadToLocal($request, "resume_pdf_url");
+        $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
         $data = [
             "resume_pdf_url" => $stored_path,
         ];
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.user.index')->with("success", "User resume is updated");
+            return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => "User resume is updated"]);
         }
-        return redirect()->back()->with("warning", "User resume is not updated");
+        return  $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User resume is not updated"]);
     }
 
     public function deleteUserResume($id)
     {
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         if ($user->resume_pdf_url) {
-            $this->StorageManagerService->deleteFromLocal($user->resume_pdf_url);
+            $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
         }
         $data = [
             "resume_pdf_url" => null,
         ];
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.user.index')->with("success", "User resume is deleted");
+            return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => "User resume is deleted"]);
         }
-        return redirect()->back()->with("warning", "User resume is not deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User resume is not deleted"]);
     }
 
     public function follow($id)
     {
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         $isFollowed = $user->followers()->attach(auth()->user()->id);
         if ($isFollowed) {
-            return redirect()->back()->with("success", "User is followed");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "User is followed"]);
         }
-        return redirect()->back()->with("warning", "User is not followed");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not followed"]);
     }
 
     public function unfollow($id)
     {
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         $isUnfollowed = $user->followers()->detach(auth()->user()->id);
         if ($isUnfollowed) {
-            return redirect()->back()->with("success", "User is unfollowed");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "User is unfollowed"]);
         }
-        return redirect()->back()->with("warning", "User is not unfollowed");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not unfollowed"]);
     }
 
     // follow a company
@@ -548,13 +551,13 @@ class UserController extends Controller
     // {
     //     $user = $this->user->find($id);
     //     if (!$user) {
-    //         return redirect()->back()->with("warning", "Company is not found");
+    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
     //     }
     //     $isFollowed = $user->followers()->attach(auth()->user()->id);
     //     if ($isFollowed) {
-    //         return redirect()->back()->with("success", "Company is followed");
+    //         return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is followed"]);
     //     }
-    //     return redirect()->back()->with("warning", "Company is not followed");
+    //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not followed"]);
     // }
 
     // unfollow a company
@@ -563,13 +566,13 @@ class UserController extends Controller
     // {
     //     $user = $this->user->find($id);
     //     if (!$user) {
-    //         return redirect()->back()->with("warning", "Company is not found");
+    //         return  $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
     //     }
     //     $isUnfollowed = $user->followers()->detach(auth()->user()->id);
     //     if ($isUnfollowed) {
-    //         return redirect()->back()->with("success", "Company is unfollowed");
+    //     return  $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is unfollowed"]);
     //     }
-    //     return redirect()->back()->with("warning", "Company is not unfollowed");
+    //     return  $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not unfollowed"]);
     // }
 
     // following and followers
@@ -578,21 +581,21 @@ class UserController extends Controller
     {
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         $following = $user->following()->paginate($this->paginate);
-        return view('admin.user.following', compact('following'));
+        return $this->navigationManagerService->loadView('admin.user.following', compact('following'));
     }
 
     public function followers($id)
     {
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         $followers = $user->followers()->paginate($this->paginate);
-        return view('admin.user.followers', compact('followers'));
+        return $this->navigationManagerService->loadView('admin.user.followers', compact('followers'));
     }
 }

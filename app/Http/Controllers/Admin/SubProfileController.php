@@ -5,23 +5,31 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProfileCategory;
 use App\Models\SubProfile;
+use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
 
 class SubProfileController extends Controller
 {
     private SubProfile $subProfile;
     private int $paginate;
+    private NavigationManagerService $navigationManagerService;
 
-    public function __construct(SubProfile $subProfile)
-    {
+    public function __construct(
+        SubProfile $subProfile,
+        NavigationManagerService $navigationManagerService,
+    ) {
         $this->subProfile = $subProfile;
         $this->paginate = env('PAGINATEVALUE');
+        $this->navigationManagerService = $navigationManagerService;
     }
 
     public function create()
     {
+        // return $this->navigationManagerService->loadView('view-name');
+        // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
+        // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
         $profileCategories = ProfileCategory::all();
-        return view('admin.sub-profile.create', compact('profileCategories'));
+        return $this->navigationManagerService->loadView('admin.sub-profile.create', compact('profileCategories'));
     }
 
     public function store(Request $request)
@@ -50,19 +58,19 @@ class SubProfileController extends Controller
             'name' => $request->name,
             'profile_category_id' => $request->profile_category_id,
         ];
-        // dd($data);
+
         $isCreated = $this->subProfile->create($data);
+
         if ($isCreated) {
-            return redirect()->route('admin.sub-profile.index')->with('success', 'Sub Profile created successfully');
+            return $this->navigationManagerService->redirectRoute('admin.sub-profile.index', [], 302, [], false, ["success" => "Sub Profile created successfully"]);
         }
-        return redirect()->back()->with('error', 'Sub Profile creation failed');
+        return $this->navigationManagerService->redirectBack(302, [], false, ["error" => "Sub Profile creation failed"]);
     }
 
     public function index()
     {
-        // dd($this->paginate);
         $subProfiles = $this->subProfile->withCount('jobs')->with('profileCategory')->paginate($this->paginate);
-        return view('admin.sub-profile.index', compact('subProfiles'));
+        return $this->navigationManagerService->loadView('admin.sub-profile.index', compact('subProfiles'));
     }
 
     public function show($id)
@@ -104,21 +112,21 @@ class SubProfileController extends Controller
             ->get()
             ->ToArray();
         if (!$subProfile) {
-            return redirect()->back()->with("warning", "Sub Profile is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not found"]);
         }
         $subProfile =  $subProfile[0];
-        return view('admin.sub-profile.show', compact('subProfile'));
+        return $this->navigationManagerService->loadView('admin.sub-profile.show', compact('subProfile'));
     }
 
     public function edit($id)
     {
         $subProfile = $this->subProfile->where('id', $id)->with('profileCategory')->get()->ToArray();
         if (!$subProfile) {
-            return redirect()->back()->with("warning", "Sub Profile is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not found"]);
         }
         $subProfile =  $subProfile[0];
         $profileCategories = ProfileCategory::all();
-        return view('admin.sub-profile.edit', compact('subProfile', 'profileCategories'));
+        return $this->navigationManagerService->loadView('admin.sub-profile.edit', compact('subProfile', 'profileCategories'));
     }
 
     public function update(Request $request, $id)
@@ -143,25 +151,25 @@ class SubProfileController extends Controller
 
         $isUpdated = $this->subProfile->where('id', $id)->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.sub-profile.index')->with('success', 'Sub Profile is updated');
+            return $this->navigationManagerService->redirectRoute('admin.sub-profile.index', [], 302, [], false, ["success" => "Sub Profile is updated"]);
         }
-        return redirect()->back()->with("warning", "Sub Profile is not updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not updated"]);
     }
 
     public function delete($id)
     {
         $subProfile = $this->subProfile->where('id', $id)->withCount('jobs')->get()->ToArray();
         if (!$subProfile) {
-            return redirect()->back()->with("warning", "Sub Profile is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not found"]);
         }
         $subProfile =  $subProfile[0];
         if ($subProfile['jobs_count'] == 0) {
             $isDeleted = $this->subProfile->where('id', $id)->delete();
             if ($isDeleted) {
-                return redirect()->route('admin.sub-profile.index')->with('success', 'Sub Profile is deleted');
+                return $this->navigationManagerService->redirectRoute('admin.sub-profile.index', [], 302, [], false, ["success" => "Sub Profile is deleted"]);
             }
-            return redirect()->back()->with("warning", "Sub Profile is not deleted");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not deleted"]);
         }
-        return redirect()->back()->with("warning", "Sub Profile is not deleted, because it has jobs associated with it");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not deleted, because it has jobs associated with it"]);
     }
 }

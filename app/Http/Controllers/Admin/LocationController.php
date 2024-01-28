@@ -4,22 +4,27 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Location;
+use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
     private Location $location;
     private int $paginate;
+    private NavigationManagerService $navigationManagerService;
 
-    public function __construct(Location $location)
-    {
+    public function __construct(
+        Location $location,
+        NavigationManagerService $navigationManagerService,
+    ) {
         $this->location = $location;
         $this->paginate = env('PAGINATEVALUE');
+        $this->navigationManagerService = $navigationManagerService;
     }
 
     public function create()
     {
-        return view('admin.location.create');
+        return $this->navigationManagerService->loadView('admin.location.create');
     }
 
     public function store(Request $request)
@@ -76,15 +81,15 @@ class LocationController extends Controller
         }
         $isCreated = $this->location->create($data);
         if ($isCreated) {
-            return redirect()->route('admin.location.index')->with('success', 'Location is created');
+            return $this->navigationManagerService->redirectRoute('admin.location.index', [], 302, [], false, ["success" => "Location is created"]);
         }
-        return redirect()->back()->with("warning", "Location is not created");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Location is not created"]);
     }
 
     public function index()
     {
         $locations = $this->location->withCount('jobs')->paginate($this->paginate);
-        return view('admin.location.index', compact('locations'));
+        return $this->navigationManagerService->loadView('admin.location.index', compact('locations'));
     }
 
     public function show($id)
@@ -130,22 +135,21 @@ class LocationController extends Controller
             ])
             ->get()
             ->ToArray();
-        // dd($location);
         if (!$location) {
-            return redirect()->back()->with("warning", "Location is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Location is not found"]);
         }
         $location =  $location[0];
-        return view('admin.location.show', compact('location'));
+        return $this->navigationManagerService->loadView('admin.location.show', compact('location'));
     }
 
     public function edit($id)
     {
         $location = $this->location->where('id', $id)->get()->ToArray();
         if (!$location) {
-            return redirect()->back()->with("warning", "Location is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Location is not found"]);
         }
         $location =  $location[0];
-        return view('admin.location.edit', compact('location'));
+        return $this->navigationManagerService->loadView('admin.location.edit', compact('location'));
     }
 
     public function update(Request $request, $id)
@@ -203,29 +207,29 @@ class LocationController extends Controller
         }
         $isUpdated = $this->location->find($id);
         if (!$isUpdated) {
-            return redirect()->back()->with("warning", "Location is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Location is not found"]);
         }
         $isUpdated = $isUpdated->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.location.index')->with('success', 'Location is updated');
+            return $this->navigationManagerService->redirectRoute('admin.location.index', [], 302, [], false, ["success" => "Location is updated"]);
         }
-        return redirect()->back()->with("warning", "Location is not updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Location is not updated"]);
     }
 
     public function delete($id)
     {
         $location = $this->location->where('id', $id)->withCount('jobs')->get()->ToArray();
         if (!$location) {
-            return redirect()->back()->with("warning", "Location is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Location is not found"]);
         }
         $location =  $location[0];
         if ($location['jobs_count'] == 0) {
             $isDeleted = $this->location->where('id', $id)->delete();
             if ($isDeleted) {
-                return redirect()->route('admin.location.index')->with('success', 'Location is deleted');
+                return $this->navigationManagerService->redirectRoute('admin.location.index', [], 302, [], false, ["success" => "Location is deleted"]);
             }
-            return redirect()->back()->with("warning", "Location is not deleted");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Location is not deleted"]);
         }
-        return redirect()->back()->with("warning", "Location is not deleted, because it has jobs associated with it");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Location is not deleted, because it has jobs associated with it"]);
     }
 }

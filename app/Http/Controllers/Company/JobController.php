@@ -9,8 +9,9 @@ use App\Models\Job;
 use App\Models\Location;
 use App\Models\Qualification;
 use App\Models\SubProfile;
-use App\Services\SendMailService;
-use App\Services\SendNotificationService;
+use App\Services\MailableService;
+use App\Services\NavigationManagerService;
+use App\Services\NotifiableService;
 use Illuminate\Http\Request;
 
 class JobController extends Controller
@@ -19,12 +20,18 @@ class JobController extends Controller
     private Job $job;
     private $current_company;
     private int $paginate;
-    private SendMailService $sendMailService;
-    private SendNotificationService $sendNotificationService;
+    private MailableService $mailableService;
+    private NotifiableService $notifiableService;
+    private NavigationManagerService $navigationManagerService;
 
 
-    public function __construct(Company $company, Job $job, SendMailService $sendMailService, SendNotificationService $sendNotificationService)
-    {
+    public function __construct(
+        Company $company,
+        Job $job,
+        MailableService $mailableService,
+        NotifiableService $notifiableService,
+        NavigationManagerService $navigationManagerService,
+    ) {
         $this->middleware(
             function ($request, $next) {
                 if (auth()->guard('company')->check()) {
@@ -36,8 +43,9 @@ class JobController extends Controller
         $this->job = $job;
         $this->company = $company;
         $this->paginate = env('PAGINATEVALUE');
-        $this->sendMailService = $sendMailService;
-        $this->sendNotificationService = $sendNotificationService;
+        $this->mailableService = $mailableService;
+        $this->notifiableService = $notifiableService;
+        $this->navigationManagerService = $navigationManagerService;
     }
 
     public function index()
@@ -72,12 +80,8 @@ class JobController extends Controller
                 'is_active',
                 'is_featured'
             ])
-            // ->get()->toArray();
             ->paginate($this->paginate);
-
-        // dd($jobs);
-
-        return view('company.job.index', compact('jobs'));
+        return $this->navigationManagerService->loadView('company.job.index', compact('jobs'));
     }
 
     public function create()
@@ -85,11 +89,11 @@ class JobController extends Controller
         $company_id = $this->current_company->id;
         $company = Company::where('id', $company_id)->select(['id', 'name', 'is_verified'])->get()->toArray();
         if (!$company) {
-            return redirect()->back()->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $company = $company[0];
         if ($company['is_verified'] == 0) {
-            return redirect()->back()->with("warning", "Company is not verified");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not verified"]);
         }
 
         $sub_profiles = SubProfile::select([
@@ -114,17 +118,17 @@ class JobController extends Controller
             "WFO",
             "HYBRID"
         ];
-        return view('company.job.create', compact('company', 'sub_profiles', 'locations', 'qualifications', 'work_types'));
+        return $this->navigationManagerService->loadView('company.job.create', compact('company', 'sub_profiles', 'locations', 'qualifications', 'work_types'));
     }
 
     public function store(Request $request)
     {
         $id = $this->current_company->id;
         if (!$id) {
-            return redirect()->route('company.job.index')->with("warning", "Company is not found");
+            return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["warning" => "Company is not found"]);
         }
         if (auth()->guard('company')->user()->is_verified == 0) {
-            return redirect()->route('company.job.index')->with("warning", "Company is not verified");
+            return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["warning" => "Company is not verified"]);
         }
         $request->validate([
             "sub_profile_id" =>
@@ -279,9 +283,9 @@ class JobController extends Controller
                 'body' => "Your job for $profileName profile is created successfully. Admin will verify it."
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($company, $msg);
+            $this->notifiableService->sendNotification($company, $msg);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($company->email, $details);
+            $this->mailableService->sendMail($company->email, $details);
 
             $admins = Admin::all();
             $details = [
@@ -290,15 +294,14 @@ class JobController extends Controller
             ];
             foreach ($admins as $admin) {
                 // UNCOMMENT: To send notification
-                $this->sendNotificationService->sendNotification($admin, $details['body']);
+                $this->notifiableService->sendNotification($admin, $details['body']);
                 // UNCOMMENT: To send mail
-                $this->sendMailService->sendMail($admin->email, $details);
+                $this->mailableService->sendMail($admin->email, $details);
             }
 
-
-            return redirect()->route('company.job.index')->with('success', 'Job is created');
+            return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is created"]);
         }
-        return redirect()->back()->with("warning", "Job is not created");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not created"]);
     }
 
     public function show($id)
@@ -322,10 +325,10 @@ class JobController extends Controller
             ]
         )->get()->ToArray();
         if (!$job) {
-            return redirect()->back()->with("warning", "Job is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
         $job = $job[0];
-        return view('company.job.show', compact('job'));
+        return $this->navigationManagerService->loadView('company.job.show', compact('job'));
     }
 
     public function edit($id)
@@ -337,7 +340,7 @@ class JobController extends Controller
             ->find($id);
 
         if (!$job) {
-            return redirect()->back()->with('warning', 'The job is not created by this company.');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "The job is not created by this company."]);
         }
         $job = $this->job->where('id', $id)->with([
             'subProfile' => function ($query) {
@@ -363,10 +366,10 @@ class JobController extends Controller
         ])
             ->get()->toArray();
         if (!$job) {
-            return redirect()->back()->with("warning", "Job is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
         $job  =  $job[0];
-        return view('company.job.edit', compact('job', 'qualifications', 'locations', 'sub_profiles'));
+        return $this->navigationManagerService->loadView('company.job.edit', compact('job', 'qualifications', 'locations', 'sub_profiles'));
     }
 
     public function update(Request $request, $id)
@@ -512,9 +515,9 @@ class JobController extends Controller
         if ($isUpdated) {
             $d = $isUpdated->qualifications()->sync($request->get('qualifications'));
             $isUpdated->locations()->sync($request->get('locations'));
-            return redirect()->route('company.job.index')->with('success', 'Job is updated');
+            return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
         }
-        return redirect()->back()->with("warning", "Job is not updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not updated"]);
     }
 
     public function delete($id)
@@ -526,7 +529,7 @@ class JobController extends Controller
             ->find($id);
 
         if (!$isDeleted) {
-            return redirect()->back()->with('warning', 'The job is not created by this company.');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "The job is not created by this company."]);
         }
 
         // $isDeleted = $this->job->find($id);
@@ -534,9 +537,9 @@ class JobController extends Controller
         $isDeleted->qualifications()->detach();
         $isDeleted->delete();
         if (!$isDeleted) {
-            return redirect()->back()->with("warning", "Job is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
-        return redirect()->route('company.job.index')->with('success', 'Job is deleted');
+        return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is deleted"]);
     }
 
     public function toggleFeatured($id, $is_featured)
@@ -546,18 +549,18 @@ class JobController extends Controller
             ->where('company_id', $company_id)
             ->find($id);
         if (!$job) {
-            return redirect()->back()->with('warning', 'Job not found');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
         if ($is_featured == 1) {
             $job->is_featured = 0;
             $job->save();
-            return redirect()->back()->with('success', 'Company is unfeatured');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is unfeatured"]);
         } else {
             $job->is_featured = 1;
             $job->save();
-            return redirect()->back()->with('success', 'Company is featured');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is featured"]);
         }
-        return redirect()->route('company.job.index')->with('success', 'Job updated successfully');
+        return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
     }
 
     public function toggleActive($id, $is_active)
@@ -567,28 +570,17 @@ class JobController extends Controller
             ->where('company_id', $company_id)
             ->find($id);
         if (!$job) {
-            return redirect()->back()->with('warning', 'Job not found');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
         if ($is_active == 1) {
             $job->is_active = 0;
             $job->save();
-            return redirect()->back()->with('success', 'Company is unaactive');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is unaactive"]);
         } else {
             $job->is_active = 1;
             $job->save();
-            return redirect()->back()->with('success', 'Company is active');
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is active"]);
         }
-        return redirect()->route('company.job.index')->with('success', 'Job updated successfully');
-
-        // $company = $this->company->find(auth()->guard('company')->user()->id);
-        // $msg = "Your profile image has been deleted successfully";
-        // Notification::send($company, new SendNotification($msg));
-
-        // // UNCOMMENT: To send mail
-        // $details = [
-        //     'title' => 'Profile Image Deleted',
-        //     'body' => "Your profile image has been deleted successfully"
-        // ];
-        // SendMailJob::dispatch($company->email, $details);
+        return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
     }
 }

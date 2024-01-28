@@ -5,22 +5,22 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Services\NavigationManagerService;
-use App\Services\SendNotificationService;
+use App\Services\NotifiableService;
 
 class CompanyController extends Controller
 {
     private Company $company;
-    private SendNotificationService $sendNotificationService;
     private NavigationManagerService $navigationManagerService;
+    private NotifiableService $notifiableService;
 
     public function __construct(
         Company $company,
-        SendNotificationService $sendNotificationService,
-        NavigationManagerService $navigationManagerService
+        NavigationManagerService $navigationManagerService,
+        NotifiableService $notifiableService
     ) {
         $this->company = $company;
-        $this->sendNotificationService = $sendNotificationService;
         $this->navigationManagerService = $navigationManagerService;
+        $this->notifiableService = $notifiableService;
     }
 
 
@@ -49,7 +49,7 @@ class CompanyController extends Controller
         $company->followers()->syncWithoutDetaching($current_user_id);
 
         $msg = auth()->guard('user')->user()->name . " is started following you";
-        $this->sendNotificationService->sendNotification($company, $msg);
+        $this->notifiableService->sendNotification($company, $msg);
         return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "User is followed"]);
     }
 

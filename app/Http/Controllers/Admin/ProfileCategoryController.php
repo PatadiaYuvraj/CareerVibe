@@ -4,24 +4,30 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\ProfileCategory;
+use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
-
-use function Laravel\Prompts\select;
 
 class ProfileCategoryController extends Controller
 {
     private ProfileCategory $profileCategory;
     private int $paginate;
+    private NavigationManagerService $navigationManagerService;
 
-    public function __construct(ProfileCategory $profileCategory)
-    {
+    public function __construct(
+        ProfileCategory $profileCategory,
+        NavigationManagerService $navigationManagerService,
+    ) {
         $this->profileCategory = $profileCategory;
         $this->paginate = env('PAGINATEVALUE');
+        $this->navigationManagerService = $navigationManagerService;
     }
 
     public function create()
     {
-        return view('admin.profile-category.create');
+        // return $this->navigationManagerService->loadView('view-name');
+        // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
+        // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
+        return $this->navigationManagerService->loadView('admin.profile-category.create');
     }
 
     public function store(Request $request)
@@ -40,15 +46,15 @@ class ProfileCategoryController extends Controller
         ];
         $isCreated = $this->profileCategory->create($data);
         if ($isCreated) {
-            return redirect()->route('admin.profile-category.index')->with('success', 'Profile Category created successfully');
+            return $this->navigationManagerService->redirectRoute('admin.profile-category.index', [], 302, [], false, ["success" => "Profile Category is created"]);
         }
-        return redirect()->back()->with('error', 'Profile Category creation failed');
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not created"]);
     }
 
     public function index()
     {
         $profileCategories = $this->profileCategory->withCount('subProfiles', 'jobs')->paginate($this->paginate);
-        return view('admin.profile-category.index', compact('profileCategories'));
+        return $this->navigationManagerService->loadView('admin.profile-category.index', compact('profileCategories'));
     }
 
     public function show($id)
@@ -63,20 +69,20 @@ class ProfileCategoryController extends Controller
             ->get()
             ->ToArray();
         if (!$profileCategory) {
-            return redirect()->back()->with("warning", "Profile Category is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not found"]);
         }
         $profileCategory =  $profileCategory[0];
-        return view('admin.profile-category.show', compact('profileCategory'));
+        return $this->navigationManagerService->loadView('admin.profile-category.show', compact('profileCategory'));
     }
 
     public function edit($id)
     {
         $profileCategory = $this->profileCategory->where('id', $id)->get()->ToArray();
         if (!$profileCategory) {
-            return redirect()->back()->with("warning", "Profile Category is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not found"]);
         }
         $profileCategory =  $profileCategory[0];
-        return view('admin.profile-category.edit', compact('profileCategory'));
+        return $this->navigationManagerService->loadView('admin.profile-category.edit', compact('profileCategory'));
     }
 
     public function update(Request $request, $id)
@@ -95,24 +101,24 @@ class ProfileCategoryController extends Controller
 
         $isUpdated = $this->profileCategory->where('id', $id)->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.profile-category.index')->with('success', 'Profile Category updated successfully');
+            return $this->navigationManagerService->redirectRoute('admin.profile-category.index', [], 302, [], false, ["success" => "Profile Category is updated"]);
         }
-        return redirect()->back()->with('error', 'Profile Category updation failed');
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not updated"]);
     }
 
     public function delete($id)
     {
         $profileCategory = $this->profileCategory->find($id)->withCount('subProfiles')->first();
         if (!$profileCategory) {
-            return redirect()->back()->with("warning", "Profile Category is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not found"]);
         }
         if ($profileCategory['sub_profiles_count'] > 0) {
-            return redirect()->back()->with("warning", "Profile Category is not deleted because it has sub profiles");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not deleted because it has sub profiles"]);
         }
         $isDeleted = $this->profileCategory->where('id', $id)->delete();
         if ($isDeleted) {
-            return redirect()->route('admin.profile-category.index')->with('success', 'Profile Category deleted successfully');
+            return $this->navigationManagerService->redirectRoute('admin.profile-category.index', [], 302, [], false, ["success" => "Profile Category is deleted"]);
         }
-        return redirect()->back()->with('error', 'Profile Category deletion failed');
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not deleted"]);
     }
 }

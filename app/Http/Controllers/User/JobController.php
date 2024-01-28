@@ -35,7 +35,7 @@ class JobController extends Controller
             $job->is_applied = $job->applyByUsers->count() > 0;
             $job->is_saved = $job->savedByUsers->count() > 0;
         }
-        $navigation = $this->navigationManagerService->loadView('user.job.index', compact('jobs'));
+        return $this->navigationManagerService->loadView('user.job.index', compact('jobs'));
     }
 
     public function show($job_id)
@@ -52,7 +52,7 @@ class JobController extends Controller
             ])
             ->first()
             ->toArray();
-        $navigation = $this->navigationManagerService->loadView('user.job.show', compact('job'));
+        return $this->navigationManagerService->loadView('user.job.show', compact('job'));
     }
 
     public function appliedJobs()
@@ -64,7 +64,7 @@ class JobController extends Controller
             }
         ])->get()->toArray();
         $jobs = $jobs[0];
-        $navigation = $this->navigationManagerService->loadView('user.job.applied', compact('jobs'));
+        return $this->navigationManagerService->loadView('user.job.applied', compact('jobs'));
     }
 
     public function apply($job_id)
@@ -101,7 +101,7 @@ class JobController extends Controller
             }
         ])->get()->toArray();
         $jobs = $jobs[0];
-        $navigation = $this->navigationManagerService->loadView('user.job.saved', compact('jobs'));
+        return $this->navigationManagerService->loadView('user.job.saved', compact('jobs'));
     }
 
     public function saveJob($job_id)

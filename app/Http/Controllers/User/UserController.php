@@ -11,31 +11,31 @@ use App\Models\Post;
 use App\Models\User;
 use App\Services\NavigationManagerService;
 use App\Services\StorageManagerService;
-use App\Services\SendMailService;
-use App\Services\SendNotificationService;
+use App\Services\MailableService;
+use App\Services\NotifiableService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 class UserController extends Controller
 {
     private User $user;
-    private StorageManagerService $StorageManagerService;
-    private SendNotificationService $sendNotificationService;
-    private SendMailService $sendMailService;
+    private StorageManagerService $storageManagerService;
+    private NotifiableService $notifiableService;
+    private MailableService $mailableService;
     private int $paginate;
     private NavigationManagerService $navigationManagerService;
 
     public function __construct(
         User $user,
-        SendNotificationService $sendNotificationService,
-        SendMailService $sendMailService,
-        StorageManagerService $StorageManagerService,
+        NotifiableService $notifiableService,
+        MailableService $mailableService,
+        StorageManagerService $storageManagerService,
         NavigationManagerService $navigationManagerService,
     ) {
         $this->user = $user;
-        $this->sendNotificationService = $sendNotificationService;
-        $this->sendMailService = $sendMailService;
-        $this->StorageManagerService = $StorageManagerService;
+        $this->notifiableService = $notifiableService;
+        $this->mailableService = $mailableService;
+        $this->storageManagerService = $storageManagerService;
         $this->paginate = env('PAGINATEVALUE');
         $this->navigationManagerService = $navigationManagerService;
     }
@@ -170,7 +170,7 @@ class UserController extends Controller
     public function doChangePassword(Request $request)
     {
         if (!auth()->guard('user')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('user')->user()->id;
@@ -215,8 +215,8 @@ class UserController extends Controller
             'title' => 'Password Changed',
             'body' => 'Your password is changed'
         ];
-        $this->sendNotificationService->sendNotification($user, $details['body']);
-        $this->sendMailService->sendMail($user->email, $details);
+        $this->notifiableService->sendNotification($user, $details['body']);
+        $this->mailableService->sendMail($user->email, $details);
 
         if ($isUpdated) {
             return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "Password Updated Successfully"]);
@@ -232,7 +232,7 @@ class UserController extends Controller
     public function updateProfile(Request $request)
     {
         if (!auth()->guard('user')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('user')->user()->id;
@@ -377,8 +377,8 @@ class UserController extends Controller
                 'title' => 'Profile Updated',
                 'body' => 'Your profile is updated'
             ];
-            $this->sendNotificationService->sendNotification($user, $details['body']);
-            $this->sendMailService->sendMail($user->email, $details);
+            $this->notifiableService->sendNotification($user, $details['body']);
+            $this->mailableService->sendMail($user->email, $details);
             return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "Profile Updated Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Not Updated"]);
@@ -392,7 +392,7 @@ class UserController extends Controller
     public function updateProfileImage(Request $request)
     {
         if (!auth()->guard('user')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('user')->user()->id;
@@ -409,15 +409,15 @@ class UserController extends Controller
         $user = $this->user->find($id);
 
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
-        $this->StorageManagerService->uploadToCloudinary($request, "USER", $user->id);
+        $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
 
         $data = [
             "profile_image_public_id" => null,
@@ -432,8 +432,8 @@ class UserController extends Controller
                 'title' => 'Profile Image Updated',
                 'body' => 'Your profile image is updated'
             ];
-            $this->sendNotificationService->sendNotification($user, $details['body']);
-            $this->sendMailService->sendMail($user->email, $details);
+            $this->notifiableService->sendNotification($user, $details['body']);
+            $this->mailableService->sendMail($user->email, $details);
             return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "Profile Image Updated Successfully"]);
         }
 
@@ -443,7 +443,7 @@ class UserController extends Controller
     public function deleteProfileImage()
     {
         if (!auth()->guard('user')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('user')->user()->id;
@@ -451,12 +451,12 @@ class UserController extends Controller
         $user = $this->user->find($id);
 
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
         $data = [
@@ -473,8 +473,8 @@ class UserController extends Controller
                 'title' => 'Profile Image Deleted',
                 'body' => 'Your profile image is deleted'
             ];
-            $this->sendNotificationService->sendNotification($user, $details['body']);
-            $this->sendMailService->sendMail($user->email, $details);
+            $this->notifiableService->sendNotification($user, $details['body']);
+            $this->mailableService->sendMail($user->email, $details);
             return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "Profile Image Deleted Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Deleted"]);
@@ -488,7 +488,7 @@ class UserController extends Controller
     public function updateResumePdf(Request $request)
     {
         if (!auth()->guard('user')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('user')->user()->id;
@@ -502,12 +502,12 @@ class UserController extends Controller
         ]);
         $user = $this->user->find($id);
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         if ($user->resume_pdf_url) {
-            $this->StorageManagerService->deleteFromLocal($user->resume_pdf_url);
+            $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
         }
-        $stored_path = $this->StorageManagerService->uploadToLocal($request, "resume_pdf_url");
+        $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
         $data = [
             "resume_pdf_url" => $stored_path,
         ];
@@ -520,9 +520,9 @@ class UserController extends Controller
                 'body' => 'Your resume is updated'
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($user, $details['body']);
+            $this->notifiableService->sendNotification($user, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($user->email, $details);
+            $this->mailableService->sendMail($user->email, $details);
             return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "User resume is updated"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User resume is not updated"]);
@@ -531,7 +531,7 @@ class UserController extends Controller
     public function deleteResumePdf()
     {
         if (!auth()->guard('user')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('user')->user()->id;
@@ -539,7 +539,7 @@ class UserController extends Controller
         $user = $this->user->find($id);
 
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         if ($user->resume_pdf_url) {
@@ -596,7 +596,7 @@ class UserController extends Controller
 
         $user->followers()->syncWithoutDetaching($current_user_id);
         $msg = auth()->guard('user')->user()->name . " is started following you";
-        $this->sendNotificationService->sendNotification($user, $msg);
+        $this->notifiableService->sendNotification($user, $msg);
         return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "User is followed"]);
     }
 

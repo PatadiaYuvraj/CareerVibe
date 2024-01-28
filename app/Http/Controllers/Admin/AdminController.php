@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Services\MailableService;
+use App\Services\NavigationManagerService;
+use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
-use App\Services\SendMailService;
-use App\Services\SendNotificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
@@ -15,31 +16,37 @@ class AdminController extends Controller
 {
     private Admin $admin;
     private int $paginate;
-    private SendMailService $sendMailService;
-    private SendNotificationService $sendNotificationService;
-    private StorageManagerService $StorageManagerService;
+    private MailableService $mailableService;
+    private NotifiableService $notifiableService;
+    private StorageManagerService $storageManagerService;
+    private NavigationManagerService $navigationManagerService;
 
     public function __construct(
         Admin $admin,
-        SendMailService $sendMailService,
-        SendNotificationService $sendNotificationService,
-        StorageManagerService $StorageManagerService
+        MailableService $mailableService,
+        NotifiableService $notifiableService,
+        StorageManagerService $storageManagerService,
+        NavigationManagerService $navigationManagerService,
     ) {
-        $this->admin = $admin;
         $this->paginate = env('PAGINATEVALUE');
-        $this->sendMailService = $sendMailService;
-        $this->sendNotificationService = $sendNotificationService;
-        $this->StorageManagerService = $StorageManagerService;
+        $this->admin = $admin;
+        $this->mailableService = $mailableService;
+        $this->notifiableService = $notifiableService;
+        $this->storageManagerService = $storageManagerService;
+        $this->navigationManagerService = $navigationManagerService;
     }
 
     public function dashboard()
     {
-        return view('admin.dashboard.index');
+        // return $this->navigationManagerService->loadView('view-name');
+        // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
+        // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
+        return $this->navigationManagerService->loadView('admin.dashboard.index');
     }
 
     public function login()
     {
-        return view('admin.auth.login');
+        return $this->navigationManagerService->loadView('admin.auth.login');
     }
 
     public function doLogin(Request $request)
@@ -51,7 +58,7 @@ class AdminController extends Controller
                 function ($attribute, $value, $fail) {
                     $user = $this->admin->where('email', $value)->first();
                     if (!$user) {
-                        return $fail(__('The email is not registered.'));
+                        return $fail(__('The email is incorrect.'));
                     }
                 }
             ],
@@ -73,14 +80,14 @@ class AdminController extends Controller
         ];
 
         if (auth()->guard('admin')->attempt($data, true)) {
-            return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
+            return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
         }
-        return redirect()->back()->with("warning", "Invalid Credentials");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
     }
 
     public function register()
     {
-        return view('admin.auth.register');
+        return $this->navigationManagerService->loadView('admin.auth.register');
     }
 
     public function doRegister(Request $request)
@@ -144,9 +151,9 @@ class AdminController extends Controller
             foreach ($admins as $admin) {
                 $email = $admin->email;
                 // UNCOMMENT: To send notification
-                $this->sendNotificationService->sendNotification($admin, $details['body']);
+                $this->notifiableService->sendNotification($admin, $details['body']);
                 // UNCOMMENT: To send mail
-                $this->sendMailService->sendMail($email, $details);
+                $this->mailableService->sendMail($email, $details);
             }
         }
 
@@ -158,25 +165,23 @@ class AdminController extends Controller
             ]);
 
             if ($isAuth) {
-                return redirect()->route('admin.dashboard')->with("success", "You're Logged In");
+                return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
             }
-
-            return redirect()->route('admin.login')->with("success", "Admin Created Successfully");
+            return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["success" => "Admin Created Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Admin Not Created");
+        return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["warning" => "Admin Not Created"]);
     }
 
     public function logout()
     {
         auth()->guard('admin')->logout();
         Session::flush();
-        return redirect()->route('admin.login')->with("success", "You're Logged Out");
+        return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["success" => "You're Logged Out"]);
     }
 
     public function changePassword()
     {
-        return view('admin.auth.change-password');
+        return $this->navigationManagerService->loadView('admin.auth.change-password');
     }
 
     public function doChangePassword(Request $request)
@@ -185,7 +190,7 @@ class AdminController extends Controller
         // currentPassword newPassword confirmPassword
 
         if (!auth()->guard('admin')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('admin')->user()->id;
@@ -231,27 +236,26 @@ class AdminController extends Controller
             'body' => "Your password has been changed successfully"
         ];
         // UNCOMMENT: To send notification
-        $this->sendNotificationService->sendNotification($admin, $details['body']);
+        $this->notifiableService->sendNotification($admin, $details['body']);
         // UNCOMMENT: To send mail
-        $this->sendMailService->sendMail($admin->email, $details);
+        $this->mailableService->sendMail($admin->email, $details);
 
 
         if ($isUpdated) {
-            return redirect()->route('admin.dashboard')->with("success", "Password Updated Successfully");
+            return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "Password Updated Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Password Not Updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Password Not Updated"]);
     }
 
     public function editProfile()
     {
-        return view('admin.auth.edit-profile');
+        return $this->navigationManagerService->loadView('admin.auth.edit-profile');
     }
 
     public function updateProfile(Request $request)
     {
         if (!auth()->guard('admin')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('admin')->user()->id;
@@ -295,25 +299,24 @@ class AdminController extends Controller
                 'body' => "Your profile has been updated successfully"
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($admin, $details['body']);
+            $this->notifiableService->sendNotification($admin, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($admin->email, $details);
+            $this->mailableService->sendMail($admin->email, $details);
 
-            return redirect()->route('admin.dashboard')->with("success", "Profile Updated Successfully");
+            return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "Profile Updated Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Profile Not Updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Not Updated"]);
     }
 
     public function editProfileImage()
     {
-        return view('admin.auth.edit-profile-image');
+        return $this->navigationManagerService->loadView('admin.auth.edit-profile-image');
     }
 
     public function updateProfileImage(Request $request)
     {
         if (!auth()->guard('admin')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('admin')->user()->id;
@@ -330,13 +333,13 @@ class AdminController extends Controller
         $user = $this->admin->find($id);
 
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
-            $this->StorageManagerService->uploadToCloudinary($request, "ADMIN", $user->id);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->uploadToCloudinary($request, "ADMIN", $user->id);
         }
 
 
@@ -355,19 +358,18 @@ class AdminController extends Controller
                 'body' => "Your profile image has been updated successfully"
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($admin, $details['body']);
+            $this->notifiableService->sendNotification($admin, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($admin->email, $details);
-            return redirect()->route('admin.dashboard')->with("success", "Profile Image Updated Successfully");
+            $this->mailableService->sendMail($admin->email, $details);
+            return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "Profile Image Updated Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Profile Image Not Updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Updated"]);
     }
 
     public function deleteProfileImage()
     {
         if (!auth()->guard('admin')->check()) {
-            return redirect()->back()->with("warning", "You are not authorized");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
         $id = auth()->guard('admin')->user()->id;
@@ -375,12 +377,12 @@ class AdminController extends Controller
         $user = $this->admin->find($id);
 
         if (!$user) {
-            return redirect()->back()->with("warning", "User is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
         if ($user->profile_image_url) {
             $public_ids = $user->profile_image_public_id;
-            $this->StorageManagerService->deleteFromCloudinary($public_ids);
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
         $data = [
@@ -397,110 +399,25 @@ class AdminController extends Controller
                 'body' => "Your profile image has been deleted successfully"
             ];
             // UNCOMMENT: To send notification
-            $this->sendNotificationService->sendNotification($admin, $details['body']);
+            $this->notifiableService->sendNotification($admin, $details['body']);
             // UNCOMMENT: To send mail
-            $this->sendMailService->sendMail($admin->email, $details);
+            $this->mailableService->sendMail($admin->email, $details);
 
-            return redirect()->route('admin.dashboard')->with("success", "Profile Image Deleted Successfully");
+            return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "Profile Image Deleted Successfully"]);
         }
-
-        return redirect()->back()->with("warning", "Profile Image Not Deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Deleted"]);
     }
 
-    // forget password
-
-    // public function forgetPassword()
-    // {
-    //     return view('admin.auth.forget-password');
-    // }
-
-    // public function doForgetPassword(Request $request)
-    // {
-    //     $request->validate([
-    //         "email" => [
-    //             "required",
-    //             "email",
-    //       function ($attribute, $value, $fail) {
-    //         $user = $this->admin->where('email', $value)->first();
-    //         if (!$user) {
-    //             return $fail(__('The email is not registered.'));
-    //         }
-    //      }
-    //      ]
-    //     ]);
-    //     $user = $this->admin->where('email', $request->get('email'))->first();
-
-    //     if (!$user) {
-    //         return redirect()->back()->with("warning", "User is not found");
-    //     }
-
-    //     $token = $this->admin->generateToken();
-
-    //     $data = [
-    //         "token" => $token
-    //     ];
-
-    //     $isUpdated = $this->admin->where('id', $user->id)->update($data);
-
-    //     if ($isUpdated) {
-    //         $user->sendPasswordResetNotification($token);
-    //         return redirect()->route('admin.login')->with("success", "Password Reset Link Sent Successfully");
-    //     }
-
-    //     return redirect()->back()->with("warning", "Password Reset Link Not Sent");
-    // }
-
-    // public function resetPassword($token)
-    // {
-    //     $user = $this->admin->where('token', $token)->first();
-
-    //     if (!$user) {
-    //         return redirect()->route('admin.login')->with("warning", "Invalid Token");
-    //     }
-
-    //     return view('admin.auth.reset-password', compact('token'));
-    // }
-
-    // public function doResetPassword(Request $request, $token)
-    // {
-    //     $request->validate([
-    //         "password" => "required|min:6|max:20",
-    //         "confirm_password" => "required|min:6|max:20|same:password"
-    //     ]);
-
-    //     $user = $this->admin->where('token', $token)->first();
-
-    //     if (!$user) {
-    //         return redirect()->route('admin.login')->with("warning", "Invalid Token");
-    //     }
-
-    //     $data = [
-    //         "password" => Hash::make($request->get("password")),
-    //         "token" => null
-    //     ];
-
-    //     $isUpdated = $this->admin->where('id', $user->id)->update($data);
-
-    //     if ($isUpdated) {
-    //         return redirect()->route('admin.login')->with("success", "Password Reset Successfully");
-    //     }
-
-    //     return redirect()->back()->with("warning", "Password Not Reset");
-    // }
-
-    // notificatons
     public function notifications()
     {
         $admin_id = auth()->guard('admin')->user()->id;
         $admin = $this->admin->find($admin_id);
         if (!$admin) {
-            return redirect()->back()->with("warning", "Admin is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
         $notifications = $admin->notifications()->paginate($this->paginate);
-
         $notifications = $notifications->unique('data');
-
-        return view('admin.dashboard.notifications', compact('notifications'));
+        return $this->navigationManagerService->loadView('admin.dashboard.notifications', compact('notifications'));
     }
 
     public function markAsRead($id)
@@ -508,10 +425,10 @@ class AdminController extends Controller
         $admin_id = auth()->guard('admin')->user()->id;
         $admin = $this->admin->find($admin_id);
         if (!$admin) {
-            return redirect()->back()->with("warning", "Admin is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
         $admin->notifications()->where('id', $id)->update(['read_at' => now()]);
-        return redirect()->back()->with("success", "Notification is marked as read");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Notification is marked as read"]);
     }
 
     public function markAllAsRead()
@@ -519,10 +436,10 @@ class AdminController extends Controller
         $admin_id = auth()->guard('admin')->user()->id;
         $admin = $this->admin->find($admin_id);
         if (!$admin) {
-            return redirect()->back()->with("warning", "Admin is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
         $admin->unreadNotifications->markAsRead();
-        return redirect()->back()->with("success", "All notifications are marked as read");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "All notifications are marked as read"]);
     }
 
     public function markAsUnread($id)
@@ -530,10 +447,10 @@ class AdminController extends Controller
         $admin_id = auth()->guard('admin')->user()->id;
         $admin = $this->admin->find($admin_id);
         if (!$admin) {
-            return redirect()->back()->with("warning", "Admin is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
         $admin->notifications()->where('id', $id)->update(['read_at' => null]);
-        return redirect()->back()->with("success", "Notification is marked as unread");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Notification is marked as unread"]);
     }
 
     public function deleteNotification($id)
@@ -541,10 +458,10 @@ class AdminController extends Controller
         $admin_id = auth()->guard('admin')->user()->id;
         $admin = $this->admin->find($admin_id);
         if (!$admin) {
-            return redirect()->back()->with("warning", "Admin is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
         $admin->notifications()->where('id', $id)->delete();
-        return redirect()->back()->with("success", "Notification is deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Notification is deleted"]);
     }
 
     public function deleteAllNotification()
@@ -552,9 +469,9 @@ class AdminController extends Controller
         $admin_id = auth()->guard('admin')->user()->id;
         $admin = $this->admin->find($admin_id);
         if (!$admin) {
-            return redirect()->back()->with("warning", "Admin is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
         $admin->notifications()->delete();
-        return redirect()->back()->with("success", "All notifications are deleted");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "All notifications are deleted"]);
     }
 }

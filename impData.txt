@@ -15,9 +15,9 @@ $details = [
 'body' => "Your password has been changed successfully"
 ];
 // UNCOMMENT: To send notification
-$this->sendNotificationService->sendNotification($company, $details['body']);
+$this->notifiableService->sendNotification($company, $details['body']);
 // UNCOMMENT: To send mail
-$this->sendMailService->sendMail($company->email, $details);
+$this->mailableService->sendMail($company->email, $details);
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.all.min.js"></script>
 

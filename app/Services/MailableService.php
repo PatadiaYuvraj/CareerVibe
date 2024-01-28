@@ -3,9 +3,9 @@
 namespace App\Services;
 
 use App\Jobs\SendMailJob;
-use App\Repository\SendMailRepository;
+use App\Repository\MailableRepository;
 
-class SendMailService implements SendMailRepository
+class MailableService implements MailableRepository
 {
     public function sendMail(string $email, array $details): void
     {

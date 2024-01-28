@@ -5,22 +5,31 @@ namespace App\Http\Controllers\Admin;
 use App\Exceptions\Handler;
 use App\Http\Controllers\Controller;
 use App\Models\Qualification;
+use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
 
 class QualificationController extends Controller
 {
     private Qualification $qualification;
     private int $paginate;
+    private NavigationManagerService $navigationManagerService;
 
-    public function __construct(Qualification $qualification)
-    {
-        $this->qualification = $qualification;
+    public function __construct(
+        Qualification $qualification,
+        NavigationManagerService $navigationManagerService,
+    ) {
         $this->paginate = env('PAGINATEVALUE');
+        $this->qualification = $qualification;
+        $this->navigationManagerService = $navigationManagerService;
     }
 
     public function create()
     {
-        return view('admin.qualification.create');
+        // return $this->navigationManagerService->loadView('view-name');
+        // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
+        // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
+
+        return $this->navigationManagerService->loadView('admin.qualification.create');
     }
 
     public function store(Request $request)
@@ -38,15 +47,15 @@ class QualificationController extends Controller
         ];
         $isCreated = $this->qualification->create($data);
         if ($isCreated) {
-            return redirect()->route('admin.qualification.index')->with('success', 'Qualification is created');
+            return $this->navigationManagerService->redirectRoute('admin.qualification.index', [], 302, [], false, ["success" => "Qualification is created"]);
         }
-        return redirect()->back()->with("warning", "Qualification is not created");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not created"]);
     }
 
     public function index()
     {
         $qualifications = $this->qualification->withCount('jobs')->paginate($this->paginate);
-        return view('admin.qualification.index', compact('qualifications'));
+        return $this->navigationManagerService->loadView('admin.qualification.index', compact('qualifications'));
     }
 
     public function show($id)
@@ -101,10 +110,10 @@ class QualificationController extends Controller
             ->get()
             ->ToArray();
         if (!$qualification) {
-            return redirect()->back()->with("warning", "Qualification is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not found"]);
         }
         $qualification =  $qualification[0];
-        return view('admin.qualification.show', compact('qualification'));
+        return $this->navigationManagerService->loadView('admin.qualification.show', compact('qualification'));
     }
 
     public function edit($id)
@@ -112,10 +121,10 @@ class QualificationController extends Controller
 
         $qualification = $this->qualification->where('id', $id)->get()->ToArray();
         if (!$qualification) {
-            return redirect()->back()->with("warning", "Qualification is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not found"]);
         }
         $qualification =  $qualification[0];
-        return view('admin.qualification.edit', compact('qualification'));
+        return $this->navigationManagerService->loadView('admin.qualification.edit', compact('qualification'));
     }
 
     public function update(Request $request, $id)
@@ -133,25 +142,25 @@ class QualificationController extends Controller
         ];
         $isUpdated = $this->qualification->where('id', $id)->update($data);
         if ($isUpdated) {
-            return redirect()->route('admin.qualification.index')->with('success', 'Qualification is updated');
+            return $this->navigationManagerService->redirectRoute('admin.qualification.index', [], 302, [], false, ["success" => "Qualification is updated"]);
         }
-        return redirect()->back()->with("warning", "Qualification is not updated");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not updated"]);
     }
 
     public function delete($id)
     {
         $qualification = $this->qualification->where('id', $id)->withCount('jobs')->get()->ToArray();
         if (!$qualification) {
-            return redirect()->back()->with("warning", "Qualification is not found");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not found"]);
         }
         $qualification =  $qualification[0];
         if ($qualification['jobs_count'] == 0) {
             $isDeleted = $this->qualification->where('id', $id)->delete();
             if ($isDeleted) {
-                return redirect()->route('admin.qualification.index')->with('success', 'Qualification is deleted');
+                return $this->navigationManagerService->redirectRoute('admin.qualification.index', [], 302, [], false, ["success" => "Qualification is deleted"]);
             }
-            return redirect()->back()->with("warning", "Qualification is not deleted");
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not deleted"]);
         }
-        return redirect()->back()->with("warning", "Qualification is not deleted, because it has jobs associated with it");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not deleted, because it has jobs associated with it"]);
     }
 }
