@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -26,11 +27,28 @@ return new class extends Migration
             $table->boolean('is_featured')->default(false);
             $table->boolean('is_active')->default(true);
             $table->string('keywords')->nullable();
-            $table->enum('work_type', ['REMOTE', "WFO", "HYBRID"])->nullable();
-            $table->enum('job_type', ['FULL_TIME', "PART_TIME", "INTERNSHIP", "CONTRACT"])->nullable();
-            $table->enum('experience_level', ['FRESHER', "EXPERIENCED"])->nullable();
-            $table->enum('experience_type', ['ANY', "1-2", "2-3", "3-5", "5-8", "8-10", "10+"])->nullable();
-            $table->index(['keywords', 'id']);
+            $table->enum(
+                'work_type',
+                array_keys(Config::get('constants.job.work_type'))
+            )->nullable();
+            $table->enum(
+                'job_type',
+                array_keys(Config::get('constants.job.job_type'))
+            )->nullable();
+            $table->enum(
+                'experience_level',
+                array_keys(Config::get('constants.job.experience_level'))
+            )->nullable();
+            $table->enum(
+                'experience_type',
+                array_keys(Config::get('constants.job.experience_type'))
+            )->nullable();
+            $table->index([
+                'keywords',
+                'id',
+                'company_id',
+                'sub_profile_id',
+            ]);
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->foreign('sub_profile_id')->references('id')->on('sub_profiles')->onDelete('cascade');
             $table->timestamps();

@@ -75,7 +75,7 @@ class UserController extends Controller
                 "required",
                 "email",
                 function ($attribute, $value, $fail) {
-                    $user = $this->user->where('email', $value)->first();
+                    $user = $this->authenticableService->getUserByEmail($value);
                     if (!$user) {
                         return $fail(__('The email is not registered.'));
                     }
@@ -85,6 +85,13 @@ class UserController extends Controller
                 "required",
                 "min:6",
                 "max:20",
+                function ($attribute, $value, $fail) {
+                    $user = $this->authenticableService->getUserByEmail(request()->get('email'));
+                    if ($user && !$this->authenticableService->verifyPassword($value, $user->password)) {
+                        return $fail(__('The password is incorrect.'));
+                    }
+                }
+
             ]
         ]);
         $data = [
@@ -110,20 +117,14 @@ class UserController extends Controller
                 "required",
                 "string",
                 "max:100",
-                function ($attribute, $value, $fail) {
-                    $isExist = $this->user->where('name', $value)->get()->ToArray();
-                    if ($isExist) {
-                        $fail($attribute . ' is already exist.');
-                    }
-                },
             ],
             "email" => [
                 "required",
                 "email",
                 function ($attribute, $value, $fail) {
-                    $isExist = $this->user->where('email', $value)->get()->ToArray();
-                    if ($isExist) {
-                        $fail($attribute . ' is already exist.');
+                    $user = $this->authenticableService->getUserByEmail($value);
+                    if ($user) {
+                        return $fail(__('The email is already registered.'));
                     }
                 },
             ],
@@ -131,10 +132,6 @@ class UserController extends Controller
                 "required",
                 "min:6",
                 "max:20",
-                function ($attribute, $value, $fail) {
-                    $name = $this->user->where('name', request()->get('name'))->first();
-                    $email = $this->user->where('email', request()->get('email'))->first();
-                }
             ],
             "confirm_password" => [
                 "required",
@@ -249,7 +246,7 @@ class UserController extends Controller
                 function ($attribute, $value, $fail) use ($id) {
                     $isExist = $this->user->where('id', '!=', $id)->where('name', $value)->get()->ToArray();
                     if ($isExist) {
-                        $fail($attribute . ' is already exist.');
+                        return $fail($attribute . ' is already exist.');
                     }
                 },
             ],
@@ -259,7 +256,7 @@ class UserController extends Controller
                 function ($attribute, $value, $fail) use ($id) {
                     $isExist = $this->user->where('id', '!=', $id)->where('email', $value)->get()->ToArray();
                     if ($isExist) {
-                        $fail($attribute . ' is already exist.');
+                        return $fail($attribute . ' is already exist.');
                     }
                 },
             ]

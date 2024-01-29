@@ -73,10 +73,10 @@ Route::group(['middleware' => "isAdmin"], function () {
 
             return redirect()->route('admin.dashboard')->with('info', 'Search is not implemented yet');
         })->name('admin.search');
-        Route::post('search', function (Request $request) {
+        // Route::post('search', function (Request $request) {
 
-            return redirect()->route('admin.dashboard')->with('info', 'Search is not implemented yet');
-        })->name('admin.search');
+        //     return redirect()->route('admin.dashboard')->with('info', 'Search is not implemented yet');
+        // })->name('admin.search');
 
 
         Route::get('/edit-profile',  [AdminController::class, "editProfile"])->name('admin.editProfile');
@@ -88,6 +88,9 @@ Route::group(['middleware' => "isAdmin"], function () {
         // Route::get('/edit-resume-pdf',  [AdminController::class, "editResumePdf"])->name('admin.editResumePdf');
         // Route::post('/update-resume-pdf',  [AdminController::class, "updateResumePdf"])->name('admin.updateResumePdf');
         Route::post('/delete-profile-image',  [AdminController::class, "deleteProfileImage"])->name('admin.deleteProfileImage');
+        // add throttle limit 
+
+        // Route::get('/dashboard',  [AdminController::class, "dashboard"])->name('admin.dashboard');
         Route::get('/dashboard',  [AdminController::class, "dashboard"])->name('admin.dashboard');
         Route::get('/logout',  [AdminController::class, "logout"])->name('admin.logout');
 
@@ -244,23 +247,8 @@ Route::group(['middleware' => "isCompany"], function () {
 });
 
 // Route::group(['middleware' => "isUser"], function () {
-//     // Route::get('/', [FrontUserController::class, "index"])->name('index');
-//     // Route::get("/logout", [FrontUserController::class, 'logout'])->name('logout');
-//     // Route::get('/about', [FrontUserController::class, "about"])->name('about');
-//     // Route::get('/blog-single', [FrontUserController::class, "blog_single"])->name('blog-single');
-//     // Route::get('/blog', [FrontUserController::class, "blog"])->name('blog');
-//     // Route::get('/contact', [FrontUserController::class, "contact"])->name('contact');
-//     // Route::get('/faq', [FrontUserController::class, "faq"])->name('faq');
-//     // Route::get('/gallery', [FrontUserController::class, "gallery"])->name('gallery');
-//     // Route::get('/job-listings', [FrontUserController::class, "job_listings"])->name('job-listings');
-//     // Route::get('/job-single', [FrontUserController::class, "job_single"])->name('job-single');
-//     // Route::get('/portfolio-single', [FrontUserController::class, "portfolio_single"])->name('portfolio-single');
-//     // Route::get('/portfolio', [FrontUserController::class, "portfolio"])->name('portfolio');
-//     // Route::get('/post-job', [FrontUserController::class, "post_job"])->name('post-job');
-//     // Route::get('/service-sinlge', [FrontUserController::class, "service_sinlge"])->name('service-sinlge');
-//     // Route::get('/services', [FrontUserController::class, "services"])->name('services');
-//     // Route::get('/testimonials', [FrontUserController::class, "testimonials"])->name('testimonials');
-
+//     Route::get('/', [FrontUserController::class, "index"])->name('index');
+//     Route::get("/logout", [FrontUserController::class, 'logout'])->name('logout');
 // });
 
 
@@ -272,10 +260,10 @@ Route::group(['middleware' => "isUser"], function () {
 
             return redirect()->route('user.dashboard')->with('info', 'Search is not implemented yet');
         })->name('user.search');
-        Route::post('search', function (Request $request) {
+        // Route::post('search', function (Request $request) {
 
-            return redirect()->route('user.dashboard')->with('info', 'Search is not implemented yet');
-        })->name('user.search');
+        //     return redirect()->route('user.dashboard')->with('info', 'Search is not implemented yet');
+        // })->name('user.search');
 
 
         Route::get('/dashboard',  [UserUserController::class, "dashboard"])->name('user.dashboard');

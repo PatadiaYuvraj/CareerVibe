@@ -20,6 +20,12 @@ return new class extends Migration
             $table->unique([
                 'id', 'authorable_id', 'authorable_type'
             ]);
+            $table->index([
+                'id',
+                'authorable_id',
+                'authorable_type',
+                'post_id',
+            ]);
             // $table->softDeletes();
             $table->timestamps();
         });

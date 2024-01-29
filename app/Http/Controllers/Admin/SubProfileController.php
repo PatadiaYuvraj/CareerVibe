@@ -49,7 +49,7 @@ class SubProfileController extends Controller
                 function ($attribute, $value, $fail) {
                     $profileCategory = ProfileCategory::where('id', $value)->first();
                     if (!$profileCategory) {
-                        $fail('The ' . $attribute . ' is invalid.');
+                        return $fail('The ' . $attribute . ' is invalid.');
                     }
                 },
 

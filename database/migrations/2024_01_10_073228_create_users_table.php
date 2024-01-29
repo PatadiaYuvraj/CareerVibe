@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -22,7 +23,10 @@ return new class extends Migration
             $table->text("resume_pdf_url")->nullable();
             $table->text("resume_pdf_public_id")->nullable();
             $table->string("contact", 15)->nullable();
-            $table->enum("gender", ["MALE", "FEMALE", "OTHER"])->nullable();
+            $table->enum(
+                "gender",
+                array_keys(Config::get('constants.gender'))
+            )->nullable();
             $table->boolean('is_active')->default(true);
             $table->string("headline", 200)->nullable();
             $table->string("education", 200)->nullable();
@@ -32,7 +36,12 @@ return new class extends Migration
             $table->text("about")->nullable();
             $table->string("experience", 200)->nullable();
             $table->rememberToken();
-            $table->index(['name', 'email', 'id']);
+            $table->index([
+                'name',
+                'email',
+                'id',
+                'is_active',
+            ]);
             $table->timestamps();
         });
     }

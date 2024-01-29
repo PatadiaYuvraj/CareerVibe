@@ -18,6 +18,12 @@ return new class extends Migration
             $table->morphs('authorable');
             $table->unique(['authorable_id', 'authorable_type']);
             // $table->softDeletes();
+            $table->index([
+                'id',
+                'likeable_id',
+                'authorable_id',
+                'authorable_type',
+            ]);
             $table->timestamps();
         });
     }

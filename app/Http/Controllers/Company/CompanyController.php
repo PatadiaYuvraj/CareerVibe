@@ -44,6 +44,32 @@ class CompanyController extends Controller
 
     public function login()
     {
+
+        // AuthenticableService has the following methods:
+        // registerUser(array $details): User -> register a new user
+        // loginUser(array $details): bool -> login a user
+        // logoutUser(): void -> logout a user
+        // registerCompany(array $details): Company -> register a new company
+        // loginCompany(array $details): bool -> login a company
+        // logoutCompany(): void  -> logout a company
+        // registerAdmin(array $details): Admin -> register a new admin
+        // loginAdmin(array $details): bool -> login an admin
+        // logoutAdmin(): void  -> logout an admin
+        // passwordHash(string $password): string -> hash a password
+        // verifyPassword(string $password, string $hashedPassword): bool -> verify a password
+        // isUser(): bool -> check if a user is logged in
+        // isCompany(): bool  -> check if a company is logged in
+        // isAdmin(): bool  -> check if an admin is logged in
+        // getUser(): User  -> get the logged in user
+        // getCompany(): Company  -> get the logged in company
+        // getAdmin(): Admin  -> get the logged in admin
+        // getUserById(int $id): User  -> get a user by id
+        // getCompanyById(int $id): Company  -> get a company by id
+        // getAdminById(int $id): Admin  -> get an admin by id
+        // getUserByEmail(string $email): User  -> get a user by email
+        // getCompanyByEmail(string $email): Company  -> get a company by email
+        // getAdminByEmail(string $email): Admin  -> get an admin by email
+
         return $this->navigationManagerService->loadView('company.auth.login');
     }
 
@@ -61,7 +87,7 @@ class CompanyController extends Controller
                 function ($attribute, $value, $fail) {
                     $company = $this->authenticableService->getCompanyByEmail($value);
                     if (!$company) {
-                        $fail("Email does not exist");
+                        return $fail("Email does not exist");
                     }
                 }
             ],
@@ -71,8 +97,8 @@ class CompanyController extends Controller
                 "max:20",
                 function ($attribute, $value, $fail) use ($request) {
                     $company = $this->authenticableService->getCompanyByEmail($request->get("email"));
-                    if (!$this->authenticableService->verifyPassword($value, $company->password)) {
-                        $fail("Password is incorrect");
+                    if ($company && !$this->authenticableService->verifyPassword($value, $company->password)) {
+                        return $fail("Password is incorrect");
                     }
                 }
             ]
@@ -247,7 +273,7 @@ class CompanyController extends Controller
                 function ($attribute, $value, $fail) use ($id) {
                     $user = $this->company->where("name", $value)->where("id", "!=", $id)->first();
                     if ($user) {
-                        $fail("Name already exist");
+                        return $fail("Name already exist");
                     }
                 }
             ],
@@ -257,7 +283,7 @@ class CompanyController extends Controller
                 function ($attribute, $value, $fail) use ($id) {
                     $user = $this->company->where("email", $value)->where("id", "!=", $id)->first();
                     if ($user) {
-                        $fail("Email already exist");
+                        return $fail("Email already exist");
                     }
                 }
             ]

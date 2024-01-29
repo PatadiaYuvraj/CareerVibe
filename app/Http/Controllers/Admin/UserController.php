@@ -50,7 +50,7 @@ class UserController extends Controller
                 function ($attribute, $value, $fail) {
                     $user = User::where('email', $value)->first();
                     if ($user) {
-                        $fail('Email is already exist');
+                        return $fail('Email is already exist');
                     }
                 }
             ],

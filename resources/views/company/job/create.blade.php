@@ -81,15 +81,15 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="row row-cols-3">
-                                @foreach ($work_types as $work_type)
+                                @foreach (Config::get('constants.job.work_type') as $key => $value)
                                     <div class="col">
-                                        <label for="{{ $work_type }}" class="input-group mb-3">
+                                        <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $work_type }}"
-                                                    type="radio" value="{{ $work_type }}" name="work_type">
+                                                <input class="form-check-input mt-0" id="{{ $key }}"
+                                                    type="radio" value="{{ $key }}" name="work_type">
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower($work_type)) }}
+                                                {{ Str::ucfirst(Str::lower($value)) }}
                                             </div>
                                         </label>
                                     </div>
@@ -167,15 +167,15 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="row row-cols-4">
-                                @foreach (['FULL_TIME', 'PART_TIME', 'INTERNSHIP', 'CONTRACT'] as $job_type)
+                                @foreach (Config::get('constants.job.job_type') as $key => $value)
                                     <div class="col">
-                                        <label for="{{ $job_type }}" class="input-group mb-3">
+                                        <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $job_type }}"
-                                                    type="radio" value="{{ $job_type }}" name="job_type">
+                                                <input class="form-check-input mt-0" id="{{ $key }}"
+                                                    type="radio" value="{{ $key }}" name="job_type">
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower(str_replace('_', ' ', $job_type))) }}
+                                                {{ $value }}
                                             </div>
                                         </label>
                                     </div>
@@ -188,16 +188,15 @@
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Experience Level</label>
                             <div class="row row-cols-2">
-                                @foreach (['FRESHER', 'EXPERIENCED'] as $experience_level)
+                                @foreach (Config::get('constants.job.experience_level') as $key => $value)
                                     <div class="col">
-                                        <label for="{{ $experience_level }}" class="input-group mb-3">
+                                        <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $experience_level }}"
-                                                    type="radio" value="{{ $experience_level }}"
-                                                    name="experience_level">
+                                                <input class="form-check-input mt-0" id="{{ $key }}"
+                                                    type="radio" value="{{ $key }}" name="experience_level">
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower(str_replace('_', ' ', $experience_level))) }}
+                                                {{ $value }}
                                             </div>
                                         </label>
                                     </div>
@@ -212,16 +211,15 @@
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Experience Type</label>
                             <div class="row row-cols-7">
-                                @foreach (['ANY', '1-2', '2-3', '3-5', '5-8', '8-10', '10+'] as $experience_type)
+                                @foreach (Config::get('constants.job.experience_type') as $key => $value)
                                     <div class="col">
-                                        <label for="{{ $experience_type }}" class="input-group mb-3">
+                                        <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $experience_type }}"
-                                                    type="radio" value="{{ $experience_type }}"
-                                                    name="experience_type">
+                                                <input class="form-check-input mt-0" id="{{ $key }}"
+                                                    type="radio" value="{{ $key }}" name="experience_type">
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower(str_replace('_', ' ', $experience_type))) }}
+                                                {{ $value }}
                                             </div>
                                         </label>
                                     </div>

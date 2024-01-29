@@ -18,18 +18,15 @@ use Illuminate\Support\Facades\Config;
 
 class JobController extends Controller
 {
-    private Company $company;
     private Job $job;
     private MailableService $mailableService;
     private NotifiableService $notifiableService;
     private NavigationManagerService $navigationManagerService;
     private AuthenticableService $authenticableService;
-    private $current_company;
     private int $paginate;
 
 
     public function __construct(
-        Company $company,
         Job $job,
         MailableService $mailableService,
         NotifiableService $notifiableService,
@@ -37,37 +34,11 @@ class JobController extends Controller
         AuthenticableService $authenticableService,
     ) {
         $this->job = $job;
-        $this->company = $company;
         $this->paginate = Config::get('constants.pagination');
         $this->mailableService = $mailableService;
         $this->notifiableService = $notifiableService;
         $this->navigationManagerService = $navigationManagerService;
         $this->authenticableService = $authenticableService;
-
-        // AuthenticableService has the following methods:
-        // registerUser(array $details): User -> register a new user
-        // loginUser(array $details): bool -> login a user
-        // logoutUser(): void -> logout a user
-        // registerCompany(array $details): Company -> register a new company
-        // loginCompany(array $details): bool -> login a company
-        // logoutCompany(): void  -> logout a company
-        // registerAdmin(array $details): Admin -> register a new admin
-        // loginAdmin(array $details): bool -> login an admin
-        // logoutAdmin(): void  -> logout an admin
-        // passwordHash(string $password): string -> hash a password
-        // verifyPassword(string $password, string $hashedPassword): bool -> verify a password
-        // isUser(): bool -> check if a user is logged in
-        // isCompany(): bool  -> check if a company is logged in
-        // isAdmin(): bool  -> check if an admin is logged in
-        // getUser(): User  -> get the logged in user
-        // getCompany(): Company  -> get the logged in company
-        // getAdmin(): Admin  -> get the logged in admin
-        // getUserById(int $id): User  -> get a user by id
-        // getCompanyById(int $id): Company  -> get a company by id
-        // getAdminById(int $id): Admin  -> get an admin by id
-        // getUserByEmail(string $email): User  -> get a user by email
-        // getCompanyByEmail(string $email): Company  -> get a company by email
-        // getAdminByEmail(string $email): Admin  -> get an admin by email
     }
 
     public function index()
@@ -132,17 +103,12 @@ class JobController extends Controller
         $locations = Location::select(['id', 'city', 'state'])->get()->toArray();
 
         $qualifications = Qualification::select(['id', 'name'])->get()->toArray();
-
-        $work_types = [
-            "REMOTE",
-            "WFO",
-            "HYBRID"
-        ];
-        return $this->navigationManagerService->loadView('company.job.create', compact('company', 'sub_profiles', 'locations', 'qualifications', 'work_types'));
+        return $this->navigationManagerService->loadView('company.job.create', compact('company', 'sub_profiles', 'locations', 'qualifications'));
     }
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $company = $this->authenticableService->getCompany();
         if (!$company->id) {
             return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["warning" => "Company is not found"]);
@@ -151,14 +117,13 @@ class JobController extends Controller
             return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["warning" => "Company is not verified"]);
         }
         $request->validate([
-            "sub_profile_id" =>
-            [
+            "sub_profile_id" => [
                 "required",
                 "string",
                 "max:100",
                 function ($attribute, $value, $fail) {
                     if (!SubProfile::where('id', $value)->exists()) {
-                        $fail("The selected $attribute is invalid.");
+                        return $fail("The selected $attribute is invalid.");
                     }
                 },
 
@@ -168,7 +133,7 @@ class JobController extends Controller
                 "integer",
                 function ($attribute, $value, $fail) {
                     if ($value <= 0) {
-                        $fail("The $attribute must be greater than 0.");
+                        return $fail("The $attribute must be greater than 0.");
                     }
                 },
             ],
@@ -177,11 +142,11 @@ class JobController extends Controller
                 "integer",
                 function ($attribute, $value, $fail) use ($request) {
                     if ($value <= 0) {
-                        $fail("The minimum salary must be greater than 0.");
+                        return $fail("The minimum salary must be greater than 0.");
                     }
 
                     if ($value > $request->get('max_salary')) {
-                        $fail("The minimum salary must be less than max salary.");
+                        return $fail("The minimum salary must be less than max salary.");
                     }
                 },
 
@@ -192,7 +157,7 @@ class JobController extends Controller
                 // greater than min_salary
                 function ($attribute, $value, $fail) use ($request) {
                     if ($value <= $request->get('min_salary')) {
-                        $fail("The $attribute must be greater than min salary.");
+                        return $fail("The $attribute must be greater than min salary.");
                     }
                 },
             ],
@@ -202,7 +167,7 @@ class JobController extends Controller
                 function ($attribute, $value, $fail) {
                     foreach ($value as $id) {
                         if (!Location::where('id', $id)->exists()) {
-                            $fail("The selected $attribute is invalid.");
+                            return $fail("The selected $attribute is invalid.");
                         }
                     }
                 },
@@ -213,7 +178,7 @@ class JobController extends Controller
                 function ($attribute, $value, $fail) {
                     foreach ($value as $id) {
                         if (!Qualification::where('id', $id)->exists()) {
-                            $fail("The selected $attribute is invalid.");
+                            return $fail("The selected $attribute is invalid.");
                         }
                     }
                 },
@@ -259,28 +224,60 @@ class JobController extends Controller
         }
         if ($request->get('work_type')) {
             $request->validate([
-                "work_type" => "required|string|in:REMOTE,WFO,HYBRID",
+                "work_type" => [
+                    "required",
+                    "string",
+                    function ($attribute, $value, $fail) {
+                        if (!array_key_exists($value, Config::get('constants.job.work_type'))) {
+                            return $fail("The selected $attribute is invalid.");
+                        }
+                    },
+                ],
             ]);
             $data['work_type'] = $request->get('work_type');
         }
 
         if ($request->get('job_type')) {
             $request->validate([
-                "job_type" => "required|string|in:FULL_TIME,PART_TIME,INTERNSHIP,CONTRACT",
+                "job_type" => [
+                    "required",
+                    "string",
+                    function ($attribute, $value, $fail) {
+                        if (!array_key_exists($value, Config::get('constants.job.job_type'))) {
+                            return $fail("The selected $attribute is invalid.");
+                        }
+                    },
+                ]
             ]);
             $data['job_type'] = $request->get('job_type');
         }
 
         if ($request->get('experience_level')) {
             $request->validate([
-                "experience_level" => "required|string|in:FRESHER,EXPERIENCED",
+                "experience_level" => [
+                    "required",
+                    "string",
+                    function ($attribute, $value, $fail) {
+                        if (!array_key_exists($value, Config::get('constants.job.experience_level'))) {
+                            return $fail("The selected $attribute is invalid.");
+                        }
+                    },
+                ]
             ]);
             $data['experience_level'] = $request->get('experience_level');
         }
 
         if ($request->get('experience_type')) {
             $request->validate([
-                "experience_type" => "required|string|in:ANY,1-2,2-3,3-5,5-8,8-10,10+",
+                "experience_type" => [
+                    "required",
+                    "string",
+                    function ($attribute, $value, $fail) {
+                        if (!array_key_exists($value, Config::get('constants.job.experience_type'))) {
+                            return $fail("The selected $attribute is invalid.");
+                        }
+                    },
+                ],
             ]);
             $data['experience_type'] = $request->get('experience_type');
         }
@@ -324,8 +321,6 @@ class JobController extends Controller
 
     public function show($id)
     {
-        $company_id = $this->current_company->id;
-
         $job = $this->job->where('id', $id)->with(
             [
                 'subProfile' => function ($query) {
@@ -351,10 +346,10 @@ class JobController extends Controller
 
     public function edit($id)
     {
-        $company_id = $this->current_company->id;
+        $id = $this->authenticableService->getCompany()->id;
         // check this job is created by this company
         $job = $this->job
-            ->where('company_id', $company_id)
+            ->where('company_id', $id)
             ->find($id);
 
         if (!$job) {
@@ -392,6 +387,11 @@ class JobController extends Controller
 
     public function update(Request $request, $id)
     {
+        $isExists = $this->job->find($id);
+        if (!$isExists) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
+        }
+
         $request->validate([
             "sub_profile_id" =>
             [
@@ -400,7 +400,7 @@ class JobController extends Controller
                 "max:100",
                 function ($attribute, $value, $fail) {
                     if (!SubProfile::where('id', $value)->exists()) {
-                        $fail("The selected $attribute is invalid.");
+                        return $fail("The selected $attribute is invalid.");
                     }
                 },
 
@@ -410,7 +410,7 @@ class JobController extends Controller
                 "integer",
                 function ($attribute, $value, $fail) {
                     if ($value <= 0) {
-                        $fail("The $attribute must be greater than 0.");
+                        return $fail("The $attribute must be greater than 0.");
                     }
                 },
             ],
@@ -419,11 +419,11 @@ class JobController extends Controller
                 "integer",
                 function ($attribute, $value, $fail) use ($request) {
                     if ($value <= 0) {
-                        $fail("The minimum salary must be greater than 0.");
+                        return $fail("The minimum salary must be greater than 0.");
                     }
 
                     if ($value > $request->get('max_salary')) {
-                        $fail("The minimum salary must be less than max salary.");
+                        return $fail("The minimum salary must be less than max salary.");
                     }
                 },
 
@@ -434,7 +434,7 @@ class JobController extends Controller
                 // greater than min_salary
                 function ($attribute, $value, $fail) use ($request) {
                     if ($value <= $request->get('min_salary')) {
-                        $fail("The $attribute must be greater than min salary.");
+                        return $fail("The $attribute must be greater than min salary.");
                     }
                 },
             ],
@@ -444,7 +444,7 @@ class JobController extends Controller
                 function ($attribute, $value, $fail) {
                     foreach ($value as $id) {
                         if (!Location::where('id', $id)->exists()) {
-                            $fail("The selected $attribute is invalid.");
+                            return $fail("The selected $attribute is invalid.");
                         }
                     }
                 },
@@ -455,7 +455,7 @@ class JobController extends Controller
                 function ($attribute, $value, $fail) {
                     foreach ($value as $id) {
                         if (!Qualification::where('id', $id)->exists()) {
-                            $fail("The selected $attribute is invalid.");
+                            return $fail("The selected $attribute is invalid.");
                         }
                     }
                 },
@@ -502,36 +502,68 @@ class JobController extends Controller
         }
         if ($request->get('work_type')) {
             $request->validate([
-                "work_type" => "required|string|in:REMOTE,WFO,HYBRID",
+                "work_type" => [
+                    "required",
+                    "string",
+                    function ($attribute, $value, $fail) {
+                        if (!array_key_exists($value, Config::get('constants.job.work_type'))) {
+                            return $fail("The selected $attribute is invalid.");
+                        }
+                    },
+                ]
             ]);
             $data['work_type'] = $request->get('work_type');
         }
 
         if ($request->get('job_type')) {
             $request->validate([
-                "job_type" => "required|string|in:FULL_TIME,PART_TIME,INTERNSHIP,CONTRACT",
+                "job_type" => [
+                    "required",
+                    "string",
+                    function ($attribute, $value, $fail) {
+                        if (!array_key_exists($value, Config::get('constants.job.job_type'))) {
+                            return $fail("The selected $attribute is invalid.");
+                        }
+                    },
+                ],
             ]);
             $data['job_type'] = $request->get('job_type');
         }
 
         if ($request->get('experience_level')) {
             $request->validate([
-                "experience_level" => "required|string|in:FRESHER,EXPERIENCED",
+                "experience_level" => [
+                    "required",
+                    "string",
+                    function ($attribute, $value, $fail) {
+                        if (!array_key_exists($value, Config::get('constants.job.experience_level'))) {
+                            return $fail("The selected $attribute is invalid.");
+                        }
+                    },
+                ],
             ]);
             $data['experience_level'] = $request->get('experience_level');
         }
 
         if ($request->get('experience_type')) {
             $request->validate([
-                "experience_type" => "required|string|in:ANY,1-2,2-3,3-5,5-8,8-10,10+",
+                "experience_type" => [
+                    "required",
+                    "string",
+                    function ($attribute, $value, $fail) {
+                        if (!array_key_exists($value, Config::get('constants.job.experience_type'))) {
+                            return $fail("The selected $attribute is invalid.");
+                        }
+                    },
+                ],
             ]);
             $data['experience_type'] = $request->get('experience_type');
         }
 
-        $isUpdated = $this->job->find($id);
+        $isUpdated = $this->job->find($id); // but dont change company_id
         $isUpdated->update($data);
         if ($isUpdated) {
-            $d = $isUpdated->qualifications()->sync($request->get('qualifications'));
+            $isUpdated->qualifications()->sync($request->get('qualifications'));
             $isUpdated->locations()->sync($request->get('locations'));
             return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
         }
@@ -540,20 +572,17 @@ class JobController extends Controller
 
     public function delete($id)
     {
-        $company_id = $this->current_company->id;
-        // check this job is created by this company
+        $id = $this->authenticableService->getCompany()->id;
         $isDeleted = $this->job
-            ->where('company_id', $company_id)
+            ->where('company_id', $id)
             ->find($id);
-
         if (!$isDeleted) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "The job is not created by this company."]);
         }
 
-        // $isDeleted = $this->job->find($id);
-        $isDeleted->locations()->detach();
-        $isDeleted->qualifications()->detach();
-        $isDeleted->delete();
+        $isDeleted->locations()->detach(); // delete all locations
+        $isDeleted->qualifications()->detach(); // delete all qualifications
+        $isDeleted->delete(); // delete job
         if (!$isDeleted) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
@@ -562,9 +591,9 @@ class JobController extends Controller
 
     public function toggleFeatured($id, $is_featured)
     {
-        $company_id = $this->current_company->id;
+        $id = $this->authenticableService->getCompany()->id;
         $job = $this->job
-            ->where('company_id', $company_id)
+            ->where('company_id', $id)
             ->find($id);
         if (!$job) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
@@ -583,9 +612,9 @@ class JobController extends Controller
 
     public function toggleActive($id, $is_active)
     {
-        $company_id = $this->current_company->id;
+        $id = $this->authenticableService->getCompany()->id;
         $job = $this->job
-            ->where('company_id', $company_id)
+            ->where('company_id', $id)
             ->find($id);
         if (!$job) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);

@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Services\AuthenticableService;
 use App\Services\MailableService;
 use App\Services\NavigationManagerService;
 use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AdminController extends Controller
 {
@@ -21,6 +22,7 @@ class AdminController extends Controller
     private NotifiableService $notifiableService;
     private StorageManagerService $storageManagerService;
     private NavigationManagerService $navigationManagerService;
+    private AuthenticableService $authenticableService;
 
     public function __construct(
         Admin $admin,
@@ -28,6 +30,7 @@ class AdminController extends Controller
         NotifiableService $notifiableService,
         StorageManagerService $storageManagerService,
         NavigationManagerService $navigationManagerService,
+        AuthenticableService $authenticableService,
     ) {
         $this->paginate = Config::get('constants.pagination');
         $this->admin = $admin;
@@ -35,13 +38,36 @@ class AdminController extends Controller
         $this->notifiableService = $notifiableService;
         $this->storageManagerService = $storageManagerService;
         $this->navigationManagerService = $navigationManagerService;
+        $this->authenticableService = $authenticableService;
     }
 
     public function dashboard()
     {
-        // return $this->navigationManagerService->loadView('view-name');
-        // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
-        // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
+        // AuthenticableService has the following methods:
+        // registerUser(array $details): User -> register a new user
+        // loginUser(array $details): bool -> login a user
+        // logoutUser(): void -> logout a user
+        // registerCompany(array $details): Company -> register a new company
+        // loginCompany(array $details): bool -> login a company
+        // logoutCompany(): void  -> logout a company
+        // registerAdmin(array $details): Admin -> register a new admin
+        // loginAdmin(array $details): bool -> login an admin
+        // logoutAdmin(): void  -> logout an admin
+        // passwordHash(string $password): string -> hash a password
+        // verifyPassword(string $password, string $hashedPassword): bool -> verify a password
+        // isUser(): bool -> check if a user is logged in
+        // isCompany(): bool  -> check if a company is logged in
+        // isAdmin(): bool  -> check if an admin is logged in
+        // getUser(): User  -> get the logged in user
+        // getCompany(): Company  -> get the logged in company
+        // getAdmin(): Admin  -> get the logged in admin
+        // getUserById(int $id): User  -> get a user by id
+        // getCompanyById(int $id): Company  -> get a company by id
+        // getAdminById(int $id): Admin  -> get an admin by id
+        // getUserByEmail(string $email): User  -> get a user by email
+        // getCompanyByEmail(string $email): Company  -> get a company by email
+        // getAdminByEmail(string $email): Admin  -> get an admin by email
+
         return $this->navigationManagerService->loadView('admin.dashboard.index');
     }
 
@@ -57,7 +83,7 @@ class AdminController extends Controller
                 "required",
                 "email",
                 function ($attribute, $value, $fail) {
-                    $user = $this->admin->where('email', $value)->first();
+                    $user = $this->authenticableService->getAdminByEmail($value);
                     if (!$user) {
                         return $fail(__('The email is incorrect.'));
                     }
@@ -68,8 +94,8 @@ class AdminController extends Controller
                 "min:6",
                 "max:20",
                 function ($attribute, $value, $fail) {
-                    $user = $this->admin->where('email', request()->get('email'))->first();
-                    if ($user && !Hash::check($value, $user->password)) {
+                    $user = $this->authenticableService->getAdminByEmail(request()->get('email'));
+                    if ($user && !$this->authenticableService->verifyPassword($value, $user->password)) {
                         return $fail(__('The password is incorrect.'));
                     }
                 }
@@ -80,7 +106,7 @@ class AdminController extends Controller
             "password" => $request->get("password")
         ];
 
-        if (auth()->guard('admin')->attempt($data, true)) {
+        if ($this->authenticableService->loginAdmin($data)) {
             return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
@@ -98,20 +124,14 @@ class AdminController extends Controller
                 "required",
                 "string",
                 "max:100",
-                function ($attribute, $value, $fail) {
-                    $isExist = $this->admin->where('name', $value)->get()->ToArray();
-                    if ($isExist) {
-                        $fail($attribute . ' is already exist.');
-                    }
-                },
             ],
             "email" => [
                 "required",
                 "email",
                 function ($attribute, $value, $fail) {
-                    $isExist = $this->admin->where('email', $value)->get()->ToArray();
+                    $isExist = $this->authenticableService->getAdminByEmail($value);
                     if ($isExist) {
-                        $fail($attribute . ' is already exist.');
+                        return $fail($attribute . ' is already exist.');
                     }
                 },
             ],
@@ -119,27 +139,22 @@ class AdminController extends Controller
                 "required",
                 "min:6",
                 "max:20",
-                function ($attribute, $value, $fail) {
-                    $name = $this->admin->where('name', request()->get('name'))->first();
-                    $email = $this->admin->where('email', request()->get('email'))->first();
-                    if ($name && Hash::check($value, $name->password)) {
-                        return $fail(__('The password should not be same as name.'));
-                    }
-                    if ($email && Hash::check($value, $email->password)) {
-                        return $fail(__('The password should not be same as email.'));
-                    }
-                }
             ],
-            "confirm_password" => "required|min:6|max:20|same:password"
+            "confirm_password" => [
+                "required",
+                "min:6",
+                "max:20",
+                "same:password"
+            ]
         ]);
 
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email"),
-            "password" => Hash::make($request->get("password"))
+            "password" => $request->get("password")
         ];
 
-        $isCreated = $this->admin->create($data);
+        $isCreated = $this->authenticableService->registerAdmin($data);
 
         // MAIL: when admin is created then send mail to other admins that new admin is created
 
@@ -160,10 +175,11 @@ class AdminController extends Controller
 
 
         if ($isCreated) {
-            $isAuth = auth()->guard('admin')->attempt([
+            $data = [
                 "email" => $request->get("email"),
                 "password" => $request->get("password")
-            ]);
+            ];
+            $isAuth = $this->authenticableService->loginAdmin($data);
 
             if ($isAuth) {
                 return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
@@ -175,8 +191,7 @@ class AdminController extends Controller
 
     public function logout()
     {
-        auth()->guard('admin')->logout();
-        Session::flush();
+        $this->authenticableService->logoutAdmin();
         return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["success" => "You're Logged Out"]);
     }
 
@@ -190,18 +205,17 @@ class AdminController extends Controller
 
         // currentPassword newPassword confirmPassword
 
-        if (!auth()->guard('admin')->check()) {
+        if (!$this->authenticableService->isAdmin()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
-        $id = auth()->guard('admin')->user()->id;
+        $admin = $this->authenticableService->getAdmin();
 
         $request->validate([
             "currentPassword" => [
                 "required",
-                function ($attribute, $value, $fail) use ($id) {
-                    $user = $this->admin->find($id);
-                    if (!Hash::check($value, $user->password)) {
+                function ($attribute, $value, $fail) use ($admin) {
+                    if (!$this->authenticableService->verifyPassword($value, $admin->password)) {
                         return $fail(__('The current password is incorrect.'));
                     }
                 },
@@ -210,9 +224,8 @@ class AdminController extends Controller
                 "required",
                 "min:6",
                 "max:20",
-                function ($attribute, $value, $fail) use ($id) {
-                    $user = $this->admin->find($id);
-                    if (Hash::check($value, $user->password)) {
+                function ($attribute, $value, $fail) use ($admin) {
+                    if ($this->authenticableService->verifyPassword($value, $admin->password)) {
                         return $fail(__('The new password must be different from current password.'));
                     }
                 }
@@ -226,12 +239,10 @@ class AdminController extends Controller
         ]);
 
         $data = [
-            "password" => Hash::make($request->get("newPassword"))
+            "password" => $this->authenticableService->passwordHash($request->get("newPassword"))
         ];
 
-        $isUpdated = $this->admin->where('id', $id)->update($data);
-
-        $admin = $this->admin->find(auth()->guard('admin')->user()->id);
+        $isUpdated = $this->admin->find($admin->id)->update($data);
         $details = [
             'title' => 'Password Changed',
             'body' => "Your password has been changed successfully"
@@ -255,31 +266,27 @@ class AdminController extends Controller
 
     public function updateProfile(Request $request)
     {
-        if (!auth()->guard('admin')->check()) {
+        if (!$this->authenticableService->isAdmin()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
-        $id = auth()->guard('admin')->user()->id;
+        $admin = $this->authenticableService->getAdmin();
 
         $request->validate([
             "name" => [
                 "required",
                 "string",
                 "max:100",
-                function ($attribute, $value, $fail) use ($id) {
-                    $isExist = $this->admin->where('id', '!=', $id)->where('name', $value)->get()->ToArray();
-                    if ($isExist) {
-                        $fail($attribute . ' is already exist.');
-                    }
-                },
             ],
             "email" => [
                 "required",
                 "email",
-                function ($attribute, $value, $fail) use ($id) {
-                    $isExist = $this->admin->where('id', '!=', $id)->where('email', $value)->get()->ToArray();
-                    if ($isExist) {
-                        $fail($attribute . ' is already exist.');
+                function ($attribute, $value, $fail) use ($admin) {
+                    if ($value != $admin->email) {
+                        $isExist = $this->admin->where('email', $value)->get()->ToArray();
+                        if ($isExist) {
+                            return $fail($attribute . ' is already exist.');
+                        }
                     }
                 },
             ]
@@ -290,11 +297,9 @@ class AdminController extends Controller
             "email" => $request->get("email")
         ];
 
-        $isUpdated = $this->admin->where('id', $id)->update($data);
+        $isUpdated = $this->admin->find($admin->id)->update($data);
 
         if ($isUpdated) {
-            $admin = $this->admin->find(auth()->guard('admin')->user()->id);
-
             $details = [
                 'title' => 'Profile Updated',
                 'body' => "Your profile has been updated successfully"
@@ -316,11 +321,11 @@ class AdminController extends Controller
 
     public function updateProfileImage(Request $request)
     {
-        if (!auth()->guard('admin')->check()) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
-        }
+        // if (!$this->authenticableService->isAdmin()) {
+        //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
+        // }
 
-        $id = auth()->guard('admin')->user()->id;
+        $admin = $this->authenticableService->getAdmin();
 
         $request->validate([
             "profile_image_url" => [
@@ -331,19 +336,11 @@ class AdminController extends Controller
             ],
         ]);
 
-        $user = $this->admin->find($id);
-
-        if (!$user) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
-        }
-
-        if ($user->profile_image_url) {
-            $public_ids = $user->profile_image_public_id;
+        if ($admin->profile_image_url) {
+            $public_ids = $admin->profile_image_public_id;
             $this->storageManagerService->deleteFromCloudinary($public_ids);
-            $this->storageManagerService->uploadToCloudinary($request, "ADMIN", $user->id);
         }
-
-
+        $this->storageManagerService->uploadToCloudinary($request, Config::get('constants.USER_TYPE.admin'), $admin->id);
 
 
         $data = [
@@ -351,9 +348,8 @@ class AdminController extends Controller
             "profile_image_url" => null,
         ];
 
-        $isUpdated = $this->admin->where('id', $id)->update($data);
+        $isUpdated = $this->admin->find($admin->id)->update($data);
         if ($isUpdated) {
-            $admin = $this->admin->find(auth()->guard('admin')->user()->id);
             $details = [
                 'title' => 'Profile Image Updated',
                 'body' => "Your profile image has been updated successfully"
@@ -369,20 +365,18 @@ class AdminController extends Controller
 
     public function deleteProfileImage()
     {
-        if (!auth()->guard('admin')->check()) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
-        }
+        // if (!$this->authenticableService->isAdmin()) {
+        //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
+        // }
 
-        $id = auth()->guard('admin')->user()->id;
+        $admin = $this->authenticableService->getAdmin();
 
-        $user = $this->admin->find($id);
-
-        if (!$user) {
+        if (!$admin) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
 
-        if ($user->profile_image_url) {
-            $public_ids = $user->profile_image_public_id;
+        if ($admin->profile_image_url) {
+            $public_ids = $admin->profile_image_public_id;
             $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
@@ -391,10 +385,9 @@ class AdminController extends Controller
             "profile_image_url" => null,
         ];
 
-        $isUpdated = $this->admin->where('id', $id)->update($data);
+        $isUpdated = $this->admin->find($admin->id)->update($data);
 
         if ($isUpdated) {
-            $admin = $this->admin->find(auth()->guard('admin')->user()->id);
             $details = [
                 'title' => 'Profile Image Deleted',
                 'body' => "Your profile image has been deleted successfully"
@@ -411,8 +404,7 @@ class AdminController extends Controller
 
     public function notifications()
     {
-        $admin_id = auth()->guard('admin')->user()->id;
-        $admin = $this->admin->find($admin_id);
+        $admin = $this->authenticableService->getAdmin();
         if (!$admin) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
@@ -423,8 +415,7 @@ class AdminController extends Controller
 
     public function markAsRead($id)
     {
-        $admin_id = auth()->guard('admin')->user()->id;
-        $admin = $this->admin->find($admin_id);
+        $admin = $this->authenticableService->getAdmin();
         if (!$admin) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
@@ -434,8 +425,7 @@ class AdminController extends Controller
 
     public function markAllAsRead()
     {
-        $admin_id = auth()->guard('admin')->user()->id;
-        $admin = $this->admin->find($admin_id);
+        $admin = $this->authenticableService->getAdmin();
         if (!$admin) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
@@ -445,8 +435,7 @@ class AdminController extends Controller
 
     public function markAsUnread($id)
     {
-        $admin_id = auth()->guard('admin')->user()->id;
-        $admin = $this->admin->find($admin_id);
+        $admin = $this->authenticableService->getAdmin();
         if (!$admin) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
@@ -456,8 +445,7 @@ class AdminController extends Controller
 
     public function deleteNotification($id)
     {
-        $admin_id = auth()->guard('admin')->user()->id;
-        $admin = $this->admin->find($admin_id);
+        $admin = $this->authenticableService->getAdmin();
         if (!$admin) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }
@@ -467,8 +455,7 @@ class AdminController extends Controller
 
     public function deleteAllNotification()
     {
-        $admin_id = auth()->guard('admin')->user()->id;
-        $admin = $this->admin->find($admin_id);
+        $admin = $this->authenticableService->getAdmin();
         if (!$admin) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Admin is not found"]);
         }

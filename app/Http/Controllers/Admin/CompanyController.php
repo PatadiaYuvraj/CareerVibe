@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Services\AuthenticableService;
 use App\Services\MailableService;
 use App\Services\NavigationManagerService;
 use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Hash;
 
 class CompanyController extends Controller
 {
@@ -20,6 +20,7 @@ class CompanyController extends Controller
     private int $paginate;
     private StorageManagerService $storageManagerService;
     private NavigationManagerService $navigationManagerService;
+    private AuthenticableService $authenticableService;
 
     public function __construct(
         Company $company,
@@ -27,6 +28,7 @@ class CompanyController extends Controller
         MailableService $mailableService,
         StorageManagerService $storageManagerService,
         NavigationManagerService $navigationManagerService,
+        AuthenticableService $authenticableService,
     ) {
         $this->paginate = Config::get('constants.pagination');
         $this->company = $company;
@@ -34,13 +36,11 @@ class CompanyController extends Controller
         $this->mailableService = $mailableService;
         $this->storageManagerService = $storageManagerService;
         $this->navigationManagerService = $navigationManagerService;
+        $this->authenticableService = $authenticableService;
     }
 
     public function create()
     {
-        // return $this->navigationManagerService->loadView('view-name');
-        // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
-        // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
         return $this->navigationManagerService->loadView('admin.company.create');
     }
 
@@ -79,7 +79,7 @@ class CompanyController extends Controller
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email"),
-            "password" => Hash::make($request->get("password")),
+            "password" => $this->authenticableService->passwordHash($request->get("password")),
         ];
 
         if ($request->hasFile('profile_image_url')) {
@@ -280,7 +280,7 @@ class CompanyController extends Controller
             ]);
             $data['description'] = $request->get("description");
         }
-        $isUpdated = $this->company->where('id', $id)->update($data);
+        $isUpdated = $this->company->find($id)->update($data);
 
         if ($isUpdated) {
             return $this->navigationManagerService->redirectRoute('admin.company.index', [], 302, [], false, ["success" => "Company is updated"]);
@@ -303,7 +303,7 @@ class CompanyController extends Controller
             $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
-        $isDeleted = $this->company->where('id', $id)->delete();
+        $isDeleted = $this->company->find($id)->delete();
         if ($isDeleted) {
             return $this->navigationManagerService->redirectRoute('admin.company.index', [], 302, [], false, ["success" => "Company is deleted"]);
         }
@@ -312,7 +312,7 @@ class CompanyController extends Controller
 
     public function toggleVerified($id, $is_verified)
     {
-        if (!auth()->guard('admin')->check()) {
+        if (!$this->authenticableService->isAdmin()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
         $company = $this->company->find($id);

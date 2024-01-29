@@ -112,16 +112,16 @@
                                     Work Type
                                 </h5>
                                 <h6 class="">
-                                    {{-- {{ $job['work_type'] }} --}}
-                                    {{ Str::ucfirst(Str::lower($job['work_type'])) }}
+                                    @foreach (Config::get('constants.job.work_type') as $key => $value)
+                                        @if ($job['work_type'] == $key)
+                                            {{ $value }}
+                                        @endif
+                                    @endforeach
                                 </h6>
                             </div>
                         </div>
                     </div>
                     <hr />
-                    {{-- "job_type",
-        "experience_level",
-        "experience_type" --}}
                     <div class="row">
                         <div class="col" style="">
                             <div class="card-body">
@@ -129,9 +129,10 @@
                                     Job Type
                                 </h5>
                                 <h6 class="">
-                                    {{-- remove _ --}}
-                                    @foreach (explode('_', $job['job_type']) as $row)
-                                        {{ Str::ucfirst(Str::lower($row)) }}
+                                    @foreach (Config::get('constants.job.job_type') as $key => $value)
+                                        @if ($job['job_type'] == $key)
+                                            {{ $value }}
+                                        @endif
                                     @endforeach
                                 </h6>
                             </div>
@@ -142,25 +143,25 @@
                                     Experience Level
                                 </h5>
                                 <h6 class="">
-                                    {{ Str::ucfirst(Str::lower($job['experience_level'])) }}
+                                    @foreach (Config::get('constants.job.experience_level') as $key => $value)
+                                        @if ($job['experience_level'] == $key)
+                                            {{ $value }}
+                                        @endif
+                                    @endforeach
                                 </h6>
                             </div>
                         </div>
                         <div class="col" style="">
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    Experience Type
+                                    Experience Type (Years)
                                 </h5>
                                 <h6 class="">
-                                    @if ($job['experience_type'] == null)
-                                        N/A
-                                    @elseif($job['experience_type'] == 'ANY')
-                                        {{ Str::ucfirst(Str::lower($job['experience_type'])) }}
-                                    @else
-                                        {{ Str::replaceFirst('-', ' to ', $job['experience_type']) }} Years
-                                    @endif
-
-                                    {{-- {{ $job['experience_type'] }} --}}
+                                    @foreach (Config::get('constants.job.experience_type') as $key => $value)
+                                        @if ($job['experience_type'] == $key)
+                                            {{ $value }}
+                                        @endif
+                                    @endforeach
                                 </h6>
                             </div>
                         </div>

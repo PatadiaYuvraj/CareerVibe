@@ -166,7 +166,7 @@ class AuthenticableService implements AuthenticableRepository
   }
 
   // getUser() is used to get the user that is logged in
-  public function getUser(): User
+  public function getUser(): User|null
   {
     return User::find(Auth::guard(
       Config::get('constants.USER_GUARD')
@@ -174,7 +174,7 @@ class AuthenticableService implements AuthenticableRepository
   }
 
   // getCompany() is used to get the company that is logged in
-  public function getCompany(): Company
+  public function getCompany(): Company|null
   {
     return Company::find(Auth::guard(
       Config::get('constants.COMPANY_GUARD')
@@ -182,7 +182,7 @@ class AuthenticableService implements AuthenticableRepository
   }
 
   // getAdmin() is used to get the admin that is logged in
-  public function getAdmin(): Admin
+  public function getAdmin(): Admin|null
   {
     return Admin::find(Auth::guard(
       Config::get('constants.ADMIN_GUARD')
@@ -190,37 +190,37 @@ class AuthenticableService implements AuthenticableRepository
   }
 
   // getUserById() is used to get a user by id
-  public function getUserById(int $id): User
+  public function getUserById(int $id): User|null
   {
     return User::find($id);
   }
 
   // getCompanyById() is used to get a company by id
-  public function getCompanyById(int $id): Company
+  public function getCompanyById(int $id): Company|null
   {
     return Company::find($id);
   }
 
   // getAdminById() is used to get an admin by id
-  public function getAdminById(int $id): Admin
+  public function getAdminById(int $id): Admin|null
   {
     return Admin::find($id);
   }
 
   // getUserByEmail() is used to get a user by email
-  public function getUserByEmail(string $email): User
+  public function getUserByEmail(string $email): User|null
   {
     return User::where('email', $email)->first();
   }
 
   // getCompanyByEmail() is used to get a company by email
-  public function getCompanyByEmail(string $email): Company
+  public function getCompanyByEmail(string $email): Company|null
   {
     return Company::where('email', $email)->first();
   }
 
   // getAdminByEmail() is used to get an admin by email
-  public function getAdminByEmail(string $email): Admin
+  public function getAdminByEmail(string $email): Admin|null
   {
     return Admin::where('email', $email)->first();
   }

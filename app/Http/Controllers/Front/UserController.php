@@ -4,31 +4,37 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\AuthenticableService;
+use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
+
 
 class UserController extends Controller
 {
 
-    private User $user;
+    private AuthenticableService $authenticableService;
+    private NavigationManagerService $navigationManagerService;
 
-    public function __construct(User $user)
-    {
-        $this->user = $user;
+    public function __construct(
+        AuthenticableService $authenticableService,
+        NavigationManagerService $navigationManagerService,
+    ) {
+        $this->authenticableService = $authenticableService;
+        $this->navigationManagerService = $navigationManagerService;
     }
 
     public function index()
     {
-        return view('front.index');
+        return $this->navigationManagerService->loadView('front.index');
     }
 
     public function login()
     {
-        return view('front.login');
+        return $this->navigationManagerService->loadView('front.login');
     }
     public function register()
     {
-        return view('front.register');
+        return $this->navigationManagerService->loadView('front.register');
     }
     public function doLogin(Request $request)
     {
@@ -52,12 +58,11 @@ class UserController extends Controller
                 'min:8',
             ]
         ]);
-        $data =
-            [
-                "email" => $request->get("email"),
-                "password" => $request->get("password")
-            ];
-        $isAuth = auth()->guard('user')->attempt($data, true);
+        $data = [
+            "email" => $request->get("email"),
+            "password" => $request->get("password")
+        ];
+        $isAuth = $this->authenticableService->loginUser($data);
         if ($isAuth) {
             return redirect()->route('index')->with('success', 'You are logged in');
         }
@@ -106,84 +111,20 @@ class UserController extends Controller
             "password" => $request->get("password")
         ];
 
-        $user = $this->user->create($data);
+        $user = $this->authenticableService->registerUser($data);
         if ($user) {
-            $data =
-                [
-                    "email" => $request->get("email"),
-                    "password" => $request->get("password")
-                ];
-            $isAuth = auth()->guard('user')->attempt($data, true);
+            $isAuth = $this->authenticableService->loginUser($data);
             if ($isAuth) {
-
-                return redirect()->route('index')->with('success', 'You are logged in');
+                return $this->navigationManagerService->redirectRoute('index', [], 302, [], false, ["success" => "You are Logged In"]);
             }
-            return redirect()->route('login')->with('success', 'You are registered');
+            return $this->navigationManagerService->redirectRoute('login', [], 302, [], false, ["success" => "You are registered"]);
         }
-        return redirect()->back()->with("warning", "Something went wrong");
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Something went wrong"]);
     }
 
     public function logout()
     {
-        auth()->guard('user')->logout();
-        Session::flush();
-        return redirect()->route("login")->with("success", "You're Logged Out");
-    }
-
-    public function about()
-    {
-        return view('front.about');
-    }
-    public function blog_single()
-    {
-        return view('front.blog-single');
-    }
-    public function blog()
-    {
-        return view('front.blog');
-    }
-    public function contact()
-    {
-        return view('front.contact');
-    }
-    public function faq()
-    {
-        return view('front.faq');
-    }
-    public function gallery()
-    {
-        return view('front.gallery');
-    }
-    public function job_listings()
-    {
-        return view('front.job-listings');
-    }
-    public function job_single()
-    {
-        return view('front.job-single');
-    }
-    public function portfolio_single()
-    {
-        return view('front.portfolio-single');
-    }
-    public function portfolio()
-    {
-        return view('front.portfolio');
-    }
-    public function post_job()
-    {
-        return view('front.post-job');
-    }
-    public function service_sinlge()
-    {
-        return view('front.service-sinlge');
-    }
-    public function services()
-    {
-        return view('front.services');
-    }
-    public function testimonials()
-    {
-        return view('front.testimonials');
+        $this->authenticableService->logoutUser();
+        return $this->navigationManagerService->redirectRoute('login', [], 302, [], false, ["success" => "You are Logged Out"]);
     }
 }

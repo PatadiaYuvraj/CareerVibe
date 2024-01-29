@@ -17,7 +17,48 @@ return [
     'admin' => 'career-vibe/admins/profile_image',
   ],
   'USER_RESUME_PATH' => "uploads/users/resumes",
-  "APP_URL" => Env::get('APP_URL'),
-  "APP_NAME" => Env::get('APP_NAME'),
-  'pagination' => 10,
+  "APP_URL" => Env::get('APP_URL', 'http://localhost:8000'),
+  "APP_NAME" => Env::get('APP_NAME', 'Career Vibe'),
+  'pagination' => Env::get('PAGINATEVALUE', 10),
+  'gender' => [
+    "MALE" => 'Male',
+    "FEMALE" => 'Female',
+    "OTHER" => 'Other',
+  ],
+  "IS_NOTIFICATION_SERVICE_ENABLED" => Env::get('IS_NOTIFICATION_SERVICE_ENABLED', true),
+  "IS_MAIL_SERVICE_ENABLED" => Env::get('IS_MAIL_SERVICE_ENABLED', true),
+  "IS_FILE_UPLOAD_SERVICE_ENABLED" => Env::get('IS_FILE_UPLOAD_SERVICE_ENABLED', true),
+  'post' => [
+    'type' => [
+      'TEXT' => 'text',
+      'IMAGE' => 'image',
+      'VIDEO' => 'video',
+    ],
+  ],
+  'job' => [
+    'work_type' => [
+      'REMOTE' => 'Remote',
+      'WFO' => 'Work From Office',
+      'HYBRID' => 'Hybrid',
+    ],
+    'job_type' => [
+      'FULL_TIME' => 'Full Time',
+      'PART_TIME' => 'Part Time',
+      'INTERNSHIP' => 'Internship',
+      'CONTRACT' => 'Contract',
+    ],
+    'experience_level' => [
+      'FRESHER' => 'Fresher',
+      'EXPERIENCED' => 'Experienced',
+    ],
+    'experience_type' => [
+      'ANY' => 'Any',
+      '1-2' => '1-2',
+      '2-3' => '2-3',
+      '3-5' => '3-5',
+      '5-8' => '5-8',
+      '8-10' => '8-10',
+      '10+' => '10+',
+    ],
+  ]
 ];

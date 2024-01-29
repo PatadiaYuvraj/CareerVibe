@@ -77,29 +77,29 @@ interface AuthenticableRepository
   public function isAdmin(): bool;
 
   // getUser() is used to get the logged in user
-  public function getUser(): User;
+  public function getUser(): User|null;
 
   // getCompany() is used to get the logged in company
-  public function getCompany(): Company;
+  public function getCompany(): Company|null;
 
   // getAdmin() is used to get the logged in admin
-  public function getAdmin(): Admin;
+  public function getAdmin(): Admin|null;
 
   // getUserById() is used to get a user by id
-  public function getUserById(int $id): User;
+  public function getUserById(int $id): User|null;
 
   // getCompanyById() is used to get a company by id
-  public function getCompanyById(int $id): Company;
+  public function getCompanyById(int $id): Company|null;
 
   // getAdminById() is used to get an admin by id
-  public function getAdminById(int $id): Admin;
+  public function getAdminById(int $id): Admin|null;
 
   // getUserByEmail() is used to get a user by email
-  public function getUserByEmail(string $email): User;
+  public function getUserByEmail(string $email): User|null;
 
   // getCompanyByEmail() is used to get a company by email
-  public function getCompanyByEmail(string $email): Company;
+  public function getCompanyByEmail(string $email): Company|null;
 
   // getAdminByEmail() is used to get an admin by email
-  public function getAdminByEmail(string $email): Admin;
+  public function getAdminByEmail(string $email): Admin|null;
 }

@@ -17,6 +17,12 @@ return new class extends Migration
             $table->unsignedBigInteger('followable_id');
             $table->string('followable_type');
             $table->unique(['user_id', 'followable_id', 'followable_type']);
+            // $table->softDeletes();
+            $table->index([
+                'followable_id',
+                'followable_type',
+                'user_id',
+            ]);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

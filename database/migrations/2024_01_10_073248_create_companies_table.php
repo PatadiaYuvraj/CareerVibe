@@ -25,7 +25,13 @@ return new class extends Migration
             $table->string('address', 100)->nullable();
             $table->string('linkedin', 100)->nullable();
             $table->text('description')->nullable();
-            $table->index(['name', 'email', 'id']);
+            $table->index([
+                'name',
+                'email',
+                'id',
+                'is_verified',
+                'password',
+            ]);
             $table->rememberToken();
             $table->timestamps();
         });

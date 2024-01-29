@@ -20,7 +20,12 @@ return new class extends Migration
             $table->text("profile_image_url")->nullable();
             $table->text("profile_image_public_id")->nullable();
             $table->rememberToken();
-            $table->index(['name', 'email', 'id']);
+            $table->index([
+                'name',
+                'email',
+                'id',
+                'password',
+            ]);
             $table->timestamps();
         });
     }

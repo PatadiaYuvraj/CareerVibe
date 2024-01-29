@@ -9,125 +9,6 @@
     @endphp
 @endforeach
 
-{{-- 
-    array:4 [▼ // app/Http/Controllers/Admin/JobController.php:310
-  "job" => array:23 [▼
-    "id" => 1
-    "company_id" => 1
-    "sub_profile_id" => 1
-    "vacancy" => 1
-    "min_salary" => 12
-    "max_salary" => 123
-    "description" => null
-    "responsibility" => null
-    "benifits_perks" => null
-    "other_benifits" => null
-    "is_verified" => 0
-    "is_featured" => 0
-    "is_active" => 1
-    "keywords" => null
-    "work_type" => "REMOTE"
-    "job_type" => "FULL_TIME"
-    "experience_level" => "FRESHER"
-    "experience_type" => "ANY"
-    "created_at" => "2024-01-18T13:01:29.000000Z"
-    "updated_at" => "2024-01-18T13:13:24.000000Z"
-    "sub_profile" => array:4 [▼
-      "id" => 1
-      "name" => "Laravel Developer"
-      "profile_category_id" => 1
-      "profile_category" => array:2 [▼
-        "id" => 1
-        "name" => "Web Development"
-      ]
-    ]
-    "qualifications" => array:1 [▼
-      0 => array:3 [▼
-        "id" => 3
-        "name" => "B. Tech"
-        "pivot" => array:2 [▶]
-      ]
-    ]
-    "locations" => array:1 [▼
-      0 => array:4 [▼
-        "id" => 1
-        "city" => "Rajkot"
-        "state" => "Gujarat"
-        "pivot" => array:2 [▶]
-      ]
-    ]
-  ]
-  "qualifications" => array:6 [▼
-    0 => array:2 [▼
-      "id" => 3
-      "name" => "B. Tech"
-    ]
-    1 => array:2 [▼
-      "id" => 5
-      "name" => "BBA"
-    ]
-    2 => array:2 [▼
-      "id" => 2
-      "name" => "BCA"
-    ]
-    3 => array:2 [▼
-      "id" => 4
-      "name" => "M. Tech"
-    ]
-    4 => array:2 [▼
-      "id" => 6
-      "name" => "MBA"
-    ]
-    5 => array:2 [▼
-      "id" => 1
-      "name" => "MCA"
-    ]
-  ]
-  "locations" => array:4 [▼
-    0 => array:3 [▼
-      "id" => 1
-      "city" => "Rajkot"
-      "state" => "Gujarat"
-    ]
-    1 => array:3 [▼
-      "id" => 2
-      "city" => "Ahmedabad"
-      "state" => "Gujarat"
-    ]
-    2 => array:3 [▼
-      "id" => 3
-      "city" => "Vadodara"
-      "state" => "Gujarat"
-    ]
-    3 => array:3 [▼
-      "id" => 4
-      "city" => "Surat"
-      "state" => null
-    ]
-  ]
-  "sub_profiles" => array:2 [▼
-    0 => array:4 [▼
-      "id" => 1
-      "name" => "Laravel Developer"
-      "profile_category_id" => 1
-      "profile_category" => array:2 [▼
-        "id" => 1
-        "name" => "Web Development"
-      ]
-    ]
-    1 => array:4 [▼
-      "id" => 2
-      "name" => "PhotoShop Designer"
-      "profile_category_id" => 2
-      "profile_category" => array:2 [▼
-        "id" => 2
-        "name" => "Designing"
-      ]
-    ]
-  ]
-]
-    --}}
-
 @extends('admin.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
@@ -203,16 +84,16 @@
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Work Type</label>
                             <div class="row row-cols-3">
-                                @foreach (['REMOTE', 'WFO', 'HYBRID'] as $work_type)
+                                @foreach (Config::get('constants.job.work_type') as $key => $value)
                                     <div class="col">
-                                        <label for="{{ $work_type }}" class="input-group mb-3">
+                                        <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $work_type }}"
-                                                    type="radio" value="{{ $work_type }}" name="work_type"
-                                                    @if ($work_type == $job['work_type']) checked @endif>
+                                                <input class="form-check-input mt-0" id="{{ $key }}"
+                                                    type="radio" value="{{ $key }}" name="work_type"
+                                                    @if ($key == $job['work_type']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower($work_type)) }}
+                                                {{ $value }}
                                             </div>
                                         </label>
                                     </div>
@@ -269,16 +150,16 @@
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Job Type</label>
                             <div class="row row-cols-4">
-                                @foreach (['FULL_TIME', 'PART_TIME', 'INTERNSHIP', 'CONTRACT'] as $job_type)
+                                @foreach (Config::get('constants.job.job_type') as $key => $value)
                                     <div class="col">
-                                        <label for="{{ $job_type }}" class="input-group mb-3">
+                                        <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $job_type }}"
-                                                    type="radio" value="{{ $job_type }}" name="job_type"
-                                                    @if ($job_type == $job['job_type']) checked @endif>
+                                                <input class="form-check-input mt-0" id="{{ $key }}"
+                                                    type="radio" value="{{ $key }}" name="job_type"
+                                                    @if ($key == $job['job_type']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower(str_replace('_', ' ', $job_type))) }}
+                                                {{ $value }}
                                             </div>
                                         </label>
                                     </div>
@@ -291,17 +172,16 @@
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Experience Level</label>
                             <div class="row row-cols-2">
-                                @foreach (['FRESHER', 'EXPERIENCED'] as $experience_level)
+                                @foreach (Config::get('constants.job.experience_level') as $key => $value)
                                     <div class="col">
-                                        <label for="{{ $experience_level }}" class="input-group mb-3">
+                                        <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $experience_level }}"
-                                                    type="radio" value="{{ $experience_level }}"
-                                                    name="experience_level"
-                                                    @if ($experience_level == $job['experience_level']) checked @endif>
+                                                <input class="form-check-input mt-0" id="{{ $key }}"
+                                                    type="radio" value="{{ $key }}" name="experience_level"
+                                                    @if ($key == $job['experience_level']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower(str_replace('_', ' ', $experience_level))) }}
+                                                {{ $value }}
                                             </div>
                                         </label>
                                     </div>
@@ -314,16 +194,16 @@
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Experience Type</label>
                             <div class="row row-cols-7">
-                                @foreach (['ANY', '1-2', '2-3', '3-5', '5-8', '8-10', '10+'] as $experience_type)
+                                @foreach (Config::get('constants.job.experience_type') as $key => $value)
                                     <div class="col">
-                                        <label for="{{ $experience_type }}" class="input-group mb-3">
+                                        <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $experience_type }}"
-                                                    type="radio" value="{{ $experience_type }}" name="experience_type"
-                                                    @if ($experience_type == $job['experience_type']) checked @endif>
+                                                <input class="form-check-input mt-0" id="{{ $key }}"
+                                                    type="radio" value="{{ $key }}" name="experience_type"
+                                                    @if ($key == $job['experience_type']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower(str_replace('_', ' ', $experience_type))) }}
+                                                {{ $value }}
                                             </div>
                                         </label>
                                     </div>

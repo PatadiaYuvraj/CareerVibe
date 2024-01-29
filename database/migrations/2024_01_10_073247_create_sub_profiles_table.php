@@ -15,7 +15,11 @@ return new class extends Migration
             $table->id();
             $table->bigInteger("profile_category_id")->unsigned()->index();
             $table->string("name", 50);
-            $table->index(['name', 'id']);
+            $table->index([
+                'name',
+                'id',
+                'profile_category_id',
+            ]);
             $table->foreign('profile_category_id')->references('id')->on('profile_categories')->onDelete('cascade');
             $table->timestamps();
         });

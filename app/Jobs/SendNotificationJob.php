@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 
 class SendNotificationJob implements ShouldQueue
@@ -27,5 +28,6 @@ class SendNotificationJob implements ShouldQueue
     public function handle(): void
     {
         Notification::send($this->user, new SendNotification($this->msg));
+        Log::info('Notification sent to ' . $this->user->email);
     }
 }
