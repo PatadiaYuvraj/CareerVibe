@@ -9,20 +9,23 @@ use App\Models\Job;
 use App\Models\Location;
 use App\Models\Qualification;
 use App\Models\SubProfile;
+use App\Services\AuthenticableService;
 use App\Services\MailableService;
 use App\Services\NavigationManagerService;
 use App\Services\NotifiableService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class JobController extends Controller
 {
     private Company $company;
     private Job $job;
-    private $current_company;
-    private int $paginate;
     private MailableService $mailableService;
     private NotifiableService $notifiableService;
     private NavigationManagerService $navigationManagerService;
+    private AuthenticableService $authenticableService;
+    private $current_company;
+    private int $paginate;
 
 
     public function __construct(
@@ -31,26 +34,45 @@ class JobController extends Controller
         MailableService $mailableService,
         NotifiableService $notifiableService,
         NavigationManagerService $navigationManagerService,
+        AuthenticableService $authenticableService,
     ) {
-        $this->middleware(
-            function ($request, $next) {
-                if (auth()->guard('company')->check()) {
-                    $this->current_company = auth()->guard('company')->user();
-                }
-                return $next($request);
-            }
-        );
         $this->job = $job;
         $this->company = $company;
-        $this->paginate = env('PAGINATEVALUE');
+        $this->paginate = Config::get('constants.pagination');
         $this->mailableService = $mailableService;
         $this->notifiableService = $notifiableService;
         $this->navigationManagerService = $navigationManagerService;
+        $this->authenticableService = $authenticableService;
+
+        // AuthenticableService has the following methods:
+        // registerUser(array $details): User -> register a new user
+        // loginUser(array $details): bool -> login a user
+        // logoutUser(): void -> logout a user
+        // registerCompany(array $details): Company -> register a new company
+        // loginCompany(array $details): bool -> login a company
+        // logoutCompany(): void  -> logout a company
+        // registerAdmin(array $details): Admin -> register a new admin
+        // loginAdmin(array $details): bool -> login an admin
+        // logoutAdmin(): void  -> logout an admin
+        // passwordHash(string $password): string -> hash a password
+        // verifyPassword(string $password, string $hashedPassword): bool -> verify a password
+        // isUser(): bool -> check if a user is logged in
+        // isCompany(): bool  -> check if a company is logged in
+        // isAdmin(): bool  -> check if an admin is logged in
+        // getUser(): User  -> get the logged in user
+        // getCompany(): Company  -> get the logged in company
+        // getAdmin(): Admin  -> get the logged in admin
+        // getUserById(int $id): User  -> get a user by id
+        // getCompanyById(int $id): Company  -> get a company by id
+        // getAdminById(int $id): Admin  -> get an admin by id
+        // getUserByEmail(string $email): User  -> get a user by email
+        // getCompanyByEmail(string $email): Company  -> get a company by email
+        // getAdminByEmail(string $email): Admin  -> get an admin by email
     }
 
     public function index()
     {
-        $company_id = $this->current_company->id;
+        $company_id = $this->authenticableService->getCompany()->id;
 
         $jobs = $this->job
             ->where('company_id', $company_id)
@@ -86,13 +108,11 @@ class JobController extends Controller
 
     public function create()
     {
-        $company_id = $this->current_company->id;
-        $company = Company::where('id', $company_id)->select(['id', 'name', 'is_verified'])->get()->toArray();
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
-        $company = $company[0];
-        if ($company['is_verified'] == 0) {
+        if ($company->is_verified == 0) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not verified"]);
         }
 
@@ -123,11 +143,11 @@ class JobController extends Controller
 
     public function store(Request $request)
     {
-        $id = $this->current_company->id;
-        if (!$id) {
+        $company = $this->authenticableService->getCompany();
+        if (!$company->id) {
             return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["warning" => "Company is not found"]);
         }
-        if (auth()->guard('company')->user()->is_verified == 0) {
+        if ($company->is_verified == 0) {
             return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["warning" => "Company is not verified"]);
         }
         $request->validate([
@@ -200,7 +220,7 @@ class JobController extends Controller
             ],
         ]);
         $data = [
-            "company_id" => $id,
+            // "company_id" => $company->id,
             "sub_profile_id" => $request->get("sub_profile_id"),
             "vacancy" => $request->get("vacancy"),
             "min_salary" => $request->get("min_salary"),
@@ -268,15 +288,13 @@ class JobController extends Controller
         $data['is_verified'] = 0;
         $data['is_featured'] = 0;
         $data['is_active'] = 1;
-        $isCreated = $this->job->create($data);
+        $isCreated = $company->jobs()->create($data);
 
         if ($isCreated) {
             $isCreated->locations()->attach($request->get('locations'));
             $isCreated->qualifications()->attach($request->get('qualifications'));
 
-            $company = $this->company->find(auth()->guard('company')->user()->id);
             $profileName = $isCreated->subProfile->name;
-
             $msg = "Your job for $profileName profile is created successfully";
             $details = [
                 'title' => 'Job Created',

@@ -9,6 +9,7 @@ use App\Services\NavigationManagerService;
 use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 
 class CompanyController extends Controller
@@ -27,7 +28,7 @@ class CompanyController extends Controller
         StorageManagerService $storageManagerService,
         NavigationManagerService $navigationManagerService,
     ) {
-        $this->paginate = env('PAGINATEVALUE');
+        $this->paginate = Config::get('constants.pagination');
         $this->company = $company;
         $this->notifiableService = $notifiableService;
         $this->mailableService = $mailableService;

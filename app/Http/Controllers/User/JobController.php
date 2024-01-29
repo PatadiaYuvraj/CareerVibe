@@ -5,32 +5,39 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Models\Job;
 use App\Models\User;
+use App\Repository\AuthenticableRepository;
 use App\Services\NavigationManagerService;
+use Illuminate\Support\Facades\Config;
 
 class JobController extends Controller
 {
-
-
+    private int $paginate;
     private NavigationManagerService $navigationManagerService;
+    private AuthenticableRepository $authenticableRepository;
 
-    public function __construct(NavigationManagerService $navigationManagerService)
-    {
+    public function __construct(
+        NavigationManagerService $navigationManagerService,
+        AuthenticableRepository $authenticableRepository
+    ) {
         $this->navigationManagerService = $navigationManagerService;
+        $this->authenticableRepository = $authenticableRepository;
+        $this->paginate = Config::get('constants.pagination');
     }
 
     public function index()
     {
-        $user = auth()->guard('user')->user();
+        $user = $this->authenticableRepository->getUser();
 
-        $jobs = Job::where('is_active', 1)->with([
-            'applyByUsers' => function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            },
-            'savedByUsers' => function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            },
-        ])
-            ->paginate(10);
+        $jobs = Job::where('is_active', 1)
+            ->with([
+                'applyByUsers' => function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                },
+                'savedByUsers' => function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                },
+            ])
+            ->paginate($this->paginate);
         foreach ($jobs as $job) {
             $job->is_applied = $job->applyByUsers->count() > 0;
             $job->is_saved = $job->savedByUsers->count() > 0;
@@ -40,14 +47,15 @@ class JobController extends Controller
 
     public function show($job_id)
     {
+        $user_id = $this->authenticableRepository->getUser()->id;
         $job = Job::find($job_id)
             ->with([
                 'company',
                 'locations',
                 'qualifications',
                 'subProfile',
-                'applyByUsers' => function ($query) {
-                    $query->where('user_id', auth()->guard('user')->user()->id);
+                'applyByUsers' => function ($query) use ($user_id) {
+                    $query->where('user_id', $user_id);
                 },
             ])
             ->first()
@@ -57,9 +65,9 @@ class JobController extends Controller
 
     public function appliedJobs()
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableRepository->getUser()->id;
         $jobs = User::where('id', $user_id)->with([
-            'appliedJobs' => function ($query) use ($user_id) {
+            'appliedJobs' => function ($query) {
                 $query->with(['subProfile']);
             }
         ])->get()->toArray();
@@ -69,7 +77,7 @@ class JobController extends Controller
 
     public function apply($job_id)
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableRepository->getUser()->id;
         $job = Job::find($job_id);
 
         $check = $job->applyByUsers()->where('user_id', $user_id)->exists();
@@ -82,7 +90,7 @@ class JobController extends Controller
 
     public function unapply($job_id)
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableRepository->getUser()->id;
         $job = Job::find($job_id);
         $check = $job->applyByUsers()->where('user_id', $user_id)->exists();
         if (!$check) {
@@ -94,7 +102,7 @@ class JobController extends Controller
 
     public function savedJobs()
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableRepository->getUser()->id;
         $jobs = User::where('id', $user_id)->with([
             'savedJobs' => function ($query) use ($user_id) {
                 $query->with(['subProfile']);
@@ -106,7 +114,7 @@ class JobController extends Controller
 
     public function saveJob($job_id)
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableRepository->getUser()->id;
         $job = Job::find($job_id);
         $check = $job->savedByUsers()->where('user_id', $user_id)->exists();
         if ($check) {
@@ -118,7 +126,7 @@ class JobController extends Controller
 
     public function unsaveJob($job_id)
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableRepository->getUser()->id;
         $job = Job::find($job_id);
         $check = $job->savedByUsers()->where('user_id', $user_id)->exists();
         if (!$check) {

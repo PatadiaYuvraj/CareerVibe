@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Qualification;
 use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class QualificationController extends Controller
 {
@@ -18,7 +19,7 @@ class QualificationController extends Controller
         Qualification $qualification,
         NavigationManagerService $navigationManagerService,
     ) {
-        $this->paginate = env('PAGINATEVALUE');
+        $this->paginate = Config::get('constants.pagination');
         $this->qualification = $qualification;
         $this->navigationManagerService = $navigationManagerService;
     }

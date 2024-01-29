@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Services\NavigationManagerService;
 use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -24,7 +25,7 @@ class UserController extends Controller
         $this->storageManagerService = $storageManagerService;
         $this->navigationManagerService = $navigationManagerService;
         $this->user = $user;
-        $this->paginate = env('PAGINATEVALUE');
+        $this->paginate = Config::get('constants.pagination');
     }
 
     public function create()

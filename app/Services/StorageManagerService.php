@@ -6,6 +6,7 @@ use App\Jobs\DeleteFromCloudinary;
 use App\Jobs\UploadToCloudinary;
 use App\Repository\StorageManagerRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
 
 class StorageManagerService implements StorageManagerRepository
@@ -31,7 +32,7 @@ class StorageManagerService implements StorageManagerRepository
     public function uploadToLocal(Request $request, string $field_name): string
     {
         $stored_path = Storage::putFile(
-            "uploads/users/resumes",
+            Config::get('constants.USER_RESUME_PATH'),
             $request->file($field_name)
         );
         return $stored_path;

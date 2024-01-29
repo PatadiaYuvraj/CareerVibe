@@ -9,6 +9,7 @@ use App\Services\NavigationManagerService;
 use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
@@ -28,7 +29,7 @@ class AdminController extends Controller
         StorageManagerService $storageManagerService,
         NavigationManagerService $navigationManagerService,
     ) {
-        $this->paginate = env('PAGINATEVALUE');
+        $this->paginate = Config::get('constants.pagination');
         $this->admin = $admin;
         $this->mailableService = $mailableService;
         $this->notifiableService = $notifiableService;

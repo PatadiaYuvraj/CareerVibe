@@ -7,23 +7,22 @@ use App\Models\Admin;
 use App\Models\Company;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\AuthenticableService;
 use App\Services\MailableService;
 use App\Services\NavigationManagerService;
 use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Config;
 
 class CompanyController extends Controller
 {
-
     private StorageManagerService $storageManagerService;
     private NotifiableService $notifiableService;
     private MailableService $mailableService;
     private NavigationManagerService $navigationManagerService;
+    private AuthenticableService $authenticableService;
     private Company $company;
-    private $current_company;
     private int $paginate;
 
     public function __construct(
@@ -31,20 +30,16 @@ class CompanyController extends Controller
         NotifiableService $notifiableService,
         MailableService $mailableService,
         StorageManagerService $storageManagerService,
-        NavigationManagerService $navigationManagerService
+        NavigationManagerService $navigationManagerService,
+        AuthenticableService $authenticableService,
     ) {
-        $this->middleware(function ($request, $next) {
-            if (auth()->guard('company')->check()) {
-                $this->current_company = auth()->guard('company')->user();
-            }
-            return $next($request);
-        });
         $this->company = $company;
-        $this->paginate = env('PAGINATEVALUE');
+        $this->paginate = Config::get('constants.pagination');
         $this->notifiableService = $notifiableService;
         $this->mailableService = $mailableService;
         $this->storageManagerService = $storageManagerService;
         $this->navigationManagerService = $navigationManagerService;
+        $this->authenticableService = $authenticableService;
     }
 
     public function login()
@@ -64,7 +59,7 @@ class CompanyController extends Controller
                 "required",
                 "email",
                 function ($attribute, $value, $fail) {
-                    $company = Company::where("email", $value)->first();
+                    $company = $this->authenticableService->getCompanyByEmail($value);
                     if (!$company) {
                         $fail("Email does not exist");
                     }
@@ -75,9 +70,9 @@ class CompanyController extends Controller
                 "min:8",
                 "max:20",
                 function ($attribute, $value, $fail) use ($request) {
-                    $company = Company::where("email", $request->get("email"))->first();
-                    if ($company && !Hash::check($value, $company->password)) {
-                        $fail("Invalid Credentials");
+                    $company = $this->authenticableService->getCompanyByEmail($request->get("email"));
+                    if (!$this->authenticableService->verifyPassword($value, $company->password)) {
+                        $fail("Password is incorrect");
                     }
                 }
             ]
@@ -86,8 +81,7 @@ class CompanyController extends Controller
             "email" => $request->get("email"),
             "password" => $request->get("password")
         ];
-        if (auth()->guard('company')->attempt($data, true)) {
-            auth()->login(auth()->guard('company')->user(), true);
+        if ($this->authenticableService->loginCompany($data)) {
             return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
@@ -120,45 +114,40 @@ class CompanyController extends Controller
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email"),
-            "password" => Hash::make($request->get("password"))
+            "password" => $request->get("password")
         ];
 
-        $isCreated = $this->company->create($data);
+        $isCreated = $this->authenticableService->registerCompany($data);
 
         if ($isCreated) {
 
-            $company = $this->company->find($isCreated->id);
-            $companyName = $isCreated->name;
-
-            $details = [
-                'title' => 'Account Created',
-                'body' => "Your account is created successfully."
-            ];
-            // UNCOMMENT: To send notification
-            $this->notifiableService->sendNotification($company, $details['body']);
-            // UNCOMMENT: To send mail
-            $this->mailableService->sendMail($company->email, $details);
-
-
-            $admins = Admin::all();
-            $details = [
-                'title' => 'New Company Registered',
-                'body' => "New company $companyName is registered. Please verify it."
-            ];
-            foreach ($admins as $admin) {
-                // UNCOMMENT: To send notification
-                $this->notifiableService->sendNotification($admin, $details['body']);
-                // UNCOMMENT: To send mail
-                $this->mailableService->sendMail($admin->email, $details);
-            }
-
-            $isAuth = auth()->guard('company')->attempt([
-                "email" => $request->get("email"),
-                "password" => $request->get("password")
-            ]);
+            $isAuth = $this->authenticableService->loginCompany($data);
 
             if ($isAuth) {
-                auth()->login(auth()->guard('company')->user(), true);
+
+                $company = $this->authenticableService->getCompany();
+
+                $details = [
+                    'title' => 'Account Created',
+                    'body' => "Your account is created successfully."
+                ];
+                // UNCOMMENT: To send notification
+                $this->notifiableService->sendNotification($company, $details['body']);
+                // UNCOMMENT: To send mail
+                $this->mailableService->sendMail($company->email, $details);
+
+
+                $admins = Admin::all();
+                $details = [
+                    'title' => 'New Company Registered',
+                    'body' => "New company $company->name is registered. Please verify it."
+                ];
+                foreach ($admins as $admin) {
+                    // UNCOMMENT: To send notification
+                    $this->notifiableService->sendNotification($admin, $details['body']);
+                    // UNCOMMENT: To send mail
+                    $this->mailableService->sendMail($admin->email, $details);
+                }
                 return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
             }
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
@@ -168,8 +157,7 @@ class CompanyController extends Controller
 
     public function logout()
     {
-        auth()->guard('company')->logout();
-        Session::flush();
+        $this->authenticableService->logoutCompany();
         return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "You're Logged Out"]);
     }
 
@@ -185,18 +173,19 @@ class CompanyController extends Controller
 
     public function doChangePassword(Request $request)
     {
-        if (!auth()->guard('company')->check()) {
+
+        if (!$this->authenticableService->isCompany()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
-        $id = $this->current_company->id;
+        $id = $this->authenticableService->getCompany()->id;
 
         $request->validate([
             "currentPassword" => [
                 "required",
                 function ($attribute, $value, $fail) use ($id) {
                     $user = $this->company->find($id);
-                    if (!Hash::check($value, $user->password)) {
+                    if (!$this->authenticableService->verifyPassword($value, $user->password)) {
                         return $fail(__('The current password is incorrect.'));
                     }
                 }
@@ -208,7 +197,7 @@ class CompanyController extends Controller
                 "max:20",
                 function ($attribute, $value, $fail) use ($id) {
                     $user = $this->company->find($id);
-                    if (Hash::check($value, $user->password)) {
+                    if ($this->authenticableService->verifyPassword($value, $user->password)) {
                         return $fail(__('The new password cannot be same as current password.'));
                     }
                 }
@@ -222,13 +211,13 @@ class CompanyController extends Controller
         ]);
 
         $data = [
-            "password" => Hash::make($request->get("newPassword"))
+            "password" => $this->authenticableService->passwordHash($request->get("newPassword"))
         ];
 
         $isUpdated = $this->company->where('id', $id)->update($data);
 
         if ($isUpdated) {
-            $company = $this->company->find(auth()->guard('company')->user()->id);
+            $company = $this->authenticableService->getCompany();
             $details = [
                 'title' => 'Password Changed',
                 'body' => "Your password has been changed successfully"
@@ -249,7 +238,7 @@ class CompanyController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $id = $this->current_company->id;
+        $id = $this->authenticableService->getCompany()->id;
         $request->validate([
             "name" => [
                 "required",
@@ -358,7 +347,7 @@ class CompanyController extends Controller
         $isUpdated = $this->company->where('id', $id)->update($data);
 
         if ($isUpdated) {
-            $company = $this->company->find(auth()->guard('company')->user()->id);
+            $company = $this->authenticableService->getCompany();
             $details = [
                 'title' => 'Profile Updated',
                 'body' => "Your profile has been updated successfully"
@@ -378,7 +367,7 @@ class CompanyController extends Controller
 
     public function updateProfileImage(Request $request)
     {
-        $id = $this->current_company->id;
+        $id = $this->authenticableService->getCompany()->id;
 
         $request->validate([
             "profile_image_url" => [
@@ -410,7 +399,7 @@ class CompanyController extends Controller
         $isUpdated = $this->company->where('id', $id)->update($data);
         if ($isUpdated) {
 
-            $company = $this->company->find(auth()->guard('company')->user()->id);
+            $company = $this->authenticableService->getCompany();
             $details = [
                 'title' => 'Profile Image Updated',
                 'body' => "Your profile image has been updated successfully"
@@ -427,7 +416,7 @@ class CompanyController extends Controller
 
     public function deleteProfileImage()
     {
-        $id = $this->current_company->id;
+        $id = $this->authenticableService->getCompany()->id;
 
         $user = $this->company->find($id);
 
@@ -448,7 +437,7 @@ class CompanyController extends Controller
         $isUpdated = $this->company->where('id', $id)->update($data);
 
         if ($isUpdated) {
-            $company = $this->company->find(auth()->guard('company')->user()->id);
+            $company = $this->authenticableService->getCompany();
             $details = [
                 'title' => 'Profile Image Deleted',
                 'body' => "Your profile image has been deleted successfully"
@@ -464,8 +453,7 @@ class CompanyController extends Controller
 
     public function notifications()
     {
-        $company_id = auth()->guard('company')->user()->id;
-        $company = $this->company->find($company_id);
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
@@ -477,8 +465,7 @@ class CompanyController extends Controller
 
     public function markAsRead($id)
     {
-        $company_id = auth()->guard('company')->user()->id;
-        $company = $this->company->find($company_id);
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
@@ -488,8 +475,7 @@ class CompanyController extends Controller
 
     public function markAllAsRead()
     {
-        $company_id = auth()->guard('company')->user()->id;
-        $company = $this->company->find($company_id);
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
@@ -499,8 +485,7 @@ class CompanyController extends Controller
 
     public function markAsUnread($id)
     {
-        $company_id = auth()->guard('company')->user()->id;
-        $company = $this->company->find($company_id);
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
@@ -510,8 +495,7 @@ class CompanyController extends Controller
 
     public function deleteNotification($id)
     {
-        $company_id = auth()->guard('company')->user()->id;
-        $company = $this->company->find($company_id);
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
@@ -521,8 +505,7 @@ class CompanyController extends Controller
 
     public function deleteAllNotification()
     {
-        $company_id = auth()->guard('company')->user()->id;
-        $company = $this->company->find($company_id);
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
@@ -532,8 +515,7 @@ class CompanyController extends Controller
 
     public function followers()
     {
-        $company_id = auth()->guard('company')->user()->id;
-        $company = $this->company->find($company_id);
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
@@ -543,8 +525,7 @@ class CompanyController extends Controller
 
     public function removeFollower($id)
     {
-        $company_id = auth()->guard('company')->user()->id;
-        $company = $this->company->find($company_id);
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
@@ -558,8 +539,7 @@ class CompanyController extends Controller
 
     public function allUsers()
     {
-        $company_id = auth()->guard('company')->user()->id;
-        $company = $this->company->find($company_id);
+        $company = $this->authenticableService->getCompany();
         if (!$company) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
@@ -573,9 +553,9 @@ class CompanyController extends Controller
 
     public function indexPost()
     {
-        $user_id = auth()->guard('company')->user()->id;
+        $id = $this->authenticableService->getCompany()->id;
         $posts = Post::where([
-            ['authorable_id', $user_id],
+            ['authorable_id', $id],
             ['authorable_type', 'App\Models\Company']
         ])
             ->with([
@@ -587,7 +567,7 @@ class CompanyController extends Controller
 
     public function allPost()
     {
-        $user_id = auth()->guard('company')->user()->id;
+        // $id = $this->authenticableService->getCompany()->id;
         $posts =
             Post::with([
                 'authorable',
@@ -620,12 +600,10 @@ class CompanyController extends Controller
             ],
         ]);
 
-        $user_id = auth()->guard('company')->user()->id;
-
         $data = [
             "title" => $request->get("title"),
             "content" => $request->get("content"),
-            "authorable_id" => $user_id,
+            "authorable_id" => $this->authenticableService->getCompany()->id,
             "authorable_type" => "App\Models\Company"
         ];
 
@@ -655,8 +633,8 @@ class CompanyController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        // $user_id = auth()->guard('company')->user()->id;
-        // if ($post->authorable_type != "App\Models\Company" || $post->authorable_id != $user_id) {
+        // $id = $this->authenticableService->getCompany()->id;
+        // if ($post->authorable_type != "App\Models\Company" || $post->authorable_id != $id) {
         //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         // }
         return $this->navigationManagerService->loadView('company.post.show', compact('post'));
@@ -668,8 +646,8 @@ class CompanyController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('company')->user()->id;
-        if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
+        $id = $this->authenticableService->getCompany()->id;
+        if ($post->authorable_id != $id || $post->authorable_type != "App\Models\Company") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
         return $this->navigationManagerService->loadView('company.post.edit', compact('post'));
@@ -693,8 +671,8 @@ class CompanyController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
-        if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
+        $id = $this->authenticableService->getCompany()->id;
+        if ($post->authorable_id != $id || $post->authorable_type != "App\Models\Company") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
         $data = [
@@ -714,8 +692,8 @@ class CompanyController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('company')->user()->id;
-        if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
+        $id = $this->authenticableService->getCompany()->id;
+        if ($post->authorable_id != $id || $post->authorable_type != "App\Models\Company") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
         $post->comments()->detach();
@@ -733,10 +711,10 @@ class CompanyController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
+        $id = $this->authenticableService->getCompany()->id;
         $isAlreadyLiked = $post->likes()->where(
             [
-                ['authorable_id', $user_id],
+                ['authorable_id', $id],
                 ['authorable_type', 'App\Models\Company']
             ]
         )->exists();
@@ -744,7 +722,7 @@ class CompanyController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is already liked"]);
         }
         $data = [
-            "authorable_id" => $user_id,
+            "authorable_id" => $id,
             "authorable_type" => "App\Models\Company"
         ];
         $post->likes()->create($data);
@@ -757,10 +735,10 @@ class CompanyController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
+        $id = $this->authenticableService->getCompany()->id;
         $isAlreadyLiked = $post->likes()->where(
             [
-                ['authorable_id', $user_id],
+                ['authorable_id', $id],
                 ['authorable_type', 'App\Models\Company']
             ]
         )->exists();
@@ -769,7 +747,7 @@ class CompanyController extends Controller
         }
         $post->likes()->where(
             [
-                ['authorable_id', $user_id],
+                ['authorable_id', $id],
                 ['authorable_type', 'App\Models\Company']
             ]
         )->delete();

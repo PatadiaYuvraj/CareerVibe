@@ -9,12 +9,12 @@ use App\Models\Follow;
 use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\AuthenticableService;
 use App\Services\NavigationManagerService;
 use App\Services\StorageManagerService;
 use App\Services\MailableService;
 use App\Services\NotifiableService;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Config;
 
 class UserController extends Controller
 {
@@ -24,6 +24,7 @@ class UserController extends Controller
     private MailableService $mailableService;
     private int $paginate;
     private NavigationManagerService $navigationManagerService;
+    private AuthenticableService $authenticableService;
 
     public function __construct(
         User $user,
@@ -31,17 +32,34 @@ class UserController extends Controller
         MailableService $mailableService,
         StorageManagerService $storageManagerService,
         NavigationManagerService $navigationManagerService,
+        AuthenticableService $authenticableService,
     ) {
         $this->user = $user;
         $this->notifiableService = $notifiableService;
         $this->mailableService = $mailableService;
         $this->storageManagerService = $storageManagerService;
-        $this->paginate = env('PAGINATEVALUE');
         $this->navigationManagerService = $navigationManagerService;
+        $this->authenticableService = $authenticableService;
+        $this->paginate = Config::get('constants.pagination');
     }
 
     public function dashboard()
     {
+        // AuthenticableService has the following methods:
+        // registerUser(array $details): User
+        // loginUser(array $details): bool
+        // logoutUser(): void
+        // registerCompany(array $details): Company
+        // loginCompany(array $details): bool
+        // logoutCompany(): void
+        // registerAdmin(array $details): Admin
+        // loginAdmin(array $details): bool
+        // logoutAdmin(): void
+        // passwordHash(string $password): string
+        // verifyPassword(string $password, string $hashedPassword): bool
+        // isUser(): bool
+        // isCompany(): bool
+        // isAdmin(): bool
         return $this->navigationManagerService->loadView('user.dashboard.index');
     }
 
@@ -67,12 +85,6 @@ class UserController extends Controller
                 "required",
                 "min:6",
                 "max:20",
-                function ($attribute, $value, $fail) {
-                    $user = $this->user->where('email', request()->get('email'))->first();
-                    if ($user && !Hash::check($value, $user->password)) {
-                        return $fail(__('The password is incorrect.'));
-                    }
-                }
             ]
         ]);
         $data = [
@@ -80,7 +92,7 @@ class UserController extends Controller
             "password" => $request->get("password")
         ];
 
-        if (auth()->guard('user')->attempt($data, true)) {
+        if ($this->authenticableService->loginUser($data)) {
             return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
@@ -122,32 +134,26 @@ class UserController extends Controller
                 function ($attribute, $value, $fail) {
                     $name = $this->user->where('name', request()->get('name'))->first();
                     $email = $this->user->where('email', request()->get('email'))->first();
-                    if ($name && Hash::check($value, $name->password)) {
-                        return $fail(__('The password should not be same as name.'));
-                    }
-                    if ($email && Hash::check($value, $email->password)) {
-                        return $fail(__('The password should not be same as email.'));
-                    }
                 }
             ],
-            "confirm_password" => "required|min:6|max:20|same:password"
+            "confirm_password" => [
+                "required",
+                "min:6",
+                "max:20",
+                "same:password",
+            ]
         ]);
 
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email"),
-            "password" => Hash::make($request->get("password"))
+            "password" => $request->get("password"),
         ];
 
-        $isCreated = $this->user->create($data);
+        $isCreated = $this->authenticableService->registerUser($data);
 
         if ($isCreated) {
-            $isAuth = auth()->guard('user')->attempt([
-                "email" => $request->get("email"),
-                "password" => $request->get("password")
-            ]);
-
-            if ($isAuth) {
+            if ($this->authenticableService->loginUser($data)) {
                 return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
             }
             return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "User Created Successfully"]);
@@ -157,8 +163,7 @@ class UserController extends Controller
 
     public function logout()
     {
-        auth()->guard('user')->logout();
-        Session::flush();
+        $this->authenticableService->logoutUser();
         return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "You're Logged Out"]);
     }
 
@@ -169,18 +174,17 @@ class UserController extends Controller
 
     public function doChangePassword(Request $request)
     {
-        if (!auth()->guard('user')->check()) {
+        if (!$this->authenticableService->isUser()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
-        $id = auth()->guard('user')->user()->id;
-
+        $id = $this->authenticableService->getUser()->id;
         $request->validate([
             "currentPassword" => [
                 "required",
                 function ($attribute, $value, $fail) use ($id) {
                     $user = $this->user->find($id);
-                    if (!Hash::check($value, $user->password)) {
+                    if (!$this->authenticableService->verifyPassword($value, $user->password)) {
                         return $fail(__('The current password is incorrect.'));
                     }
                 },
@@ -191,7 +195,7 @@ class UserController extends Controller
                 "max:20",
                 function ($attribute, $value, $fail) use ($id) {
                     $user = $this->user->find($id);
-                    if (Hash::check($value, $user->password)) {
+                    if ($this->authenticableService->verifyPassword($value, $user->password)) {
                         return $fail(__('The new password must be different from current password.'));
                     }
                 }
@@ -205,12 +209,12 @@ class UserController extends Controller
         ]);
 
         $data = [
-            "password" => Hash::make($request->get("newPassword"))
+            "password" => $this->authenticableService->passwordHash($request->get("newPassword")),
         ];
 
-        $isUpdated = $this->user->where('id', $id)->update($data);
+        $isUpdated = $this->user->find($id)->update($data);
 
-        $user = $this->user->find(auth()->guard('user')->user()->id);
+        $user = $this->user->find($id);
         $details = [
             'title' => 'Password Changed',
             'body' => 'Your password is changed'
@@ -231,11 +235,11 @@ class UserController extends Controller
 
     public function updateProfile(Request $request)
     {
-        if (!auth()->guard('user')->check()) {
+        if (!$this->authenticableService->isUser()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
-        $id = auth()->guard('user')->user()->id;
+        $id = $this->authenticableService->getUser()->id;
 
         $request->validate([
             "name" => [
@@ -368,11 +372,11 @@ class UserController extends Controller
             $data["experience"] = $request->experience;
         }
 
-        $isUpdated = $this->user->where('id', $id)->update($data);
+        $isUpdated = $this->user->find($id)->update($data);
 
         if ($isUpdated) {
 
-            $user = $this->user->find(auth()->guard('user')->user()->id);
+            $user = $this->user->find($id);
             $details = [
                 'title' => 'Profile Updated',
                 'body' => 'Your profile is updated'
@@ -391,11 +395,9 @@ class UserController extends Controller
 
     public function updateProfileImage(Request $request)
     {
-        if (!auth()->guard('user')->check()) {
+        if (!$this->authenticableService->isUser()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
-
-        $id = auth()->guard('user')->user()->id;
 
         $request->validate([
             "profile_image_url" => [
@@ -406,7 +408,7 @@ class UserController extends Controller
             ],
         ]);
 
-        $user = $this->user->find($id);
+        $user = $this->authenticableService->getUser();
 
         if (!$user) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
@@ -424,10 +426,8 @@ class UserController extends Controller
             "profile_image_url" => null,
         ];
 
-        $isUpdated = $this->user->where('id', $id)->update($data);
+        $isUpdated = $this->user->find($user->id)->update($data);
         if ($isUpdated) {
-
-            $user = $this->user->find(auth()->guard('user')->user()->id);
             $details = [
                 'title' => 'Profile Image Updated',
                 'body' => 'Your profile image is updated'
@@ -442,11 +442,11 @@ class UserController extends Controller
 
     public function deleteProfileImage()
     {
-        if (!auth()->guard('user')->check()) {
+        if (!$this->authenticableService->isUser()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
-        $id = auth()->guard('user')->user()->id;
+        $id = $this->authenticableService->getUser()->id;
 
         $user = $this->user->find($id);
 
@@ -468,7 +468,7 @@ class UserController extends Controller
 
         if ($isUpdated) {
 
-            $user = $this->user->find(auth()->guard('user')->user()->id);
+            $user = $this->user->find($id);
             $details = [
                 'title' => 'Profile Image Deleted',
                 'body' => 'Your profile image is deleted'
@@ -487,11 +487,11 @@ class UserController extends Controller
 
     public function updateResumePdf(Request $request)
     {
-        if (!auth()->guard('user')->check()) {
+        if (!$this->authenticableService->isUser()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
-        $id = auth()->guard('user')->user()->id;
+        $id = $this->authenticableService->getUser()->id;
 
         $request->validate([
             "resume_pdf_url" => [
@@ -514,7 +514,7 @@ class UserController extends Controller
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
 
-            $user = $this->user->find(auth()->guard('user')->user()->id);
+            $user = $this->user->find($id);
             $details = [
                 'title' => 'Resume Updated',
                 'body' => 'Your resume is updated'
@@ -530,11 +530,11 @@ class UserController extends Controller
 
     public function deleteResumePdf()
     {
-        if (!auth()->guard('user')->check()) {
+        if (!$this->authenticableService->isUser()) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
-        $id = auth()->guard('user')->user()->id;
+        $id =  $this->authenticableService->getUser()->id;
 
         $user = $this->user->find($id);
 
@@ -555,7 +555,7 @@ class UserController extends Controller
 
         if ($isUpdated) {
 
-            $user = $this->user->find(auth()->guard('user')->user()->id);
+            $user = $this->user->find($id);
             $details = [
                 'title' => 'Profile Image Deleted',
                 'body' => 'Your profile image is deleted'
@@ -567,7 +567,7 @@ class UserController extends Controller
 
     public function allUsers()
     {
-        $current_user_id = auth()->guard('user')->user()->id;
+        $current_user_id =  $this->authenticableService->getUser()->id;
         $users = $this->user
             ->where('id', '!=', $current_user_id)
             ->with([
@@ -581,7 +581,7 @@ class UserController extends Controller
 
     public function follow($id)
     {
-        $current_user_id = auth()->guard('user')->user()->id;
+        $current_user_id =  $this->authenticableService->getUser()->id;
         $user = $this->user->find($id);
 
         if (!$user || $current_user_id == $id) {
@@ -595,14 +595,14 @@ class UserController extends Controller
         }
 
         $user->followers()->syncWithoutDetaching($current_user_id);
-        $msg = auth()->guard('user')->user()->name . " is started following you";
+        $msg = $this->authenticableService->getUser()->name . " is started following you";
         $this->notifiableService->sendNotification($user, $msg);
         return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "User is followed"]);
     }
 
     public function unfollow($id)
     {
-        $current_user_id = auth()->guard('user')->user()->id;
+        $current_user_id =  $this->authenticableService->getUser()->id;
         $user = $this->user->find($id);
 
         if (!$user) {
@@ -622,7 +622,7 @@ class UserController extends Controller
 
     public function removeFollower($id)
     {
-        $current_user_id = auth()->guard('user')->user()->id;
+        $current_user_id =  $this->authenticableService->getUser()->id;
         $current_user = $this->user->find($current_user_id);
         $user = $this->user->find($id);
         if (!$user) {
@@ -638,7 +638,7 @@ class UserController extends Controller
 
     public function following()
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id =  $this->authenticableService->getUser()->id;
         $users = Follow::where('user_id', $user_id)
             ->with('followable')
             ->paginate($this->paginate);
@@ -647,7 +647,7 @@ class UserController extends Controller
 
     public function followers()
     {
-        $id = auth()->guard('user')->user()->id;
+        $id =  $this->authenticableService->getUser()->id;
         $user = $this->user->find($id);
         if (!$user) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
@@ -659,7 +659,7 @@ class UserController extends Controller
 
     public function notifications()
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id =  $this->authenticableService->getUser()->id;
         $user = $this->user->find($user_id);
         if (!$user) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
@@ -672,7 +672,7 @@ class UserController extends Controller
 
     public function markAsRead($id)
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id =  $this->authenticableService->getUser()->id;
         $user = $this->user->find($user_id);
         if (!$user) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
@@ -683,7 +683,7 @@ class UserController extends Controller
 
     public function markAllAsRead()
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id =  $this->authenticableService->getUser()->id;
         $user = $this->user->find($user_id);
         if (!$user) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
@@ -694,7 +694,7 @@ class UserController extends Controller
 
     public function markAsUnread($id)
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id =  $this->authenticableService->getUser()->id;
         $user = $this->user->find($user_id);
         if (!$user) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
@@ -705,7 +705,7 @@ class UserController extends Controller
 
     public function deleteNotification($id)
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id =  $this->authenticableService->getUser()->id;
         $user = $this->user->find($user_id);
         if (!$user) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
@@ -716,7 +716,7 @@ class UserController extends Controller
 
     public function deleteAllNotification()
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id =  $this->authenticableService->getUser()->id;
         $user = $this->user->find($user_id);
         if (!$user) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
@@ -727,7 +727,7 @@ class UserController extends Controller
 
     public function indexPost()
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         $posts = Post::where([
             ['authorable_id', $user_id],
             ['authorable_type', 'App\Models\User']
@@ -743,7 +743,7 @@ class UserController extends Controller
 
     public function allPost()
     {
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         $posts =
             Post::with([
                 'authorable',
@@ -776,7 +776,7 @@ class UserController extends Controller
             ],
         ]);
 
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
 
         $data = [
             "title" => $request->get("title"),
@@ -800,7 +800,7 @@ class UserController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized to see this post"]);
         }
@@ -813,7 +813,7 @@ class UserController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
@@ -838,7 +838,7 @@ class UserController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
@@ -859,7 +859,7 @@ class UserController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
@@ -878,7 +878,7 @@ class UserController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         $isAlreadyLiked = $post->likes()->where([
             ['authorable_id', $user_id],
             ['authorable_type', 'App\Models\User']
@@ -901,7 +901,7 @@ class UserController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         $isAlreadyLiked = $post->likes()->where(
             [
                 ['authorable_id', $user_id],
@@ -962,7 +962,7 @@ class UserController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         $data = [
             "content" => $request->get("content"),
             "authorable_id" => $user_id,
@@ -984,7 +984,7 @@ class UserController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not found"]);
         }
 
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         if ($comment->authorable_id != $user_id || $comment->authorable_type != "App\Models\User") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This comment is not created by you"]);
         }
@@ -1010,7 +1010,7 @@ class UserController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not found"]);
         }
 
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         if ($comment->authorable_id != $user_id || $comment->authorable_type != "App\Models\User") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This comment is not created by you"]);
         }
@@ -1037,7 +1037,7 @@ class UserController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not found"]);
         }
 
-        $user_id = auth()->guard('user')->user()->id;
+        $user_id = $this->authenticableService->getUser()->id;
         if ($comment->authorable_id != $user_id || $comment->authorable_type != "App\Models\User") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This comment is not created by you"]);
         }

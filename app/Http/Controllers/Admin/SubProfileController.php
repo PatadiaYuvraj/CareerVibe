@@ -7,6 +7,7 @@ use App\Models\ProfileCategory;
 use App\Models\SubProfile;
 use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class SubProfileController extends Controller
 {
@@ -19,7 +20,7 @@ class SubProfileController extends Controller
         NavigationManagerService $navigationManagerService,
     ) {
         $this->subProfile = $subProfile;
-        $this->paginate = env('PAGINATEVALUE');
+        $this->paginate = Config::get('constants.pagination');
         $this->navigationManagerService = $navigationManagerService;
     }
 

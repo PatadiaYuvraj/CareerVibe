@@ -5,12 +5,14 @@ namespace App\Jobs;
 use App\Models\Admin;
 use App\Models\Company;
 use App\Models\User;
+use App\Services\StorageManagerService;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -47,15 +49,15 @@ class UploadToCloudinary implements ShouldQueue
 
             if ($this->user_data['user_type']  == "USER") {
                 $user = USER::find($this->user_data['user_id']);
-                $folder = 'career-vibe/users/profile_image';
+                $folder = Config::get('constants.CLOUDINARY_FOLDER.user');
             }
             if ($this->user_data['user_type']  == "ADMIN") {
                 $user = Admin::find($this->user_data['user_id']);
-                $folder = 'career-vibe/admins/profile_image';
+                $folder = Config::get('constants.CLOUDINARY_FOLDER.admin');
             }
             if ($this->user_data['user_type']  == "COMPANY") {
                 $user = Company::find($this->user_data['user_id']);
-                $folder = 'career-vibe/companies/profile_image';
+                $folder = Config::get('constants.CLOUDINARY_FOLDER.company');
             }
 
             $response = (new UploadApi())->upload(
@@ -66,7 +68,10 @@ class UploadToCloudinary implements ShouldQueue
                 ]
             );
 
-            unlink(Storage::path($this->user_data['stored_path']));
+            // unlink(Storage::path($this->user_data['stored_path']));
+            $storageManagerService  = new StorageManagerService();
+            $storageManagerService->deleteFromLocal($this->user_data['stored_path']);
+
 
 
             $user->profile_image_url = $response['secure_url'];

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ProfileCategory;
 use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class ProfileCategoryController extends Controller
 {
@@ -18,7 +19,7 @@ class ProfileCategoryController extends Controller
         NavigationManagerService $navigationManagerService,
     ) {
         $this->profileCategory = $profileCategory;
-        $this->paginate = env('PAGINATEVALUE');
+        $this->paginate = Config::get('constants.pagination');
         $this->navigationManagerService = $navigationManagerService;
     }
 

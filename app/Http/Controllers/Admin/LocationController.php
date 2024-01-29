@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Location;
 use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class LocationController extends Controller
 {
@@ -18,7 +19,7 @@ class LocationController extends Controller
         NavigationManagerService $navigationManagerService,
     ) {
         $this->location = $location;
-        $this->paginate = env('PAGINATEVALUE');
+        $this->paginate = Config::get('constants.pagination');
         $this->navigationManagerService = $navigationManagerService;
     }
 
