@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Jobs\ChangePasswordJob;
 use App\Jobs\EmailVerificationJob;
+use App\Jobs\PasswordResetJob;
 use App\Jobs\SendMailJob;
 use App\Repository\MailableRepository;
 use Illuminate\Support\Facades\Config;
@@ -24,7 +26,15 @@ class MailableService implements MailableRepository
     {
         if (Config::get('constants.IS_MAIL_SERVICE_ENABLED')) {
             EmailVerificationJob::dispatch($email, $details);
-            Log::info("MailableService : " . json_encode($details));
+        } else {
+            Log::info("Mail service is disabled");
+        }
+    }
+
+    public function passwordResetMail(string $email, array $details): void
+    {
+        if (Config::get('constants.IS_MAIL_SERVICE_ENABLED')) {
+            PasswordResetJob::dispatch($email, $details);
         } else {
             Log::info("Mail service is disabled");
         }

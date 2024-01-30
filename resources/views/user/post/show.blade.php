@@ -41,7 +41,7 @@
                                 No. of Comments
                             </h5>
                             <h6 class="">
-                                0
+                                {{ count($post['comments']) }}
                             </h6>
                         </div>
                     </div>
@@ -52,7 +52,7 @@
                                 No. of Likes
                             </h5>
                             <h6 class="">
-                                0
+                                {{ count($post['likes']) }}
                             </h6>
                         </div>
                     </div>

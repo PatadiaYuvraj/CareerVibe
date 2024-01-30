@@ -4,9 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Comment;
 use App\Models\Follow;
-use App\Models\Like;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\AuthenticableService;
@@ -98,7 +96,11 @@ class UserController extends Controller
         }
 
         if ($this->authenticableService->loginUser($data)) {
-            return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
+            return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0',
+                'Pragma' => 'no-cache',
+                'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT'
+            ], true, ["success" => "You're Logged In"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
     }
@@ -139,7 +141,7 @@ class UserController extends Controller
             ]
         ]);
 
-        $token = $this->authenticableService->generateToken();
+        $token = $this->authenticableService->generateEmailVerificationToken();
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email"),
@@ -150,7 +152,7 @@ class UserController extends Controller
 
         $details = [
             'username' => $data['name'],
-            'url' => route('user.verifyEmail', $token),
+            'url' => $this->authenticableService->generateUserEmailVerificationLink('user.verifyEmail', $token),
         ];
 
         // send mail
@@ -160,7 +162,7 @@ class UserController extends Controller
         $isCreated = $this->authenticableService->registerUser($data);
 
         if ($isCreated) {
-            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "Verify your email to login"]);
+            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "Verification Link Sent To Your Email"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User Not Registered"]);
     }
@@ -181,6 +183,98 @@ class UserController extends Controller
             return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "Email Verified Successfully"]);
         }
         return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Email Not Verified"]);
+    }
+
+    // fogot password
+    public function forgotPassword()
+    {
+        return $this->navigationManagerService->loadView('user.auth.forgot-password');
+    }
+
+    public function doForgotPassword(Request $request)
+    {
+        $request->validate([
+            "email" => [
+                "required",
+                "email",
+                function ($attribute, $value, $fail) {
+                    $user = $this->authenticableService->getUserByEmail($value);
+                    if (!$user) {
+                        return $fail(__('The email is not registered.'));
+                    }
+                },
+                function ($attribute, $value, $fail) {
+                    $user = $this->authenticableService->getUserByEmail($value);
+                    if ($user && !$user->is_email_verified) {
+                        return $fail(__('The email is not verified.'));
+                    }
+                },
+            ],
+        ]);
+
+        $token = $this->authenticableService->generatePasswordResetToken();
+        $data = [
+            "email" => $request->get("email"),
+            "password_reset_token" => $token,
+        ];
+
+        $details = [
+            'username' => $data['email'],
+            'url' => $this->authenticableService->generateUserPasswordResetLink('user.resetPassword', $token),
+        ];
+
+        // send mail
+        $this->mailableService->passwordResetMail($data['email'], $details);
+
+        $isUpdated = $this->user->where('email', $data['email'])->update($data);
+
+        if ($isUpdated) {
+            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "Reset Password Link Sent Successfully"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Reset Password Link Not Sent"]);
+    }
+
+    public function resetPassword($token)
+    {
+        $user = $this->user->where('password_reset_token', $token)->first();
+        if (!$user) {
+            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+        }
+        return $this->navigationManagerService->loadView('user.auth.reset-password', compact('token'));
+    }
+
+    public function doResetPassword(Request $request, $token)
+    {
+        $request->validate([
+            "password" => [
+                "required",
+                "min:6",
+                "max:20",
+            ],
+            "confirm_password" => [
+                "required",
+                "min:6",
+                "max:20",
+                "same:password",
+            ]
+        ]);
+
+        $user = $this->user->where('password_reset_token', $token)->first();
+        if (!$user) {
+            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+        }
+
+        $data = [
+            "password" => $this->authenticableService->passwordHash($request->get("password")),
+            "password_reset_token" => null,
+        ];
+
+        $isUpdated = $this->user->where('id', $user->id)->update($data);
+
+        if ($isUpdated) {
+            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "Password Reset Successfully"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Password Not Reset"]);
     }
 
     public function logout()
@@ -991,7 +1085,7 @@ class UserController extends Controller
             "authorable_type" => "App\Models\User"
         ];
         $post->comments()->create($data);
-        return $this->navigationManagerService->redirectRoute('user.post.commentIndex', $id, 302, [], false, ["success" => "Comment is created"]);
+        return $this->navigationManagerService->redirectRoute('user.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is created"]);
     }
 
     public function commentPostEdit($id, $comment_id)
@@ -1042,7 +1136,7 @@ class UserController extends Controller
         ];
         $isUpdated = $comment->update($data);
         if ($isUpdated) {
-            return $this->navigationManagerService->redirectRoute('user.post.commentIndex', $id, 302, [], false, ["success" => "Comment is updated"]);
+            return $this->navigationManagerService->redirectRoute('user.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is updated"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not updated"]);
     }

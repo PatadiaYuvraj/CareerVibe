@@ -1,4 +1,5 @@
 @extends('company.layout.auth')
+@section('title', 'Login | Company - ' . config('constants.APP_NAME'))
 @section('content')
     <div class="card mb-3">
         <div class="card-body">
@@ -28,13 +29,20 @@
                 <div class="col-12">
                     <button class="btn btn-primary w-100" type="submit">Login</button>
                 </div>
-                <div class="col-12 text-center">
+                <div class="col-12">
                     <p class="small mb-0">Don't have account?
                         <a href="{{ route('company.register') }}">Create an account</a>
                     </p>
                     <p class="small mb-0">
-                        <a href="{{ route('user.register') }}">User</a> |
-                        <a href="{{ route('admin.register') }}">Admin</a>
+                        <a href="{{ route('company.forgotPassword') }}">
+                            Forgot Password?
+                        </a>
+                    </p>
+                </div>
+                <div class="col-12 text-center">
+                    <p class="small mb-0">
+                        <a href="{{ route('user.login') }}">User</a> |
+                        <a href="{{ route('admin.login') }}">Admin</a>
                     </p>
                 </div>
             </form>

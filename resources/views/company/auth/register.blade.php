@@ -1,5 +1,5 @@
 @extends('company.layout.auth')
-
+@section('title', 'Register | Company - ' . config('constants.APP_NAME'))
 @section('content')
     <div class="card mb-3">
         <div class="card-body">

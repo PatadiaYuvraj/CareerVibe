@@ -29,7 +29,7 @@ Route::get('/checkAuth',  function () {
 })->name('checkAuth');
 
 Route::get('/test', [TestController::class, "test"])->name('test');
-Route::post('/testing',  [TestController::class, "testing"])->name('testing');
+Route::get('/testing',  [TestController::class, "testing"])->name('testing');
 
 
 Route::group(['middleware' => "isGuest"], function () {
@@ -45,10 +45,13 @@ Route::group(['middleware' => "isGuest"], function () {
         Route::get('/register', [UserUserController::class, "register"])->name('user.register');
         Route::post('/login', [UserUserController::class, "doLogin"])->name('user.doLogin');
         Route::post('/register', [UserUserController::class, "doRegister"])->name('user.doRegister');
-        // email verification
         Route::get('/verify-email/{token}',  [UserUserController::class, "verifyEmail"])->name('user.verifyEmail');
         Route::get('/resend-verification-email',  [UserUserController::class, "resendVerificationEmail"])->name('user.resendVerificationEmail');
         Route::get('/send-verification-email',  [UserUserController::class, "sendVerificationEmail"])->name('user.sendVerificationEmail');
+        Route::get('/forgot-password',  [UserUserController::class, "forgotPassword"])->name('user.forgotPassword');
+        Route::post('/forgot-password',  [UserUserController::class, "doForgotPassword"])->name('user.doForgotPassword');
+        Route::get('/reset-password/{token}',  [UserUserController::class, "resetPassword"])->name('user.resetPassword');
+        Route::post('/reset-password/{token}',  [UserUserController::class, "doResetPassword"])->name('user.doResetPassword');
     });
 
     // Admin Routes 
@@ -65,6 +68,13 @@ Route::group(['middleware' => "isGuest"], function () {
         Route::get('/register', [CompanyCompanyController::class, "register"])->name('company.register');
         Route::post('/login', [CompanyCompanyController::class, "doLogin"])->name('company.doLogin');
         Route::post('/register', [CompanyCompanyController::class, "doRegister"])->name('company.doRegister');
+        Route::get('/verify-email/{token}',  [CompanyCompanyController::class, "verifyEmail"])->name('company.verifyEmail');
+        Route::get('/resend-verification-email',  [CompanyCompanyController::class, "resendVerificationEmail"])->name('company.resendVerificationEmail');
+        Route::get('/send-verification-email',  [CompanyCompanyController::class, "sendVerificationEmail"])->name('company.sendVerificationEmail');
+        Route::get('/forgot-password',  [CompanyCompanyController::class, "forgotPassword"])->name('company.forgotPassword');
+        Route::post('/forgot-password',  [CompanyCompanyController::class, "doForgotPassword"])->name('company.doForgotPassword');
+        Route::get('/reset-password/{token}',  [CompanyCompanyController::class, "resetPassword"])->name('company.resetPassword');
+        Route::post('/reset-password/{token}',  [CompanyCompanyController::class, "doResetPassword"])->name('company.doResetPassword');
     });
 });
 
@@ -271,6 +281,9 @@ Route::group(['middleware' => "isUser"], function () {
 
 
         Route::get('/dashboard',  [UserUserController::class, "dashboard"])->name('user.dashboard');
+        // Route::get('/dashboard',  function () {
+        //     return view('user.dashboard.index');
+        // })->name('user.dashboard');
         Route::get('/logout',  [UserUserController::class, "logout"])->name('user.logout');
         Route::get('/edit-profile',  [UserUserController::class, "editProfile"])->name('user.editProfile');
         Route::post('/update-profile',  [UserUserController::class, "updateProfile"])->name('user.updateProfile');
@@ -348,6 +361,7 @@ Route::group(['middleware' => "isUser"], function () {
             Route::get('/like/{id}',  [UserUserController::class, "likePost"])->name('user.post.like');
             Route::get('/unlike/{id}',  [UserUserController::class, "unlikePost"])->name('user.post.unlike');
             //comment view page
+
             Route::get('/comment/{id}',  [UserUserController::class, "commentPostIndex"])->name('user.post.commentIndex');  // comment index page
             Route::get('/comment/{id}/create',  [UserUserController::class, "commentPostCreate"])->name('user.post.commentCreate');  // comment create page
             Route::post('/comment/{id}/store',  [UserUserController::class, "commentPostStore"])->name('user.post.commentStore');  // comment store page

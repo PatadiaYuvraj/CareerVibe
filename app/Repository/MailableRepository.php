@@ -9,4 +9,7 @@ interface MailableRepository
 
     // emailVerificationMail() is used to send email verification mail
     public function emailVerificationMail(string $email, array $details): void;
+
+    // passwordResetMail() is used to send password reset mail
+    public function passwordResetMail(string $email, array $details): void;
 }

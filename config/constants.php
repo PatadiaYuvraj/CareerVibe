@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\Route;
 
 return [
   'USER_TYPE' => [
@@ -28,6 +29,12 @@ return [
   "IS_NOTIFICATION_SERVICE_ENABLED" => Env::get('IS_NOTIFICATION_SERVICE_ENABLED', true),
   "IS_MAIL_SERVICE_ENABLED" => Env::get('IS_MAIL_SERVICE_ENABLED', true),
   "IS_FILE_UPLOAD_SERVICE_ENABLED" => Env::get('IS_FILE_UPLOAD_SERVICE_ENABLED', true),
+  'mail' => [
+    'email_verification' => true,
+    'password_reset' => true,
+    'change_password' => true,
+
+  ],
   'post' => [
     'type' => [
       'TEXT' => 'text',

@@ -14,17 +14,11 @@ use Illuminate\Support\Facades\Config;
 
 class AuthenticableService implements AuthenticableRepository
 {
-  // registerUser() is used to register a new user
+
+  // User related methods
+
   public function registerUser(array $details): User
   {
-    // $user = User::create([
-    //   'name' => $details['name'],
-    //   'email' => $details['email'],
-    //   'password' => $this->passwordHash($details['password']),
-    //   'email_verification_token' => $details['email_verification_token'],
-    //   'is_email_verified' => false,
-    //   'email_verified_at' => null,
-    // ]);
     $user = new User();
     $user->name = $details['name'];
     $user->email = $details['email'];
@@ -37,7 +31,6 @@ class AuthenticableService implements AuthenticableRepository
     return $user;
   }
 
-  // loginUser() is used to login a user
   public function loginUser(array $details): bool
   {
     $credentials = [
@@ -50,7 +43,6 @@ class AuthenticableService implements AuthenticableRepository
     )->attempt($credentials, true);
   }
 
-  // logoutUser() is used to logout a user
   public function logoutUser(): void
   {
     Auth::guard(
@@ -60,19 +52,62 @@ class AuthenticableService implements AuthenticableRepository
     Session::regenerate();
   }
 
-  // registerCompany() is used to register a new company
+  public function isUser(): bool
+  {
+    return Auth::guard(
+      Config::get('constants.USER_GUARD')
+    )->check();
+  }
+
+  public function getUser(): User|null
+  {
+    return User::find(Auth::guard(
+      Config::get('constants.USER_GUARD')
+    )->user()->id);
+  }
+
+  public function getUserById(int $id): User|null
+  {
+    return User::find($id);
+  }
+
+  public function getUserByEmail(string $email): User|null
+  {
+    return User::where('email', $email)->first();
+  }
+
+  public function generateUserEmailVerificationLink(string $routeName, string $token): string
+  {
+    return $this->generateLink(
+      $routeName,
+      $token
+    );
+  }
+
+  public function generateUserPasswordResetLink(string $routeName, string $token): string
+  {
+    return $this->generateLink(
+      $routeName,
+      $token
+    );
+  }
+
+  // Company related methods
+
   public function registerCompany(array $details): Company
   {
-    $company = Company::create([
-      'name' => $details['name'],
-      'email' => $details['email'],
-      'password' => $this->passwordHash($details['password']),
-    ]);
+    $company = new Company();
+    $company->name = $details['name'];
+    $company->email = $details['email'];
+    $company->password = $this->passwordHash($details['password']);
+    $company->email_verification_token = $details['email_verification_token'];
+    $company->is_email_verified = false;
+    $company->email_verified_at = null;
+    $company->save();
 
     return $company;
   }
 
-  // loginCompany() is used to login a company
   public function loginCompany(array $details): bool
   {
     $credentials = [
@@ -85,7 +120,6 @@ class AuthenticableService implements AuthenticableRepository
     )->attempt($credentials, true);
   }
 
-  // logoutCompany() is used to logout a company
   public function logoutCompany(): void
   {
     Auth::guard(Config::get('constants.COMPANY_GUARD'))->logout();
@@ -93,19 +127,62 @@ class AuthenticableService implements AuthenticableRepository
     Session::regenerate();
   }
 
-  // registerAdmin() is used to register a new admin
+  public function isCompany(): bool
+  {
+    return Auth::guard(
+      Config::get('constants.COMPANY_GUARD')
+    )->check();
+  }
+
+  public function getCompany(): Company|null
+  {
+    return Company::find(Auth::guard(
+      Config::get('constants.COMPANY_GUARD')
+    )->user()->id);
+  }
+
+  public function getCompanyById(int $id): Company|null
+  {
+    return Company::find($id);
+  }
+
+  public function getCompanyByEmail(string $email): Company|null
+  {
+    return Company::where('email', $email)->first();
+  }
+
+  public function generateCompanyEmailVerificationLink(string $routeName, string $token): string
+  {
+    return $this->generateLink(
+      $routeName,
+      $token
+    );
+  }
+
+  public function generateCompanyPasswordResetLink(string $routeName, string $token): string
+  {
+    return $this->generateLink(
+      $routeName,
+      $token
+    );
+  }
+
+  // Admin related methods
+
   public function registerAdmin(array $details): Admin
   {
-    $admin = Admin::create([
-      'name' => $details['name'],
-      'email' => $details['email'],
-      'password' => $this->passwordHash($details['password']),
-    ]);
+    $admin = new Admin();
+    $admin->name = $details['name'];
+    $admin->email = $details['email'];
+    $admin->password = $this->passwordHash($details['password']);
+    $admin->email_verification_token = $details['email_verification_token'];
+    $admin->is_email_verified = false;
+    $admin->email_verified_at = null;
+    $admin->save();
 
     return $admin;
   }
 
-  // loginAdmin() is used to login an admin
   public function loginAdmin(array $details): bool
   {
     $credentials = [
@@ -116,7 +193,6 @@ class AuthenticableService implements AuthenticableRepository
     return Auth::guard(Config::get('constants.ADMIN_GUARD'))->attempt($credentials, true);
   }
 
-  // logoutAdmin() is used to logout an admin
   public function logoutAdmin(): void
   {
     Auth::guard(Config::get('constants.ADMIN_GUARD'))->logout();
@@ -124,35 +200,6 @@ class AuthenticableService implements AuthenticableRepository
     Session::regenerate();
   }
 
-  // passwordHash() is used to hash a password
-  public function passwordHash(string $password): string
-  {
-    return Hash::make($password);
-  }
-
-  // verifyPassword() is used to verify a password
-  public function verifyPassword(string $password, string $hashedPassword): bool
-  {
-    return Hash::check($password, $hashedPassword);
-  }
-
-  // isUser() is used to check if a user is logged in
-  public function isUser(): bool
-  {
-    return Auth::guard(
-      Config::get('constants.USER_GUARD')
-    )->check();
-  }
-
-  // isCompany() is used to check if a company is logged in
-  public function isCompany(): bool
-  {
-    return Auth::guard(
-      Config::get('constants.COMPANY_GUARD')
-    )->check();
-  }
-
-  // isAdmin() is used to check if an admin is logged in
   public function isAdmin(): bool
   {
     return Auth::guard(
@@ -160,23 +207,6 @@ class AuthenticableService implements AuthenticableRepository
     )->check();
   }
 
-  // getUser() is used to get the user that is logged in
-  public function getUser(): User|null
-  {
-    return User::find(Auth::guard(
-      Config::get('constants.USER_GUARD')
-    )->user()->id);
-  }
-
-  // getCompany() is used to get the company that is logged in
-  public function getCompany(): Company|null
-  {
-    return Company::find(Auth::guard(
-      Config::get('constants.COMPANY_GUARD')
-    )->user()->id);
-  }
-
-  // getAdmin() is used to get the admin that is logged in
   public function getAdmin(): Admin|null
   {
     return Admin::find(Auth::guard(
@@ -184,45 +214,64 @@ class AuthenticableService implements AuthenticableRepository
     )->user()->id);
   }
 
-  // getUserById() is used to get a user by id
-  public function getUserById(int $id): User|null
-  {
-    return User::find($id);
-  }
-
-  // getCompanyById() is used to get a company by id
-  public function getCompanyById(int $id): Company|null
-  {
-    return Company::find($id);
-  }
-
-  // getAdminById() is used to get an admin by id
   public function getAdminById(int $id): Admin|null
   {
     return Admin::find($id);
   }
 
-  // getUserByEmail() is used to get a user by email
-  public function getUserByEmail(string $email): User|null
-  {
-    return User::where('email', $email)->first();
-  }
-
-  // getCompanyByEmail() is used to get a company by email
-  public function getCompanyByEmail(string $email): Company|null
-  {
-    return Company::where('email', $email)->first();
-  }
-
-  // getAdminByEmail() is used to get an admin by email
   public function getAdminByEmail(string $email): Admin|null
   {
     return Admin::where('email', $email)->first();
   }
 
-  // generateToken() is used to generate a token
+  public function generateAdminEmailVerificationLink(string $routeName, string $token): string
+  {
+    return $this->generateLink(
+      $routeName,
+      $token
+    );
+  }
+
+  public function generateAdminPasswordResetLink(string $routeName, string $token): string
+  {
+    return $this->generateLink(
+      $routeName,
+      $token
+    );
+  }
+
+  // Common methods
+
+  public function passwordHash(string $password): string
+  {
+    return Hash::make($password);
+  }
+
+  public function verifyPassword(string $password, string $hashedPassword): bool
+  {
+    return Hash::check($password, $hashedPassword);
+  }
+
   public function generateToken(): string
   {
     return bin2hex(random_bytes(50));
+  }
+
+  public function generateEmailVerificationToken(): string
+  {
+    return $this->generateToken();
+  }
+
+  public function generatePasswordResetToken(): string
+  {
+    return $this->generateToken();
+  }
+
+  public function generateLink(string $routeName, string $token): string
+  {
+    return route(
+      $routeName,
+      $token
+    );
   }
 }

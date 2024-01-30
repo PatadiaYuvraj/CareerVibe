@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Mail\EmailVerification;
+use App\Mail\PasswordResetMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class EmailVerificationJob implements ShouldQueue
+class PasswordResetJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -30,6 +30,6 @@ class EmailVerificationJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Mail::to($this->email)->send(new EmailVerification($this->details));
+        Mail::to($this->email)->send(new PasswordResetMail($this->details));
     }
 }

@@ -44,32 +44,6 @@ class CompanyController extends Controller
 
     public function login()
     {
-
-        // AuthenticableService has the following methods:
-        // registerUser(array $details): User -> register a new user
-        // loginUser(array $details): bool -> login a user
-        // logoutUser(): void -> logout a user
-        // registerCompany(array $details): Company -> register a new company
-        // loginCompany(array $details): bool -> login a company
-        // logoutCompany(): void  -> logout a company
-        // registerAdmin(array $details): Admin -> register a new admin
-        // loginAdmin(array $details): bool -> login an admin
-        // logoutAdmin(): void  -> logout an admin
-        // passwordHash(string $password): string -> hash a password
-        // verifyPassword(string $password, string $hashedPassword): bool -> verify a password
-        // isUser(): bool -> check if a user is logged in
-        // isCompany(): bool  -> check if a company is logged in
-        // isAdmin(): bool  -> check if an admin is logged in
-        // getUser(): User  -> get the logged in user
-        // getCompany(): Company  -> get the logged in company
-        // getAdmin(): Admin  -> get the logged in admin
-        // getUserById(int $id): User  -> get a user by id
-        // getCompanyById(int $id): Company  -> get a company by id
-        // getAdminById(int $id): Admin  -> get an admin by id
-        // getUserByEmail(string $email): User  -> get a user by email
-        // getCompanyByEmail(string $email): Company  -> get a company by email
-        // getAdminByEmail(string $email): Admin  -> get an admin by email
-
         return $this->navigationManagerService->loadView('company.auth.login');
     }
 
@@ -89,6 +63,13 @@ class CompanyController extends Controller
                     if (!$company) {
                         return $fail("Email does not exist");
                     }
+                },
+                // check email verification
+                function ($attribute, $value, $fail) {
+                    $company = $this->authenticableService->getCompanyByEmail($value);
+                    if ($company && !$company->email_verified_at) {
+                        return $fail("Email is not verified");
+                    }
                 }
             ],
             "password" => [
@@ -107,6 +88,13 @@ class CompanyController extends Controller
             "email" => $request->get("email"),
             "password" => $request->get("password")
         ];
+
+        // check emial verification
+        $company = $this->authenticableService->getCompanyByEmail($data["email"]);
+        if (!$company->email_verified_at) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Email is not verified"]);
+        }
+
         if ($this->authenticableService->loginCompany($data)) {
             return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
         }
@@ -137,48 +125,167 @@ class CompanyController extends Controller
             ]
         ]);
 
+        $token = $this->authenticableService->generateEmailVerificationToken();
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email"),
-            "password" => $request->get("password")
+            "password" => $request->get("password"),
+            "email_verification_token" => $token,
+            'is_email_verified' => false,
         ];
+
+        $details = [
+            'username' => $data['name'],
+            'url' => $this->authenticableService->generateUserEmailVerificationLink('company.verifyEmail', $token),
+        ];
+
+
+
+        // send mail
+        $this->mailableService->emailVerificationMail($data['email'], $details);
+
 
         $isCreated = $this->authenticableService->registerCompany($data);
 
         if ($isCreated) {
 
-            $isAuth = $this->authenticableService->loginCompany($data);
+            $company = $this->authenticableService->getCompanyById($isCreated->id);
 
-            if ($isAuth) {
+            $details = [
+                'title' => 'Account Created',
+                'body' => "Your account is created successfully."
+            ];
+            // UNCOMMENT: To send notification
+            $this->notifiableService->sendNotification($company, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->mailableService->sendMail($company->email, $details);
 
-                $company = $this->authenticableService->getCompany();
 
-                $details = [
-                    'title' => 'Account Created',
-                    'body' => "Your account is created successfully."
-                ];
+            $admins = Admin::all();
+            $details = [
+                'title' => 'New Company Registered',
+                'body' => "New company $company->name is registered. Please verify it."
+            ];
+            foreach ($admins as $admin) {
                 // UNCOMMENT: To send notification
-                $this->notifiableService->sendNotification($company, $details['body']);
+                $this->notifiableService->sendNotification($admin, $details['body']);
                 // UNCOMMENT: To send mail
-                $this->mailableService->sendMail($company->email, $details);
-
-
-                $admins = Admin::all();
-                $details = [
-                    'title' => 'New Company Registered',
-                    'body' => "New company $company->name is registered. Please verify it."
-                ];
-                foreach ($admins as $admin) {
-                    // UNCOMMENT: To send notification
-                    $this->notifiableService->sendNotification($admin, $details['body']);
-                    // UNCOMMENT: To send mail
-                    $this->mailableService->sendMail($admin->email, $details);
-                }
-                return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
+                $this->mailableService->sendMail($admin->email, $details);
             }
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
+
+            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "Verification Link Sent To Your Email"]);
         }
-        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Something went wrong"]);
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Account Not Created"]);
+    }
+
+    public function verifyEmail($token)
+    {
+        $company = $this->company->where('email_verification_token', $token)->first();
+        if (!$company) {
+            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+        }
+        $data = [
+            "is_email_verified" => true,
+            "email_verification_token" => null,
+            "email_verified_at" => now(),
+        ];
+        $isUpdated = $this->company->where('id', $company->id)->update($data);
+        if ($isUpdated) {
+            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "Email Verified Successfully"]);
+        }
+        return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Email Not Verified"]);
+    }
+
+    // forgotPassword
+    public function forgotPassword()
+    {
+        return $this->navigationManagerService->loadView('company.auth.forgot-password');
+    }
+
+    public function doForgotPassword(Request $request)
+    {
+        $request->validate([
+            "email" => [
+                "required",
+                "email",
+                function ($attribute, $value, $fail) {
+                    $company = $this->authenticableService->getCompanyByEmail($value);
+                    if (!$company) {
+                        return $fail("Email does not exist");
+                    }
+                },
+                // check email verification
+                function ($attribute, $value, $fail) {
+                    $company = $this->authenticableService->getCompanyByEmail($value);
+                    if ($company && !$company->email_verified_at) {
+                        return $fail("Email is not verified");
+                    }
+                }
+            ],
+        ]);
+
+        $token = $this->authenticableService->generatePasswordResetToken();
+        $data = [
+            "email" => $request->get("email"),
+            "password_reset_token" => $token,
+        ];
+
+        $details = [
+            'username' => $data['email'],
+            'url' => $this->authenticableService->generateCompanyPasswordResetLink('company.resetPassword', $token),
+        ];
+
+        // send mail
+        $this->mailableService->passwordResetMail($data['email'], $details);
+
+        $isUpdated = $this->company->where('email', $data['email'])->update($data);
+
+        if ($isUpdated) {
+            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "Reset Password Link Sent To Your Email"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Reset Password Link Not Sent"]);
+    }
+
+    public function resetPassword($token)
+    {
+        $company = $this->company->where('password_reset_token', $token)->first();
+        if (!$company) {
+            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+        }
+        return $this->navigationManagerService->loadView('company.auth.reset-password', compact('token'));
+    }
+
+    public function doResetPassword(Request $request, $token)
+    {
+        $request->validate([
+            "password" => [
+                "required",
+                "min:8",
+                "max:20",
+            ],
+            "confirm_password" => [
+                "required",
+                "same:password"
+            ]
+        ]);
+
+        $company = $this->company->where('password_reset_token', $token)->first();
+        if (!$company) {
+            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+        }
+
+        $data = [
+            // "password" => $request->get("password"),
+            "password" => $this->authenticableService->passwordHash($request->get("password")), "password" => $this->authenticableService->passwordHash($request->get("password")),
+            "password_reset_token" => null,
+        ];
+
+        $isUpdated = $this->company->where('id', $company->id)->update($data);
+
+        if ($isUpdated) {
+            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "Password Reset Successfully"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Password Not Reset"]);
     }
 
     public function logout()

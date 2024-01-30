@@ -26,7 +26,8 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="{{ route('user.post.commentIndex') }}" class="btn btn-danger">Cancel</a>
+                            <a href="{{ route('user.post.commentIndex', $post['id']) }}"
+                                class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
                 </div>

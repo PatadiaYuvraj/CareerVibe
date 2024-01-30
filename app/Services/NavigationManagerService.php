@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repository\NavigationManagerRepository;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
 class NavigationManagerService implements NavigationManagerRepository
@@ -12,7 +13,10 @@ class NavigationManagerService implements NavigationManagerRepository
         string $view,
         array $data = []
     ): View {
-        return view($view, $data);
+        return view(
+            $this->getViewName($view),
+            $data
+        );
     }
 
     public function redirectBack(
@@ -21,7 +25,11 @@ class NavigationManagerService implements NavigationManagerRepository
         $fallback = false,
         array $with = []
     ): RedirectResponse {
-        return redirect()->back($status, $headers, $fallback)->with($with);
+        return redirect()->back(
+            $status,
+            $headers,
+            $fallback
+        )->with($with);
     }
 
     public function redirectRoute(
@@ -32,10 +40,22 @@ class NavigationManagerService implements NavigationManagerRepository
         bool $secure = null,
         array $with = []
     ): RedirectResponse {
-        return redirect()->route($route, $parameters, $status, $headers, $secure)->with($with);
+        return redirect()->route(
+            $this->getRouteName($route),
+            $parameters,
+            $status,
+            $headers,
+            $secure
+        )->with($with);
     }
 
-    // return $this->navigationManagerService->loadView('view-name');
-    // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
-    // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
+    public function getRouteName(string $route)
+    {
+        return Route::has($route) ? Route::getRoutes()->getByName($route)->getName() : 'routeDoesNotExist';
+    }
+
+    public function getViewName(string $view)
+    {
+        return view()->exists($view) ? $view : 'viewDoesNotExist';
+    }
 }

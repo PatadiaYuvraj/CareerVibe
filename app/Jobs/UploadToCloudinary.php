@@ -68,15 +68,17 @@ class UploadToCloudinary implements ShouldQueue
                 ]
             );
 
-            // unlink(Storage::path($this->user_data['stored_path']));
-            $storageManagerService  = new StorageManagerService();
-            $storageManagerService->deleteFromLocal($this->user_data['stored_path']);
-
-
-
             $user->profile_image_url = $response['secure_url'];
             $user->profile_image_public_id = $response['public_id'];
             $user->save();
+
+            // unlink(Storage::path($this->user_data['stored_path']));
+            $storageManagerService  = new StorageManagerService();
+            $storageManagerService->deleteFromLocal($this->user_data['stored_path']);
+            // delete instance $storageManagerService 
+
+
+
 
             Log::info('File upload response:', [$user, $response]);
         } catch (\Exception $e) {
