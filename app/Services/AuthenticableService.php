@@ -14,30 +14,25 @@ use Illuminate\Support\Facades\Config;
 
 class AuthenticableService implements AuthenticableRepository
 {
-  // AuthenticableService has the following methods:
-  // registerUser(array $details): User
-  // loginUser(array $details): bool
-  // logoutUser(): void
-  // registerCompany(array $details): Company
-  // loginCompany(array $details): bool
-  // logoutCompany(): void
-  // registerAdmin(array $details): Admin
-  // loginAdmin(array $details): bool
-  // logoutAdmin(): void
-  // passwordHash(string $password): string
-  // verifyPassword(string $password, string $hashedPassword): bool
-  // isUser(): bool
-  // isCompany(): bool
-  // isAdmin(): bool
-
   // registerUser() is used to register a new user
   public function registerUser(array $details): User
   {
-    $user = User::create([
-      'name' => $details['name'],
-      'email' => $details['email'],
-      'password' => $this->passwordHash($details['password']),
-    ]);
+    // $user = User::create([
+    //   'name' => $details['name'],
+    //   'email' => $details['email'],
+    //   'password' => $this->passwordHash($details['password']),
+    //   'email_verification_token' => $details['email_verification_token'],
+    //   'is_email_verified' => false,
+    //   'email_verified_at' => null,
+    // ]);
+    $user = new User();
+    $user->name = $details['name'];
+    $user->email = $details['email'];
+    $user->password = $this->passwordHash($details['password']);
+    $user->email_verification_token = $details['email_verification_token'];
+    $user->is_email_verified = false;
+    $user->email_verified_at = null;
+    $user->save();
 
     return $user;
   }
@@ -223,5 +218,11 @@ class AuthenticableService implements AuthenticableRepository
   public function getAdminByEmail(string $email): Admin|null
   {
     return Admin::where('email', $email)->first();
+  }
+
+  // generateToken() is used to generate a token
+  public function generateToken(): string
+  {
+    return bin2hex(random_bytes(50));
   }
 }

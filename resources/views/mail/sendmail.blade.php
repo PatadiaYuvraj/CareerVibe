@@ -12,8 +12,8 @@
 
         {{ $body }}
 
-        Thanks,
-        Career Vibe
+        # Thanks,
+        {{ config('constants.APP_NAME') }}
     </x-mail::message>
 </body>
 

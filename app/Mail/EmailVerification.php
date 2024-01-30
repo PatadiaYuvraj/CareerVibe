@@ -8,16 +8,13 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
-class SendMail extends Mailable
+class EmailVerification extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
     private array $details;
+
     public function __construct(array $details)
     {
         $this->details = $details;
@@ -29,7 +26,7 @@ class SendMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Send Mail',
+            subject: 'Email Verification',
         );
     }
 
@@ -39,12 +36,14 @@ class SendMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'mail.sendmail',
+            markdown: 'mail.verifyEmail',
             with: [
-                'title' => $this->details['title'] ?? null,
-                'body' => $this->details['body'] ?? null,
+                'username' => $this->details['username'],
+                'url' => $this->details['url'],
             ],
         );
+        //  run failed job
+        // php artisan queue:failed-table
     }
 
     /**

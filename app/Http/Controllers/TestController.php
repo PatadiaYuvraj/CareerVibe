@@ -8,7 +8,12 @@ class TestController extends Controller
 {
     public function test()
     {
-        return view("test");
+        $username = "John Doe";
+        $url = "https://www.google.com";
+        return view("mail.verifyEmail", compact([
+            'username',
+            'url'
+        ]));
     }
 
     public function testing(Request $request)

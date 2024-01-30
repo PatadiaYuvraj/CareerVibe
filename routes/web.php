@@ -45,6 +45,10 @@ Route::group(['middleware' => "isGuest"], function () {
         Route::get('/register', [UserUserController::class, "register"])->name('user.register');
         Route::post('/login', [UserUserController::class, "doLogin"])->name('user.doLogin');
         Route::post('/register', [UserUserController::class, "doRegister"])->name('user.doRegister');
+        // email verification
+        Route::get('/verify-email/{token}',  [UserUserController::class, "verifyEmail"])->name('user.verifyEmail');
+        Route::get('/resend-verification-email',  [UserUserController::class, "resendVerificationEmail"])->name('user.resendVerificationEmail');
+        Route::get('/send-verification-email',  [UserUserController::class, "sendVerificationEmail"])->name('user.sendVerificationEmail');
     });
 
     // Admin Routes 
@@ -355,3 +359,37 @@ Route::group(['middleware' => "isUser"], function () {
         });
     });
 });
+// $table->string(
+//     "email_verification_token",
+//     100
+// )->nullable();
+// $table->timestamp("email_verified_at")->nullable();
+// $table->string(
+//     "password_reset_token",
+//     100
+// )->nullable();
+// $table->timestamp("password_reset_at")->nullable();
+// $table->string(
+//     "password_change_token",
+//     100
+// )->nullable();
+// $table->timestamp("password_change_at")->nullable();
+// $table->string(
+//     "email_change_token",
+//     100
+// )->nullable();
+// $table->timestamp("email_change_at")->nullable();
+// $table->timestamp("last_login_at")->nullable();
+// want to implement email verification 
+// when a user register send a email to user email address to verify the email address, through mail send a link to verify the email address, 
+// link contains a token, when user click on the link, it will redirect to a page where user can verify the email address,
+// if user click on the link, it will redirect to a page where user can verify the email address,
+// when a user forget password, send a email to user email address to reset the password, through mail send a link to reset the password,
+// link contains a token, when user click on the link, it will redirect to a page where user can reset the password,
+// if user click on the link, it will redirect to a page where user can reset the password,
+// when a user change password, send a email to user email address to verify the password, through mail send a link to verify the password,
+// link contains a token, when user click on the link, it will redirect to a page where user can verify the password,
+// if user click on the link, it will redirect to a page where user can verify the password,
+// when a user change email address, send a email to user email address to verify the email address, through mail send a link to verify the email address,
+// link contains a token, when user click on the link, it will redirect to a page where user can verify the email address,
+// if user click on the link, it will redirect to a page where user can verify the email address,

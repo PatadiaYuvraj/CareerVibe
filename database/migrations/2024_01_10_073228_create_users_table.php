@@ -35,6 +35,28 @@ return new class extends Migration
             $table->string("city", 30)->nullable();
             $table->text("about")->nullable();
             $table->string("experience", 200)->nullable();
+            $table->boolean('is_email_verified')->default(false);
+            $table->string(
+                "email_verification_token",
+                100
+            )->nullable();
+            $table->timestamp("email_verified_at")->nullable();
+            $table->string(
+                "password_reset_token",
+                100
+            )->nullable();
+            $table->timestamp("password_reset_at")->nullable();
+            $table->string(
+                "password_change_token",
+                100
+            )->nullable();
+            $table->timestamp("password_change_at")->nullable();
+            $table->string(
+                "email_change_token",
+                100
+            )->nullable();
+            $table->timestamp("email_change_at")->nullable();
+            $table->timestamp("last_login_at")->nullable();
             $table->rememberToken();
             $table->index([
                 'name',

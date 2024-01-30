@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Mail\SendMail;
+use App\Mail\EmailVerification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,11 +12,9 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class SendMailJob implements ShouldQueue
+class EmailVerificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    // php artisan queue:work --queue=high,default
 
     private array $details;
     private string $email;
@@ -32,9 +30,8 @@ class SendMailJob implements ShouldQueue
      */
     public function handle(): void
     {
-
-        // Mail::to($this->email)->send(new SendMail($this->details));
-        // // Log::info('Mail sent to ' . $this->email . ' successfully');
-        Log::info('Send Mail Job : Wrong');
+        Mail::to($this->email)->send(new EmailVerification($this->details));
+        // Log::info('Mail sent to ' . $this->email . ' successfully');
+        Log::info('EmailVerificationJob : ' . json_encode($this->details));
     }
 }

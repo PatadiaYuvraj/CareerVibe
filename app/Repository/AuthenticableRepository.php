@@ -102,4 +102,7 @@ interface AuthenticableRepository
 
   // getAdminByEmail() is used to get an admin by email
   public function getAdminByEmail(string $email): Admin|null;
+
+  // generateToken() is used to generate a token
+  public function generateToken(): string;
 }

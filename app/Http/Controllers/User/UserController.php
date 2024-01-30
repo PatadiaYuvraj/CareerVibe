@@ -45,21 +45,6 @@ class UserController extends Controller
 
     public function dashboard()
     {
-        // AuthenticableService has the following methods:
-        // registerUser(array $details): User
-        // loginUser(array $details): bool
-        // logoutUser(): void
-        // registerCompany(array $details): Company
-        // loginCompany(array $details): bool
-        // logoutCompany(): void
-        // registerAdmin(array $details): Admin
-        // loginAdmin(array $details): bool
-        // logoutAdmin(): void
-        // passwordHash(string $password): string
-        // verifyPassword(string $password, string $hashedPassword): bool
-        // isUser(): bool
-        // isCompany(): bool
-        // isAdmin(): bool
         return $this->navigationManagerService->loadView('user.dashboard.index');
     }
 
@@ -79,7 +64,14 @@ class UserController extends Controller
                     if (!$user) {
                         return $fail(__('The email is not registered.'));
                     }
-                }
+                },
+                // check email verification
+                function ($attribute, $value, $fail) {
+                    $user = $this->authenticableService->getUserByEmail($value);
+                    if ($user && !$user->is_email_verified) {
+                        return $fail(__('The email is not verified.'));
+                    }
+                },
             ],
             "password" => [
                 "required",
@@ -98,6 +90,12 @@ class UserController extends Controller
             "email" => $request->get("email"),
             "password" => $request->get("password")
         ];
+
+        // check email verification
+        $user = $this->authenticableService->getUserByEmail($data['email']);
+        if (!$user->is_email_verified) {
+            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Verify your email to login"]);
+        }
 
         if ($this->authenticableService->loginUser($data)) {
             return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
@@ -141,21 +139,48 @@ class UserController extends Controller
             ]
         ]);
 
+        $token = $this->authenticableService->generateToken();
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email"),
             "password" => $request->get("password"),
+            "email_verification_token" => $token,
+            'is_email_verified' => false,
         ];
+
+        $details = [
+            'username' => $data['name'],
+            'url' => route('user.verifyEmail', $token),
+        ];
+
+        // send mail
+        $this->mailableService->emailVerificationMail($data['email'], $details);
+
 
         $isCreated = $this->authenticableService->registerUser($data);
 
         if ($isCreated) {
-            if ($this->authenticableService->loginUser($data)) {
-                return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
-            }
-            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "User Created Successfully"]);
+            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "Verify your email to login"]);
         }
-        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User Not Created"]);
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User Not Registered"]);
+    }
+
+    public function verifyEmail($token)
+    {
+        $user = $this->user->where('email_verification_token', $token)->first();
+        if (!$user) {
+            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+        }
+        $data = [
+            "is_email_verified" => true,
+            "email_verification_token" => null,
+            "email_verified_at" => now(),
+        ];
+        $isUpdated = $this->user->where('id', $user->id)->update($data);
+        if ($isUpdated) {
+            return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["success" => "Email Verified Successfully"]);
+        }
+        return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Email Not Verified"]);
     }
 
     public function logout()
