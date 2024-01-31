@@ -22,9 +22,9 @@
                     <table class="table table-striped text-center">
                         <thead>
                             <tr>
-                                <th>Content</th>
                                 <th>Commented By</th>
-                                <th>Type</th>
+                                <th>Content</th>
+                                <th>Likes</th>
                                 <th>Date</th>
                                 <th>Action</th>
                             </tr>
@@ -32,8 +32,11 @@
                         <tbody>
                             @forelse ($post['comments'] as $comment)
                                 <tr>
-                                    <td>{{ $comment['content'] }}</td>
-                                    <td>
+                                    <td
+                                        title="
+                                    @if ($comment['authorable_type'] == 'App\Models\User') User @endif
+                                        @if ($comment['authorable_type'] == 'App\Models\Company') Company @endif
+                                    ">
                                         @if ($comment['authorable_type'] == 'App\Models\Company' && $comment['authorable_id'] == $currentAuthId)
                                             <span class="badge text-dark bg-transparent">
                                                 {{-- Posted by  --}}
@@ -46,15 +49,25 @@
                                             </span>
                                         @endif
                                     </td>
+                                    <td>{{ $comment['content'] }}</td>
                                     <td>
-                                        @if ($comment['authorable_type'] == 'App\Models\User')
-                                            <span class="badge text-dark bg-transparent">User</span>
-                                        @endif
-                                        @if ($comment['authorable_type'] == 'App\Models\Company')
-                                            <span class="badge text-dark bg-transparent">Company</span>
+
+                                        @if ($comment['likes']->where('authorable_type', 'App\Models\Company')->where('authorable_id', $currentAuthId)->count() > 0)
+                                            <a href="{{ route('company.post.commentUnlike', [$post['id'], $comment['id']]) }}"
+                                                class="btn btn-sm link-danger">
+                                                <i class="bi-heart-fill">
+                                                    {{ $comment['likes']->count() }}
+                                                </i>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('company.post.commentLike', [$post['id'], $comment['id']]) }}"
+                                                class="btn btn-sm">
+                                                <i class="bi-heart">
+                                                    {{ $comment['likes']->count() }}
+                                                </i>
+                                            </a>
                                         @endif
                                     </td>
-
                                     <td>
                                         @if ($comment['created_at'])
                                             {{ Illuminate\Support\Carbon::parse($comment['created_at'])->diffForHumans() }}

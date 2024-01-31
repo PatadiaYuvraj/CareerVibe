@@ -24,9 +24,10 @@
                             <tr>
                                 <th>Title</th>
                                 <th>Content</th>
-                                <th>Date</th>
-                                <th>Like</th>
-                                <th>Action</th>
+                                <th class="">Date</th>
+                                <th class="col-1">Likes</th>
+                                <th class="col-1">Comments</th>
+                                <th class="col-1">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -34,34 +35,52 @@
                                 <tr>
                                     <td>
                                         <a href="{{ route('company.post.show', $post['id']) }}">
-                                            {{ $post['title'] }}
+                                            {{-- {{ $post['title'] }} --}}
+                                            {{-- dont show full title , on hover show full title --}}
+                                            <span class="" data-bs-toggle="tooltip" data-bs-placement="right"
+                                                title="{{ $post['title'] }}">
+                                                {{ Str::limit($post['title'], 20) }}
+                                            </span>
                                         </a>
                                     </td>
-                                    <td>{{ $post['content'] }}</td>
+                                    <td>
+                                        {{-- {{ $post['content'] }} --}}
+                                        {{-- dont show full content , on hover show full content --}}
+                                        <span class="" data-bs-toggle="tooltip" data-bs-placement="right"
+                                            title="{{ $post['content'] }}">
+                                            {{ Str::limit($post['content'], 20) }}
+                                        </span>
+                                    </td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>
                                     <td>
                                         @if ($post->likes->where('authorable_type', 'App\Models\Company')->where('authorable_id', $currentAuthId)->count() > 0)
-                                            <a href="{{ route('company.post.unlike', $post['id']) }}" class="btn btn-sm">
-                                                <i class="bi-hand-thumbs-up-fill"></i>
-                                                {{-- Unlike --}}
+                                            <a href="{{ route('company.post.unlike', $post['id']) }}"
+                                                class="btn btn-sm link-danger">
+                                                <i class="bi-heart-fill"> {{ $post->likes->count() }}</i>
                                             </a>
                                         @else
                                             <a href="{{ route('company.post.like', $post['id']) }}" class="btn btn-sm">
-                                                <i class="bi-hand-thumbs-up"></i>
-                                                {{-- Like --}}
+                                                <i class="bi-heart  "> {{ $post->likes->count() }}</i>
                                             </a>
                                         @endif
                                     </td>
                                     <td>
+                                        <a href="{{ route('company.post.commentIndex', $post['id']) }}" class="btn btn-sm">
+                                            <i class="bi-chat-square"></i>
+                                            {{ $post->comments->count() }}
+                                        </a>
+                                    </td>
+
+                                    <td>
 
                                         <div class="d-flex btn-group">
                                             <a href="{{ route('company.post.edit', $post['id']) }}"
-                                                class="btn btn-sm btn-primary">
-                                                Edit
+                                                class="btn btn-sm btn-outline-primary p-1">
+                                                <i class="bi-pencil-square"></i>
                                             </a>
                                             <a href="{{ route('company.post.delete', $post['id']) }}"
-                                                class="btn btn-sm btn-danger">
-                                                Delete
+                                                class="btn btn-sm btn-outline-danger p-1">
+                                                <i class="bi-trash"></i>
                                             </a>
                                         </div>
                                     </td>

@@ -24,19 +24,19 @@
                                 <th>Created By</th>
                                 <th>Title</th>
                                 <th>Content</th>
-                                <th>User Type</th>
-                                {{-- like by you --}}
-                                <th>Like by you</th>
-                                <th>No of likes</th>
-                                <th>No of comments</th>
-                                <th>See Comments</th>
+                                <th>Likes</th>
+                                <th>Comments</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($posts as $post)
                                 <tr>
-                                    <td class="">
+                                    <td class=""
+                                        title='
+                                    @if ($post->authorable_type == $userType) User @endif
+                                        @if ($post->authorable_type == $companyType) Company @endif
+                                    '>
                                         @if ($post->authorable_id == $currentAuthId && $post->authorable_type == $companyType)
                                             <span class="badge text-dark bg-transparent">
                                                 {{-- Posted by  --}}
@@ -55,37 +55,22 @@
                                         </a>
                                     </td>
                                     <td>{{ $post['content'] }}</td>
-                                    <td>
-                                        @if ($post->authorable_type == $userType)
-                                            <span class="badge text-dark bg-transparent">User</span>
-                                        @endif
-                                        @if ($post->authorable_type == $companyType)
-                                            <span class="badge text-dark bg-transparent">Company</span>
-                                        @endif
-                                    </td>
 
                                     <td>
                                         @if ($post->likes->where('authorable_type', $companyType)->where('authorable_id', $currentAuthId)->count() > 0)
-                                            <a href="{{ route('company.post.unlike', $post['id']) }}" class="btn btn-sm">
-                                                <i class="bi-hand-thumbs-up-fill"></i>
+                                            <a href="{{ route('company.post.unlike', $post['id']) }}"
+                                                class="btn btn-sm link-danger">
+                                                <i class="bi-heart-fill"> {{ $post->likes->count() }}</i>
                                             </a>
                                         @else
                                             <a href="{{ route('company.post.like', $post['id']) }}" class="btn btn-sm">
-                                                <i class="bi-hand-thumbs-up"></i>
+                                                <i class="bi-heart  "> {{ $post->likes->count() }}</i>
                                             </a>
                                         @endif
                                     </td>
-
-                                    <td>
-                                        {{ $post->likes->count() }}
-                                    </td>
-                                    <td>
-                                        {{ $post->comments->count() }}
-                                    </td>
                                     <td>
                                         <a href="{{ route('company.post.commentIndex', $post['id']) }}" class="btn btn-sm">
-                                            <i class="bi-chat-left-text-fill"></i>
-                                            {{-- See Comments --}}
+                                            <i class="bi-chat-square-text"> {{ $post->comments->count() }} </i>
                                         </a>
                                     </td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>

@@ -48,19 +48,31 @@
                                     <td>{{ $job['work_type'] }}</td>
                                     <td>
                                         <span class="btn-sm badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
-                                            {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
+                                            <i
+                                                class="
+                                            {{ $job['is_verified'] ? 'bi-toggle-on' : 'bi-toggle-off' }}
+                                            "></i>
+                                            {{-- {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }} --}}
                                         </span>
                                     </td>
                                     <td>
                                         <a href="{{ route('company.job.toggleFeatured', [$job['id'], $job['is_featured']]) }}"
                                             class="badge bg-{{ $job['is_featured'] ? 'success' : 'danger' }}">
-                                            {{ $job['is_featured'] ? 'Featured' : 'Not Featured' }}
+                                            <i
+                                                class="
+                                            {{ $job['is_featured'] ? 'bi-toggle-on' : 'bi-toggle-off' }}
+                                            "></i>
+                                            {{-- {{ $job['is_featured'] ? 'Featured' : 'Not Featured' }} --}}
                                         </a>
                                     </td>
                                     <td>
                                         <a href="{{ route('company.job.toggleActive', [$job['id'], $job['is_active']]) }}"
                                             class="badge bg-{{ $job['is_active'] ? 'success' : 'danger' }}">
-                                            {{ $job['is_active'] ? 'Active' : 'Not Active' }}
+                                            <i
+                                                class="
+                                            {{ $job['is_active'] ? 'bi-toggle-on' : 'bi-toggle-off' }}
+                                            "></i>
+                                            {{-- {{ $job['is_active'] ? 'Active' : 'Not Active' }} --}}
                                         </a>
                                     </td>
                                     <td>

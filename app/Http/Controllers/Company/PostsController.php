@@ -104,10 +104,10 @@ class PostsController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = $this->authenticableService->getCompany()->id;
-        if ($post->authorable_type != "App\Models\Company" || $post->authorable_id != $user_id) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
-        }
+        // $user_id = $this->authenticableService->getCompany()->id;
+        // if ($post->authorable_type != "App\Models\Company" || $post->authorable_id != $user_id) {
+        //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
+        // }
         return $this->navigationManagerService->loadView('company.post.show', compact('post'));
     }
 
@@ -237,8 +237,7 @@ class PostsController extends Controller
             'comments.authorable',
             'comments.likes'
         ])
-            ->find($id)
-            ->toArray();
+            ->find($id);
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
@@ -354,5 +353,66 @@ class PostsController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Comment is deleted"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not deleted"]);
+    }
+
+    public function commentPostLike($post_id, $comment_id)
+    {
+        $post = $this->post->find($post_id);
+        if (!$post) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
+        }
+
+        $comment = $post->comments()->find($comment_id);
+        if (!$comment) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not found"]);
+        }
+
+        $user_id = $this->authenticableService->getCompany()->id;
+        $isAlreadyLiked = $comment->likes()->where(
+            [
+                ['authorable_id', $user_id],
+                ['authorable_type', 'App\Models\Company']
+
+            ]
+        )->exists();
+        if ($isAlreadyLiked) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is already liked"]);
+        }
+        $data = [
+            "authorable_id" => $user_id,
+            "authorable_type" => "App\Models\Company"
+        ];
+        $comment->likes()->create($data);
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Comment is liked"]);
+    }
+
+    public function commentPostUnlike($post_id, $comment_id)
+    {
+        $post = $this->post->find($post_id);
+        if (!$post) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
+        }
+
+        $comment = $post->comments()->find($comment_id);
+        if (!$comment) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not found"]);
+        }
+
+        $user_id = $this->authenticableService->getCompany()->id;
+        $isAlreadyLiked = $comment->likes()->where(
+            [
+                ['authorable_id', $user_id],
+                ['authorable_type', 'App\Models\Company']
+            ]
+        )->exists();
+        if (!$isAlreadyLiked) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not liked"]);
+        }
+        $comment->likes()->where([
+            ['authorable_id', $user_id],
+            ['authorable_type', 'App\Models\Company']
+
+        ])->delete();
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Comment is unliked"]);
     }
 }

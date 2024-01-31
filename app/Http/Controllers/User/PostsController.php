@@ -105,10 +105,10 @@ class PostsController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        $user_id = $this->authenticableService->getUser()->id;
-        if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized to see this post"]);
-        }
+        // $user_id = $this->authenticableService->getUser()->id;
+        // if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
+        //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized to see this post"]);
+        // }
         return $this->navigationManagerService->loadView('user.post.show', compact('post'));
     }
 
@@ -242,11 +242,11 @@ class PostsController extends Controller
             'comments.authorable',
             'comments.likes'
         ])
-            ->find($id)
-            ->toArray();
+            ->find($id);
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
+        // dd(count($post['comments'][0]['likes']));
         return $this->navigationManagerService->loadView('user.post.comment.index', compact('post'));
     }
 
@@ -360,5 +360,66 @@ class PostsController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Comment is deleted"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not deleted"]);
+    }
+
+    public function commentPostLike($post_id, $comment_id)
+    {
+        $post = $this->post->find($post_id);
+        if (!$post) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
+        }
+
+        $comment = $post->comments()->find($comment_id);
+        if (!$comment) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not found"]);
+        }
+
+        $user_id = $this->authenticableService->getUser()->id;
+        $isAlreadyLiked = $comment->likes()->where(
+            [
+                ['authorable_id', $user_id],
+                ['authorable_type', 'App\Models\User']
+
+            ]
+        )->exists();
+        if ($isAlreadyLiked) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is already liked"]);
+        }
+        $data = [
+            "authorable_id" => $user_id,
+            "authorable_type" => "App\Models\User"
+        ];
+        $comment->likes()->create($data);
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Comment is liked"]);
+    }
+
+    public function commentPostUnlike($post_id, $comment_id)
+    {
+        $post = $this->post->find($post_id);
+        if (!$post) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
+        }
+
+        $comment = $post->comments()->find($comment_id);
+        if (!$comment) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not found"]);
+        }
+
+        $user_id = $this->authenticableService->getUser()->id;
+        $isAlreadyLiked = $comment->likes()->where(
+            [
+                ['authorable_id', $user_id],
+                ['authorable_type', 'App\Models\User']
+            ]
+        )->exists();
+        if (!$isAlreadyLiked) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not liked"]);
+        }
+        $comment->likes()->where([
+            ['authorable_id', $user_id],
+            ['authorable_type', 'App\Models\User']
+
+        ])->delete();
+        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Comment is unliked"]);
     }
 }

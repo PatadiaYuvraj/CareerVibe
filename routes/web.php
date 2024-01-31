@@ -254,16 +254,17 @@ Route::group(['middleware' => "isCompany"], function () {
             Route::get('/like/{id}',  [CompanyPostsController::class, "likePost"])->name('company.post.like');
             Route::get('/unlike/{id}',  [CompanyPostsController::class, "unlikePost"])->name('company.post.unlike');
 
-            // comments
-            Route::get('/comment/{id}',  [CompanyPostsController::class, "commentPostIndex"])->name('company.post.commentIndex');  // comment index page
-            Route::get('/comment/{id}/create',  [CompanyPostsController::class, "commentPostCreate"])->name('company.post.commentCreate');  // comment create page
-            Route::post('/comment/{id}/store',  [CompanyPostsController::class, "commentPostStore"])->name('company.post.commentStore');  // comment store page
-            Route::get('/comment/{id}/edit/{comment_id}',  [CompanyPostsController::class, "commentPostEdit"])->name('company.post.commentEdit');  // comment edit page
-            Route::post('/comment/{id}/update/{comment_id}',  [CompanyPostsController::class, "commentPostUpdate"])->name('company.post.commentUpdate');  // comment update page
-            Route::get('/comment/{id}/delete/{comment_id}',  [CompanyPostsController::class, "commentPostDelete"])->name('company.post.commentDelete');  // comment delete page
-            Route::get('/comment/{id}/like/{comment_id}',  [CompanyPostsController::class, "commentPostLike"])->name('company.post.commentLike');  // comment like page
-            Route::get('/comment/{id}/unlike/{comment_id}',  [CompanyPostsController::class, "commentPostUnlike"])->name('company.post.commentUnlike');  // comment unlike page
-
+            // comments profix
+            Route::prefix('comment')->group(function () {
+                Route::get('/{id}',  [CompanyPostsController::class, "commentPostIndex"])->name('company.post.commentIndex');  // comment index page
+                Route::get('/{id}/create',  [CompanyPostsController::class, "commentPostCreate"])->name('company.post.commentCreate');  // comment create page
+                Route::post('/{id}/store',  [CompanyPostsController::class, "commentPostStore"])->name('company.post.commentStore');  // comment store page
+                Route::get('/{id}/edit/{comment_id}',  [CompanyPostsController::class, "commentPostEdit"])->name('company.post.commentEdit');  // comment edit page
+                Route::post('/{id}/update/{comment_id}',  [CompanyPostsController::class, "commentPostUpdate"])->name('company.post.commentUpdate');  // comment update page
+                Route::get('/{id}/delete/{comment_id}',  [CompanyPostsController::class, "commentPostDelete"])->name('company.post.commentDelete');  // comment delete page
+                Route::get('/{id}/like/{comment_id}',  [CompanyPostsController::class, "commentPostLike"])->name('company.post.commentLike');  // comment like page
+                Route::get('/{id}/unlike/{comment_id}',  [CompanyPostsController::class, "commentPostUnlike"])->name('company.post.commentUnlike');  // comment unlike page
+            });
         });
 
         Route::prefix('job')->group(function () {
@@ -380,49 +381,17 @@ Route::group(['middleware' => "isUser"], function () {
             Route::get('/like/{id}',  [UserPostsController::class, "likePost"])->name('user.post.like');
             Route::get('/unlike/{id}',  [UserPostsController::class, "unlikePost"])->name('user.post.unlike');
 
-            //comment view page
-            Route::get('/comment/{id}',  [UserPostsController::class, "commentPostIndex"])->name('user.post.commentIndex');  // comment index page
-            Route::get('/comment/{id}/create',  [UserPostsController::class, "commentPostCreate"])->name('user.post.commentCreate');  // comment create page
-            Route::post('/comment/{id}/store',  [UserPostsController::class, "commentPostStore"])->name('user.post.commentStore');  // comment store page
-            Route::get('/comment/{id}/edit/{comment_id}',  [UserPostsController::class, "commentPostEdit"])->name('user.post.commentEdit');  // comment edit page
-            Route::post('/comment/{id}/update/{comment_id}',  [UserPostsController::class, "commentPostUpdate"])->name('user.post.commentUpdate');  // comment update page
-            Route::get('/comment/{id}/delete/{comment_id}',  [UserPostsController::class, "commentPostDelete"])->name('user.post.commentDelete');  // comment delete page
-            Route::get('/comment/{id}/like/{comment_id}',  [UserPostsController::class, "commentPostLike"])->name('user.post.commentLike');  // comment like page
-            Route::get('/comment/{id}/unlike/{comment_id}',  [UserPostsController::class, "commentPostUnlike"])->name('user.post.commentUnlike');  // comment unlike page
+            // comments profix
+            Route::prefix('comment')->group(function () {
+                Route::get('/{id}',  [UserPostsController::class, "commentPostIndex"])->name('user.post.commentIndex');  // comment index page
+                Route::get('/{id}/create',  [UserPostsController::class, "commentPostCreate"])->name('user.post.commentCreate');  // comment create page
+                Route::post('/{id}/store',  [UserPostsController::class, "commentPostStore"])->name('user.post.commentStore');  // comment store page
+                Route::get('/{id}/edit/{comment_id}',  [UserPostsController::class, "commentPostEdit"])->name('user.post.commentEdit');  // comment edit page
+                Route::post('/{id}/update/{comment_id}',  [UserPostsController::class, "commentPostUpdate"])->name('user.post.commentUpdate');  // comment update page
+                Route::get('/{id}/delete/{comment_id}',  [UserPostsController::class, "commentPostDelete"])->name('user.post.commentDelete');  // comment delete page
+                Route::get('/{id}/like/{comment_id}',  [UserPostsController::class, "commentPostLike"])->name('user.post.commentLike');  // comment like page
+                Route::get('/{id}/unlike/{comment_id}',  [UserPostsController::class, "commentPostUnlike"])->name('user.post.commentUnlike');  // comment unlike page
+            });
         });
     });
 });
-// $table->string(
-//     "email_verification_token",
-//     100
-// )->nullable();
-// $table->timestamp("email_verified_at")->nullable();
-// $table->string(
-//     "password_reset_token",
-//     100
-// )->nullable();
-// $table->timestamp("password_reset_at")->nullable();
-// $table->string(
-//     "password_change_token",
-//     100
-// )->nullable();
-// $table->timestamp("password_change_at")->nullable();
-// $table->string(
-//     "email_change_token",
-//     100
-// )->nullable();
-// $table->timestamp("email_change_at")->nullable();
-// $table->timestamp("last_login_at")->nullable();
-// want to implement email verification 
-// when a user register send a email to user email address to verify the email address, through mail send a link to verify the email address, 
-// link contains a token, when user click on the link, it will redirect to a page where user can verify the email address,
-// if user click on the link, it will redirect to a page where user can verify the email address,
-// when a user forget password, send a email to user email address to reset the password, through mail send a link to reset the password,
-// link contains a token, when user click on the link, it will redirect to a page where user can reset the password,
-// if user click on the link, it will redirect to a page where user can reset the password,
-// when a user change password, send a email to user email address to verify the password, through mail send a link to verify the password,
-// link contains a token, when user click on the link, it will redirect to a page where user can verify the password,
-// if user click on the link, it will redirect to a page where user can verify the password,
-// when a user change email address, send a email to user email address to verify the email address, through mail send a link to verify the email address,
-// link contains a token, when user click on the link, it will redirect to a page where user can verify the email address,
-// if user click on the link, it will redirect to a page where user can verify the email address,

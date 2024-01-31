@@ -346,10 +346,10 @@ class JobController extends Controller
 
     public function edit($id)
     {
-        $id = $this->authenticableService->getCompany()->id;
+        $user_id = $this->authenticableService->getCompany()->id;
         // check this job is created by this company
         $job = $this->job
-            ->where('company_id', $id)
+            ->where('company_id', $user_id)
             ->find($id);
 
         if (!$job) {
@@ -572,9 +572,9 @@ class JobController extends Controller
 
     public function delete($id)
     {
-        $id = $this->authenticableService->getCompany()->id;
+        $user_id = $this->authenticableService->getCompany()->id;
         $isDeleted = $this->job
-            ->where('company_id', $id)
+            ->where('company_id', $user_id)
             ->find($id);
         if (!$isDeleted) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "The job is not created by this company."]);
@@ -591,9 +591,9 @@ class JobController extends Controller
 
     public function toggleFeatured($id, $is_featured)
     {
-        $id = $this->authenticableService->getCompany()->id;
+        $user_id = $this->authenticableService->getCompany()->id;
         $job = $this->job
-            ->where('company_id', $id)
+            ->where('company_id', $user_id)
             ->find($id);
         if (!$job) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
@@ -612,9 +612,9 @@ class JobController extends Controller
 
     public function toggleActive($id, $is_active)
     {
-        $id = $this->authenticableService->getCompany()->id;
+        $user_id = $this->authenticableService->getCompany()->id;
         $job = $this->job
-            ->where('company_id', $id)
+            ->where('company_id', $user_id)
             ->find($id);
         if (!$job) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);

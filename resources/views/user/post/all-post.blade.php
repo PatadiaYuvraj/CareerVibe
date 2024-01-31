@@ -22,11 +22,8 @@
                                 <th>Title</th>
                                 <th>Content</th>
                                 <th>User Type</th>
-                                {{-- like by you --}}
-                                <th>Like by you</th>
-                                <th>No of likes</th>
-                                <th>No of comments</th>
-                                <th>See Comments</th>
+                                <th>Likes</th>
+                                <th>Comments</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
@@ -34,7 +31,7 @@
                             @forelse ($posts as $post)
                                 <tr>
                                     <td class="">
-                                        @if ($post->authorable->id == auth()->id() && $post->authorable->userType == 'USER')
+                                        @if ($post->authorable->id == $currentAuthId && $post->authorable->userType == 'USER')
                                             <span class="badge text-dark bg-transparent">
                                                 {{-- Posted by  --}}
                                                 You
@@ -62,27 +59,20 @@
                                     </td>
 
                                     <td>
-                                        @if ($post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', auth()->id())->count() > 0)
-                                            <a href="{{ route('user.post.unlike', $post['id']) }}" class="btn btn-sm">
-                                                <i class="bi-hand-thumbs-up-fill"></i>
+                                        @if ($post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', $currentAuthId)->count() > 0)
+                                            <a href="{{ route('user.post.unlike', $post['id']) }}"
+                                                class="btn btn-sm link-danger">
+                                                <i class="bi-heart-fill"> {{ $post->likes->count() }}</i>
                                             </a>
                                         @else
                                             <a href="{{ route('user.post.like', $post['id']) }}" class="btn btn-sm">
-                                                <i class="bi-hand-thumbs-up"></i>
+                                                <i class="bi-heart  "> {{ $post->likes->count() }}</i>
                                             </a>
                                         @endif
                                     </td>
-
-                                    <td>
-                                        {{ $post->likes->count() }}
-                                    </td>
-                                    <td>
-                                        {{ $post->comments->count() }}
-                                    </td>
                                     <td>
                                         <a href="{{ route('user.post.commentIndex', $post['id']) }}" class="btn btn-sm">
-                                            <i class="bi-chat-left-text-fill"></i>
-                                            {{-- See Comments --}}
+                                            <i class="bi-chat-square-text"> {{ $post->comments->count() }} </i>
                                         </a>
                                     </td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>

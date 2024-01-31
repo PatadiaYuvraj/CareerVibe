@@ -211,6 +211,34 @@
                                     </div>
                                     <div class="row">
                                         <div class="col-lg-3 col-md-4 label">
+                                            Applied Jobs
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            @if (auth()->guard('user')->user()->experience)
+                                                {{ auth()->guard('user')->user()->experience }}
+                                            @else
+                                                <span class="text-dark">
+                                                    {{ auth()->guard('user')->user()->appliedJobs->count() }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
+                                            saved Jobs
+                                        </div>
+                                        <div class="col-lg-9 col-md-8">
+                                            @if (auth()->guard('user')->user()->experience)
+                                                {{ auth()->guard('user')->user()->experience }}
+                                            @else
+                                                <span class="text-dark">
+                                                    {{ auth()->guard('user')->user()->savedJobs->count() }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-3 col-md-4 label">
                                             Your Posts
                                         </div>
                                         <div class="col-lg-9 col-md-8">

@@ -25,6 +25,7 @@
                                 <th>Content</th>
                                 <th>Commented By</th>
                                 <th>Type</th>
+                                <th>Likes</th>
                                 <th>Date</th>
                                 <th>Action</th>
                             </tr>
@@ -53,6 +54,22 @@
                                         @if ($comment['authorable_type'] == 'App\Models\Company')
                                             <span class="badge text-dark bg-transparent">Company</span>
                                         @endif
+                                    </td>
+
+                                    <td>
+
+                                        @if ($comment['likes']->where('authorable_type', 'App\Models\User')->where('authorable_id', $currentAuthId)->count() > 0)
+                                            <a href="{{ route('user.post.commentUnlike', [$post['id'], $comment['id']]) }}"
+                                                class="btn btn-sm link-danger">
+                                                <i class="bi-heart-fill"></i>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('user.post.commentLike', [$post['id'], $comment['id']]) }}"
+                                                class="btn btn-sm">
+                                                <i class="bi-heart"></i>
+                                            </a>
+                                        @endif
+                                        {{ $comment['likes']->count() }}
                                     </td>
 
                                     <td>
