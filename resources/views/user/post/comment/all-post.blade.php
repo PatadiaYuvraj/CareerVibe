@@ -1,7 +1,7 @@
 @extends('user.layout.app')
 @section('pageTitle', 'All Posts | ' . env('APP_NAME'))
 @section('content')
-    <main id="main" class="main">
+    {{-- <main id="main" class="main">
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
@@ -17,7 +17,6 @@
                                 <th>Title</th>
                                 <th>Content</th>
                                 <th>User Type</th>
-                                {{-- like by you --}}
                                 <th>Like by you</th>
                                 <th>No of likes</th>
                                 <th>No of comments</th>
@@ -30,12 +29,10 @@
                                     <td class="">
                                         @if ($post->authorable_id == auth()->id())
                                             <span class="badge text-dark bg-transparent">
-                                                {{-- Posted by  --}}
                                                 You
                                             </span>
                                         @else
                                             <span class="badge text-dark bg-transparent">
-                                                {{-- Posted by --}}
                                                 {{ $post->authorable->name }}
                                             </span>
                                         @endif
@@ -59,12 +56,10 @@
                                         @if ($post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', auth()->id())->count() > 0)
                                             <a href="{{ route('user.post.unlike', $post['id']) }}" class="btn btn-sm">
                                                 <i class="bi-hand-thumbs-up-fill"></i>
-                                                {{-- Unlike --}}
                                             </a>
                                         @else
                                             <a href="{{ route('user.post.like', $post['id']) }}" class="btn btn-sm">
                                                 <i class="bi-hand-thumbs-up"></i>
-                                                {{-- Like --}}
                                             </a>
                                         @endif
                                     </td>
@@ -90,5 +85,5 @@
                 </div>
             </div>
         </section>
-    </main>
+    </main> --}}
 @endsection

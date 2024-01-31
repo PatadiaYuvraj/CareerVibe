@@ -1,6 +1,11 @@
 @extends('user.layout.app')
 @section('pageTitle', 'Your Posts | ' . env('APP_NAME'))
 @section('content')
+    @php
+        $currentAuthId = auth()
+            ->guard(config('constants.USER_GUARD'))
+            ->id();
+    @endphp
     <main id="main" class="main">
 
         <section class="section dashboard">

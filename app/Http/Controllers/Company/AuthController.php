@@ -5,17 +5,14 @@ namespace App\Http\Controllers\Company;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Company;
-use App\Models\Post;
-use App\Models\User;
 use App\Services\AuthenticableService;
 use App\Services\MailableService;
 use App\Services\NavigationManagerService;
 use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 
-class CompanyController extends Controller
+class AuthController extends Controller
 {
     private StorageManagerService $storageManagerService;
     private NotifiableService $notifiableService;
@@ -23,7 +20,6 @@ class CompanyController extends Controller
     private NavigationManagerService $navigationManagerService;
     private AuthenticableService $authenticableService;
     private Company $company;
-    private int $paginate;
 
     public function __construct(
         Company $company,
@@ -34,7 +30,6 @@ class CompanyController extends Controller
         AuthenticableService $authenticableService,
     ) {
         $this->company = $company;
-        $this->paginate = Config::get('constants.pagination');
         $this->notifiableService = $notifiableService;
         $this->mailableService = $mailableService;
         $this->storageManagerService = $storageManagerService;
@@ -582,308 +577,5 @@ class CompanyController extends Controller
             return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "Profile Image Deleted Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Deleted"]);
-    }
-
-    public function notifications()
-    {
-        $company = $this->authenticableService->getCompany();
-        if (!$company) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-        }
-        $notifications = $company->notifications()->paginate($this->paginate);
-
-        $notifications = $notifications->unique('data');
-        return $this->navigationManagerService->loadView('company.dashboard.notifications', compact('notifications'));
-    }
-
-    public function markAsRead($id)
-    {
-        $company = $this->authenticableService->getCompany();
-        if (!$company) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-        }
-        $company->notifications()->where('id', $id)->update(['read_at' => now()]);
-        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Notification is marked as read"]);
-    }
-
-    public function markAllAsRead()
-    {
-        $company = $this->authenticableService->getCompany();
-        if (!$company) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-        }
-        $company->unreadNotifications->markAsRead();
-        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "All notifications are marked as read"]);
-    }
-
-    public function markAsUnread($id)
-    {
-        $company = $this->authenticableService->getCompany();
-        if (!$company) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-        }
-        $company->notifications()->where('id', $id)->update(['read_at' => null]);
-        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Notification is marked as unread"]);
-    }
-
-    public function deleteNotification($id)
-    {
-        $company = $this->authenticableService->getCompany();
-        if (!$company) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-        }
-        $company->notifications()->where('id', $id)->delete();
-        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Notification is deleted"]);
-    }
-
-    public function deleteAllNotification()
-    {
-        $company = $this->authenticableService->getCompany();
-        if (!$company) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-        }
-        $company->notifications()->delete();
-        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "All notifications are deleted"]);
-    }
-
-    public function followers()
-    {
-        $company = $this->authenticableService->getCompany();
-        if (!$company) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-        }
-        $followers = $company->followers()->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('company.dashboard.followers', compact('followers'));
-    }
-
-    public function removeFollower($id)
-    {
-        $company = $this->authenticableService->getCompany();
-        if (!$company) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-        }
-        $isAlreadyFollowed = $company->followers()->where('user_id', $id)->exists();
-        if (!$isAlreadyFollowed) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not followed"]);
-        }
-        $company->followers()->detach($id);
-        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "User is unfollowed"]);
-    }
-
-    public function allUsers()
-    {
-        $company = $this->authenticableService->getCompany();
-        if (!$company) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-        }
-        $users = User::with([
-            'followers',
-            'following',
-            'followingCompanies'
-        ])->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('company.dashboard.all-users', compact('users'));
-    }
-
-    public function indexPost()
-    {
-        $id = $this->authenticableService->getCompany()->id;
-        $posts = Post::where([
-            ['authorable_id', $id],
-            ['authorable_type', 'App\Models\Company']
-        ])
-            ->with([
-                'authorable',
-            ])
-            ->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('company.post.index', compact('posts'));
-    }
-
-    public function allPost()
-    {
-        // $id = $this->authenticableService->getCompany()->id;
-        $posts =
-            Post::with([
-                'authorable',
-            ])
-            ->withCount([
-                'comments',
-                'likes'
-            ])
-            ->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('company.post.all-post', compact('posts'));
-    }
-
-    public function createPost()
-    {
-        return $this->navigationManagerService->loadView('company.post.create');
-    }
-
-    public function storePost(Request $request)
-    {
-        $request->validate([
-            "title" => [
-                "required",
-                "string",
-                "max:100",
-            ],
-            "content" => [
-                "required",
-                "string",
-                "max:500",
-            ],
-        ]);
-
-        $data = [
-            "title" => $request->get("title"),
-            "content" => $request->get("content"),
-            "authorable_id" => $this->authenticableService->getCompany()->id,
-            "authorable_type" => "App\Models\Company"
-        ];
-
-        $isCreated = Post::create($data);
-
-        if ($isCreated) {
-            return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Created Successfully"]);
-        }
-        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Created"]);
-    }
-
-    public function showPost($id)
-    {
-        $post = Post::with([
-            'authorable',
-            'comments' => function ($query) {
-                $query->with([
-                    'authorable'
-                ]);
-            },
-            'likes' => function ($query) {
-                $query->with([
-                    'authorable'
-                ]);
-            }
-        ])->find($id);
-        if (!$post) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
-        }
-        // $id = $this->authenticableService->getCompany()->id;
-        // if ($post->authorable_type != "App\Models\Company" || $post->authorable_id != $id) {
-        //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
-        // }
-        return $this->navigationManagerService->loadView('company.post.show', compact('post'));
-    }
-
-    public function editPost($id)
-    {
-        $post = Post::find($id);
-        if (!$post) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
-        }
-        $id = $this->authenticableService->getCompany()->id;
-        if ($post->authorable_id != $id || $post->authorable_type != "App\Models\Company") {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
-        }
-        return $this->navigationManagerService->loadView('company.post.edit', compact('post'));
-    }
-
-    public function updatePost(Request $request, $id)
-    {
-        $request->validate([
-            "title" => [
-                "required",
-                "string",
-                "max:100",
-            ],
-            "content" => [
-                "required",
-                "string",
-                "max:500",
-            ],
-        ]);
-        $post = Post::find($id);
-        if (!$post) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
-        }
-        $id = $this->authenticableService->getCompany()->id;
-        if ($post->authorable_id != $id || $post->authorable_type != "App\Models\Company") {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
-        }
-        $data = [
-            "title" => $request->get("title"),
-            "content" => $request->get("content"),
-        ];
-        $isUpdated = $post->update($data);
-        if ($isUpdated) {
-            return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Updated Successfully"]);
-        }
-        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Updated"]);
-    }
-
-    public function deletePost($id)
-    {
-        $post = Post::find($id);
-        if (!$post) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
-        }
-        $id = $this->authenticableService->getCompany()->id;
-        if ($post->authorable_id != $id || $post->authorable_type != "App\Models\Company") {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
-        }
-        $post->comments()->detach();
-        $post->likes()->detach();
-        $isDeleted = $post->delete();
-        if ($isDeleted) {
-            return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Deleted Successfully"]);
-        }
-        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Deleted"]);
-    }
-
-    public function likePost($id)
-    {
-        $post = Post::find($id);
-        if (!$post) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
-        }
-        $id = $this->authenticableService->getCompany()->id;
-        $isAlreadyLiked = $post->likes()->where(
-            [
-                ['authorable_id', $id],
-                ['authorable_type', 'App\Models\Company']
-            ]
-        )->exists();
-        if ($isAlreadyLiked) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is already liked"]);
-        }
-        $data = [
-            "authorable_id" => $id,
-            "authorable_type" => "App\Models\Company"
-        ];
-        $post->likes()->create($data);
-        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Post is liked"]);
-    }
-
-    public function unlikePost($id)
-    {
-        $post = Post::find($id);
-        if (!$post) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
-        }
-        $id = $this->authenticableService->getCompany()->id;
-        $isAlreadyLiked = $post->likes()->where(
-            [
-                ['authorable_id', $id],
-                ['authorable_type', 'App\Models\Company']
-            ]
-        )->exists();
-        if (!$isAlreadyLiked) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not liked"]);
-        }
-        $post->likes()->where(
-            [
-                ['authorable_id', $id],
-                ['authorable_type', 'App\Models\Company']
-            ]
-        )->delete();
-        return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Post is unliked"]);
     }
 }

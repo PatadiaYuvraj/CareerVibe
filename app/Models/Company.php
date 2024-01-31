@@ -68,49 +68,8 @@ class Company extends Authenticatable
         return $this->morphToMany(User::class, 'followable', 'follows');
     }
 
-
-    /*
-    Schema::create('posts', function (Blueprint $table) {
-        $table->id();
-        $table->morphs('postable');
-        $table->string('title');
-        $table->text('content');
-        $table->timestamps();
-    });
-
-    Schema::create('comments', function (Blueprint $table) {
-        $table->id();
-        $table->morphs('postable');
-        $table->foreignId('post_id')->constrained()->onDelete('cascade');
-        $table->text('content');
-        $table->timestamps();
-    });
-
-    Schema::create('likes', function (Blueprint $table) {
-        $table->id();
-        $table->morphs('postable');
-        $table->foreignId('post_id')->constrained()->onDelete('cascade');
-        $table->timestamps();
-    });
-    */
-
-    public function postable()
-    {
-        return $this->morphTo();
-    }
-
-    public function comments()
-    {
-        return $this->morphMany(Comment::class, 'postable');
-    }
-
-    public function likes()
-    {
-        return $this->morphMany(Like::class, 'postable');
-    }
-
     public function posts()
     {
-        return $this->morphMany(Post::class, 'postable');
+        return $this->morphMany(Post::class, 'authorable', 'authorable_type', 'authorable_id', 'id');
     }
 }

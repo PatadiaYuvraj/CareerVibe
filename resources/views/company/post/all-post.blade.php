@@ -1,6 +1,14 @@
 @extends('company.layout.app')
 @section('pageTitle', 'All Posts | ' . env('APP_NAME'))
 @section('content')
+    @php
+        $currentAuthId = auth()
+            ->guard(config('constants.COMPANY_GUARD'))
+            ->id();
+        // $userType = 'App\Models\Company';
+        $companyType = 'App\Models\Company';
+        $userType = 'App\Models\User';
+    @endphp
     <main id="main" class="main">
         <section class="section dashboard">
             <div class="card">
@@ -21,6 +29,7 @@
                                 <th>Like by you</th>
                                 <th>No of likes</th>
                                 <th>No of comments</th>
+                                <th>See Comments</th>
                                 <th>Date</th>
                             </tr>
                         </thead>
@@ -28,7 +37,7 @@
                             @forelse ($posts as $post)
                                 <tr>
                                     <td class="">
-                                        @if ($post->authorable_id == auth()->id())
+                                        @if ($post->authorable_id == $currentAuthId && $post->authorable_type == $companyType)
                                             <span class="badge text-dark bg-transparent">
                                                 {{-- Posted by  --}}
                                                 You
@@ -47,24 +56,22 @@
                                     </td>
                                     <td>{{ $post['content'] }}</td>
                                     <td>
-                                        @if ($post->authorable_type == 'App\Models\User')
+                                        @if ($post->authorable_type == $userType)
                                             <span class="badge text-dark bg-transparent">User</span>
                                         @endif
-                                        @if ($post->authorable_type == 'App\Models\Company')
+                                        @if ($post->authorable_type == $companyType)
                                             <span class="badge text-dark bg-transparent">Company</span>
                                         @endif
                                     </td>
 
                                     <td>
-                                        @if ($post->likes->where('authorable_type', 'App\Models\Company')->where('authorable_id', auth()->id())->count() > 0)
+                                        @if ($post->likes->where('authorable_type', $companyType)->where('authorable_id', $currentAuthId)->count() > 0)
                                             <a href="{{ route('company.post.unlike', $post['id']) }}" class="btn btn-sm">
                                                 <i class="bi-hand-thumbs-up-fill"></i>
-                                                {{-- Unlike --}}
                                             </a>
                                         @else
                                             <a href="{{ route('company.post.like', $post['id']) }}" class="btn btn-sm">
                                                 <i class="bi-hand-thumbs-up"></i>
-                                                {{-- Like --}}
                                             </a>
                                         @endif
                                     </td>
@@ -74,6 +81,12 @@
                                     </td>
                                     <td>
                                         {{ $post->comments->count() }}
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('company.post.commentIndex', $post['id']) }}" class="btn btn-sm">
+                                            <i class="bi-chat-left-text-fill"></i>
+                                            {{-- See Comments --}}
+                                        </a>
                                     </td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>
                                 </tr>

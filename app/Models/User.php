@@ -114,6 +114,6 @@ class User extends Authenticatable
 
     public function posts()
     {
-        return $this->morphMany(Post::class, 'authorable');
+        return $this->morphMany(Post::class, 'authorable', 'authorable_type', 'authorable_id', 'id');
     }
 }

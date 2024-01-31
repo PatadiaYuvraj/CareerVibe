@@ -1,6 +1,11 @@
 @extends('company.layout.app')
 @section('pageTitle', 'Your Posts | ' . env('APP_NAME'))
 @section('content')
+    @php
+        $currentAuthId = auth()
+            ->guard(config('constants.COMPANY_GUARD'))
+            ->id();
+    @endphp
     <main id="main" class="main">
 
         <section class="section dashboard">
@@ -35,7 +40,7 @@
                                     <td>{{ $post['content'] }}</td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>
                                     <td>
-                                        @if ($post->likes->where('authorable_type', 'App\Models\Company')->where('authorable_id', auth()->id())->count() > 0)
+                                        @if ($post->likes->where('authorable_type', 'App\Models\Company')->where('authorable_id', $currentAuthId)->count() > 0)
                                             <a href="{{ route('company.post.unlike', $post['id']) }}" class="btn btn-sm">
                                                 <i class="bi-hand-thumbs-up-fill"></i>
                                                 {{-- Unlike --}}

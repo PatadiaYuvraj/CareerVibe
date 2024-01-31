@@ -1,9 +1,9 @@
-@extends('user.layout.app')
+@extends('company.layout.app')
 @section('pageTitle', 'Comments | ' . env('APP_NAME'))
 @section('content')
     @php
         $currentAuthId = auth()
-            ->guard(config('constants.USER_GUARD'))
+            ->guard(config('constants.COMPANY_GUARD'))
             ->id();
     @endphp
     <main id="main" class="main">
@@ -14,7 +14,7 @@
                     <span class="h3 text-black">
                         Comments of {{ $post['title'] }}
                         {{-- add comment --}}
-                        <a href="{{ route('user.post.commentCreate', $post['id']) }}"
+                        <a href="{{ route('company.post.commentCreate', $post['id']) }}"
                             class="float-end btn btn-sm btn-primary">Add Comment</a>
                     </span>
                 </div>
@@ -34,7 +34,7 @@
                                 <tr>
                                     <td>{{ $comment['content'] }}</td>
                                     <td>
-                                        @if ($comment['authorable_type'] == 'App\Models\User' && $comment['authorable_id'] == $currentAuthId)
+                                        @if ($comment['authorable_type'] == 'App\Models\Company' && $comment['authorable_id'] == $currentAuthId)
                                             <span class="badge text-dark bg-transparent">
                                                 {{-- Posted by  --}}
                                                 You
@@ -63,18 +63,22 @@
                                         @endif
                                     </td>
                                     <td>
-                                        {{-- if this comment is created by current user then user can edit and delete comment  --}}
-                                        @if ($comment['authorable_type'] == 'App\Models\User' && $comment['authorable_id'] == $currentAuthId)
-                                            {{-- Route::get('/comment/{id}/edit/{comment_id}',  [UserUserController::class, "commentPostEdit"])->name('user.post.commentEdit'); --}}
-                                            <a href="{{ route('user.post.commentEdit', [$post['id'], $comment['id']]) }}"
+                                        {{-- if this comment is created by current company then company can edit and delete comment  --}}
+                                        @if ($comment['authorable_type'] == 'App\Models\Company' && $comment['authorable_id'] == $currentAuthId)
+                                            {{-- Route::get('/comment/{id}/edit/{comment_id}',  [UserUserController::class, "commentPostEdit"])->name('company.post.commentEdit'); --}}
+                                            <a href="{{ route('company.post.commentEdit', [$post['id'], $comment['id']]) }}"
                                                 class="btn btn-sm btn-primary">
                                                 Edit
                                             </a>
-                                            <a href="{{ route('user.post.commentDelete', [$post['id'], $comment['id']]) }}"
+                                            <a href="{{ route('company.post.commentDelete', [$post['id'], $comment['id']]) }}"
                                                 class="btn btn-sm btn-danger">
                                                 Delete
                                             </a>
                                         @else
+                                            {{-- you cant edit or delete --}}
+                                            <span class="badge text-dark bg-transparent">
+                                                No Action
+                                            </span>
                                         @endif
                                     </td>
                                 </tr>
