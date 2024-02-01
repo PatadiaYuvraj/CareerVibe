@@ -13,298 +13,175 @@ class TestController extends Controller
 {
     public function test()
     {
-        dd(Uuid::uuid());
-        /*
-        return [
-        'USER_TYPE' => [
-            'user' => 'USER',
-            'company' => 'COMPANY',
-            'admin' => 'ADMIN',
-        ],
-        'USER_GUARD' => 'user',
-        'COMPANY_GUARD' => 'company',
-        'ADMIN_GUARD' => 'admin',
-        'CLOUDINARY_FOLDER' => [
-            'user' => 'career-vibe/users/profile_image',
-            'company' => 'career-vibe/companies/profile_image',
-            'admin' => 'career-vibe/admins/profile_image',
-        ],
-        'USER_RESUME_PATH' => "uploads/users/resumes",
-        "APP_URL" => Env::get('APP_URL', 'http://localhost:8000'),
-        "APP_NAME" => Env::get('APP_NAME', 'Career Vibe'),
-        'pagination' => Env::get('PAGINATEVALUE', 10),
-        'gender' => [
-            "MALE" => 'Male',
-            "FEMALE" => 'Female',
-            "OTHER" => 'Other',
-        ],
-        "IS_NOTIFICATION_SERVICE_ENABLED" => Env::get('IS_NOTIFICATION_SERVICE_ENABLED', true),
-        "IS_MAIL_SERVICE_ENABLED" => Env::get('IS_MAIL_SERVICE_ENABLED', true),
-        "IS_FILE_UPLOAD_SERVICE_ENABLED" => Env::get('IS_FILE_UPLOAD_SERVICE_ENABLED', true),
-        'mail' => [
-            'email_verification' => true,
-            'password_reset' => true,
-            'change_password' => true,
 
-        ],
-        'post' => [
-            'type' => [
-            'TEXT' => 'text',
-            'IMAGE' => 'image',
-            'VIDEO' => 'video',
-            ],
-        ],
-        'job' => [
-            'work_type' => [
-            'REMOTE' => 'Remote',
-            'WFO' => 'Work From Office',
-            'HYBRID' => 'Hybrid',
-            ],
-            'job_type' => [
-            'FULL_TIME' => 'Full Time',
-            'PART_TIME' => 'Part Time',
-            'INTERNSHIP' => 'Internship',
-            'CONTRACT' => 'Contract',
-            ],
-            'experience_level' => [
-            'FRESHER' => 'Fresher',
-            'EXPERIENCED' => 'Experienced',
-            ],
-            'experience_type' => [
-            'ANY' => 'Any',
-            '1-2' => '1-2',
-            '2-3' => '2-3',
-            '3-5' => '3-5',
-            '5-8' => '5-8',
-            '8-10' => '8-10',
-            '10+' => '10+',
-            ],
-        ]
-        ];
-        */
+        // $noOfUsers = 100;
+
+        // for ($i = 1; $i <= $noOfUsers; $i++) {
+        //     $user = DB::table('users')
+        //         ->insertGetId([
+        //             'name' => 'User ' . $i,
+        //             'email' => 'user' . $i . '@user.com',
+        //             'password' => Hash::make('12121212'),
+        //             'is_email_verified' => 1,
+        //             'email_verified_at' => Carbon::now(),
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+
+        for ($j = 1; $j <= 1000; $j++) {
+            DB::table('comments')
+                ->insert([
+                    'post_id' => rand(1, 500),
+                    'authorable_id' => rand(1, 100),
+                    'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+                    'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]);
+        }
+
+        dd("user done");
 
 
-        // DB::table('settings')
-        //     ->insert([
-        //         'key' => 'USER_TYPE',
-        //         'value' => json_encode([
-        //             'user' => 'USER',
-        //             'company' => 'COMPANY',
-        //             'admin' => 'ADMIN',
-        //         ]),
+        // $noOfCompanies = 100;
+
+        // for ($i = 1; $i <= $noOfCompanies; $i++) {
+        //     DB::table('companies')->insert([
+        //         'name' => 'Company ' . $i,
+        //         'email' => 'company' . $i . '@company.com',
+        //         'password' => Hash::make('12121212'),
+        //         'is_verified' => true,
+        //         'is_email_verified' => 1,
+        //         'email_verified_at' => Carbon::now(),
         //         'created_at' => Carbon::now(),
         //         'updated_at' => Carbon::now(),
         //     ]);
+        // }
 
 
+        // dd("company done");
+        // DB::table('admins')->insert([
+        //     'name' => 'Admin 1',
+        //     'email' => 'admin1@admin.com',
+        //     'password' => Hash::make('12121212'),
 
+        //     'is_email_verified' => 1,
+        //     'email_verified_at' => Carbon::now(),
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
+        // $noOfAdmins = 10;
 
-        dd('done');
+        // for ($i = 1; $i <= $noOfAdmins; $i++) {
+        //     DB::table('admins')->insert([
+        //         'name' => 'Admin ' . $i,
+        //         'email' => 'admin' . $i . '@admin.com',
+        //         'password' => Hash::make('12121212'),
 
-        Artisan::call('migrate:fresh');
+        //         'is_email_verified' => 1,
+        //         'email_verified_at' => Carbon::now(),
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ]);
+        // }
 
-        DB::table('users')->insert([
-            'name' => 'User 1',
-            'email' => 'user1@user.com',
-            'password' => Hash::make('12121212'),
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('users')->insert([
-            'name' => 'User 2',
-            'email' => 'user2@user.com',
-            'password' => Hash::make('12121212'),
-
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('users')->insert([
-            'name' => 'User 3',
-            'email' => 'user3@user.com',
-            'password' => Hash::make('12121212'),
-
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('users')->insert([
-            'name' => 'User 4',
-            'email' => 'user4@user.com',
-            'password' => Hash::make('12121212'),
-
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('users')->insert([
-            'name' => 'User 5',
-            'email' => 'user5@user.com',
-            'password' => Hash::make('12121212'),
-
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('companies')->insert([
-            'name' => 'Company 1',
-            'email' => 'company1@company.com',
-            'password' => Hash::make('12121212'),
-            'is_verified' => true,
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('companies')->insert([
-            'name' => 'Company 2',
-            'email' => 'company2@company.com',
-            'password' => Hash::make('12121212'),
-            'is_verified' => true,
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('companies')->insert([
-            'name' => 'Company 3',
-            'email' => 'company3@company.com',
-            'password' => Hash::make('12121212'),
-            'is_verified' => true,
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('companies')->insert([
-            'name' => 'Company 4',
-            'email' => 'company4@company.com',
-            'password' => Hash::make('12121212'),
-            'is_verified' => true,
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('companies')->insert([
-            'name' => 'Company 5',
-            'email' => 'company5@company.com',
-            'password' => Hash::make('12121212'),
-            'is_verified' => true,
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-        DB::table('admins')->insert([
-            'name' => 'Admin 1',
-            'email' => 'admin1@admin.com',
-            'password' => Hash::make('12121212'),
-
-            'is_email_verified' => 1,
-            'email_verified_at' => Carbon::now(),
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // dd("admin done");
 
         // locations
 
-        DB::table('locations')->insert([
-            'city' => 'Rajkot',
-            'state' => 'Gujarat',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Rajkot',
+        //     'state' => 'Gujarat',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('locations')->insert([
-            'city' => 'Ahmedabad',
-            'state' => 'Gujarat',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Ahmedabad',
+        //     'state' => 'Gujarat',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('locations')->insert([
-            'city' => 'Surat',
-            'state' => 'Gujarat',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Surat',
+        //     'state' => 'Gujarat',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('locations')->insert([
-            'city' => 'Mumbai',
-            'state' => 'Maharashtra',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Mumbai',
+        //     'state' => 'Maharashtra',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('locations')->insert([
-            'city' => 'Delhi',
-            'state' => 'Delhi',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Delhi',
+        //     'state' => 'Delhi',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('locations')->insert([
-            'city' => 'Chennai',
-            'state' => 'Tamil Nadu',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Chennai',
+        //     'state' => 'Tamil Nadu',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('locations')->insert([
-            'city' => 'Kolkata',
-            'state' => 'West Bengal',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Kolkata',
+        //     'state' => 'West Bengal',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('locations')->insert([
-            'city' => 'Bengaluru',
-            'state' => 'Karnataka',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Bengaluru',
+        //     'state' => 'Karnataka',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('locations')->insert([
-            'city' => 'Hyderabad',
-            'state' => 'Telangana',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Hyderabad',
+        //     'state' => 'Telangana',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('locations')->insert([
-            'city' => 'Pune',
-            'state' => 'Maharashtra',
-            'country' => 'India',
-            'pincode' => null,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('locations')->insert([
+        //     'city' => 'Pune',
+        //     'state' => 'Maharashtra',
+        //     'country' => 'India',
+        //     'pincode' => null,
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
+
+        // dd("admin done");
 
         // profile_categories
 
@@ -554,12 +431,12 @@ class TestController extends Controller
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
-
+        // dd("done");
 
         for ($i = 1; $i <= 100; $i++) {
             $job = DB::table('jobs')
                 ->insertGetId([
-                    'company_id' => rand(1, 3),
+                    'company_id' => rand(1, 100),
                     'sub_profile_id' => rand(1, 20),
                     'vacancy' => rand(1, 10),
                     'min_salary' => rand(10000, 50000),
@@ -613,10 +490,10 @@ class TestController extends Controller
 
         // add random user or company post and comments
 
-        for ($i = 1; $i <= 50; $i++) {
+        for ($i = 1; $i <= 500; $i++) {
             $post = DB::table('posts')
                 ->insertGetId([
-                    'authorable_id' => rand(1, 5),
+                    'authorable_id' => rand(1, 100),
                     // 'App\Models\User' or 'App\Models\Company'
                     'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
                     'title' => 'This is post title ' . $i,
@@ -629,8 +506,8 @@ class TestController extends Controller
         for ($j = 1; $j <= 100; $j++) {
             DB::table('comments')
                 ->insert([
-                    'post_id' => rand(1, 50),
-                    'authorable_id' => rand(1, 5),
+                    'post_id' => rand(1, 500),
+                    'authorable_id' => rand(1, 100),
                     'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
                     'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
                     'created_at' => Carbon::now(),

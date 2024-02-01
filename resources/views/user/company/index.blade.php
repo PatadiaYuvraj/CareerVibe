@@ -15,6 +15,7 @@
                             <tr>
                                 <th scope="col">Company Name</th>
                                 <th scope="col">Company Email</th>
+                                <th scope="col">Followers</th>
                                 <th scope="col">Follow</th>
                             </tr>
                         </thead>
@@ -23,6 +24,7 @@
                                 <tr>
                                     <td>{{ $company->name }}</td>
                                     <td>{{ $company->email }}</td>
+                                    <td>{{ $company->followers->count() }}</td>
                                     <td>
                                         @if ($company->followers->contains(Auth::guard('user')->user()->id))
                                             <a href="{{ route('user.company.unfollow', $company->id) }}"

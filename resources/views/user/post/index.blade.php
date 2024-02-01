@@ -14,7 +14,9 @@
                     <span class="h3 text-black">
                         Posts
                         <a href="{{ route('user.post.create') }}" class="float-end btn btn-sm btn-primary">
-                            Add Post
+                            <i class="bi-plus-lg">
+                                Add Post
+                            </i>
                         </a>
                     </span>
                 </div>
@@ -35,40 +37,46 @@
                                 <tr>
                                     <td>
                                         <a href="{{ route('user.post.show', $post['id']) }}">
-                                            {{ $post['title'] }}
+                                            <span class="" data-bs-toggle="tooltip" data-bs-placement="right"
+                                                title="{{ $post['title'] }}">
+                                                {{ Str::limit($post['title'], 20) }}
+                                            </span>
                                         </a>
                                     </td>
-                                    <td>{{ $post['content'] }}</td>
+                                    <td>
+                                        <span class="" data-bs-toggle="tooltip" data-bs-placement="right"
+                                            title="{{ $post['content'] }}">
+                                            {{ Str::limit($post['content'], 20) }}
+                                        </span>
+                                    </td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>
                                     <td>
                                         @if ($post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', auth()->id())->count() > 0)
                                             <a href="{{ route('user.post.unlike', $post['id']) }}" class="btn btn-sm">
-                                                <i class="bi-hand-thumbs-up-fill"></i>
-                                                {{-- Unlike --}}
+                                                <i class="bi-heart-fill"> {{ $post->likes->count() }}</i>
                                             </a>
                                         @else
                                             <a href="{{ route('user.post.like', $post['id']) }}" class="btn btn-sm">
-                                                <i class="bi-hand-thumbs-up"></i>
-                                                {{-- Like --}}
+                                                <i class="bi-heart  "> {{ $post->likes->count() }}</i>
                                             </a>
                                         @endif
                                     </td>
                                     <td>
                                         <a href="{{ route('user.post.commentIndex', $post['id']) }}" class="btn btn-sm">
-                                            <i class="bi-chat-left-text-fill"></i>
-                                            {{-- See Comments --}}
+                                            <i class="bi-chat-square"></i>
+                                            {{ $post->comments->count() }}
                                         </a>
                                     </td>
                                     <td>
 
                                         <div class="d-flex btn-group">
                                             <a href="{{ route('user.post.edit', $post['id']) }}"
-                                                class="btn btn-sm btn-primary">
-                                                Edit
+                                                class="btn btn-sm btn-outline-primary p-1">
+                                                <i class="bi-pencil-square"></i>
                                             </a>
                                             <a href="{{ route('user.post.delete', $post['id']) }}"
-                                                class="btn btn-sm btn-danger">
-                                                Delete
+                                                class="btn btn-sm btn-outline-danger p-1">
+                                                <i class="bi-trash"></i>
                                             </a>
                                         </div>
                                     </td>

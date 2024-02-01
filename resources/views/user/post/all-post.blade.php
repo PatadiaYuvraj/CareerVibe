@@ -21,7 +21,6 @@
                                 <th>Created By</th>
                                 <th>Title</th>
                                 <th>Content</th>
-                                <th>User Type</th>
                                 <th>Likes</th>
                                 <th>Comments</th>
                                 <th>Date</th>
@@ -30,7 +29,11 @@
                         <tbody>
                             @forelse ($posts as $post)
                                 <tr>
-                                    <td class="">
+                                    <td class="" data-bs-toggle="tooltip" data-bs-placement="right"
+                                        title='
+                                    @if ($post->authorable_type == 'App\Models\User') User @endif
+                                        @if ($post->authorable_type == 'App\Models\Company') Company @endif
+                                    '>
                                         @if ($post->authorable->id == $currentAuthId && $post->authorable->userType == 'USER')
                                             <span class="badge text-dark bg-transparent">
                                                 {{-- Posted by  --}}
@@ -44,19 +47,26 @@
                                         @endif
 
                                     <td>
-                                        <a href="{{ route('user.post.show', $post['id']) }}">
-                                            {{ $post['title'] }}
+                                        <a href="{{ route('user.post.show', $post['id']) }}" data-bs-toggle="tooltip"
+                                            data-bs-placement="right" title="{{ $post['title'] }}">
+                                            {{-- Str limit --}}
+                                            {{ Str::limit($post['title'], 20) }}
                                         </a>
                                     </td>
-                                    <td>{{ $post['content'] }}</td>
                                     <td>
-                                        @if ($post->authorable_type == 'App\Models\User')
+                                        <span class="" data-bs-toggle="tooltip" data-bs-placement="right"
+                                            title="{{ $post['content'] }}">
+                                            {{-- Str limit --}}
+                                            {{ Str::limit($post['content'], 20) }}
+                                        </span>
+                                    </td>
+
+                                    {{-- @if ($post->authorable_type == 'App\Models\User')
                                             <span class="badge text-dark bg-transparent">User</span>
                                         @endif
                                         @if ($post->authorable_type == 'App\Models\Company')
                                             <span class="badge text-dark bg-transparent">Company</span>
-                                        @endif
-                                    </td>
+                                        @endif --}}
 
                                     <td>
                                         @if ($post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', $currentAuthId)->count() > 0)
@@ -75,7 +85,11 @@
                                             <i class="bi-chat-square-text"> {{ $post->comments->count() }} </i>
                                         </a>
                                     </td>
-                                    <td>{{ $post['created_at']->diffForHumans() }}</td>
+                                    <td>
+                                        <span class="badge text-dark bg-transparent">
+                                            {{ $post['created_at']->diffForHumans() }}
+                                        </span>
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>

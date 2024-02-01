@@ -18,7 +18,10 @@ return new class extends Migration
             $table->morphs('authorable');
             $table->text('content');
             $table->unique([
-                'id', 'authorable_id', 'authorable_type'
+                'id',
+                'authorable_id',
+                'authorable_type',
+                'post_id',
             ]);
             $table->index([
                 'id',

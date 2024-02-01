@@ -14,7 +14,9 @@
                     <span class="h3 text-black">
                         Posts
                         <a href="{{ route('company.post.create') }}" class="float-end btn btn-sm btn-primary">
-                            Add Post
+                            <i class="bi-plus-lg">
+                                Add Post
+                            </i>
                         </a>
                     </span>
                 </div>
@@ -35,8 +37,6 @@
                                 <tr>
                                     <td>
                                         <a href="{{ route('company.post.show', $post['id']) }}">
-                                            {{-- {{ $post['title'] }} --}}
-                                            {{-- dont show full title , on hover show full title --}}
                                             <span class="" data-bs-toggle="tooltip" data-bs-placement="right"
                                                 title="{{ $post['title'] }}">
                                                 {{ Str::limit($post['title'], 20) }}
@@ -44,8 +44,6 @@
                                         </a>
                                     </td>
                                     <td>
-                                        {{-- {{ $post['content'] }} --}}
-                                        {{-- dont show full content , on hover show full content --}}
                                         <span class="" data-bs-toggle="tooltip" data-bs-placement="right"
                                             title="{{ $post['content'] }}">
                                             {{ Str::limit($post['content'], 20) }}

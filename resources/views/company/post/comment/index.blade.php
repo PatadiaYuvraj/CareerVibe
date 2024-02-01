@@ -15,7 +15,11 @@
                         Comments of {{ $post['title'] }}
                         {{-- add comment --}}
                         <a href="{{ route('company.post.commentCreate', $post['id']) }}"
-                            class="float-end btn btn-sm btn-primary">Add Comment</a>
+                            class="float-end btn btn-sm btn-primary">
+                            <i class="bi-plus-lg">
+                                Add Comment
+                            </i>
+                        </a>
                     </span>
                 </div>
                 <div class="card-body">
@@ -32,24 +36,27 @@
                         <tbody>
                             @forelse ($post['comments'] as $comment)
                                 <tr>
-                                    <td
-                                        title="
-                                    @if ($comment['authorable_type'] == 'App\Models\User') User @endif
-                                        @if ($comment['authorable_type'] == 'App\Models\Company') Company @endif
-                                    ">
+                                    <td>
                                         @if ($comment['authorable_type'] == 'App\Models\Company' && $comment['authorable_id'] == $currentAuthId)
-                                            <span class="badge text-dark bg-transparent">
+                                            <span class="badge text-dark bg-transparent" data-bs-toggle="tooltip"
+                                                data-bs-placement="right" title="{{ $comment['authorable']['name'] }}">
                                                 {{-- Posted by  --}}
                                                 You
                                             </span>
                                         @else
-                                            <span class="badge text-dark bg-transparent">
+                                            <span class="badge text-dark bg-transparent" data-bs-toggle="tooltip"
+                                                data-bs-placement="right" title="{{ $comment['authorable']['name'] }}">
                                                 {{-- Posted by --}}
                                                 {{ $comment['authorable']['name'] }}
                                             </span>
                                         @endif
                                     </td>
-                                    <td>{{ $comment['content'] }}</td>
+                                    <td>
+                                        <span class="" data-bs-toggle="tooltip" data-bs-placement="right"
+                                            title="{{ $comment['content'] }}">
+                                            {{ Str::limit($comment['content'], 20) }}
+                                        </span>
+                                    </td>
                                     <td>
 
                                         @if ($comment['likes']->where('authorable_type', 'App\Models\Company')->where('authorable_id', $currentAuthId)->count() > 0)
@@ -79,14 +86,16 @@
                                         {{-- if this comment is created by current company then company can edit and delete comment  --}}
                                         @if ($comment['authorable_type'] == 'App\Models\Company' && $comment['authorable_id'] == $currentAuthId)
                                             {{-- Route::get('/comment/{id}/edit/{comment_id}',  [UserUserController::class, "commentPostEdit"])->name('company.post.commentEdit'); --}}
-                                            <a href="{{ route('company.post.commentEdit', [$post['id'], $comment['id']]) }}"
-                                                class="btn btn-sm btn-primary">
-                                                Edit
-                                            </a>
-                                            <a href="{{ route('company.post.commentDelete', [$post['id'], $comment['id']]) }}"
-                                                class="btn btn-sm btn-danger">
-                                                Delete
-                                            </a>
+                                            <div class="d-flex btn-group">
+                                                <a href="{{ route('company.post.commentEdit', [$post['id'], $comment['id']]) }}"
+                                                    class="btn btn-sm btn-outline-primary p-1">
+                                                    <i class="bi-pencil-square"></i>
+                                                </a>
+                                                <a href="{{ route('company.post.commentDelete', [$post['id'], $comment['id']]) }}"
+                                                    class="btn btn-sm btn-outline-danger p-1">
+                                                    <i class="bi-trash"></i>
+                                                </a>
+                                            </div>
                                         @else
                                             {{-- you cant edit or delete --}}
                                             <span class="badge text-dark bg-transparent">
