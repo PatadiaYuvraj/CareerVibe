@@ -86,7 +86,7 @@ class AuthController extends Controller
 
         // check emial verification
         $company = $this->authenticableService->getCompanyByEmail($data["email"]);
-        if (!$company->email_verified_at) {
+        if ($company && !$company->email_verified_at) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Email is not verified"]);
         }
 

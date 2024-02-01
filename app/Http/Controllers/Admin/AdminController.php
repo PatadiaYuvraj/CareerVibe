@@ -85,7 +85,14 @@ class AdminController extends Controller
                     if (!$user) {
                         return $fail(__('The email is incorrect.'));
                     }
-                }
+                },
+                // check email verification
+                function ($attribute, $value, $fail) {
+                    $user = $this->authenticableService->getAdminByEmail($value);
+                    if ($user && !$user->is_email_verified) {
+                        return $fail(__('The email is not verified.'));
+                    }
+                },
             ],
             "password" => [
                 "required",
@@ -103,6 +110,12 @@ class AdminController extends Controller
             "email" => $request->get("email"),
             "password" => $request->get("password")
         ];
+
+        // check email verification 
+        $user = $this->authenticableService->getAdminByEmail($data['email']);
+        if ($user && !$user->is_email_verified) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Email is not verified"]);
+        }
 
         if ($this->authenticableService->loginAdmin($data)) {
             return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
@@ -146,45 +159,159 @@ class AdminController extends Controller
             ]
         ]);
 
+        $token = $this->authenticableService->generateEmailVerificationToken();
         $data = [
             "name" => $request->get("name"),
             "email" => $request->get("email"),
-            "password" => $request->get("password")
+            "password" => $request->get("password"),
+            "email_verification_token" => $token,
+            'is_email_verified' => false,
         ];
+
+        $details = [
+            'username' => $data['name'],
+            'url' => $this->authenticableService->generateAdminEmailVerificationLink('admin.verifyEmail', $token),
+        ];
+
+        // send mail
+        $this->mailableService->emailVerificationMail($data['email'], $details);
 
         $isCreated = $this->authenticableService->registerAdmin($data);
 
         // MAIL: when admin is created then send mail to other admins that new admin is created
 
-        $admins = $this->admin->where('id', '!=', $isCreated->id)->get();
-        if (count($admins) > 0) {
-            $details = [
-                'title' => 'New Admin Created',
-                'body' => 'New Admin Created with name ' . $isCreated->name . ' and email ' . $isCreated->email,
-            ];
-            foreach ($admins as $admin) {
-                $email = $admin->email;
-                // UNCOMMENT: To send notification
-                $this->notifiableService->sendNotification($admin, $details['body']);
-                // UNCOMMENT: To send mail
-                $this->mailableService->sendMail($email, $details);
-            }
-        }
+
 
 
         if ($isCreated) {
-            $data = [
-                "email" => $request->get("email"),
-                "password" => $request->get("password")
-            ];
-            $isAuth = $this->authenticableService->loginAdmin($data);
-
-            if ($isAuth) {
-                return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
+            $admins = $this->admin->where('id', '!=', $isCreated->id)->get();
+            if (count($admins) > 0) {
+                $details = [
+                    'title' => 'New Admin Created',
+                    'body' => 'New Admin Created with name ' . $isCreated->name . ' and email ' . $isCreated->email,
+                ];
+                foreach ($admins as $admin) {
+                    $email = $admin->email;
+                    // UNCOMMENT: To send notification
+                    $this->notifiableService->sendNotification($admin, $details['body']);
+                    // UNCOMMENT: To send mail
+                    $this->mailableService->sendMail($email, $details);
+                }
             }
-            return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["success" => "Admin Created Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["success" => "Verification Link Sent Successfully"]);
         }
         return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["warning" => "Admin Not Created"]);
+    }
+
+
+    public function verifyEmail($token)
+    {
+        $user = $this->admin->where('email_verification_token', $token)->first();
+        if (!$user) {
+            return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+        }
+        $data = [
+            "is_email_verified" => true,
+            "email_verification_token" => null,
+            "email_verified_at" => now(),
+        ];
+        $isUpdated = $this->admin->where('id', $user->id)->update($data);
+        if ($isUpdated) {
+            return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["success" => "Email Verified Successfully"]);
+        }
+        return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["warning" => "Email Not Verified"]);
+    }
+
+    // fogot password
+    public function forgotPassword()
+    {
+        return $this->navigationManagerService->loadView('admin.auth.forgot-password');
+    }
+
+    public function doForgotPassword(Request $request)
+    {
+        $request->validate([
+            "email" => [
+                "required",
+                "email",
+                function ($attribute, $value, $fail) {
+                    $user = $this->authenticableService->getAdminByEmail($value);
+                    if (!$user) {
+                        return $fail(__('The email is not registered.'));
+                    }
+                },
+                function ($attribute, $value, $fail) {
+                    $user = $this->authenticableService->getAdminByEmail($value);
+                    if ($user && !$user->is_email_verified) {
+                        return $fail(__('The email is not verified.'));
+                    }
+                },
+            ],
+        ]);
+
+        $token = $this->authenticableService->generatePasswordResetToken();
+        $data = [
+            "email" => $request->get("email"),
+            "password_reset_token" => $token,
+        ];
+
+        $details = [
+            'username' => $data['email'],
+            'url' => $this->authenticableService->generateAdminPasswordResetLink('admin.resetPassword', $token),
+        ];
+
+        // send mail
+        $this->mailableService->passwordResetMail($data['email'], $details);
+
+        $isUpdated = $this->admin->where('email', $data['email'])->update($data);
+
+        if ($isUpdated) {
+            return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["success" => "Reset Password Link Sent Successfully"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Reset Password Link Not Sent"]);
+    }
+
+    public function resetPassword($token)
+    {
+        $user = $this->admin->where('password_reset_token', $token)->first();
+        if (!$user) {
+            return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+        }
+        return $this->navigationManagerService->loadView('admin.auth.reset-password', compact('token'));
+    }
+
+    public function doResetPassword(Request $request, $token)
+    {
+        $request->validate([
+            "password" => [
+                "required",
+                "min:6",
+                "max:20",
+            ],
+            "confirm_password" => [
+                "required",
+                "min:6",
+                "max:20",
+                "same:password",
+            ]
+        ]);
+
+        $user = $this->admin->where('password_reset_token', $token)->first();
+        if (!$user) {
+            return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+        }
+
+        $data = [
+            "password" => $this->authenticableService->passwordHash($request->get("password")),
+            "password_reset_token" => null,
+        ];
+
+        $isUpdated = $this->admin->where('id', $user->id)->update($data);
+
+        if ($isUpdated) {
+            return $this->navigationManagerService->redirectRoute('admin.login', [], 302, [], false, ["success" => "Password Reset Successfully"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Password Not Reset"]);
     }
 
     public function logout()

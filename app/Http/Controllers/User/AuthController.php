@@ -89,7 +89,7 @@ class AuthController extends Controller
 
         // check email verification
         $user = $this->authenticableService->getUserByEmail($data['email']);
-        if (!$user->is_email_verified) {
+        if ($user && !$user->is_email_verified) {
             return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Verify your email to login"]);
         }
 

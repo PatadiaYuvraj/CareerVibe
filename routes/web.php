@@ -71,6 +71,13 @@ Route::group(['middleware' => "isGuest"], function () {
         Route::get('/register', [AdminController::class, "register"])->name('admin.register');
         Route::post('/login', [AdminController::class, "doLogin"])->name('admin.doLogin');
         Route::post('/register', [AdminController::class, "doRegister"])->name('admin.doRegister');
+        Route::get('/verify-email/{token}',  [AdminController::class, "verifyEmail"])->name('admin.verifyEmail');
+        Route::get('/resend-verification-email',  [AdminController::class, "resendVerificationEmail"])->name('admin.resendVerificationEmail');
+        Route::get('/send-verification-email',  [AdminController::class, "sendVerificationEmail"])->name('admin.sendVerificationEmail');
+        Route::get('/forgot-password',  [AdminController::class, "forgotPassword"])->name('admin.forgotPassword');
+        Route::post('/forgot-password',  [AdminController::class, "doForgotPassword"])->name('admin.doForgotPassword');
+        Route::get('/reset-password/{token}',  [AdminController::class, "resetPassword"])->name('admin.resetPassword');
+        Route::post('/reset-password/{token}',  [AdminController::class, "doResetPassword"])->name('admin.doResetPassword');
     });
 
     // Company Routes

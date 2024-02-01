@@ -1,4 +1,4 @@
-@extends('user.layout.auth')
+@extends('admin.layout.auth')
 
 @section('content')
     <div class="card mb-3">
@@ -12,7 +12,7 @@
                 </p>
             </div>
 
-            <form class="row g-3" action="{{ route('user.doResetPassword', ['token' => $token]) }}" method="POST">
+            <form class="row g-3" action="{{ route('admin.doResetPassword', ['token' => $token]) }}" method="POST">
                 @csrf
                 <div class="col-12">
                     <label for="password" class="form-label">
@@ -42,7 +42,7 @@
                 <div class="col-12">
                     <p class="small mb-0">
 
-                        <a href="{{ route('user.login') }}">Login?</a>
+                        <a href="{{ route('admin.login') }}">Login?</a>
                     </p>
                 </div>
             </form>
