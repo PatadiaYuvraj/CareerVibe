@@ -22,7 +22,7 @@ return new class extends Migration
             )->default('text');
             $table->text('content');
             $table->unique([
-                'id', 'authorable_id', 'authorable_type'
+                'id', 'authorable_id', 'authorable_type',
             ]);
             $table->index([
                 'id',

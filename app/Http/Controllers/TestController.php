@@ -13,7 +13,67 @@ class TestController extends Controller
 {
     public function test()
     {
+        // $noOfUsers = 100;
 
+        // for ($i = 1288; $i <= 1500; $i++) {
+        //     $user = DB::table('users')
+        //         ->insertGetId([
+        //             'name' => 'User ' . $i,
+        //             'email' => 'user' . $i . '@user.com',
+        //             'password' => Hash::make('12121212'),
+        //             'is_email_verified' => 1,
+        //             'email_verified_at' => Carbon::now(),
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+
+
+
+
+        // dd("user done");
+        // $noOfCompanies = 100;
+
+        // for ($i = 1; $i <= $noOfCompanies; $i++) {
+        //     DB::table('companies')->insert([
+        //         'name' => 'Company ' . $i,
+        //         'email' => 'company' . $i . '@company.com',
+        //         'password' => Hash::make('12121212'),
+        //         'is_verified' => true,
+        //         'is_email_verified' => 1,
+        //         'email_verified_at' => Carbon::now(),
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ]);
+        // }
+        // dd("user done");
+        // for ($i = 1; $i <= 5000; $i++) {
+        //     $post = DB::table('posts')
+        //         ->insertGetId([
+        //             'authorable_id' => rand(1, 100),
+        //             // 'App\Models\User' or 'App\Models\Company'
+        //             'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'title' => 'This is post title ' . $i,
+        //             'type' => 'text',
+        //             'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+        // dd("user done");
+
+        // for ($j = 1; $j <= 5000; $j++) {
+        //     DB::table('comments')
+        //         ->insert([
+        //             'post_id' => rand(5000, 10000),
+        //             'authorable_id' => rand(1, 100),
+        //             'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+        // dd("user done");
         // $noOfUsers = 100;
 
         // for ($i = 1; $i <= $noOfUsers; $i++) {
@@ -29,19 +89,8 @@ class TestController extends Controller
         //         ]);
         // }
 
-        for ($j = 1; $j <= 1000; $j++) {
-            DB::table('comments')
-                ->insert([
-                    'post_id' => rand(1, 500),
-                    'authorable_id' => rand(1, 100),
-                    'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
-                    'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
-        }
 
-        dd("user done");
+
 
 
         // $noOfCompanies = 100;
@@ -181,339 +230,350 @@ class TestController extends Controller
         //     'updated_at' => Carbon::now(),
         // ]);
 
-        // dd("admin done");
+        // // dd("admin done");
 
-        // profile_categories
+        // // profile_categories
 
-        DB::table('profile_categories')->insert([
-            'name' => 'IT',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('profile_categories')->insert([
+        //     'name' => 'IT',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('profile_categories')->insert([
-            'name' => 'Marketing',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('profile_categories')->insert([
+        //     'name' => 'Marketing',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('profile_categories')->insert([
-            'name' => 'Sales',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('profile_categories')->insert([
+        //     'name' => 'Sales',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('profile_categories')->insert([
-            'name' => 'Finance',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('profile_categories')->insert([
+        //     'name' => 'Finance',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('profile_categories')->insert([
-            'name' => 'HR',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('profile_categories')->insert([
+        //     'name' => 'HR',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
 
-        // sub_profiles => profile_category_id and name
+        // // sub_profiles => profile_category_id and name
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 1,
-            'name' => 'Web Developer',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 1,
+        //     'name' => 'Web Developer',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 1,
-            'name' => 'Android Developer',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 1,
+        //     'name' => 'Android Developer',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 1,
-            'name' => 'iOS Developer',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 1,
+        //     'name' => 'iOS Developer',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 1,
-            'name' => 'UI/UX Designer',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 1,
+        //     'name' => 'UI/UX Designer',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 2,
-            'name' => 'Digital Marketing',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 2,
+        //     'name' => 'Digital Marketing',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 2,
-            'name' => 'Content Marketing',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 2,
+        //     'name' => 'Content Marketing',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 2,
-            'name' => 'SEO',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 2,
+        //     'name' => 'SEO',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 2,
-            'name' => 'Social Media Marketing',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 2,
+        //     'name' => 'Social Media Marketing',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 3,
-            'name' => 'Sales Executive',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 3,
+        //     'name' => 'Sales Executive',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 3,
-            'name' => 'Sales Manager',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 3,
+        //     'name' => 'Sales Manager',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 3,
-            'name' => 'Sales Head',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 3,
+        //     'name' => 'Sales Head',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 3,
-            'name' => 'Business Development Executive',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 3,
+        //     'name' => 'Business Development Executive',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 4,
-            'name' => 'Accountant',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 4,
+        //     'name' => 'Accountant',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 4,
-            'name' => 'Financial Analyst',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 4,
+        //     'name' => 'Financial Analyst',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 4,
-            'name' => 'Financial Advisor',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 4,
+        //     'name' => 'Financial Advisor',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 4,
-            'name' => 'Financial Manager',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 4,
+        //     'name' => 'Financial Manager',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 5,
-            'name' => 'HR Executive',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 5,
+        //     'name' => 'HR Executive',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 5,
-            'name' => 'HR Manager',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 5,
+        //     'name' => 'HR Manager',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 5,
-            'name' => 'HR Head',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 5,
+        //     'name' => 'HR Head',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('sub_profiles')->insert([
-            'profile_category_id' => 5,
-            'name' => 'HR Recruiter',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('sub_profiles')->insert([
+        //     'profile_category_id' => 5,
+        //     'name' => 'HR Recruiter',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        // qualifications
+        // // qualifications
 
-        DB::table('qualifications')->insert([
-            'name' => 'B.E.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'B.E.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'B.Tech.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'B.Tech.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'B.Sc.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'B.Sc.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'B.Com.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'B.Com.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'B.A.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'B.A.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'M.E.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'M.E.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'M.Tech.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'M.Tech.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'M.Sc.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'M.Sc.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'M.Com.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'M.Com.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'M.A.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'M.A.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'Ph.D.',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'Ph.D.',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
 
-        DB::table('qualifications')->insert([
-            'name' => 'Diploma',
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        // DB::table('qualifications')->insert([
+        //     'name' => 'Diploma',
+        //     'created_at' => Carbon::now(),
+        //     'updated_at' => Carbon::now(),
+        // ]);
         // dd("done");
 
-        for ($i = 1; $i <= 100; $i++) {
-            $job = DB::table('jobs')
-                ->insertGetId([
-                    'company_id' => rand(1, 100),
-                    'sub_profile_id' => rand(1, 20),
-                    'vacancy' => rand(1, 10),
-                    'min_salary' => rand(10000, 50000),
-                    'max_salary' => rand(50000, 100000),
-                    'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
-                    'responsibility' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
-                    'benifits_perks' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
-                    'other_benifits' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
-                    'is_verified' => true,
-                    'is_featured' => true,
-                    'is_active' => true,
-                    'keywords' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
-                    'work_type' => rand(0, 1) ? 'REMOTE' : 'WFO',
-                    'job_type' => rand(0, 1) ? 'FULL_TIME' : 'PART_TIME',
-                    'experience_level' => rand(0, 1) ? 'FRESHER' : 'EXPERIENCED',
-                    'experience_type' => rand(0, 1) ? 'ANY' : '1-2',
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
+        // for ($i = 1; $i <= 10000; $i++) {
+        //     $job = DB::table('jobs')
+        //         ->insertGetId([
+        //             'company_id' => rand(1, 100),
+        //             'sub_profile_id' => rand(1, 20),
+        //             'vacancy' => rand(1, 10),
+        //             'min_salary' => rand(10000, 50000),
+        //             'max_salary' => rand(50000, 100000),
+        //             'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'responsibility' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'benifits_perks' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'other_benifits' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'is_verified' => true,
+        //             'is_featured' => true,
+        //             'is_active' => true,
+        //             'keywords' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'work_type' => rand(0, 1) ? 'REMOTE' : 'WFO',
+        //             'job_type' => rand(0, 1) ? 'FULL_TIME' : 'PART_TIME',
+        //             'experience_level' => rand(0, 1) ? 'FRESHER' : 'EXPERIENCED',
+        //             'experience_type' => rand(0, 1) ? 'ANY' : '1-2',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
 
-            $locations = DB::table('locations')
-                ->inRandomOrder()
-                ->limit(rand(1, 5))
-                ->get();
+        //     $locations = DB::table('locations')
+        //         ->inRandomOrder()
+        //         ->limit(rand(1, 5))
+        //         ->get();
 
-            foreach ($locations as $location) {
-                DB::table('job_locations')
-                    ->insert([
-                        'jobs_id' => $job,
-                        'locations_id' => $location->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
-            }
+        //     foreach ($locations as $location) {
+        //         DB::table('job_locations')
+        //             ->insert([
+        //                 'jobs_id' => $job,
+        //                 'locations_id' => $location->id,
+        //                 'created_at' => Carbon::now(),
+        //                 'updated_at' => Carbon::now(),
+        //             ]);
+        //     }
 
-            $qualifications = DB::table('qualifications')
-                ->inRandomOrder()
-                ->limit(rand(1, 5))
-                ->get();
+        //     $qualifications = DB::table('qualifications')
+        //         ->inRandomOrder()
+        //         ->limit(rand(1, 5))
+        //         ->get();
 
-            foreach ($qualifications as $qualification) {
-                DB::table('job_qualifications')
-                    ->insert([
-                        'jobs_id' => $job,
-                        'qualifications_id' => $qualification->id,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now(),
-                    ]);
-            }
-        }
+        //     foreach ($qualifications as $qualification) {
+        //         DB::table('job_qualifications')
+        //             ->insert([
+        //                 'jobs_id' => $job,
+        //                 'qualifications_id' => $qualification->id,
+        //                 'created_at' => Carbon::now(),
+        //                 'updated_at' => Carbon::now(),
+        //             ]);
+        //     }
+        // }
 
         // add random user or company post and comments
-
-        for ($i = 1; $i <= 500; $i++) {
-            $post = DB::table('posts')
-                ->insertGetId([
-                    'authorable_id' => rand(1, 100),
-                    // 'App\Models\User' or 'App\Models\Company'
-                    'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
-                    'title' => 'This is post title ' . $i,
-                    'type' => 'text',
-                    'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
-        }
-        for ($j = 1; $j <= 100; $j++) {
-            DB::table('comments')
-                ->insert([
-                    'post_id' => rand(1, 500),
-                    'authorable_id' => rand(1, 100),
-                    'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
-                    'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now(),
-                ]);
-        }
+        dd("done");
+        // for ($i = 1; $i <= 500; $i++) {
+        //     $post = DB::table('posts')
+        //         ->insertGetId([
+        //             'authorable_id' => rand(1, 100),
+        //             // 'App\Models\User' or 'App\Models\Company'
+        //             'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'title' => 'This is post title ' . $i,
+        //             'type' => 'text',
+        //             'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+        // for ($j = 1; $j <= 100; $j++) {
+        //     DB::table('comments')
+        //         ->insert([
+        //             'post_id' => rand(1, 500),
+        //             'authorable_id' => rand(1, 100),
+        //             'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+        // for ($j = 1; $j <= 1000; $j++) {
+        //     DB::table('comments')
+        //         ->insert([
+        //             'post_id' => rand(1, 500),
+        //             'authorable_id' => rand(1, 100),
+        //             'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
 
 
         dd('done');

@@ -2,7 +2,7 @@
 
 // Admin 
 use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 use App\Http\Controllers\Admin\JobController as AdminJobController;
 use App\Http\Controllers\Admin\LocationController;
@@ -67,17 +67,17 @@ Route::group(['middleware' => "isGuest"], function () {
 
     // Admin Routes 
     Route::prefix('/admin')->group(function () {
-        Route::get('/login',  [AdminController::class, "login"])->name('admin.login');
-        Route::get('/register', [AdminController::class, "register"])->name('admin.register');
-        Route::post('/login', [AdminController::class, "doLogin"])->name('admin.doLogin');
-        Route::post('/register', [AdminController::class, "doRegister"])->name('admin.doRegister');
-        Route::get('/verify-email/{token}',  [AdminController::class, "verifyEmail"])->name('admin.verifyEmail');
-        Route::get('/resend-verification-email',  [AdminController::class, "resendVerificationEmail"])->name('admin.resendVerificationEmail');
-        Route::get('/send-verification-email',  [AdminController::class, "sendVerificationEmail"])->name('admin.sendVerificationEmail');
-        Route::get('/forgot-password',  [AdminController::class, "forgotPassword"])->name('admin.forgotPassword');
-        Route::post('/forgot-password',  [AdminController::class, "doForgotPassword"])->name('admin.doForgotPassword');
-        Route::get('/reset-password/{token}',  [AdminController::class, "resetPassword"])->name('admin.resetPassword');
-        Route::post('/reset-password/{token}',  [AdminController::class, "doResetPassword"])->name('admin.doResetPassword');
+        Route::get('/login',  [AdminAuthController::class, "login"])->name('admin.login');
+        Route::get('/register', [AdminAuthController::class, "register"])->name('admin.register');
+        Route::post('/login', [AdminAuthController::class, "doLogin"])->name('admin.doLogin');
+        Route::post('/register', [AdminAuthController::class, "doRegister"])->name('admin.doRegister');
+        Route::get('/verify-email/{token}',  [AdminAuthController::class, "verifyEmail"])->name('admin.verifyEmail');
+        Route::get('/resend-verification-email',  [AdminAuthController::class, "resendVerificationEmail"])->name('admin.resendVerificationEmail');
+        Route::get('/send-verification-email',  [AdminAuthController::class, "sendVerificationEmail"])->name('admin.sendVerificationEmail');
+        Route::get('/forgot-password',  [AdminAuthController::class, "forgotPassword"])->name('admin.forgotPassword');
+        Route::post('/forgot-password',  [AdminAuthController::class, "doForgotPassword"])->name('admin.doForgotPassword');
+        Route::get('/reset-password/{token}',  [AdminAuthController::class, "resetPassword"])->name('admin.resetPassword');
+        Route::post('/reset-password/{token}',  [AdminAuthController::class, "doResetPassword"])->name('admin.doResetPassword');
     });
 
     // Company Routes
@@ -111,20 +111,20 @@ Route::group(['middleware' => "isAdmin"], function () {
         })->name('admin.doSearch');
 
 
-        Route::get('/edit-profile',  [AdminController::class, "editProfile"])->name('admin.editProfile');
-        Route::post('/update-profile',  [AdminController::class, "updateProfile"])->name('admin.updateProfile');
-        Route::get('/change-password',  [AdminController::class, "changePassword"])->name('admin.changePassword');
-        Route::post('/change-password',  [AdminController::class, "doChangePassword"])->name('admin.doChangePassword');
-        Route::get('/edit-profile-image',  [AdminController::class, "editProfileImage"])->name('admin.editProfileImage');
-        Route::post('/update-profile-image',  [AdminController::class, "updateProfileImage"])->name('admin.updateProfileImage');
-        // Route::get('/edit-resume-pdf',  [AdminController::class, "editResumePdf"])->name('admin.editResumePdf');
-        // Route::post('/update-resume-pdf',  [AdminController::class, "updateResumePdf"])->name('admin.updateResumePdf');
-        Route::post('/delete-profile-image',  [AdminController::class, "deleteProfileImage"])->name('admin.deleteProfileImage');
+        Route::get('/edit-profile',  [AdminAuthController::class, "editProfile"])->name('admin.editProfile');
+        Route::post('/update-profile',  [AdminAuthController::class, "updateProfile"])->name('admin.updateProfile');
+        Route::get('/change-password',  [AdminAuthController::class, "changePassword"])->name('admin.changePassword');
+        Route::post('/change-password',  [AdminAuthController::class, "doChangePassword"])->name('admin.doChangePassword');
+        Route::get('/edit-profile-image',  [AdminAuthController::class, "editProfileImage"])->name('admin.editProfileImage');
+        Route::post('/update-profile-image',  [AdminAuthController::class, "updateProfileImage"])->name('admin.updateProfileImage');
+        // Route::get('/edit-resume-pdf',  [AdminAuthController::class, "editResumePdf"])->name('admin.editResumePdf');
+        // Route::post('/update-resume-pdf',  [AdminAuthController::class, "updateResumePdf"])->name('admin.updateResumePdf');
+        Route::post('/delete-profile-image',  [AdminAuthController::class, "deleteProfileImage"])->name('admin.deleteProfileImage');
         // add throttle limit 
 
-        // Route::get('/dashboard',  [AdminController::class, "dashboard"])->name('admin.dashboard');
-        Route::get('/dashboard',  [AdminController::class, "dashboard"])->name('admin.dashboard');
-        Route::get('/logout',  [AdminController::class, "logout"])->name('admin.logout');
+        // Route::get('/dashboard',  [AdminAuthController::class, "dashboard"])->name('admin.dashboard');
+        Route::get('/dashboard',  [AdminAuthController::class, "dashboard"])->name('admin.dashboard');
+        Route::get('/logout',  [AdminAuthController::class, "logout"])->name('admin.logout');
 
         Route::prefix('user')->group(function () {
             Route::get('/create',  [AdminUserController::class, "create"])->name('admin.user.create');
@@ -198,7 +198,7 @@ Route::group(['middleware' => "isAdmin"], function () {
 
         Route::prefix('qualification')->group(function () {
             Route::get('/create',  [QualificationController::class, "create"])->name('admin.qualification.create');
-            Route::post('/store',  [QualificationController::class, "store"])->name('admin.qualification.store');
+            // Route::post('/store',  [QualificationController::class, "store"])->name('admin.qualification.store');
             Route::get('/',  [QualificationController::class, "index"])->name('admin.qualification.index');
             Route::get('/{id}',  [QualificationController::class, "show"])->name('admin.qualification.show');
             Route::get('/edit/{id}',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
@@ -206,199 +206,212 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/delete/{id}',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
         });
 
+        // qualifications ajax
+
+        Route::prefix('qualification-ajax')->group(function () {
+            Route::get('/create',  [QualificationController::class, "createAjax"])->name('admin.qualification.createAjax');
+            Route::post('/store',  [QualificationController::class, "storeAjax"])->name('admin.qualification.storeAjax');
+            Route::get('/',  [QualificationController::class, "indexAjax"])->name('admin.qualification.indexAjax');
+            Route::get('/{id}',  [QualificationController::class, "showAjax"])->name('admin.qualification.showAjax');
+            Route::get('/edit/{id}',  [QualificationController::class, "editAjax"])->name('admin.qualification.editAjax');
+            Route::post('/update/{id}',  [QualificationController::class, "updateAjax"])->name('admin.qualification.updateAjax');
+            Route::get('/delete/{id}',  [QualificationController::class, "deleteAjax"])->name('admin.qualification.deleteAjax');
+        });
+
+
         // notifications
         Route::prefix('notifications')->group(function () {
-            Route::get('/',  [AdminController::class, "notifications"])->name('admin.notifications');
-            Route::get('/mark-all-as-read',  [AdminController::class, "markAllAsRead"])->name('admin.notification.readAll');
-            Route::get('/mark-as-read/{id}',  [AdminController::class, "markAsRead"])->name('admin.notification.read');
-            Route::get('/mark-as-unread/{id}',  [AdminController::class, "markAsUnread"])->name('admin.notification.unread');
-            Route::get('/delete-notification/{id}',  [AdminController::class, "deleteNotification"])->name('admin.notification.delete');
-            Route::get('/delete-all-notification',  [AdminController::class, "deleteAllNotification"])->name('admin.notification.deleteAll');
+            Route::get('/',  [AdminAuthController::class, "notifications"])->name('admin.notifications');
+            Route::get('/mark-all-as-read',  [AdminAuthController::class, "markAllAsRead"])->name('admin.notification.readAll');
+            Route::get('/mark-as-read/{id}',  [AdminAuthController::class, "markAsRead"])->name('admin.notification.read');
+            Route::get('/mark-as-unread/{id}',  [AdminAuthController::class, "markAsUnread"])->name('admin.notification.unread');
+            Route::get('/delete-notification/{id}',  [AdminAuthController::class, "deleteNotification"])->name('admin.notification.delete');
+            Route::get('/delete-all-notification',  [AdminAuthController::class, "deleteAllNotification"])->name('admin.notification.deleteAll');
         });
     });
 });
 
-Route::group(['middleware' => "isCompany"], function () {
+// Route::group(['middleware' => "isCompany"], function () {
 
 
 
 
-    Route::prefix('/company')->group(function () {
-        Route::get('/edit-profile',  [CompanyAuthController::class, "editProfile"])->name('company.editProfile');
-        Route::post('/update-profile',  [CompanyAuthController::class, "updateProfile"])->name('company.updateProfile');
-        Route::get('/change-password',  [CompanyAuthController::class, "changePassword"])->name('company.changePassword');
-        Route::post('/change-password',  [CompanyAuthController::class, "doChangePassword"])->name('company.doChangePassword');
-        Route::get('/edit-profile-image',  [CompanyAuthController::class, "editProfileImage"])->name('company.editProfileImage');
-        Route::post('/update-profile-image',  [CompanyAuthController::class, "updateProfileImage"])->name('company.updateProfileImage');
-        Route::post('/delete-profile-image',  [CompanyAuthController::class, "deleteProfileImage"])->name('company.deleteProfileImage');
-        Route::get('/dashboard',  [CompanyAuthController::class, "dashboard"])->name('company.dashboard');
-        Route::get('/logout',  [CompanyAuthController::class, "logout"])->name('company.logout');
+//     Route::prefix('/company')->group(function () {
+//         Route::get('/edit-profile',  [CompanyAuthController::class, "editProfile"])->name('company.editProfile');
+//         Route::post('/update-profile',  [CompanyAuthController::class, "updateProfile"])->name('company.updateProfile');
+//         Route::get('/change-password',  [CompanyAuthController::class, "changePassword"])->name('company.changePassword');
+//         Route::post('/change-password',  [CompanyAuthController::class, "doChangePassword"])->name('company.doChangePassword');
+//         Route::get('/edit-profile-image',  [CompanyAuthController::class, "editProfileImage"])->name('company.editProfileImage');
+//         Route::post('/update-profile-image',  [CompanyAuthController::class, "updateProfileImage"])->name('company.updateProfileImage');
+//         Route::post('/delete-profile-image',  [CompanyAuthController::class, "deleteProfileImage"])->name('company.deleteProfileImage');
+//         Route::get('/dashboard',  [CompanyAuthController::class, "dashboard"])->name('company.dashboard');
+//         Route::get('/logout',  [CompanyAuthController::class, "logout"])->name('company.logout');
 
-        Route::get('/followers',  [CompanyFollowsController::class, "followers"])->name('company.followers');
-        Route::get('/all-users',  [CompanyFollowsController::class, "allUsers"])->name('company.allUsers');
-        Route::get('/remove-follower/{id}',  [CompanyFollowsController::class, "removeFollower"])->name('company.removeFollower');
+//         Route::get('/followers',  [CompanyFollowsController::class, "followers"])->name('company.followers');
+//         Route::get('/all-users',  [CompanyFollowsController::class, "allUsers"])->name('company.allUsers');
+//         Route::get('/remove-follower/{id}',  [CompanyFollowsController::class, "removeFollower"])->name('company.removeFollower');
 
-        // notifications
-        Route::prefix('notifications')->group(function () {
-            Route::get('/',  [CompanyNotificationsController::class, "notifications"])->name('company.notifications');
-            Route::get('/mark-all-as-read',  [CompanyNotificationsController::class, "markAllAsRead"])->name('company.notification.readAll');
-            Route::get('/mark-as-read/{id}',  [CompanyNotificationsController::class, "markAsRead"])->name('company.notification.read');
-            Route::get('/mark-as-unread/{id}',  [CompanyNotificationsController::class, "markAsUnread"])->name('company.notification.unread');
-            Route::get('/delete-notification/{id}',  [CompanyNotificationsController::class, "deleteNotification"])->name('company.notification.delete');
-            Route::get('/delete-all-notification',  [CompanyNotificationsController::class, "deleteAllNotification"])->name('company.notification.deleteAll');
-        });
+//         // notifications
+//         Route::prefix('notifications')->group(function () {
+//             Route::get('/',  [CompanyNotificationsController::class, "notifications"])->name('company.notifications');
+//             Route::get('/mark-all-as-read',  [CompanyNotificationsController::class, "markAllAsRead"])->name('company.notification.readAll');
+//             Route::get('/mark-as-read/{id}',  [CompanyNotificationsController::class, "markAsRead"])->name('company.notification.read');
+//             Route::get('/mark-as-unread/{id}',  [CompanyNotificationsController::class, "markAsUnread"])->name('company.notification.unread');
+//             Route::get('/delete-notification/{id}',  [CompanyNotificationsController::class, "deleteNotification"])->name('company.notification.delete');
+//             Route::get('/delete-all-notification',  [CompanyNotificationsController::class, "deleteAllNotification"])->name('company.notification.deleteAll');
+//         });
 
-        // posts comments likes
-        Route::prefix('post')->group(function () {
-            Route::get('/',  [CompanyPostsController::class, "indexPost"])->name('company.post.index');
-            Route::get('/all',  [CompanyPostsController::class, "allPost"])->name('company.post.all');
-            Route::get('/create',  [CompanyPostsController::class, "createPost"])->name('company.post.create');
-            Route::post('/store',  [CompanyPostsController::class, "storePost"])->name('company.post.store');
-            Route::get('/{id}',  [CompanyPostsController::class, "showPost"])->name('company.post.show');
-            Route::get('/edit/{id}',  [CompanyPostsController::class, "editPost"])->name('company.post.edit');
-            Route::post('/update/{id}',  [CompanyPostsController::class, "updatePost"])->name('company.post.update');
-            Route::get('/delete/{id}',  [CompanyPostsController::class, "deletePost"])->name('company.post.delete');
-            Route::get('/like/{id}',  [CompanyPostsController::class, "likePost"])->name('company.post.like');
-            Route::get('/unlike/{id}',  [CompanyPostsController::class, "unlikePost"])->name('company.post.unlike');
+//         // posts comments likes
+//         Route::prefix('post')->group(function () {
+//             Route::get('/',  [CompanyPostsController::class, "indexPost"])->name('company.post.index');
+//             Route::get('/all',  [CompanyPostsController::class, "allPost"])->name('company.post.all');
+//             Route::get('/create',  [CompanyPostsController::class, "createPost"])->name('company.post.create');
+//             Route::post('/store',  [CompanyPostsController::class, "storePost"])->name('company.post.store');
+//             Route::get('/{id}',  [CompanyPostsController::class, "showPost"])->name('company.post.show');
+//             Route::get('/edit/{id}',  [CompanyPostsController::class, "editPost"])->name('company.post.edit');
+//             Route::post('/update/{id}',  [CompanyPostsController::class, "updatePost"])->name('company.post.update');
+//             Route::get('/delete/{id}',  [CompanyPostsController::class, "deletePost"])->name('company.post.delete');
+//             Route::get('/like/{id}',  [CompanyPostsController::class, "likePost"])->name('company.post.like');
+//             Route::get('/unlike/{id}',  [CompanyPostsController::class, "unlikePost"])->name('company.post.unlike');
 
-            // comments profix
-            Route::prefix('comment')->group(function () {
-                Route::get('/{id}',  [CompanyPostsController::class, "commentPostIndex"])->name('company.post.commentIndex');  // comment index page
-                Route::get('/{id}/create',  [CompanyPostsController::class, "commentPostCreate"])->name('company.post.commentCreate');  // comment create page
-                Route::post('/{id}/store',  [CompanyPostsController::class, "commentPostStore"])->name('company.post.commentStore');  // comment store page
-                Route::get('/{id}/edit/{comment_id}',  [CompanyPostsController::class, "commentPostEdit"])->name('company.post.commentEdit');  // comment edit page
-                Route::post('/{id}/update/{comment_id}',  [CompanyPostsController::class, "commentPostUpdate"])->name('company.post.commentUpdate');  // comment update page
-                Route::get('/{id}/delete/{comment_id}',  [CompanyPostsController::class, "commentPostDelete"])->name('company.post.commentDelete');  // comment delete page
-                Route::get('/{id}/like/{comment_id}',  [CompanyPostsController::class, "commentPostLike"])->name('company.post.commentLike');  // comment like page
-                Route::get('/{id}/unlike/{comment_id}',  [CompanyPostsController::class, "commentPostUnlike"])->name('company.post.commentUnlike');  // comment unlike page
-            });
-        });
+//             // comments profix
+//             Route::prefix('comment')->group(function () {
+//                 Route::get('/{id}',  [CompanyPostsController::class, "commentPostIndex"])->name('company.post.commentIndex');  // comment index page
+//                 Route::get('/{id}/create',  [CompanyPostsController::class, "commentPostCreate"])->name('company.post.commentCreate');  // comment create page
+//                 Route::post('/{id}/store',  [CompanyPostsController::class, "commentPostStore"])->name('company.post.commentStore');  // comment store page
+//                 Route::get('/{id}/edit/{comment_id}',  [CompanyPostsController::class, "commentPostEdit"])->name('company.post.commentEdit');  // comment edit page
+//                 Route::post('/{id}/update/{comment_id}',  [CompanyPostsController::class, "commentPostUpdate"])->name('company.post.commentUpdate');  // comment update page
+//                 Route::get('/{id}/delete/{comment_id}',  [CompanyPostsController::class, "commentPostDelete"])->name('company.post.commentDelete');  // comment delete page
+//                 Route::get('/{id}/like/{comment_id}',  [CompanyPostsController::class, "commentPostLike"])->name('company.post.commentLike');  // comment like page
+//                 Route::get('/{id}/unlike/{comment_id}',  [CompanyPostsController::class, "commentPostUnlike"])->name('company.post.commentUnlike');  // comment unlike page
+//             });
+//         });
 
-        Route::prefix('job')->group(function () {
-            Route::get('/create',  [CompanyJobController::class, "create"])->name('company.job.create');
-            Route::post('/store',  [CompanyJobController::class, "store"])->name('company.job.store');
-            Route::get('/',  [CompanyJobController::class, "index"])->name('company.job.index');
-            Route::get('/{id}',  [CompanyJobController::class, "show"])->name('company.job.show');
-            Route::get('/edit/{id}',  [CompanyJobController::class, "edit"])->name('company.job.edit');
-            Route::post('/update/{id}',  [CompanyJobController::class, "update"])->name('company.job.update');
-            Route::get('/delete/{id}',  [CompanyJobController::class, "delete"])->name('company.job.delete');
-            Route::get('/toggle-featured/{id}/{is_featured}',  [CompanyJobController::class, "toggleFeatured"])->name('company.job.toggleFeatured');
-            Route::get('/toggle-active/{id}/{is_active}',  [CompanyJobController::class, "toggleActive"])->name('company.job.toggleActive');
-        });
-    });
-});
-
-// Route::group(['middleware' => "isUser"], function () {
-//     Route::get('/', [FrontUserController::class, "index"])->name('index');
-//     Route::get("/logout", [FrontUserController::class, 'logout'])->name('logout');
+//         Route::prefix('job')->group(function () {
+//             Route::get('/create',  [CompanyJobController::class, "create"])->name('company.job.create');
+//             Route::post('/store',  [CompanyJobController::class, "store"])->name('company.job.store');
+//             Route::get('/',  [CompanyJobController::class, "index"])->name('company.job.index');
+//             Route::get('/{id}',  [CompanyJobController::class, "show"])->name('company.job.show');
+//             Route::get('/edit/{id}',  [CompanyJobController::class, "edit"])->name('company.job.edit');
+//             Route::post('/update/{id}',  [CompanyJobController::class, "update"])->name('company.job.update');
+//             Route::get('/delete/{id}',  [CompanyJobController::class, "delete"])->name('company.job.delete');
+//             Route::get('/toggle-featured/{id}/{is_featured}',  [CompanyJobController::class, "toggleFeatured"])->name('company.job.toggleFeatured');
+//             Route::get('/toggle-active/{id}/{is_active}',  [CompanyJobController::class, "toggleActive"])->name('company.job.toggleActive');
+//         });
+//     });
 // });
 
-
-Route::group(['middleware' => "isUser"], function () {
-    Route::prefix('/user')->group(function () {
-
-
-        Route::get('search', function (Request $request) {
-
-            return redirect()->route('user.dashboard')->with('info', 'Search is not implemented yet');
-        })->name('user.search');
-        Route::post('search', function (Request $request) {
-
-            return redirect()->route('user.dashboard')->with('info', 'Search is not implemented yet');
-        })->name('user.doSearch');
+// // Route::group(['middleware' => "isUser"], function () {
+// //     Route::get('/', [FrontUserController::class, "index"])->name('index');
+// //     Route::get("/logout", [FrontUserController::class, 'logout'])->name('logout');
+// // });
 
 
-        Route::get('/dashboard',  [UserAuthController::class, "dashboard"])->name('user.dashboard');
-        Route::get('/logout',  [UserAuthController::class, "logout"])->name('user.logout');
-        Route::get('/edit-profile',  [UserAuthController::class, "editProfile"])->name('user.editProfile');
-        Route::post('/update-profile',  [UserAuthController::class, "updateProfile"])->name('user.updateProfile');
-        Route::get('/change-password',  [UserAuthController::class, "changePassword"])->name('user.changePassword');
-        Route::post('/change-password',  [UserAuthController::class, "doChangePassword"])->name('user.doChangePassword');
-        Route::get('/edit-profile-image',  [UserAuthController::class, "editProfileImage"])->name('user.editProfileImage');
-        Route::post('/update-profile-image',  [UserAuthController::class, "updateProfileImage"])->name('user.updateProfileImage');
-        Route::post('/delete-profile-image',  [UserAuthController::class, "deleteProfileImage"])->name('user.deleteProfileImage');
-        Route::get('/edit-resume-pdf',  [UserAuthController::class, "editResumePdf"])->name('user.editResumePdf');
-        Route::post('/update-resume-pdf',  [UserAuthController::class, "updateResumePdf"])->name('user.updateResumePdf');
-        Route::get('/delete-resume-pdf',  [UserAuthController::class, "deleteResumePdf"])->name('user.deleteResumePdf');
+// Route::group(['middleware' => "isUser"], function () {
+//     Route::prefix('/user')->group(function () {
 
-        // notification
-        Route::prefix('notifications')->group(function () {
-            Route::get('/',  [UserNotificationsController::class, "notifications"])->name('user.notifications');
-            Route::get('/mark-all-as-read',  [UserNotificationsController::class, "markAllAsRead"])->name('user.notification.readAll');
-            Route::get('/mark-as-read/{id}',  [UserNotificationsController::class, "markAsRead"])->name('user.notification.read');
-            Route::get('/mark-as-unread/{id}',  [UserNotificationsController::class, "markAsUnread"])->name('user.notification.unread');
-            Route::get('/delete-notification/{id}',  [UserNotificationsController::class, "deleteNotification"])->name('user.notification.delete');
-            Route::get('/delete-all-notification',  [UserNotificationsController::class, "deleteAllNotification"])->name('user.notification.deleteAll');
-        });
 
-        Route::get('/follow/{id}',  [UserFollowsController::class, "follow"])->name('user.follow');
-        Route::get('/unfollow/{id}',  [UserFollowsController::class, "unfollow"])->name('user.unfollow');
-        Route::get('/followers',  [UserFollowsController::class, "followers"])->name('user.followers');
-        Route::get('/following',  [UserFollowsController::class, "following"])->name('user.following');
-        Route::get('/all-users',  [UserFollowsController::class, "allUsers"])->name('user.allUsers');
-        Route::get('/remove-follower/{id}',  [UserFollowsController::class, "removeFollower"])->name('user.removeFollower');
+//         Route::get('search', function (Request $request) {
 
-        //  all Company
-        Route::prefix('company')->group(function () {
-            Route::get('/',  [UserFollowsController::class, "allCompany"])->name('user.company.index');
-            Route::get('/{id}',  [UserFollowsController::class, "showCompany"])->name('user.company.show');
-            Route::get('/followers/{id}',  [UserFollowsController::class, "followers"])->name('user.company.followers');
-            http: //127.0.0.1:8000/user/unfollow/1
-            Route::get('/follow/{id}',  [UserFollowsController::class, "followCompany"])->name('user.company.follow');
-            Route::get('/unfollow/{id}',  [UserFollowsController::class, "unfollowCompany"])->name('user.company.unfollow');
-        });
+//             return redirect()->route('user.dashboard')->with('info', 'Search is not implemented yet');
+//         })->name('user.search');
+//         Route::post('search', function (Request $request) {
 
-        Route::prefix('job')->group(function () {
-            Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
-            Route::get('/saved-jobs',  [UserJobController::class, "savedJobs"])->name('user.job.savedJobs');
-            Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
-            // Route::get('/search',  [UserJobController::class, "search"])->name('user.job.search');
-            // Route::post('/search',  [UserJobController::class, "doSearch"])->name('user.job.doSearch'); 
-            Route::get('/apply/{id}',  [UserJobController::class, "apply"])->name('user.job.apply');
-            Route::get('/unapply/{id}',  [UserJobController::class, "unapply"])->name('user.job.unapply');
-            // Route::get('/cancel-applied-job/{id}',  [UserJobController::class, "cancelAppliedJob"])->name('user.job.cancelAppliedJob');
-            Route::get('/save-job/{id}',  [UserJobController::class, "saveJob"])->name('user.job.saveJob');
-            Route::get('/unsave-job/{id}',  [UserJobController::class, "unsaveJob"])->name('user.job.unsaveJob');
-            // show job 
-            Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
-            Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
-            Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
-            Route::get('/profile-category/{id}',  [UserJobController::class, "jobByProfileCategory"])->name('user.job.jobByProfileCategory');
-            Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
-            Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
-        });
+//             return redirect()->route('user.dashboard')->with('info', 'Search is not implemented yet');
+//         })->name('user.doSearch');
 
-        // Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
-        // Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
-        // Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
-        // Route::get('/profile-category/{id}',  [UserJobController::class, "jobByProfileCategory"])->name('user.job.jobByProfileCategory');
-        // Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
-        // Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
 
-        // posts comments likes
-        Route::prefix('post')->group(function () {
-            Route::get('/',  [UserPostsController::class, "indexPost"])->name('user.post.index');
-            Route::get('/all',  [UserPostsController::class, "allPost"])->name('user.post.all');
-            Route::get('/create',  [UserPostsController::class, "createPost"])->name('user.post.create');
-            Route::post('/store',  [UserPostsController::class, "storePost"])->name('user.post.store');
-            Route::get('/{id}',  [UserPostsController::class, "showPost"])->name('user.post.show');
-            Route::get('/edit/{id}',  [UserPostsController::class, "editPost"])->name('user.post.edit');
-            Route::post('/update/{id}',  [UserPostsController::class, "updatePost"])->name('user.post.update');
-            Route::get('/delete/{id}',  [UserPostsController::class, "deletePost"])->name('user.post.delete');
-            Route::get('/like/{id}',  [UserPostsController::class, "likePost"])->name('user.post.like');
-            Route::get('/unlike/{id}',  [UserPostsController::class, "unlikePost"])->name('user.post.unlike');
+//         Route::get('/dashboard',  [UserAuthController::class, "dashboard"])->name('user.dashboard');
+//         Route::get('/logout',  [UserAuthController::class, "logout"])->name('user.logout');
+//         Route::get('/edit-profile',  [UserAuthController::class, "editProfile"])->name('user.editProfile');
+//         Route::post('/update-profile',  [UserAuthController::class, "updateProfile"])->name('user.updateProfile');
+//         Route::get('/change-password',  [UserAuthController::class, "changePassword"])->name('user.changePassword');
+//         Route::post('/change-password',  [UserAuthController::class, "doChangePassword"])->name('user.doChangePassword');
+//         Route::get('/edit-profile-image',  [UserAuthController::class, "editProfileImage"])->name('user.editProfileImage');
+//         Route::post('/update-profile-image',  [UserAuthController::class, "updateProfileImage"])->name('user.updateProfileImage');
+//         Route::post('/delete-profile-image',  [UserAuthController::class, "deleteProfileImage"])->name('user.deleteProfileImage');
+//         Route::get('/edit-resume-pdf',  [UserAuthController::class, "editResumePdf"])->name('user.editResumePdf');
+//         Route::post('/update-resume-pdf',  [UserAuthController::class, "updateResumePdf"])->name('user.updateResumePdf');
+//         Route::get('/delete-resume-pdf',  [UserAuthController::class, "deleteResumePdf"])->name('user.deleteResumePdf');
 
-            // comments profix
-            Route::prefix('comment')->group(function () {
-                Route::get('/{id}',  [UserPostsController::class, "commentPostIndex"])->name('user.post.commentIndex');  // comment index page
-                Route::get('/{id}/create',  [UserPostsController::class, "commentPostCreate"])->name('user.post.commentCreate');  // comment create page
-                Route::post('/{id}/store',  [UserPostsController::class, "commentPostStore"])->name('user.post.commentStore');  // comment store page
-                Route::get('/{id}/edit/{comment_id}',  [UserPostsController::class, "commentPostEdit"])->name('user.post.commentEdit');  // comment edit page
-                Route::post('/{id}/update/{comment_id}',  [UserPostsController::class, "commentPostUpdate"])->name('user.post.commentUpdate');  // comment update page
-                Route::get('/{id}/delete/{comment_id}',  [UserPostsController::class, "commentPostDelete"])->name('user.post.commentDelete');  // comment delete page
-                Route::get('/{id}/like/{comment_id}',  [UserPostsController::class, "commentPostLike"])->name('user.post.commentLike');  // comment like page
-                Route::get('/{id}/unlike/{comment_id}',  [UserPostsController::class, "commentPostUnlike"])->name('user.post.commentUnlike');  // comment unlike page
-            });
-        });
-    });
-});
+//         // notification
+//         Route::prefix('notifications')->group(function () {
+//             Route::get('/',  [UserNotificationsController::class, "notifications"])->name('user.notifications');
+//             Route::get('/mark-all-as-read',  [UserNotificationsController::class, "markAllAsRead"])->name('user.notification.readAll');
+//             Route::get('/mark-as-read/{id}',  [UserNotificationsController::class, "markAsRead"])->name('user.notification.read');
+//             Route::get('/mark-as-unread/{id}',  [UserNotificationsController::class, "markAsUnread"])->name('user.notification.unread');
+//             Route::get('/delete-notification/{id}',  [UserNotificationsController::class, "deleteNotification"])->name('user.notification.delete');
+//             Route::get('/delete-all-notification',  [UserNotificationsController::class, "deleteAllNotification"])->name('user.notification.deleteAll');
+//         });
+
+//         Route::get('/follow/{id}',  [UserFollowsController::class, "follow"])->name('user.follow');
+//         Route::get('/unfollow/{id}',  [UserFollowsController::class, "unfollow"])->name('user.unfollow');
+//         Route::get('/followers',  [UserFollowsController::class, "followers"])->name('user.followers');
+//         Route::get('/following',  [UserFollowsController::class, "following"])->name('user.following');
+//         Route::get('/all-users',  [UserFollowsController::class, "allUsers"])->name('user.allUsers');
+//         Route::get('/remove-follower/{id}',  [UserFollowsController::class, "removeFollower"])->name('user.removeFollower');
+
+//         //  all Company
+//         Route::prefix('company')->group(function () {
+//             Route::get('/',  [UserFollowsController::class, "allCompany"])->name('user.company.index');
+//             Route::get('/{id}',  [UserFollowsController::class, "showCompany"])->name('user.company.show');
+//             Route::get('/followers/{id}',  [UserFollowsController::class, "followers"])->name('user.company.followers');
+//             http: //127.0.0.1:8000/user/unfollow/1
+//             Route::get('/follow/{id}',  [UserFollowsController::class, "followCompany"])->name('user.company.follow');
+//             Route::get('/unfollow/{id}',  [UserFollowsController::class, "unfollowCompany"])->name('user.company.unfollow');
+//         });
+
+//         Route::prefix('job')->group(function () {
+//             Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
+//             Route::get('/saved-jobs',  [UserJobController::class, "savedJobs"])->name('user.job.savedJobs');
+//             Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
+//             // Route::get('/search',  [UserJobController::class, "search"])->name('user.job.search');
+//             // Route::post('/search',  [UserJobController::class, "doSearch"])->name('user.job.doSearch'); 
+//             Route::get('/apply/{id}',  [UserJobController::class, "apply"])->name('user.job.apply');
+//             Route::get('/unapply/{id}',  [UserJobController::class, "unapply"])->name('user.job.unapply');
+//             // Route::get('/cancel-applied-job/{id}',  [UserJobController::class, "cancelAppliedJob"])->name('user.job.cancelAppliedJob');
+//             Route::get('/save-job/{id}',  [UserJobController::class, "saveJob"])->name('user.job.saveJob');
+//             Route::get('/unsave-job/{id}',  [UserJobController::class, "unsaveJob"])->name('user.job.unsaveJob');
+//             // show job 
+//             Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
+//             Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
+//             Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
+//             Route::get('/profile-category/{id}',  [UserJobController::class, "jobByProfileCategory"])->name('user.job.jobByProfileCategory');
+//             Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
+//             Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
+//         });
+
+//         // Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
+//         // Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
+//         // Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
+//         // Route::get('/profile-category/{id}',  [UserJobController::class, "jobByProfileCategory"])->name('user.job.jobByProfileCategory');
+//         // Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
+//         // Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
+
+//         // posts comments likes
+//         Route::prefix('post')->group(function () {
+//             Route::get('/',  [UserPostsController::class, "indexPost"])->name('user.post.index');
+//             Route::get('/all',  [UserPostsController::class, "allPost"])->name('user.post.all');
+//             Route::get('/create',  [UserPostsController::class, "createPost"])->name('user.post.create');
+//             Route::post('/store',  [UserPostsController::class, "storePost"])->name('user.post.store');
+//             Route::get('/{id}',  [UserPostsController::class, "showPost"])->name('user.post.show');
+//             Route::get('/edit/{id}',  [UserPostsController::class, "editPost"])->name('user.post.edit');
+//             Route::post('/update/{id}',  [UserPostsController::class, "updatePost"])->name('user.post.update');
+//             Route::get('/delete/{id}',  [UserPostsController::class, "deletePost"])->name('user.post.delete');
+//             Route::get('/like/{id}',  [UserPostsController::class, "likePost"])->name('user.post.like');
+//             Route::get('/unlike/{id}',  [UserPostsController::class, "unlikePost"])->name('user.post.unlike');
+
+//             // comments profix
+//             Route::prefix('comment')->group(function () {
+//                 Route::get('/{id}',  [UserPostsController::class, "commentPostIndex"])->name('user.post.commentIndex');  // comment index page
+//                 Route::get('/{id}/create',  [UserPostsController::class, "commentPostCreate"])->name('user.post.commentCreate');  // comment create page
+//                 Route::post('/{id}/store',  [UserPostsController::class, "commentPostStore"])->name('user.post.commentStore');  // comment store page
+//                 Route::get('/{id}/edit/{comment_id}',  [UserPostsController::class, "commentPostEdit"])->name('user.post.commentEdit');  // comment edit page
+//                 Route::post('/{id}/update/{comment_id}',  [UserPostsController::class, "commentPostUpdate"])->name('user.post.commentUpdate');  // comment update page
+//                 Route::get('/{id}/delete/{comment_id}',  [UserPostsController::class, "commentPostDelete"])->name('user.post.commentDelete');  // comment delete page
+//                 Route::get('/{id}/like/{comment_id}',  [UserPostsController::class, "commentPostLike"])->name('user.post.commentLike');  // comment like page
+//                 Route::get('/{id}/unlike/{comment_id}',  [UserPostsController::class, "commentPostUnlike"])->name('user.post.commentUnlike');  // comment unlike page
+//             });
+//         });
+//     });
+// });

@@ -12,7 +12,7 @@ use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 
-class AdminController extends Controller
+class AuthController extends Controller
 {
     private Admin $admin;
     private int $paginate;

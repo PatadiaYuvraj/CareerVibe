@@ -160,4 +160,49 @@ class QualificationController extends Controller
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not deleted, because it has jobs associated with it"]);
     }
+
+    // Route::prefix('qualification-ajax')->group(function () {
+    //         Route::get('/create',  [QualificationController::class, "createAjax"])->name('admin.qualification.createAjax');
+    //         Route::post('/store',  [QualificationController::class, "storeAjax"])->name('admin.qualification.storeAjax');
+    //         Route::get('/',  [QualificationController::class, "indexAjax"])->name('admin.qualification.indexAjax');
+    //         Route::get('/{id}',  [QualificationController::class, "showAjax"])->name('admin.qualification.showAjax');
+    //         Route::get('/edit/{id}',  [QualificationController::class, "editAjax"])->name('admin.qualification.editAjax');
+    //         Route::post('/update/{id}',  [QualificationController::class, "updateAjax"])->name('admin.qualification.updateAjax');
+    //         Route::get('/delete/{id}',  [QualificationController::class, "deleteAjax"])->name('admin.qualification.deleteAjax');
+    //     });
+
+    // storeAjax
+    public function storeAjax(Request $request)
+    {
+
+
+
+        $request->validate([
+            "name" => [
+                "required",
+                "string",
+                "max:100",
+                "unique:qualifications,name",
+            ],
+        ]);
+
+
+
+        $data = [
+            "name" => $request->get("name"),
+        ];
+        $isCreated = $this->qualification->create($data);
+        if ($isCreated) {
+            return response()->json([
+                "status" => true,
+                "message" => "Qualification is created",
+                "data" => $isCreated,
+            ]);
+        }
+        return response()->json([
+            "status" => false,
+            "message" => "Qualification is not created",
+            "data" => [],
+        ]);
+    }
 }

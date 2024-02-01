@@ -232,15 +232,10 @@ class PostsController extends Controller
 
     public function commentPostIndex($id)
     {
-        $post = $this->post->find($id);
-
-        if (!$post) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
-        }
         $post = $this->post->with([
             'comments',
             'comments.authorable',
-            'comments.likes'
+            'comments.likes',
         ])
             ->find($id);
         if (!$post) {
