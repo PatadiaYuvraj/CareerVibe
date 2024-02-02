@@ -25,146 +25,10 @@ class QualificationController extends Controller
         $this->navigationManagerService = $navigationManagerService;
     }
 
-    // public function create()
-    // {
-    //     return $this->navigationManagerService->loadView('admin.qualification.create');
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         "name" => [
-    //             "required",
-    //             "string",
-    //             "max:100",
-    //             "unique:qualifications,name",
-    //         ]
-    //     ]);
-    //     $data = [
-    //         "name" => $request->get("name"),
-    //     ];
-    //     $isCreated = $this->qualification->create($data);
-    //     if ($isCreated) {
-    //         return $this->navigationManagerService->redirectRoute('admin.qualification.index', [], 302, [], false, ["success" => "Qualification is created"]);
-    //     }
-    //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not created"]);
-    // }
-
-    // public function index()
-    // {
-    //     $qualifications = $this->qualification->withCount('jobs')->paginate($this->paginate);
-    //     return $this->navigationManagerService->loadView('admin.qualification.index', compact('qualifications'));
-    // }
-
-    // public function show($id)
-    // {
-    //     $qualification = $this->qualification
-    //         ->where('id', $id)
-    //         ->select('id', 'name', 'created_at')
-    //         ->with([
-    //             'jobs' => function ($query) {
-    //                 $query->select([
-    //                     'jobs.id',
-    //                     'vacancy',
-    //                     "min_salary",
-    //                     "max_salary",
-    //                     "is_active",
-    //                     "is_featured",
-    //                     "is_verified",
-    //                     'jobs.created_at',
-    //                     'sub_profile_id',
-    //                     'company_id',
-    //                 ]);
-    //                 $query->with([
-    //                     'company' => function ($query) {
-    //                         $query->select([
-    //                             'companies.id',
-    //                             'name',
-    //                             // 'email',
-    //                         ]);
-    //                     },
-    //                     'subProfile' => function ($query) {
-    //                         $query->select([
-    //                             'sub_profiles.id',
-    //                             'name',
-    //                         ]);
-    //                     },
-    //                     'qualifications' => function ($query) {
-    //                         $query->select([
-    //                             'qualifications.id',
-    //                             'name',
-    //                         ]);
-    //                     },
-    //                     'locations' => function ($query) {
-    //                         $query->select([
-    //                             'locations.id',
-    //                             "city",
-    //                             "state",
-    //                         ]);
-    //                     },
-    //                 ]);
-    //             }
-    //         ])
-    //         ->get()
-    //         ->ToArray();
-    //     if (!$qualification) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not found"]);
-    //     }
-    //     $qualification =  $qualification[0];
-    //     return $this->navigationManagerService->loadView('admin.qualification.show', compact('qualification'));
-    // }
-
-    // public function edit($id)
-    // {
-
-    //     $qualification = $this->qualification->where('id', $id)->get()->ToArray();
-    //     if (!$qualification) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not found"]);
-    //     }
-    //     $qualification =  $qualification[0];
-    //     return $this->navigationManagerService->loadView('admin.qualification.edit', compact('qualification'));
-    // }
-
-    // public function update(Request $request, $id)
-    // {
-    //     $request->validate([
-    //         "name" => [
-    //             "required",
-    //             "string",
-    //             "max:100",
-    //             "unique:qualifications,name," . $id,
-    //         ]
-    //     ]);
-    //     $data = [
-    //         "name" => $request->get("name"),
-    //     ];
-    //     $isUpdated = $this->qualification->where('id', $id)->update($data);
-    //     if ($isUpdated) {
-    //         return $this->navigationManagerService->redirectRoute('admin.qualification.index', [], 302, [], false, ["success" => "Qualification is updated"]);
-    //     }
-    //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not updated"]);
-    // }
-
-    // public function delete($id)
-    // {
-    //     $qualification = $this->qualification->where('id', $id)->withCount('jobs')->get()->ToArray();
-    //     if (!$qualification) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not found"]);
-    //     }
-    //     $qualification =  $qualification[0];
-    //     if ($qualification['jobs_count'] == 0) {
-    //         $isDeleted = $this->qualification->where('id', $id)->delete();
-    //         if ($isDeleted) {
-    //             return $this->navigationManagerService->redirectRoute('admin.qualification.index', [], 302, [], false, ["success" => "Qualification is deleted"]);
-    //         }
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not deleted"]);
-    //     }
-    //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Qualification is not deleted, because it has jobs associated with it"]);
-    // }
-
+    // index
     public function index()
     {
-        return $this->navigationManagerService->loadView('admin.qualification.ajax.index');
+        return $this->navigationManagerService->loadView('admin.qualification.index');
     }
 
     // getAll
@@ -173,13 +37,32 @@ class QualificationController extends Controller
 
         $qualifications = $this->qualification->withCount('jobs')->get();
 
+        '<div class=" btn-group d-flex">
+            <a href="javascript:void(0)" data-id="' . $qualifications . '" id="" class="showQualification btn btn-primary btn-sm show">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+            </a>
+            <a href="javascript:void(0)" data-id="' . $qualifications . '" id="" class="editQualification btn btn-info btn-sm edit">
+                <i class="bi bi-pencil" aria-hidden="true"></i>
+            </a>
+            <a href="javascript:void(0)" data-id="' . $qualifications . '" id="" class="deleteQualification btn btn-danger btn-sm delete">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+            </a>
+        </div>';
 
         return  DataTables($qualifications)
             ->addColumn('action', function ($qualification) {
-                return '<a href="javascript:void(0)" data-id="' . $qualification->id . '" id="editQualification" class="btn btn-info btn-sm edit"><i class="bi bi-pencil" aria-hidden="true"></i></a> <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="deleteQualification" class="btn btn-danger btn-sm delete"><i class="bi bi-trash" aria-hidden="true"></i></a>';
-            })
-            ->addColumn('jobs_count', function ($qualification) {
-                return $qualification->jobs_count;
+                return
+                    '<div class=" btn-group d-flex">
+                        <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="" class="showQualification btn btn-primary btn-sm show">
+                            <i class="bi bi-eye" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="" class="editQualification btn btn-info btn-sm edit">
+                            <i class="bi bi-pencil" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="" class="deleteQualification btn btn-danger btn-sm delete">
+                            <i class="bi bi-trash" aria-hidden="true"></i>
+                        </a>
+                    </div>';
             })
             ->rawColumns([
                 'action',
@@ -228,7 +111,7 @@ class QualificationController extends Controller
         return response()->json(["warning" => "Qualification is not deleted, because it has jobs associated with it"], 400);
     }
 
-    // EDIT 
+    // edit
     public function edit(Request $request)
     {
         $id = $request->get('id');
@@ -260,5 +143,65 @@ class QualificationController extends Controller
             return response()->json(["success" => "Qualification is updated"], 200);
         }
         return response()->json(["warning" => "Qualification is not updated"], 400);
+    }
+
+    // show
+    public function show(Request $request)
+    {
+        $id = $request->get('id');
+        $qualification = $this->qualification
+            ->where('id', $id)
+            ->select('id', 'name', 'created_at')
+            ->with([
+                'jobs' => function ($query) {
+                    $query->select([
+                        'jobs.id',
+                        'vacancy',
+                        "min_salary",
+                        "max_salary",
+                        "is_active",
+                        "is_featured",
+                        "is_verified",
+                        'jobs.created_at',
+                        'sub_profile_id',
+                        'company_id',
+                    ]);
+                    $query->with([
+                        'company' => function ($query) {
+                            $query->select([
+                                'companies.id',
+                                'name',
+                                // 'email',
+                            ]);
+                        },
+                        'subProfile' => function ($query) {
+                            $query->select([
+                                'sub_profiles.id',
+                                'name',
+                            ]);
+                        },
+                        'qualifications' => function ($query) {
+                            $query->select([
+                                'qualifications.id',
+                                'name',
+                            ]);
+                        },
+                        'locations' => function ($query) {
+                            $query->select([
+                                'locations.id',
+                                "city",
+                                "state",
+                            ]);
+                        },
+                    ]);
+                }
+            ])
+            ->get()
+            ->ToArray();
+        if (!$qualification) {
+            return response()->json(["warning" => "Qualification is not found"], 400);
+        }
+        $qualification =  $qualification[0];
+        return response()->json($qualification, 200);
     }
 }

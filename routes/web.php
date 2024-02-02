@@ -187,52 +187,20 @@ Route::group(['middleware' => "isAdmin"], function () {
         });
 
         Route::prefix('location')->group(function () {
-            Route::get('/create',  [LocationController::class, "create"])->name('admin.location.create');
+            Route::get('/getAll',  [LocationController::class, "getAll"])->name('admin.location.getAll');
             Route::post('/store',  [LocationController::class, "store"])->name('admin.location.store');
             Route::get('/',  [LocationController::class, "index"])->name('admin.location.index');
-            Route::get('/{id}',  [LocationController::class, "show"])->name('admin.location.show');
-            Route::get('/edit/{id}',  [LocationController::class, "edit"])->name('admin.location.edit');
-            Route::post('/update/{id}',  [LocationController::class, "update"])->name('admin.location.update');
-            Route::get('/delete/{id}',  [LocationController::class, "delete"])->name('admin.location.delete');
+            Route::get('/show',  [LocationController::class, "show"])->name('admin.location.show');
+            Route::get('/edit',  [LocationController::class, "edit"])->name('admin.location.edit');
+            Route::post('/update',  [LocationController::class, "update"])->name('admin.location.update');
+            Route::get('/delete',  [LocationController::class, "delete"])->name('admin.location.delete');
         });
 
-        // Route::prefix('qualification')->group(function () {
-        //     Route::get('/create',  [QualificationController::class, "create"])->name('admin.qualification.create');
-        //     Route::post('/store',  [QualificationController::class, "store"])->name('admin.qualification.store');
-        //     Route::get('/',  [QualificationController::class, "index"])->name('admin.qualification.index');
-        //     Route::get('/{id}',  [QualificationController::class, "show"])->name('admin.qualification.show');
-        //     Route::get('/edit/{id}',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
-        //     Route::post('/update/{id}',  [QualificationController::class, "update"])->name('admin.qualification.update');
-        //     Route::get('/delete/{id}',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
-        // });
-
-        // qualifications ajax
-
-        // Route::prefix('qualification-ajax')->group(function () {
-        //     Route::post('/getAll',  [QualificationController::class, "getAllAjax"])->name('admin.qualification.getAll');
-        //     Route::get('/create',  [QualificationController::class, "createAjax"])->name('admin.qualification.createAjax');
-        //     Route::post('/store',  [QualificationController::class, "storeAjax"])->name('admin.qualification.storeAjax');
-        //     Route::get('/',  [QualificationController::class, "indexAjax"])->name('admin.qualification.indexAjax');
-        //     Route::get('/{id}',  [QualificationController::class, "showAjax"])->name('admin.qualification.showAjax');
-        //     Route::get('/edit/{id}',  [QualificationController::class, "editAjax"])->name('admin.qualification.editAjax');
-        //     Route::post('/update/{id}',  [QualificationController::class, "updateAjax"])->name('admin.qualification.updateAjax');
-        //     Route::get('/delete/{id}',  [QualificationController::class, "deleteAjax"])->name('admin.qualification.deleteAjax');
-        // });
-
         Route::prefix('qualification')->group(function () {
-            // Route::get('/create',  [QualificationController::class, "create"])->name('admin.qualification.create');
-            // Route::post('/store',  [QualificationController::class, "store"])->name('admin.qualification.store');
-            // Route::get('/',  [QualificationController::class, "index"])->name('admin.qualification.index');
-            // Route::get('/{id}',  [QualificationController::class, "show"])->name('admin.qualification.show');
-            // Route::get('/edit/{id}',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
-            // Route::post('/update/{id}',  [QualificationController::class, "update"])->name('admin.qualification.update');
-            // Route::get('/delete/{id}',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
-
-            // Route::get('/create',  [QualificationController::class, "create"])->name('admin.qualification.create');
             Route::post('/store',  [QualificationController::class, "store"])->name('admin.qualification.store');
             Route::get('/',  [QualificationController::class, "index"])->name('admin.qualification.index');
             Route::get('/getAll',  [QualificationController::class, "getAll"])->name('admin.qualification.getAll');
-            // Route::get('/{id}',  [QualificationController::class, "show"])->name('admin.qualification.show');
+            Route::get('/show',  [QualificationController::class, "show"])->name('admin.qualification.show');
             Route::get('/edit',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
             Route::post('/update',  [QualificationController::class, "update"])->name('admin.qualification.update');
             Route::get('/delete',  [QualificationController::class, "delete"])->name('admin.qualification.delete');

@@ -1,68 +1,238 @@
 @extends('admin.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
-    <main id="main" class="main">
 
+    <main id="main" class="main">
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
-                    <span class="h3 text-black">
-                        Qualifications
-                    </span>
-                    <a href="{{ route('admin.qualification.create') }}" class="float-end btn btn-sm btn-primary">Add
-                        Qualification</a>
+                    <span class="h3 text-black">Qualifications </span>
+                    <button type="button" class="float-end btn btn-sm btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#addQualificationModal">
+                        <i class="bi bi-plus-square"> Add Qualification</i>
+                    </button>
                 </div>
                 <div class="card-body">
-                    <table class="table text-center table-striped">
-                        <thead>
-                            <tr>
-                                <th class="col-2">#</th>
-                                <th class="col-2">Name</th>
-                                <th class="col-2">Available Jobs</th>
-                                <th class="col-2">Created At</th>
-                                <th class="col-2">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($qualifications as $qualification)
-                                <tr>
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>
-                                        <a href="{{ route('admin.qualification.show', $qualification['id']) }}">{{ $qualification['name'] }}
-                                        </a>
-                                    </td>
-                                    <td>{{ $qualification['jobs_count'] }}</td>
-                                    <td>
-                                        @if ($qualification['created_at'])
-                                            {{ $qualification['created_at']->format('d-m-Y') }}
-                                        @else
-                                            {{ 'N/A' }}
-                                        @endif
-                                    </td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="{{ route('admin.qualification.edit', $qualification['id']) }}"
-                                                class="btn btn-sm btn-primary">Edit</a>
-                                            <a href="{{ route('admin.qualification.delete', $qualification['id']) }}"
-                                                class="btn btn-sm btn-danger">Delete</a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">No Qualification Found</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                    <div class="justify-content-center">
-                        {{ $qualifications->links('pagination::bootstrap-5') }}
-                    </div>
+                    @include('admin.qualification.modals._table') {{-- qualifications table --}}
                 </div>
             </div>
-            </div>
-            </div>
         </section>
-
     </main>
+@endsection
+
+@include('admin.qualification.modals._add') {{-- add qualification modal --}}
+
+@include('admin.qualification.modals._edit') {{-- edit qualification modal --}}
+
+@include('admin.qualification.modals._show') {{-- show qualification modal --}}
+
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+
+            let table = $('#data-table').DataTable({
+
+                ajax: "{{ route('admin.qualification.getAll') }}",
+                columns: [{
+                        // loop iteration
+                        data: 'id',
+                        name: 'id',
+                    },
+                    {
+                        data: 'name',
+                        name: 'name'
+                    },
+                    {
+                        data: 'jobs_count',
+                        name: 'jobs_count'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
+                ]
+            });
+
+            $('#addQualificationForm').submit(function(e) {
+                e.preventDefault();
+                $('#addNameError').text('');
+                var name = $('#addQualificationName').val();
+                var _token = $("input[name='_token']").val();
+                addData(name, _token);
+            });
+
+            $(document).on('click', '.showQualification', function() {
+                console.log($(this).data('id'))
+                var qualificationId = $(this).data('id');
+                var _token = $("input[name='_token']").val();
+                showData(qualificationId, _token);
+            });
+
+            $(document).on('click', '#refreshTable', function() {
+                table.ajax.reload();
+            });
+
+            $(document).on('click', '.deleteQualification', function() {
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You want to delete this qualification!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var qualificationId = $(this).data('id');
+                        var _token = $("input[name='_token']").val();
+
+                        deleteData(qualificationId, _token);
+                    }
+                })
+
+            });
+
+            $(document).on('click', '.editQualification', function() {
+                var qualificationId = $(this).data('id');
+                var _token = $("input[name='_token']").val();
+
+                editData(qualificationId, _token);
+            });
+
+            const addData = (name, _token) => {
+                $.ajax({
+                    url: "{{ route('admin.qualification.store') }}",
+                    method: "POST",
+                    data: {
+                        name,
+                        _token,
+                    },
+                    success: function(response) {
+                        console.log("BackEndResponse : ", response);
+                        if (response) {
+                            $('#addQualificationModal').modal('hide');
+                            $('#addQualificationForm')[0].reset();
+                            table.ajax.reload();
+                            toastr.success(response.success);
+                        }
+                    },
+                    error: function(response) {
+                        console.log("BackEndResponse : ", response);
+                        $('#addNameError').text(response.responseJSON.errors.name);
+                    },
+                });
+            }
+
+            const showData = (qualificationId, _token) => {
+                $.ajax({
+                    url: "{{ route('admin.qualification.show') }}",
+                    method: "GET",
+                    data: {
+                        id: qualificationId,
+                        _token: _token
+                    },
+                    success: function(response) {
+                        console.log("BackEndResponse : ", response);
+                        $('#showQualificationModal').modal('show');
+                        $('#showQualificationName').text(response.name);
+                        $('#showQualificationJobs').text(response.jobs.length);
+                        var jobs = response.jobs;
+                        var html = '<ul class="card-link">';
+                        for (let i = 0; i < jobs.length; i++) {
+                            html += '<li class="text-decoration-none">' + jobs[i].sub_profile.name +
+                                ' by ' + jobs[i].company.name + ' </li>';
+                        }
+                        html += '</ul>';
+                        $('#showJobs').html(html);
+
+                    },
+                    error: function(response) {
+                        console.log("BackEndResponse : ", response);
+                        toastr.warning(response.responseJSON.warning);
+                    },
+                });
+            }
+
+            const editData = (qualificationId, _token) => {
+                $.ajax({
+                    url: "{{ route('admin.qualification.edit') }}",
+                    method: "GET",
+                    data: {
+                        id: qualificationId,
+                        _token: _token
+                    },
+                    success: function(response) {
+                        console.log("BackEndResponseSuccess : ", response);
+                        $('#editQualificationModal').modal('show');
+                        $('#editQualificationName').val(response.name);
+                        $('#editQualificationForm').submit(function(e) {
+                            e.preventDefault();
+                            var name = $('#editQualificationName')
+                                .val();
+                            var _token = $("input[name='_token']").val();
+                            updateData(qualificationId, name, _token);
+                        });
+                    },
+                    error: function(response) {
+                        console.log("BackEndResponse : ", response);
+                        toastr.warning(response.responseJSON.warning);
+                    },
+                });
+            };
+
+            const deleteData = (qualificationId, _token) => {
+                $.ajax({
+                    url: "{{ route('admin.qualification.delete') }}",
+                    method: "GET",
+                    data: {
+                        id: qualificationId,
+                        _token: _token
+                    },
+                    success: function(response) {
+                        console.log("BackEndResponse : ", response);
+                        toastr.success(response.success);
+                        table.ajax.reload();
+                    },
+                    error: function(response) {
+                        console.log("BackEndResponse : ", response);
+                        toastr.warning(response.responseJSON.warning);
+                    },
+                });
+            }
+
+            const updateData = (qualificationId, name, _token) => {
+                $.ajax({
+                    url: "{{ route('admin.qualification.update') }}",
+                    method: "POST",
+                    data: {
+                        id: qualificationId,
+                        name,
+                        _token
+                    },
+                    success: function(response) {
+                        console.log("BackEndResponse : ",
+                            response);
+                        if (response) {
+                            $('#editQualificationModal').modal(
+                                'hide');
+                            $('#editQualificationForm')[0]
+                                .reset();
+                            toastr.success(response.success);
+                            table.ajax.reload();
+                        }
+                    },
+                    error: function(response) {
+                        console.log("BackEndResponse : ",
+                            response);
+                        $('#editNameError').text(response
+                            .responseJSON.errors.name);
+                    },
+                });
+            }
+        });
+    </script>
 @endsection
