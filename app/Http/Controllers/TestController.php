@@ -13,6 +13,82 @@ class TestController extends Controller
 {
     public function test()
     {
+
+        // dd("done");
+        DB::table('qualifications')->insert([
+            'name' => 'B.E.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'B.Tech.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'B.Sc.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'B.Com.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'B.A.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'M.E.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'M.Tech.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'M.Sc.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'M.Com.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'M.A.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'Ph.D.',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        DB::table('qualifications')->insert([
+            'name' => 'Diploma',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        dd("done");
+
         // $noOfUsers = 100;
 
         // for ($i = 1288; $i <= 1500; $i++) {

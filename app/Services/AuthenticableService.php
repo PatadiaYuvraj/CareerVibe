@@ -40,7 +40,7 @@ class AuthenticableService implements AuthenticableRepository
 
     return Auth::guard(
       Config::get('constants.USER_GUARD')
-    )->attempt($credentials, true);
+    )->attempt($credentials);
   }
 
   public function logoutUser(): void
@@ -117,7 +117,7 @@ class AuthenticableService implements AuthenticableRepository
 
     return Auth::guard(
       Config::get('constants.COMPANY_GUARD')
-    )->attempt($credentials, true);
+    )->attempt($credentials);
   }
 
   public function logoutCompany(): void
@@ -190,7 +190,7 @@ class AuthenticableService implements AuthenticableRepository
       'password' => $details['password'],
     ];
 
-    return Auth::guard(Config::get('constants.ADMIN_GUARD'))->attempt($credentials, true);
+    return Auth::guard(Config::get('constants.ADMIN_GUARD'))->attempt($credentials);
   }
 
   public function logoutAdmin(): void

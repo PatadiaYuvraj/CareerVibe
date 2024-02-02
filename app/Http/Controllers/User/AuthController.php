@@ -93,14 +93,10 @@ class AuthController extends Controller
             return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Verify your email to login"]);
         }
 
-        if ($this->authenticableService->loginUser($data)) {
-            return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [
-                'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0',
-                'Pragma' => 'no-cache',
-                'Expires' => 'Sat, 26 Jul 1997 05:00:00 GMT'
-            ], true, ["success" => "You're Logged In"]);
+        if ($user && $user->is_email_verified && $this->authenticableService->loginUser($data)) {
+            return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
         }
-        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
+        return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Invalid Credentials"]);
     }
 
     public function register()
