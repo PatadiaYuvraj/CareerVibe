@@ -10,3 +10,5 @@
         <tbody>
         </tbody>
     </table>
+
+    {{-- @include('admin.qualification.modals._pagination') --}}

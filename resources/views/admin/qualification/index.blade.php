@@ -14,47 +14,131 @@
                 </div>
                 <div class="card-body">
                     @include('admin.qualification.modals._table') {{-- qualifications table --}}
+                    <div class="float-end" id="pagination"></div>
                 </div>
+
             </div>
         </section>
     </main>
+
+    @include('admin.qualification.modals._add') {{-- add qualification modal --}}
+
+    @include('admin.qualification.modals._edit') {{-- edit qualification modal --}}
+
+    @include('admin.qualification.modals._show') {{-- show qualification modal --}}
+
 @endsection
-
-@include('admin.qualification.modals._add') {{-- add qualification modal --}}
-
-@include('admin.qualification.modals._edit') {{-- edit qualification modal --}}
-
-@include('admin.qualification.modals._show') {{-- show qualification modal --}}
-
 
 @section('scripts')
     <script>
         $(document).ready(function() {
+            loadTable();
+            // let table = $('#data-table').DataTable({
 
-            let table = $('#data-table').DataTable({
+            //     ajax: "{{ route('admin.qualification.getAll') }}",
+            //     columns: [{
+            //             // loop iteration
+            //             data: 'id',
+            //             name: 'id',
+            //         },
+            //         {
+            //             data: 'name',
+            //             name: 'name'
+            //         },
+            //         {
+            //             data: 'jobs_count',
+            //             name: 'jobs_count'
+            //         },
+            //         {
+            //             data: 'action',
+            //             name: 'action',
+            //             orderable: false,
+            //             searchable: false
+            //         },
+            //     ]
+            // });
 
-                ajax: "{{ route('admin.qualification.getAll') }}",
-                columns: [{
-                        // loop iteration
-                        data: 'id',
-                        name: 'id',
+            function loadTable() {
+                $.ajax({
+                    url: "{{ route('admin.qualification.getAll') }}",
+                    method: "GET",
+                    data: {
+                        page: 1,
+                        _token: "{{ csrf_token() }}",
                     },
-                    {
-                        data: 'name',
-                        name: 'name'
+                    success: function(response) {
+                        console.log("BackEndResponse : ", response);
+
+                        let totalPages = response.total;
+                        let currentPage = response.current_page;
+                        let nextPage = response.next_page_url;
+                        let prevPage = response.prev_page_url;
+                        let lastPage = response.last_page;
+                        let lastPageUrl = response.last_page_url;
+
+                        let data = response.data;
+                        // if current page is 1 then disable the previous button
+
+                        let html = '';
+                        for (let i = 0; i < data.length; i++) {
+                            html += '<tr>';
+                            html += '<td>' + data[i].id + '</td>';
+                            html += '<td>' + data[i].name + '</td>';
+                            html += '<td>' + data[i].jobs_count + '</td>';
+                            html += '<td>';
+                            html += '<div class="btn-group">';
+                            html += '<a href="javascript:void(0)" data-id="' + data[i].id +
+                                '" id="" class="showQualification btn btn-primary btn-sm show">';
+                            html += '<i class="bi bi-eye" aria-hidden="true"></i>';
+                            html += '</a>';
+                            html += '<a href="javascript:void(0)" data-id="' + data[i].id +
+                                '" id="" class="editQualification btn btn-info btn-sm edit">';
+                            html += '<i class="bi bi-pencil" aria-hidden="true"></i>';
+                            html += '</a>';
+                            html += '<a href="javascript:void(0)" data-id="' + data[i].id +
+                                '" id="" class="deleteQualification btn btn-danger btn-sm delete">';
+                            html += '<i class="bi bi-trash" aria-hidden="true"></i>';
+                            html += '</a>';
+                            html += '</div>';
+                            html += '</td>';
+                            html += '</tr>';
+                        }
+                        $('#data-table').html(html);
+
+                        // pagination
+                        let pagination = '';
+                        pagination += '<nav aria-label="Page navigation example">';
+                        pagination += '<ul class="pagination">';
+                        pagination +=
+                            '<li class="page-item"><a class="page-link" href="javascript:void(0)" id="firstPage">First</a></li>';
+                        pagination +=
+                            '<li class="page-item"><a class="page-link" href="javascript:void(0)" id="prevPage"><code><<</code></a></li>';
+                        for (let i = 1; i <= lastPage; i++) {
+                            pagination +=
+                                '<li class="page-item"><a class="page-link" href="javascript:void(0)" data-id="' +
+                                i +
+                                '">' + i + '</a></li>';
+                        }
+                        pagination +=
+                            '<li class="page-item"><a class="page-link" href="javascript:void(0)" id="nextPage"><code>>></code></a></li>';
+                        pagination +=
+                            '<li class="page-item"><a class="page-link" href="javascript:void(0)" id="lastPage">Last</a></li>';
+                        pagination += '</ul>';
+                        pagination += '</nav>';
+                        $('#pagination').html(pagination);
+
+
+
+
+
+
                     },
-                    {
-                        data: 'jobs_count',
-                        name: 'jobs_count'
+                    error: function(response) {
+                        console.log("BackEndResponse : ", response);
                     },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    },
-                ]
-            });
+                });
+            }
+
 
             $('#addQualificationForm').submit(function(e) {
                 e.preventDefault();

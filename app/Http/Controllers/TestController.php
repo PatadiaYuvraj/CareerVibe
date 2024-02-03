@@ -662,8 +662,16 @@ class TestController extends Controller
         ]));
     }
 
+    // public function test()
+    // {
+    //     return view("test");
+    // }
+
     public function testing(Request $request)
     {
-        dd($request->all());
+        return response()->json([
+            'message' => 'success',
+            'data' => $request->all()
+        ]);
     }
 }
