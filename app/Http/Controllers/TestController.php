@@ -13,7 +13,7 @@ class TestController extends Controller
 {
     public function test()
     {
-
+        dd("test");
         DB::table('qualifications')->insert([
             // 'name' => 'B.E.',
             'name' => 'Bachelor of Engineering',

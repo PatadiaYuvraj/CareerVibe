@@ -1,13 +1,8 @@
+<div class="row">
+    <span class="h3 text-black col">Update Qualification</span>
+    @include('livewire.admin.qualification._pagination')
+</div>
 <form>
-    <div class="row">
-        <span class="h3 text-black col">Update Qualification</span>
-        <div class="input-group mb-3 col">
-            <input type="text" class="form-control" placeholder="Search" wire:model="search">
-            <button class="btn btn-primary" type="button" wire:click="searchQualification">
-                <i class="bi bi-search"></i>
-            </button>
-        </div>
-    </div>
     <input type="hidden" wire:model="qualificationId">
     <div class="form-group mb-3">
         <label for="name">Name:</label>
@@ -18,7 +13,7 @@
         @enderror
     </div>
     <div class="d-flex btn-group">
-        <button wire:click.prevent="update()" class="btn btn-success btn-block">Save</button>
+        <button wire:click.prevent="update()" class="btn btn-success btn-block">Update</button>
         <button wire:click.prevent="cancel()" class="btn btn-danger">Cancel</button>
     </div>
 </form>

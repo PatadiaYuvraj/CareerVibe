@@ -4,15 +4,19 @@ namespace App\Livewire\Admin\Qualification;
 
 use App\Models\Qualification;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class Index extends Component
 {
+    use WithPagination;
+
     public bool $updateMode = false;
     public $qualificationId;
     public $name;
     public $qualifications;
     public $search;
-
+    public $perPage = 2;
+    public $page = 1;
     // rules
     protected $rules = [
         'name' => [
@@ -36,11 +40,16 @@ class Index extends Component
 
     public function mount()
     {
-        $this->qualifications = Qualification::withCount('jobs')->get();
+        $currentPage = $this->page;
+        $this->qualifications = json_decode(json_encode(Qualification::withCount('jobs')->paginate(
+            $this->perPage,
+            ['*'],
+            'page',
+            $currentPage
+        )), true);
     }
-    public function render(Qualification $qualification)
+    public function render()
     {
-
         return view('livewire.admin.qualification.index');
     }
 
@@ -73,7 +82,9 @@ class Index extends Component
 
     public function cancel()
     {
-        $this->reset();
+        $this->name = '';
+        $this->qualificationId = '';
+        $this->updateMode = false;
     }
 
     public function update()
@@ -112,20 +123,44 @@ class Index extends Component
         }
     }
 
-    // search
-    /*
-    <div class="input-group mb-3 col">
-        <input type="text" class="form-control" placeholder="Search" wire:model="search">
-        <button class="btn btn-primary" type="button" wire:click="searchQualification">
-            <i class="bi bi-search"></i>
-        </button>
-    </div>
-    */
-
-
-
     public function searchQualification()
     {
-        $this->qualifications = Qualification::where('name', 'like', '%' . $this->search . '%')->withCount('jobs')->get();
+        // $this->qualifications = Qualification::where('name', 'like', '%' . $this->search . '%')->withCount('jobs')->get();
+        $this->qualifications = json_decode(json_encode(Qualification::where('name', 'like', '%' . $this->search . '%')->withCount('jobs')->paginate(
+            $this->perPage,
+            ['*'],
+            'page',
+            $this->page
+        )), true);
+    }
+
+    public function prevPage()
+    {
+        if ($this->page > 1) {
+            $this->page--;
+        }
+        // mount
+        $this->mount();
+    }
+
+    public function nextPage()
+    {
+        $total_pages =  $this->qualifications['last_page'];
+        if ($this->page < $total_pages) {
+            $this->page++;
+        }
+        // mount
+        $this->mount();
+    }
+
+    public function gotoPage($page)
+    {
+
+
+
+
+        $this->page = $page;
+
+        $this->mount();
     }
 }

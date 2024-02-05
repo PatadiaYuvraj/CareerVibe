@@ -20,19 +20,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($qualifications as $qualification)
+                            @forelse ($qualifications['data'] as $qualification)
                                 <tr>
-                                    {{-- <th scope="row">{{ $qualification->id }}</th> --}}
-                                    <td scope="row">{{ $loop->iteration }}</td>
-                                    <td>{{ $qualification->name }}</td>
-                                    <td>{{ $qualification->jobs->count() }}</td>
+                                    {{-- <td scope="row">{{ $loop->iteration }}</td> --}}
+                                    <td scope="row">{{ $qualification['id'] }}</td>
+                                    <td>{{ $qualification['name'] }}</td>
+                                    <td>{{ $qualification['jobs_count'] }}</td>
                                     <td class="btn-group d-flex">
                                         <button type="button" class="btn btn-sm btn-primary"
-                                            wire:click="edit({{ $qualification->id }})">
+                                            wire:click="edit({{ $qualification['id'] }})">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <button type="button" class="btn btn-sm btn-danger"
-                                            wire:click="delete({{ $qualification->id }})">
+                                        <button type="button" class="btn btn-sm btn-danger" {{-- confirm swal js --}}
+                                            onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
+                                            wire:click="delete({{ $qualification['id'] }})">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -45,6 +46,30 @@
                             @endforelse
                         </tbody>
                     </table>
+                    <div class="d-flex">
+                        <nav aria-label="Page navigation example">
+                            <ul class="pagination">
+                                <li class="page-item {{ $qualifications['prev_page_url'] ? '' : 'disabled' }}">
+                                    <button class="page-link" wire:click="prevPage">Previous</button>
+                                </li>
+                                @for ($i = 1; $i <= $qualifications['last_page']; $i++)
+                                    @if ($i == $qualifications['current_page'])
+                                        <li class="page-item active" aria-current="page">
+                                            <button class="page-link">{{ $i }}</button>
+                                        </li>
+                                    @else
+                                        <li class="page-item">
+                                            <button class="page-link"
+                                                wire:click="gotoPage({{ $i }})">{{ $i }}</button>
+                                        </li>
+                                    @endif
+                                @endfor
+                                <li class="page-item {{ $qualifications['next_page_url'] ? '' : 'disabled' }}">
+                                    <button class="page-link" wire:click="nextPage">Next</button>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
                 </div>
             </div>
 
