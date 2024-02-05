@@ -41,12 +41,13 @@ class Index extends Component
     public function mount()
     {
         $currentPage = $this->page;
-        $this->qualifications = json_decode(json_encode(Qualification::withCount('jobs')->paginate(
+
+        $this->qualifications = Qualification::withCount('jobs')->paginate(
             $this->perPage,
             ['*'],
             'page',
             $currentPage
-        )), true);
+        )->ToArray();
     }
     public function render()
     {
@@ -155,10 +156,6 @@ class Index extends Component
 
     public function gotoPage($page)
     {
-
-
-
-
         $this->page = $page;
 
         $this->mount();

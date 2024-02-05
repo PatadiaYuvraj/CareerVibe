@@ -30,15 +30,18 @@ class ProfileCategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:50',
-                'unique:profile_categories,name',
-
-            ],
-        ]);
+        $data['name'] = array();
+        // dd($request->profile_category);
+        for ($i = 0; $i < count($request->profile_category); $i++) {
+            // echo $request->profile_category[$i]['name'] . " ";
+            $request->validate([
+                'profile_category[' . $i . ']["name"]' => [
+                    'required',
+                ],
+            ]);
+            array_push($data['name'], $request->profile_category[$i]['name']);
+        }
+        dd($data);
         $data = [
             'name' => $request->name,
         ];
