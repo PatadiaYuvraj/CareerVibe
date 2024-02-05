@@ -204,6 +204,7 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/edit',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
             Route::post('/update',  [QualificationController::class, "update"])->name('admin.qualification.update');
             Route::get('/delete',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
+            Route::get('/livewire',  [QualificationController::class, "livewire"])->name('admin.qualification.livewire');
         });
 
 

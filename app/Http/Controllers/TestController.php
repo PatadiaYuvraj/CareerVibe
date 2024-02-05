@@ -14,75 +14,203 @@ class TestController extends Controller
     public function test()
     {
 
-        // dd("done");
         DB::table('qualifications')->insert([
-            'name' => 'B.E.',
+            // 'name' => 'B.E.',
+            'name' => 'Bachelor of Engineering',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'B.Tech.',
+            // 'name' => 'B.Tech.',
+            'name' => 'Bachelor of Technology',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'B.Sc.',
+            // 'name' => 'B.Sc.',
+            'name' => 'Bachelor of Science',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'B.Com.',
+            // 'name' => 'B.Com.',
+            'name' => 'Bachelor of Commerce',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'B.A.',
+            // 'name' => 'B.A.',
+            'name' => 'Bachelor of Arts',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'M.E.',
+            // 'name' => 'M.E.',
+            'name' => 'Master of Engineering',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'M.Tech.',
+            // 'name' => 'M.Tech.',
+            'name' => 'Master of Technology',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'M.Sc.',
+            // 'name' => 'M.Sc.',
+            'name' => 'Master of Science',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'M.Com.',
+            // 'name' => 'M.Com.',
+            'name' => 'Master of Commerce',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'M.A.',
+            // 'name' => 'M.A.',
+            'name' => 'Master of Arts',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
-            'name' => 'Ph.D.',
+            // 'name' => 'Ph.D.',
+            'name' => 'Doctor of Philosophy',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);
 
         DB::table('qualifications')->insert([
+            // 'name' => 'Diploma',
             'name' => 'Diploma',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // mca
+        DB::table('qualifications')->insert([
+            // 'name' => 'M.C.A.',
+            'name' => 'Master of Computer Applications',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // bca
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.C.A.',
+            'name' => 'Bachelor of Computer Applications',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // bba
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.B.A.',
+            'name' => 'Bachelor of Business Administration',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // mba
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'M.B.A.',
+            'name' => 'Master of Business Administration',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // b.e. computer
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.E. Computer',
+            'name' => 'Bachelor of Engineering in Computer',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // b.e. mechanical
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.E. Mechanical',
+            'name' => 'Bachelor of Engineering in Mechanical',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // b.e. civil
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.E. Civil',
+            'name' => 'Bachelor of Engineering in Civil',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // b.e. electrical
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.E. Electrical',
+            'name' => 'Bachelor of Engineering in Electrical',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // b.e. electronics
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.E. Electronics',
+            'name' => 'Bachelor of Engineering in Electronics',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // b.e. it
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.E. IT',
+            'name' => 'Bachelor of Engineering in Information Technology',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+
+        // b.e. mechatronics
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.E. Mechatronics',
+            'name' => 'Bachelor of Engineering in Mechatronics',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // b.e. chemical
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.E. Chemical',
+            'name' => 'Bachelor of Engineering in Chemical',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // b.e. production
+
+        DB::table('qualifications')->insert([
+            // 'name' => 'B.E. Production',
+            'name' => 'Bachelor of Engineering in Production',
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now(),
         ]);

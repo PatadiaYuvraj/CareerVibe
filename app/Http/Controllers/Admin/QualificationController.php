@@ -206,4 +206,11 @@ class QualificationController extends Controller
         $qualification =  $qualification[0];
         return response()->json($qualification, 200);
     }
+
+
+    // livewire
+    public function livewire()
+    {
+        return view('admin.qualification.index-livewire');
+    }
 }
