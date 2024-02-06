@@ -171,6 +171,8 @@ Route::group(['middleware' => "isAdmin"], function () {
             // creaet repeater
             Route::get('/create-repeater',  [ProfileCategoryController::class, "createRepeater"])->name('admin.profile-category.create-repeater');
             Route::post('/store-repeater',  [ProfileCategoryController::class, "storeRepeater"])->name('admin.profile-category.store-repeater');
+            Route::get('/create-spatie',  [ProfileCategoryController::class, "createSpatie"])->name('admin.profile-category.create-spatie');
+            Route::post('/store-spatie',  [ProfileCategoryController::class, "storeSpatie"])->name('admin.profile-category.store-spatie');
             Route::get('/create',  [ProfileCategoryController::class, "create"])->name('admin.profile-category.create');
             Route::post('/store',  [ProfileCategoryController::class, "store"])->name('admin.profile-category.store');
             Route::get('/',  [ProfileCategoryController::class, "index"])->name('admin.profile-category.index');
