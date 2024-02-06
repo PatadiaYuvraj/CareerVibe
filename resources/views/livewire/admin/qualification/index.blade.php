@@ -1,8 +1,6 @@
 <main id="main" class="main">
     <section class="section dashboard">
         <div class="card">
-
-
             <div class="card-body py-4">
                 @if ($updateMode)
                     @include('livewire.admin.qualification.update')
@@ -32,8 +30,7 @@
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
                                         <button type="button" class="btn btn-sm btn-danger" {{-- confirm swal js --}}
-                                            onclick="confirm('Are you sure?') || event.stopImmediatePropagation()"
-                                            wire:click="delete({{ $qualification['id'] }})">
+                                            {{-- onclick="confirm('Are you sure?') || event.stopImmediatePropagation()" --}} wire:click="delete({{ $qualification['id'] }})">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -46,30 +43,7 @@
                             @endforelse
                         </tbody>
                     </table>
-                    <div class="d-flex">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                                <li class="page-item {{ $qualifications['prev_page_url'] ? '' : 'disabled' }}">
-                                    <button class="page-link" wire:click="prevPage">Previous</button>
-                                </li>
-                                @for ($i = 1; $i <= $qualifications['last_page']; $i++)
-                                    @if ($i == $qualifications['current_page'])
-                                        <li class="page-item active" aria-current="page">
-                                            <button class="page-link">{{ $i }}</button>
-                                        </li>
-                                    @else
-                                        <li class="page-item">
-                                            <button class="page-link"
-                                                wire:click="gotoPage({{ $i }})">{{ $i }}</button>
-                                        </li>
-                                    @endif
-                                @endfor
-                                <li class="page-item {{ $qualifications['next_page_url'] ? '' : 'disabled' }}">
-                                    <button class="page-link" wire:click="nextPage">Next</button>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                    @include('livewire.admin.qualification._pagination', ['data' => $qualifications])
                 </div>
             </div>
 

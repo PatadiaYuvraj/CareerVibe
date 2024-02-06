@@ -184,6 +184,7 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/edit/{id}',  [SubProfileController::class, "edit"])->name('admin.sub-profile.edit');
             Route::post('/update/{id}',  [SubProfileController::class, "update"])->name('admin.sub-profile.update');
             Route::get('/delete/{id}',  [SubProfileController::class, "delete"])->name('admin.sub-profile.delete');
+            Route::get('/livewire',  [SubProfileController::class, "livewire"])->name('admin.sub-profile.livewire');
         });
 
         Route::prefix('location')->group(function () {
@@ -194,6 +195,7 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/edit',  [LocationController::class, "edit"])->name('admin.location.edit');
             Route::post('/update',  [LocationController::class, "update"])->name('admin.location.update');
             Route::get('/delete',  [LocationController::class, "delete"])->name('admin.location.delete');
+            Route::get('/livewire',  [LocationController::class, "livewire"])->name('admin.location.livewire');
         });
 
         Route::prefix('qualification')->group(function () {

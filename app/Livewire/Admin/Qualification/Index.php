@@ -3,6 +3,8 @@
 namespace App\Livewire\Admin\Qualification;
 
 use App\Models\Qualification;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -15,32 +17,51 @@ class Index extends Component
     public $name;
     public $qualifications;
     public $search;
-    public $perPage = 2;
+    public $perPage;
     public $page = 1;
-    // rules
-    protected $rules = [
-        'name' => [
-            'required',
-            'string',
-            'max:255',
-            'unique:qualifications,name',
-        ],
+    public $minRows = 1;
+    public $maxRows = 9;
+    public $items = [
+        ['name' => ''],
     ];
+    public $key = 0;
 
-    // listeners
-    protected $listeners = [];
+    public function __construct()
+    {
+        $this->perPage = Config::get('constants.pagination');
+    }
 
-    // messages
-    protected $messages = [
-        'name.required' => 'The qualification name cannot be empty.',
-        'name.string' => 'The qualification name must be a string.',
-        'name.max' => 'The qualification name cannot be more than 255 characters.',
-        'name.unique' => 'The qualification name has already been taken.',
-    ];
+    public function addRow()
+    {
+        if (count($this->items) < $this->maxRows) {
+            $this->key++;
+            $this->items[] = [
+                'name' => '',
+                // Add other fields as needed
+            ];
+        } else {
+            session()->flash('message', 'Maximum number of items reached.');
+        }
+    }
+
+    public function removeRow($index)
+    {
+        if (count($this->items) > $this->minRows) {
+            unset($this->items[$index]);
+        } else {
+            session()->flash('message', 'Minimum number of items required.');
+        }
+    }
 
     public function mount()
     {
         $currentPage = $this->page;
+        if (empty($this->items)) {
+            $this->items[] = [
+                'name' => '',
+                // Add other fields as needed
+            ];
+        }
 
         $this->qualifications = Qualification::withCount('jobs')->paginate(
             $this->perPage,
@@ -54,19 +75,46 @@ class Index extends Component
         return view('livewire.admin.qualification.index');
     }
 
-    public function store()
+    public function rules()
+    {
+        return
+            [
+                'items.*.name' => [
+                    'required',
+                    'string',
+                    'max:255',
+                    'unique:qualifications,name',
+                ],
+            ];
+    }
+
+    public function messages()
+    {
+        return [
+            'items.*.name.required' => 'The qualification name is required',
+            'items.*.name.string' => 'The qualification name must be a string',
+            'items.*.name.max' => 'The qualification name must not be greater than 255 characters',
+            'items.*.name.unique' => 'The qualification name is already taken',
+        ];
+    }
+
+    public function store(Request $request)
     {
         $this->validate();
-        $data = [
-            "name" => $this->name,
-        ];
-        $isCreated = Qualification::create($data);
-        if ($isCreated) {
-            $this->reset();
-            $this->mount();
-            session()->flash('success', 'Qualification is created');
-        } else {
-            session()->flash('warning', 'Qualification is not created');
+        try {
+            $isCreated = Qualification::insert($this->items);
+
+            if ($isCreated) {
+                $this->reset();
+                $this->mount();
+                session()->flash('success', 'Qualification is created');
+                return;
+            } else {
+                session()->flash('warning', 'Qualification is not created');
+                return;
+            }
+        } catch (\Throwable $th) {
+            throw $th;
         }
     }
 
@@ -75,6 +123,7 @@ class Index extends Component
         $qualification = Qualification::where('id', $id)->first();
         if (!$qualification) {
             session()->flash('warning', 'Qualification is not found');
+            return;
         }
         $this->qualificationId = $qualification->id;
         $this->name = $qualification->name;
@@ -99,40 +148,50 @@ class Index extends Component
             $this->reset();
             $this->mount();
             session()->flash('success', 'Qualification is updated');
+            return;
         } else {
             session()->flash('warning', 'Qualification is not updated');
+            return;
         }
     }
 
     public function delete($id)
     {
-        $qualification = Qualification::where('id', $id)->withCount('jobs')->get()->ToArray();
+        $qualification = Qualification::where('id', $id)->withCount('jobs')->first();
         if (!$qualification) {
             session()->flash('warning', 'Qualification is not found');
+            return;
         }
-        $qualification =  $qualification[0];
         if ($qualification['jobs_count'] == 0) {
             $isDeleted = Qualification::where('id', $id)->delete();
             if ($isDeleted) {
                 $this->mount();
                 session()->flash('success', 'Qualification is deleted');
+                return;
             } else {
                 session()->flash('warning', 'Qualification is not deleted');
+                return;
             }
         } else {
             session()->flash('warning', 'Qualification is not deleted, because it has jobs associated with it');
+            return;
         }
     }
 
     public function searchQualification()
     {
-        // $this->qualifications = Qualification::where('name', 'like', '%' . $this->search . '%')->withCount('jobs')->get();
-        $this->qualifications = json_decode(json_encode(Qualification::where('name', 'like', '%' . $this->search . '%')->withCount('jobs')->paginate(
+        $this->resetPage();
+        $this->qualifications = Qualification::where('name', 'like', '%' . $this->search . '%')->withCount('jobs')->paginate(
             $this->perPage,
             ['*'],
             'page',
             $this->page
-        )), true);
+        )->ToArray();
+    }
+
+    public function resetPage()
+    {
+        $this->page = 1;
     }
 
     public function prevPage()

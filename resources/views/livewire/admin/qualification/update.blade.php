@@ -1,6 +1,6 @@
 <div class="row">
     <span class="h3 text-black col">Update Qualification</span>
-    @include('livewire.admin.qualification._pagination')
+    @include('livewire.admin.qualification._search')
 </div>
 <form>
     <input type="hidden" wire:model="qualificationId">

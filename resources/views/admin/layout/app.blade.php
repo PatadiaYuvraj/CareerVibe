@@ -136,6 +136,14 @@
             </li>
             <hr>
             <li class="nav-item">
+                <a class="nav-link collapsed     " href="{{ route('admin.location.livewire') }}">
+                    <span>
+                        Location LiveWire
+                    </span>
+                </a>
+            </li>
+            <hr>
+            <li class="nav-item">
                 <a class="nav-link  collapsed   " href="{{ route('admin.qualification.index') }}">
                     <span>Qualification</span>
                 </a>

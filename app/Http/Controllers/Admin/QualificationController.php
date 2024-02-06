@@ -211,6 +211,6 @@ class QualificationController extends Controller
     // livewire
     public function livewire()
     {
-        return view('admin.qualification.index-livewire');
+        return $this->navigationManagerService->loadView('admin.qualification.index-livewire');
     }
 }

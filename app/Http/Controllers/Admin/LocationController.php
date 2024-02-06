@@ -463,4 +463,10 @@ class LocationController extends Controller
         $location =  $location[0];
         return response()->json($location, 200);
     }
+
+    // livewire
+    public function livewire(Request $request)
+    {
+        return $this->navigationManagerService->loadView('admin.location.index-livewire');
+    }
 }
