@@ -97,44 +97,59 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-            <hr>
+            {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('admin.company.index') }}">
                     <span>Company</span>
                 </a>
             </li>
-            <hr>
+            {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('admin.user.index') }}">
                     <span>User</span>
                 </a>
             </li>
-            <hr>
+            {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('admin.job.index') }}">
                     <span>Job</span>
                 </a>
             </li>
-            <hr>
+            {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('admin.profile-category.index') }}">
                     <span>Profile Category</span>
                 </a>
             </li>
-            <hr>
+            {{-- <hr> --}}
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('admin.profile-category.livewire') }}">
+                    <span>
+                        Profile Category LiveWire
+                    </span>
+                </a>
+            </li>
+            {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('admin.sub-profile.index') }}">
                     <span>Sub Profile</span>
                 </a>
             </li>
-            <hr>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('admin.sub-profile.livewire') }}">
+                    <span>
+                        Sub Profile LiveWire
+                    </span>
+                </a>
+            </li>
+            {{-- <hr> --}}
 
             <li class="nav-item">
                 <a class="nav-link collapsed     " href="{{ route('admin.location.index') }}">
                     <span>Location</span>
                 </a>
             </li>
-            <hr>
+            {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link collapsed     " href="{{ route('admin.location.livewire') }}">
                     <span>
@@ -142,13 +157,13 @@
                     </span>
                 </a>
             </li>
-            <hr>
+            {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link  collapsed   " href="{{ route('admin.qualification.index') }}">
                     <span>Qualification</span>
                 </a>
             </li>
-            <hr>
+            {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link  collapsed   " href="{{ route('admin.qualification.livewire') }}">
                     <span>
@@ -156,7 +171,7 @@
                     </span>
                 </a>
             </li>
-            <hr>
+            {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link  collapsed   " href="{{ route('admin.notifications') }}">
                     <span>

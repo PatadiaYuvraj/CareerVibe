@@ -168,11 +168,6 @@ Route::group(['middleware' => "isAdmin"], function () {
 
         Route::prefix('profile-category')->group(function () {
             Route::get('/livewire',  [ProfileCategoryController::class, "livewire"])->name('admin.profile-category.livewire');
-            // creaet repeater
-            Route::get('/create-repeater',  [ProfileCategoryController::class, "createRepeater"])->name('admin.profile-category.create-repeater');
-            Route::post('/store-repeater',  [ProfileCategoryController::class, "storeRepeater"])->name('admin.profile-category.store-repeater');
-            Route::get('/create-spatie',  [ProfileCategoryController::class, "createSpatie"])->name('admin.profile-category.create-spatie');
-            Route::post('/store-spatie',  [ProfileCategoryController::class, "storeSpatie"])->name('admin.profile-category.store-spatie');
             Route::get('/create',  [ProfileCategoryController::class, "create"])->name('admin.profile-category.create');
             Route::post('/store',  [ProfileCategoryController::class, "store"])->name('admin.profile-category.store');
             Route::get('/',  [ProfileCategoryController::class, "index"])->name('admin.profile-category.index');
@@ -183,6 +178,7 @@ Route::group(['middleware' => "isAdmin"], function () {
         });
 
         Route::prefix('sub-profile')->group(function () {
+            Route::get('/livewire',  [SubProfileController::class, "livewire"])->name('admin.sub-profile.livewire');
             Route::get('/create',  [SubProfileController::class, "create"])->name('admin.sub-profile.create');
             Route::post('/store',  [SubProfileController::class, "store"])->name('admin.sub-profile.store');
             Route::get('/',  [SubProfileController::class, "index"])->name('admin.sub-profile.index');
@@ -190,10 +186,10 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/edit/{id}',  [SubProfileController::class, "edit"])->name('admin.sub-profile.edit');
             Route::post('/update/{id}',  [SubProfileController::class, "update"])->name('admin.sub-profile.update');
             Route::get('/delete/{id}',  [SubProfileController::class, "delete"])->name('admin.sub-profile.delete');
-            Route::get('/livewire',  [SubProfileController::class, "livewire"])->name('admin.sub-profile.livewire');
         });
 
         Route::prefix('location')->group(function () {
+            Route::get('/livewire',  [LocationController::class, "livewire"])->name('admin.location.livewire');
             Route::get('/getAll',  [LocationController::class, "getAll"])->name('admin.location.getAll');
             Route::post('/store',  [LocationController::class, "store"])->name('admin.location.store');
             Route::get('/',  [LocationController::class, "index"])->name('admin.location.index');
@@ -201,10 +197,10 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/edit',  [LocationController::class, "edit"])->name('admin.location.edit');
             Route::post('/update',  [LocationController::class, "update"])->name('admin.location.update');
             Route::get('/delete',  [LocationController::class, "delete"])->name('admin.location.delete');
-            Route::get('/livewire',  [LocationController::class, "livewire"])->name('admin.location.livewire');
         });
 
         Route::prefix('qualification')->group(function () {
+            Route::get('/livewire',  [QualificationController::class, "livewire"])->name('admin.qualification.livewire');
             Route::post('/store',  [QualificationController::class, "store"])->name('admin.qualification.store');
             Route::get('/',  [QualificationController::class, "index"])->name('admin.qualification.index');
             Route::get('/getAll',  [QualificationController::class, "getAll"])->name('admin.qualification.getAll');
@@ -212,7 +208,6 @@ Route::group(['middleware' => "isAdmin"], function () {
             Route::get('/edit',  [QualificationController::class, "edit"])->name('admin.qualification.edit');
             Route::post('/update',  [QualificationController::class, "update"])->name('admin.qualification.update');
             Route::get('/delete',  [QualificationController::class, "delete"])->name('admin.qualification.delete');
-            Route::get('/livewire',  [QualificationController::class, "livewire"])->name('admin.qualification.livewire');
         });
 
 

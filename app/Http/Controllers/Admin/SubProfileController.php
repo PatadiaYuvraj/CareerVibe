@@ -173,4 +173,10 @@ class SubProfileController extends Controller
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not deleted, because it has jobs associated with it"]);
     }
+
+    // livewire
+    public function livewire()
+    {
+        return  $this->navigationManagerService->loadView('admin.sub-profile.index-livewire');
+    }
 }

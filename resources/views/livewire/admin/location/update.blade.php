@@ -1,6 +1,6 @@
 <div class="row">
     <span class="h3 text-black col">Update Location</span>
-    @include('livewire.admin.location._search')
+    @include('livewire.common._search')
 </div>
 <form>
     <input type="hidden" wire:model="locationId">

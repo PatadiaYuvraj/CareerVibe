@@ -1,10 +1,10 @@
 <div class="row">
-    <span class="h3 text-black col">Add Qualification</span>
+    <span class="h3 text-black col">Add Profile Category</span>
     @include('livewire.common._search')
 </div>
 <form class="repeater">
     <div class="row">
-        @foreach ($items as $index => $qualification)
+        @foreach ($items as $index => $item)
             <div class="form-group mb-3 repeater col-4">
                 <label for="name-{{ $index }}">
                     Name {{ $index + 1 }}
@@ -12,7 +12,7 @@
                 <div class="row input-group">
                     <input type="text"
                         class="form-control border-1 border-info col @error('items.' . $index . '.name') is-invalid @enderror"
-                        id="name-{{ $index }}" placeholder="Enter Qualification"
+                        id="name-{{ $index }}" placeholder="Enter Name"
                         wire:model="items.{{ $index }}.name">
                     @if ($index > 0)
                         <button wire:click.prevent="removeRow({{ $index }})" class="col-2 btn btn-danger">
@@ -31,7 +31,7 @@
 
     <div class="d-flex btn-group">
         @if (count($items) < $minRows || count($items) < $maxRows)
-            <button wire:click.prevent="addRow" class="btn btn-primary">Add Qualification</button>
+            <button wire:click.prevent="addRow" class="btn btn-primary">Add Category</button>
         @endif
 
         @if (count($items) >= $maxRows)

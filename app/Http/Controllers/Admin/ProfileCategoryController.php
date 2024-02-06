@@ -116,4 +116,9 @@ class ProfileCategoryController extends Controller
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not deleted"]);
     }
+
+    public function livewire()
+    {
+        return $this->navigationManagerService->loadView('admin.profile-category.index-livewire');
+    }
 }

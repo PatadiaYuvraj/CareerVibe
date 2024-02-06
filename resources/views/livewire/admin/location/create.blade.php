@@ -1,13 +1,13 @@
 <div class="row border-1 border-black">
     <span class="h3 text-black col">Add Location</span>
-    @include('livewire.admin.location._search')
+    @include('livewire.common._search')
 </div>
 
 <form class="repeater">
     <div class="row">
         @foreach ($items as $index => $location)
             <div class="form-group mb-3 repeater col-12">
-                <label for="city-{{ $index }}">City {{ $index + 1 }}</label>
+                <label for="city-{{ $index }}">Location {{ $index + 1 }}</label>
                 <div class="row input-group">
                     <input type="text"
                         class="form-control border-1 border-info col @error('items.' . $index . '.city') is-invalid @enderror"

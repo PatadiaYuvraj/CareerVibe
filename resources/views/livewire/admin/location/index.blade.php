@@ -69,7 +69,7 @@
                             @endforelse
                         </tbody>
                     </table>
-                    @include('livewire.admin.location._pagination', ['data' => $locations])
+                    @include('livewire.common._pagination', ['data' => $locations])
                 </div>
             </div>
 
