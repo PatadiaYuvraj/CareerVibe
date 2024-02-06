@@ -120,6 +120,7 @@ class Index extends Component
 
     public function edit($id)
     {
+        $this->resetErrorBag();
         $qualification = Qualification::where('id', $id)->first();
         if (!$qualification) {
             session()->flash('warning', 'Qualification is not found');
@@ -139,7 +140,9 @@ class Index extends Component
 
     public function update()
     {
-        $this->validate();
+        $this->validate([
+            'name' => 'required|string|max:255',
+        ]);
         $data = [
             "name" => $this->name,
         ];

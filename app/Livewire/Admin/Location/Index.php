@@ -15,7 +15,7 @@ class Index extends Component
 
     public bool $updateMode = false;
     public $locations;
-    public array $city;
+    public $city;
     public $state;
     public $country;
     public $pincode;
@@ -23,110 +23,119 @@ class Index extends Component
     public $search;
     public $perPage;
     public $page = 1;
-
-    // rules
-    protected $rules = [
-        'city' => [
-            'required',
-            'string',
-            'max:255',
-            'unique:locations,city',
-        ],
+    public $minRows = 1;
+    public $maxRows = 9;
+    public $items = [
+        ['city' => null, 'state' => null, 'country' => null, 'pincode' => null,],
     ];
-
-    // listeners
-    protected $listeners = [];
-
-    // messages
-    protected $messages = [
-        'city.required' => 'The city name cannot be empty.',
-        'city.string' => 'The city name must be a string.',
-        'city.max' => 'The city name cannot be more than 255 characters.',
-        'city.unique' => 'The city name has already been taken.',
-        'state.required' => 'The state name cannot be empty.',
-        'state.string' => 'The state name must be a string.',
-        'state.max' => 'The state name cannot be more than 255 characters.',
-        'country.required' => 'The country name cannot be empty.',
-        'country.string' => 'The country name must be a string.',
-        'country.max' => 'The country name cannot be more than 255 characters.',
-        'pincode.required' => 'The pincode cannot be empty.',
-        'pincode.string' => 'The pincode must be a string.',
-        'pincode.max' => 'The pincode cannot be more than 255 characters.',
-    ];
+    public $key = 0;
 
     public function __construct()
     {
         $this->perPage = Config::get('constants.pagination');
     }
 
+    public function addRow()
+    {
+        if (count($this->items) < $this->maxRows) {
+            $this->key++;
+            $this->items[] = [
+                'city' => null,
+                'state' => null,
+                'country' => null,
+                'pincode' => null,
+            ];
+        } else {
+            session()->flash('message', 'Maximum number of items reached.');
+        }
+    }
+
+    public function removeRow($index)
+    {
+        if (count($this->items) > $this->minRows) {
+            unset($this->items[$index]);
+        } else {
+            session()->flash('message', 'Minimum number of items required.');
+        }
+    }
+
     public function mount()
     {
         $currentPage = $this->page;
+        if (empty($this->items)) {
+            $this->items[] = [
+                'city' => null,
+                'state' => null,
+                'country' => null,
+                'pincode' => null,
+            ];
+        }
         $this->locations = Location::withCount('jobs')->paginate($this->perPage, ['*'], 'page', $currentPage)->ToArray();
     }
+
+    public function rules()
+    {
+        return [
+            'items.*.city' => ['required', 'string', 'max:255'],
+            'items.*.state' => ['nullable', 'string', 'max:255'],
+            'items.*.country' => ['nullable', 'string', 'max:255'],
+            'items.*.pincode' => ['nullable', 'string', 'max:10'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'items.*.city.required' => 'The city is required',
+            'items.*.city.string' => 'The city must be a string',
+            'items.*.city.max' => 'The city must not be greater than 255 characters',
+            'items.*.city.unique' => 'The city has already been taken',
+            'items.*.state.string' => 'The state, if provided, must be a string',
+            'items.*.country.string' => 'The country, if provided, must be a string',
+            'items.*.pincode.string' => 'The pincode, if provided, must be a string',
+        ];
+    }
+
 
     public function render()
     {
         return view('livewire.admin.location.index');
     }
 
-    public function store(Request $request)
+    public function store()
     {
-        dd($request->all());
         $this->validate();
-        $data = [
-            "city" => $this->city,
-            "state" => null,
-            "country" => null,
-            "pincode" => null,
-        ];
 
-        if (isset($request->all()['components'][0]['updates']['state'])) {
-            $this->validate([
-                'state' => [
-                    'required',
-                    'string',
-                    'max:255',
-                ],
-            ]);
-            $data['state'] = $this->state;
+        $data = [];
+        foreach ($this->items as $item) {
+            if ($item['city'] != null) {
+                $data[] = [
+                    'city' => $item['city'] ?? null,
+                    'state' => $item['state'] ?? null,
+                    'country' => $item['country'] ?? null,
+                    'pincode' => $item['pincode'] ?? null,
+                ];
+            }
         }
 
+        // dd($data);
 
-        if (isset($request->all()['components'][0]['updates']['country'])) {
-            $this->validate([
-                'country' => [
-                    'required',
-                    'string',
-                    'max:255',
-                ],
-            ]);
-            $data['country'] = $this->country;
-        }
-
-        if (isset($request->all()['components'][0]['updates']['pincode'])) {
-            $this->validate([
-                'pincode' => [
-                    'required',
-                    'numeric',
-                    'digits:6',
-                ],
-            ]);
-            $data['pincode'] = $this->pincode;
-        }
-
-        $isCreated = Location::create($data);
-
-        if ($isCreated) {
-            $this->reset();
-            $this->mount();
-            session()->flash('success', 'Location is created');
-            return;
-        } else {
-            session()->flash('warning', 'Location is not created');
-            return;
+        try {
+            $isCreated = Location::insert($data);
+            if ($isCreated) {
+                $this->reset();
+                $this->mount();
+                session()->flash('success', 'Locations have been created');
+                return;
+            } else {
+                session()->flash('warning', 'Locations could not be created');
+                return;
+            }
+        } catch (\Throwable $th) {
+            throw $th; // Re-throw to allow Laravel's exception handling to take over
         }
     }
+
 
     public function edit($id)
     {
