@@ -12,6 +12,10 @@
                     <a href="{{ route('admin.profile-category.create') }}" class="float-end btn btn-sm btn-primary">
                         Add Profile Category
                     </a>
+                    {{-- redirect to view  --}}
+                    <a href="{{ route('admin.profile-category.create-repeater') }}" class="float-end btn btn-sm btn-primary">
+                        Add Profile Category Repeater
+                    </a>
                 </div>
                 <div class="card-body">
                     <table class="table text-center table-striped">

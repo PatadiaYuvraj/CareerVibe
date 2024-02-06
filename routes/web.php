@@ -167,6 +167,10 @@ Route::group(['middleware' => "isAdmin"], function () {
         });
 
         Route::prefix('profile-category')->group(function () {
+            Route::get('/livewire',  [ProfileCategoryController::class, "livewire"])->name('admin.profile-category.livewire');
+            // creaet repeater
+            Route::get('/create-repeater',  [ProfileCategoryController::class, "createRepeater"])->name('admin.profile-category.create-repeater');
+            Route::post('/store-repeater',  [ProfileCategoryController::class, "storeRepeater"])->name('admin.profile-category.store-repeater');
             Route::get('/create',  [ProfileCategoryController::class, "create"])->name('admin.profile-category.create');
             Route::post('/store',  [ProfileCategoryController::class, "store"])->name('admin.profile-category.store');
             Route::get('/',  [ProfileCategoryController::class, "index"])->name('admin.profile-category.index');

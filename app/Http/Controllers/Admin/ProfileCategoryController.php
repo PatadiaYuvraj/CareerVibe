@@ -28,6 +28,37 @@ class ProfileCategoryController extends Controller
         return $this->navigationManagerService->loadView('admin.profile-category.create');
     }
 
+    public function createRepeater()
+    {
+        return $this->navigationManagerService->loadView('admin.profile-category.create-repeater');
+    }
+
+    // storeRepeater
+    public function storeRepeater(Request $request)
+    {
+        // return response()->json($request->get('profile_category')[0]['name']);
+        $data['name'] = array();
+        for ($i = 0; $i < count($request->get('profile_category')); $i++) {
+            $request->validate([
+                // 'profile_category[' . $i . ']["name"]' => [
+                //     'required',
+                // ],
+                'profile_category.' . $i . '.name' => 'required',
+            ]);
+            array_push($data['name'], $request->get('profile_category')[$i]['name']);
+        }
+        return response()->json(['data' => $data]);
+        $data = [
+            'name' => $request->name,
+        ];
+        $isCreated = $this->profileCategory->create($data);
+        if ($isCreated) {
+            return $this->navigationManagerService->redirectRoute('admin.profile-category.index', [], 302, [], false, ["success" => "Profile Category is created"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not created"]);
+    }
+
+
     public function store(Request $request)
     {
         $data['name'] = array();
