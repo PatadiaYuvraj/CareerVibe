@@ -181,7 +181,7 @@ class Index extends Component
         }
     }
 
-    public function searchQualification()
+    public function searching()
     {
         $this->resetPage();
         $this->qualifications = Qualification::where('name', 'like', '%' . $this->search . '%')->withCount('jobs')->paginate(

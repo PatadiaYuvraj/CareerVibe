@@ -14,6 +14,7 @@ class Index extends Component
     use WithPagination;
 
     public bool $updateMode = false;
+    public bool $showModal = false;
     public $locations;
     public $city;
     public $state;
@@ -136,6 +137,40 @@ class Index extends Component
         }
     }
 
+    // show
+    public function show($id)
+    {
+        $location = Location::where('id', $id)->first();
+        if (!$location) {
+            session()->flash('warning', 'Location is not found');
+            return;
+        }
+        $this->locationId = $location->id;
+        $this->city = $location->city;
+        $this->state = $location->state;
+        $this->country = $location->country;
+        $this->pincode = $location->pincode;
+        $this->openModal();
+    }
+
+    public function openModal()
+    {
+        $this->showModal = true;
+    }
+
+    public function closeModal()
+    {
+        // reset 
+        $this->reset();
+        $this->city = '';
+        $this->state = '';
+        $this->country = '';
+        $this->pincode = '';
+        $this->locationId = '';
+        $this->updateMode = false;
+
+        $this->showModal = false;
+    }
 
     public function edit($id)
     {
@@ -154,6 +189,7 @@ class Index extends Component
 
     public function cancel()
     {
+        $this->reset();
         $this->city = '';
         $this->state = '';
         $this->country = '';
@@ -248,7 +284,7 @@ class Index extends Component
         }
     }
 
-    public function searchLocation()
+    public function searching()
     {
         $this->resetPage();
         $this->locations = Location::where('city', 'like', '%' . $this->search . '%')

@@ -13,7 +13,7 @@
                     <input type="text"
                         class="form-control border-1 border-info col @error('items.' . $index . '.name') is-invalid @enderror"
                         id="name-{{ $index }}" placeholder="Enter Qualification"
-                        wire:model="items.{{ $index }}.name">
+                        wire:model.live="items.{{ $index }}.name">
                     @if ($index > 0)
                         <button wire:click.prevent="removeRow({{ $index }})" class="col-2 btn btn-danger">
                             <i class="bi-trash"></i>

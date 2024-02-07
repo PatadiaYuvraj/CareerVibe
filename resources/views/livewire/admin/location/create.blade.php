@@ -12,19 +12,19 @@
                     <input type="text"
                         class="form-control border-1 border-info col @error('items.' . $index . '.city') is-invalid @enderror"
                         id="city-{{ $index }}" placeholder="Enter City"
-                        wire:model="items.{{ $index }}.city">
+                        wire:model.live="items.{{ $index }}.city">
                     <input type="text"
                         class="form-control border-1 border-info col @error('items.' . $index . '.state') is-invalid @enderror"
                         id="state-{{ $index }}" placeholder="Enter State"
-                        wire:model="items.{{ $index }}.state">
+                        wire:model.live="items.{{ $index }}.state">
                     <input type="text"
                         class="form-control border-1 border-info col @error('items.' . $index . '.country') is-invalid @enderror"
                         id="country-{{ $index }}" placeholder="Enter Country"
-                        wire:model="items.{{ $index }}.country">
+                        wire:model.live="items.{{ $index }}.country">
                     <input type="text"
                         class="form-control border-1 border-info col @error('items.' . $index . '.pincode') is-invalid @enderror"
                         id="pincode-{{ $index }}" placeholder="Enter Pin Code"
-                        wire:model="items.{{ $index }}.pincode">
+                        wire:model.live="items.{{ $index }}.pincode">
                     @if ($index > 0)
                         <button wire:click.prevent="removeRow({{ $index }})" class="col-2 btn btn-danger">
                             <i class="bi-trash"></i>

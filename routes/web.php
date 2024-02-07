@@ -31,6 +31,13 @@ use App\Http\Controllers\TestController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// LiveWire
+use App\Livewire\Test1;
+use App\Livewire\Test2;
+
+Route::get('/test1', Test1::class)->name('test1');
+Route::get('/test2', Test2::class)->name('test2');
+
 Route::get('/checkAuth',  function () {
     dd([
         "isUser"    => auth()->guard('user')->check(),
@@ -39,8 +46,8 @@ Route::get('/checkAuth',  function () {
     ]);
 })->name('checkAuth');
 
-Route::get('/test', [TestController::class, "test"])->name('test');
-Route::post('/testing',  [TestController::class, "testing"])->name('testing');
+// Route::get('/test', [TestController::class, "test"])->name('test');
+// Route::post('/testing',  [TestController::class, "testing"])->name('testing');
 
 
 Route::group(['middleware' => "isGuest"], function () {

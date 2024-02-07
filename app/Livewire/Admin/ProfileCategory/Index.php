@@ -211,12 +211,6 @@ class Index extends Component
 
     public function resetPage()
     {
-        $this->setTimeOut(function () {
-            $this->page = 1;
-        });
-
-
-
         $this->page = 1;
     }
 

@@ -3,12 +3,12 @@
     @include('livewire.common._search')
 </div>
 <form>
-    <input type="hidden" wire:model="locationId">
+    <input type="hidden" wire:model.live="locationId">
     <div class="row ">
         <div class="col form-group mb-3">
             <label for="city">City:</label>
             <input type="text" class="form-control @error('city') is-invalid @enderror" id="city"
-                placeholder="Enter City" wire:model="city">
+                placeholder="Enter City" wire:model.live="city">
             @error('city')
                 <span class="text-danger">{{ $message }}</span>
             @enderror
@@ -16,7 +16,7 @@
         <div class="col form-group mb-3">
             <label for="state">State:</label>
             <input type="text" class="form-control @error('state') is-invalid @enderror" id="state"
-                placeholder="Enter State" wire:model="state">
+                placeholder="Enter State" wire:model.live="state">
             @error('state')
                 <span class="text-danger">{{ $message }}</span>
             @enderror
@@ -26,7 +26,7 @@
         <div class="col form-group mb-3">
             <label for="country">Country:</label>
             <input type="text" class="form-control @error('country') is-invalid @enderror" id="country"
-                placeholder="Enter Country" wire:model="country">
+                placeholder="Enter Country" wire:model.live="country">
             @error('country')
                 <span class="text-danger">{{ $message }}</span>
             @enderror
@@ -34,7 +34,7 @@
         <div class="col form-group mb-3">
             <label for="pincode">Pin Code:</label>
             <input type="text" class="form-control @error('pincode') is-invalid @enderror" id="pincode"
-                placeholder="Enter Pin Code" wire:model="pincode">
+                placeholder="Enter Pin Code" wire:model.live="pincode">
             @error('pincode')
                 <span class="text-danger">{{ $message }}</span>
             @enderror

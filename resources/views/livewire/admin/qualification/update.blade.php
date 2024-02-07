@@ -3,11 +3,11 @@
     @include('livewire.common._search')
 </div>
 <form>
-    <input type="hidden" wire:model="qualificationId">
+    <input type="hidden" wire:model.live="qualificationId">
     <div class="form-group mb-3">
         <label for="name">Name:</label>
         <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
-            placeholder="Enter Name" wire:model="name">
+            placeholder="Enter Name" wire:model.live="name">
         @error('name')
             <span class="text-danger">{{ $message }}</span>
         @enderror
