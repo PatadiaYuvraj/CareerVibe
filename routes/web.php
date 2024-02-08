@@ -161,6 +161,7 @@ Route::group(['middleware' => "isAdmin"], function () {
         });
 
         Route::prefix('job')->group(function () {
+            Route::get('/livewire',  [AdminJobController::class, "livewire"])->name('admin.job.livewire');
             Route::get('/create/{id}',  [AdminJobController::class, "create"])->name('admin.job.create');
             Route::post('/store/{id}',  [AdminJobController::class, "store"])->name('admin.job.store');
             Route::get('/',  [AdminJobController::class, "index"])->name('admin.job.index');

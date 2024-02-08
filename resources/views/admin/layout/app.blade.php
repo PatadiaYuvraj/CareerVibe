@@ -115,6 +115,13 @@
                     <span>Job</span>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('admin.job.livewire') }}">
+                    <span>
+                        Job LiveWire
+                    </span>
+                </a>
+            </li>
             {{-- <hr> --}}
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('admin.profile-category.index') }}">
