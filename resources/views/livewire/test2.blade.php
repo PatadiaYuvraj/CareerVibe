@@ -1,7 +1,6 @@
 <div>
     @section('pageTitle', 'Test2')
     @section('content')
-        @livewireStyles
         <main id="main" class="main">
             <section class="section dashboard">
                 <div class="card">
@@ -46,5 +45,4 @@
             </section>
         </main>
     @endsection
-    @livewireScripts
 </div>
