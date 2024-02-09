@@ -19,6 +19,11 @@
         "laravelcollective/html": "^6.4",
         "livewire/livewire": "^3.4",
         "yajra/laravel-datatables": "^10.1",
+        "yajra/laravel-datatables-buttons": "^10.0",
+        "yajra/laravel-datatables-editor": "^1.0",
+        "yajra/laravel-datatables-export": "^10.1",
+        "yajra/laravel-datatables-fractal": "^10.0",
+        "yajra/laravel-datatables-html": "^10.0",
         "yajra/laravel-datatables-oracle": "^10.3.1"
     },
     "require-dev": {
