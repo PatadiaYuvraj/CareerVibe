@@ -38,7 +38,7 @@ return [
     /*
      * DataTables internal index id response column name.
      */
-    'index_column'   => 'DT_RowIndex',
+    'index_column'   => 'DT_RowIndex    ',
 
     /*
      * List of available builders for DataTables.
@@ -57,12 +57,12 @@ return [
      * Note, only change this if you know what you are doing!
      */
     'builders'       => [
-        //Illuminate\Database\Eloquent\Relations\Relation::class => 'eloquent',
-        //Illuminate\Database\Eloquent\Builder::class            => 'eloquent',
-        //Illuminate\Database\Query\Builder::class               => 'query',
-        //Illuminate\Support\Collection::class                   => 'collection',
+        Illuminate\Database\Eloquent\Relations\Relation::class => 'eloquent',
+        Illuminate\Database\Eloquent\Builder::class            => 'eloquent',
+        Illuminate\Database\Query\Builder::class               => 'query',
+        Illuminate\Support\Collection::class                   => 'collection',
     ],
-
+    'serializer' => League\Fractal\Serializer\DataArraySerializer::class,
     /*
      * Nulls last sql pattern for PostgreSQL & Oracle.
      * For MySQL, use 'CASE WHEN :column IS NULL THEN 1 ELSE 0 END, :column :direction'

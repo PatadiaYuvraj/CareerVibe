@@ -8,8 +8,9 @@
                 <div class="card-header">
                     <nav aria-label="breadcrumb" class="">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.company.index') }}">Companies</a></li>
+                            <li class="breadcrumb-item"><a wire:navigate href="{{ route('admin.dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a wire:navigate
+                                    href="{{ route('admin.company.index') }}">Companies</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Show</li>
                         </ol>
                     </nav>
@@ -63,19 +64,22 @@
                                         <td>{{ $job['vacancy'] }}</td>
                                         <td>{{ $job['min_salary'] . ' - ' . $job['min_salary'] }}</td>
                                         <td>
-                                            <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
+                                            <a wire:navigate
+                                                href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
                                                 class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
                                                 {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
                                             </a>
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.job.toggleFeatured', [$job['id'], $job['is_featured']]) }}"
+                                            <a wire:navigate
+                                                href="{{ route('admin.job.toggleFeatured', [$job['id'], $job['is_featured']]) }}"
                                                 class="badge bg-{{ $job['is_featured'] ? 'success' : 'danger' }}">
                                                 {{ $job['is_featured'] ? 'Featured' : 'Not Featured' }}
                                             </a>
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.job.toggleActive', [$job['id'], $job['is_active']]) }}"
+                                            <a wire:navigate
+                                                href="{{ route('admin.job.toggleActive', [$job['id'], $job['is_active']]) }}"
                                                 class="badge bg-{{ $job['is_active'] ? 'success' : 'danger' }}">
                                                 {{ $job['is_active'] ? 'Active' : 'Not Active' }}
                                             </a>

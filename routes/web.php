@@ -109,12 +109,10 @@ Route::group(['middleware' => "isAdmin"], function () {
     Route::prefix('/admin')->group(function () {
 
         Route::get('search', function (Request $request) {
-
-            return redirect()->route('admin.dashboard')->with('info', 'Search is not implemented yet');
+            return redirect()->back()->with('info', 'Search is not implemented yet');
         })->name('admin.search');
         Route::post('search', function (Request $request) {
-
-            return redirect()->route('admin.dashboard')->with('info', 'Search is not implemented yet');
+            return redirect()->back()->with('info', 'Search is not implemented yet');
         })->name('admin.doSearch');
 
 
@@ -134,6 +132,7 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::get('/logout',  [AdminAuthController::class, "logout"])->name('admin.logout');
 
         Route::prefix('user')->group(function () {
+            Route::get('/livewire',  [AdminUserController::class, "livewire"])->name('admin.user.livewire');
             Route::get('/create',  [AdminUserController::class, "create"])->name('admin.user.create');
             Route::post('/store',  [AdminUserController::class, "store"])->name('admin.user.store');
             Route::get('/',  [AdminUserController::class, "index"])->name('admin.user.index');
@@ -161,7 +160,6 @@ Route::group(['middleware' => "isAdmin"], function () {
         });
 
         Route::prefix('job')->group(function () {
-            Route::get('/livewire',  [AdminJobController::class, "livewire"])->name('admin.job.livewire');
             Route::get('/create/{id}',  [AdminJobController::class, "create"])->name('admin.job.create');
             Route::post('/store/{id}',  [AdminJobController::class, "store"])->name('admin.job.store');
             Route::get('/',  [AdminJobController::class, "index"])->name('admin.job.index');

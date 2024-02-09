@@ -8,7 +8,8 @@
                     <span class="h3 text-black">
                         Add Profile Category
                     </span>
-                    <a href="{{ route('admin.profile-category.index') }}" class="float-end btn btn-sm btn-primary">
+                    <a wire:navigate href="{{ route('admin.profile-category.index') }}"
+                        class="float-end btn btn-sm btn-primary">
                         Back
                     </a>
                 </div>

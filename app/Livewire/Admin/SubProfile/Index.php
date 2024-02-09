@@ -55,6 +55,7 @@ class Index extends Component
     public function removeRow($index)
     {
         if (count($this->items) > $this->minRows) {
+
             unset($this->items[$index]);
         } else {
             session()->flash('message', 'Minimum number of items required.');

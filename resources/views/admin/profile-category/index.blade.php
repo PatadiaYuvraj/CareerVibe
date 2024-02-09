@@ -9,7 +9,8 @@
                     <span class="h3 text-black">
                         Profile Categories
                     </span>
-                    <a href="{{ route('admin.profile-category.create') }}" class="float-end btn btn-sm btn-primary">
+                    <a wire:navigate href="{{ route('admin.profile-category.create') }}"
+                        class="float-end btn btn-sm btn-primary">
                         Add Profile Category
                     </a>
                 </div>
@@ -29,7 +30,8 @@
                             @forelse ($profileCategories as $profileCategory)
                                 <tr>
                                     <td>
-                                        <a href="{{ route('admin.profile-category.show', $profileCategory['id']) }}">{{ $profileCategory['name'] }}
+                                        <a wire:navigate
+                                            href="{{ route('admin.profile-category.show', $profileCategory['id']) }}">{{ $profileCategory['name'] }}
                                         </a>
                                     </td>
                                     <td>{{ $profileCategory['sub_profiles_count'] }}</td>
@@ -43,11 +45,13 @@
                                     </td>
                                     <td class="">
                                         <div class="btn-group">
-                                            <a href="{{ route('admin.profile-category.edit', $profileCategory['id']) }}"
+                                            <a wire:navigate
+                                                href="{{ route('admin.profile-category.edit', $profileCategory['id']) }}"
                                                 class="btn btn-sm btn-primary">
                                                 Edit
                                             </a>
-                                            <a href="{{ route('admin.profile-category.delete', $profileCategory['id']) }}"
+                                            <a wire:navigate
+                                                href="{{ route('admin.profile-category.delete', $profileCategory['id']) }}"
                                                 class="btn btn-sm btn-danger">
                                                 Delete
                                             </a>

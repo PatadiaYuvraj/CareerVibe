@@ -10,23 +10,23 @@
                         <div class="card-body pt-3">
                             <ul class="nav nav-tabs nav-tabs-bordered">
                                 <li class="nav-item">
-                                    <a href="{{ route('admin.dashboard') }}" class="nav-link ">
+                                    <a wire:navigate href="{{ route('admin.dashboard') }}" class="nav-link ">
                                         Overview
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.editProfile') }}">
+                                    <a class="nav-link" wire:navigate href="{{ route('admin.editProfile') }}">
                                         Edit Profile
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link active" href="{{ route('admin.doChangePassword') }}">
+                                    <a class="nav-link active" wire:navigate href="{{ route('admin.doChangePassword') }}">
                                         Change Password
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('admin.editProfileImage') }}">
+                                    <a class="nav-link" wire:navigate href="{{ route('admin.editProfileImage') }}">
                                         Change Profile Image
                                     </a>
                                 </li>
@@ -46,7 +46,7 @@
                                                 <div class="input-group">
                                                     <input type="password" class="form-control" id="currentPassword"
                                                         name="currentPassword" placeholder="Old Password" value="">
-                                                    <span id="toggleOldPassword"
+                                                    <span id="toggleCurrentPassword"
                                                         class="bi-eye-slash input-group-text"></span>
                                                 </div>
                                                 @error('currentPassword')
@@ -91,7 +91,8 @@
                                             <button type="submit" class="btn btn-primary">
                                                 Update
                                             </button>
-                                            <a href="{{ route('admin.dashboard') }}" type="submit" class="btn btn-danger">
+                                            <a href="{{ route('admin.dashboard') }}" wire:navigate type="submit"
+                                                class="btn btn-danger">
                                                 Cancel
                                             </a>
                                         </div>
@@ -108,15 +109,15 @@
 @section('scripts')
     <script>
         $(document).ready(function() {
-            $('#toggleOldPassword').click(function() {
+            $('#toggleCurrentPassword').click(function() {
                 if ($(this).hasClass('bi-eye-slash')) {
                     $(this).removeClass('bi-eye-slash');
                     $(this).addClass('bi-eye');
-                    $('#oldPassword').attr('type', 'text');
+                    $('#currentPassword').attr('type', 'text');
                 } else {
                     $(this).removeClass('bi-eye');
                     $(this).addClass('bi-eye-slash');
-                    $('#oldPassword').attr('type', 'password');
+                    $('#currentPassword').attr('type', 'password');
                 }
             });
             $('#toggleNewPassword').click(function() {

@@ -11,7 +11,6 @@
                     Enter your new password
                 </p>
             </div>
-
             <form class="row g-3" action="{{ route('admin.doResetPassword', ['token' => $token]) }}" method="POST">
                 @csrf
                 <div class="col-12">
@@ -42,7 +41,7 @@
                 <div class="col-12">
                     <p class="small mb-0">
 
-                        <a href="{{ route('admin.login') }}">Login?</a>
+                        <a wire:navigate href="{{ route('admin.login') }}">Login?</a>
                     </p>
                 </div>
             </form>

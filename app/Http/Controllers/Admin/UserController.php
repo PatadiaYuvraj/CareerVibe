@@ -546,6 +546,11 @@ class UserController extends Controller
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not unfollowed"]);
     }
 
+    public function livewire()
+    {
+        return $this->navigationManagerService->loadView('admin.user.index-livewire');
+    }
+
     // follow a company
 
     // public function followCompany($id)

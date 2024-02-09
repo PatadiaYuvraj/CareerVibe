@@ -19,7 +19,7 @@
                     <span class="h3 text-black">
                         Edit Job
                     </span>
-                    <a href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
+                    <a wire:navigate href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.job.update', $job['id']) }}" method="POST">
@@ -239,7 +239,7 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
+                            <a wire:navigate href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
                 </div>

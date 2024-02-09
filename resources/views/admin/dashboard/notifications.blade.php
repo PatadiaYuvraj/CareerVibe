@@ -10,9 +10,11 @@
                     </span>
                     <div class="float-end">
                         @if (count($notifications) > 0)
-                            <a href="{{ route('admin.notification.readAll') }}" class="btn btn-sm btn-primary">Mark All As
+                            <a wire:navigate href="{{ route('admin.notification.readAll') }}"
+                                class="btn btn-sm btn-primary">Mark All As
                                 Read</a>
-                            <a href="{{ route('admin.notification.deleteAll') }}" class="btn btn-sm btn-danger">Delete
+                            <a wire:navigate href="{{ route('admin.notification.deleteAll') }}"
+                                class="btn btn-sm btn-danger">Delete
                                 All</a>
                         @endif
                     </div>
@@ -39,20 +41,25 @@
                                     </td>
                                     <td class="@if ($notification['read_at'] != null) text-muted @endif">
                                         @if ($notification['read_at'] == null)
-                                            <a href="{{ route('admin.notification.read', $notification['id']) }}"
+                                            <a wire:navigate
+                                                href="{{ route('admin.notification.read', $notification['id']) }}"
                                                 class="badge bg-primary">Mark as Read</a>
                                         @else
-                                            <a href="{{ route('admin.notification.unread', $notification['id']) }}"
+                                            <a wire:navigate
+                                                href="{{ route('admin.notification.unread', $notification['id']) }}"
                                                 class="badge bg-success">Mark as Unread</a>
                                         @endif
 
-                                        <a href="{{ route('admin.notification.delete', $notification['id']) }}"
+                                        <a wire:navigate
+                                            href="{{ route('admin.notification.delete', $notification['id']) }}"
                                             class="badge bg-danger">Delete</a>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan='6' class="text-center">No User Found</td>
+                                    <td colspan='6' class="text-center">
+                                        No Notifications
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>

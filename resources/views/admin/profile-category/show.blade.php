@@ -8,8 +8,9 @@
                 <div class="card-header">
                     <nav aria-label="breadcrumb" class="">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('admin.profile-category.index') }}">Profile</a>
+                            <li class="breadcrumb-item"><a wire:navigate href="{{ route('admin.dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a wire:navigate
+                                    href="{{ route('admin.profile-category.index') }}">Profile</a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">Show</li>
                         </ol>
@@ -27,7 +28,7 @@
                             @endif
                         </p>
                         <p class="lead">
-                            <a class="btn btn-outline-primary btn"
+                            <a class="btn btn-outline-primary btn" wire:navigate
                                 href="{{ route('admin.profile-category.edit', $profileCategory['id']) }}">Edit</a>
                         </p>
                     </div>

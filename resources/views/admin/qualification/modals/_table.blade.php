@@ -1,4 +1,4 @@
-    <table class="table table-striped" id="data-table">
+    <table class="table table-striped" id="data-tabl dataTable">
         <thead>
             <tr>
                 <th>No</th>

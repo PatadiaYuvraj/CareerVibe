@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Edit User</span>
-                    <a href="{{ route('admin.user.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
+                    <a wire:navigate href="{{ route('admin.user.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <div class="row row-cols-2">
@@ -172,7 +172,7 @@
 
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Update</button>
-                            <a href="{{ route('admin.user.index') }}" class="btn btn-danger">Cancel</a>
+                            <a wire:navigate href="{{ route('admin.user.index') }}" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
                 </div>

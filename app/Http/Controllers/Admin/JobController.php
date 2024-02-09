@@ -582,9 +582,4 @@ class JobController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Job is active"]);
         }
     }
-
-    public function livewire()
-    {
-        return $this->navigationManagerService->loadView('admin.job.index-livewire');
-    }
 }

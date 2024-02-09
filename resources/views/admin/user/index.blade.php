@@ -8,7 +8,8 @@
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Users</span>
 
-                    <a href="{{ route('admin.user.create') }}" class="float-end btn btn-sm btn-primary">Add User</a>
+                    <a wire:navigate href="{{ route('admin.user.create') }}" class="float-end btn btn-sm btn-primary">Add
+                        User</a>
                 </div>
                 <div class="card-body">
                     <table class="table text-center table-striped">
@@ -33,8 +34,8 @@
                                     <td>
                                         <div class="btn-group">
                                             @if ($user['profile_image_url'])
-                                                <a href="{{ $user['profile_image_url'] }}" class="btn btn-sm btn-primary"
-                                                    target="_blank">View</a>
+                                                <a wire:navigate href="{{ $user['profile_image_url'] }}"
+                                                    class="btn btn-sm btn-primary" target="_blank">View</a>
                                                 <form action="{{ route('admin.user.deleteProfileImage', $user['id']) }}"
                                                     method="POST">
                                                     @csrf
@@ -50,8 +51,8 @@
                                     <td>
                                         <div class="btn-group">
                                             @if ($user['resume_pdf_url'])
-                                                <a href="{{ url($user['resume_pdf_url']) }}" class="btn btn-sm btn-primary"
-                                                    target="_blank">View</a>
+                                                <a wire:navigate href="{{ url($user['resume_pdf_url']) }}"
+                                                    class="btn btn-sm btn-primary" target="_blank">View</a>
                                                 <form action="{{ route('admin.user.deleteResumePdf', $user['id']) }}"
                                                     method="POST">
                                                     @csrf

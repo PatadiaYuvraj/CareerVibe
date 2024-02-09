@@ -3,7 +3,7 @@
 @section('content')
     @livewireStyles
 
-    @livewire('admin.job.index')
+    @livewire('admin.user.index')
 
 @endsection
 @livewireScripts

@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Add Job to {{ $company['name'] }}</span>
-                    <a href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
+                    <a wire:navigate href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
 
@@ -255,7 +255,7 @@
                             <textarea class="form-control" id="keywords" name="keywords" rows="3">{{ old('keywords') }}</textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
-                        <a href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
+                        <a wire:navigate href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
                     </form>
                 </div>
             </div>
