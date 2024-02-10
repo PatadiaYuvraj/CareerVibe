@@ -349,38 +349,39 @@ class AuthController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
         }
 
-        $id = $this->authenticableService->getUser()->id;
+        $user = $this->authenticableService->getUser();
 
         $request->validate([
             "name" => [
                 "required",
                 "string",
                 "max:100",
-                function ($attribute, $value, $fail) use ($id) {
-                    $isExist = $this->user->where('id', '!=', $id)->where('name', $value)->get()->ToArray();
+                function ($attribute, $value, $fail) use ($user) {
+                    $isExist = $this->user->where('id', '!=', $user->id)->where('name', $value)->get()->ToArray();
                     if ($isExist) {
                         return $fail($attribute . ' is already exist.');
                     }
                 },
             ],
-            "email" => [
-                "required",
-                "email",
-                function ($attribute, $value, $fail) use ($id) {
-                    $isExist = $this->user->where('id', '!=', $id)->where('email', $value)->get()->ToArray();
-                    if ($isExist) {
-                        return $fail($attribute . ' is already exist.');
-                    }
-                },
-            ]
+            // "email" => [
+            //     "required",
+            //     "email",
+            //     function ($attribute, $value, $fail) use ($id) {
+            //         $isExist = $this->user->where('id', '!=', $id)->where('email', $value)->get()->ToArray();
+            //         if ($isExist) {
+            //             return $fail($attribute . ' is already exist.');
+            //         }
+            //     },
+            // ]
         ]);
 
         $data = [
             "name" => $request->get("name"),
-            "email" => $request->get("email")
+            // "email" => $request->get("email")
         ];
 
-        $data['contact'] =  $data['city'] = $data['headline'] = $data['gender'] = $data['education'] = $data['interest'] = $data['hobby'] = $data['about'] = $data['experience'] = null;
+        $data['contact'] = $data['city'] = $data['headline'] = $data['gender'] = $data['education'] = $data['interest'] = $data['hobby'] = $data['about'] = $data['experience'] = null;
+
         if ($request->contact) {
             $request->validate([
                 "contact" => [
@@ -481,11 +482,11 @@ class AuthController extends Controller
             $data["experience"] = $request->experience;
         }
 
-        $isUpdated = $this->user->find($id)->update($data);
+        $isUpdated = $this->user->find($user->id)->update($data);
 
         if ($isUpdated) {
 
-            $user = $this->user->find($id);
+            $user = $this->user->find($user->id);
             $details = [
                 'title' => 'Profile Updated',
                 'body' => 'Your profile is updated'
@@ -674,9 +675,3 @@ class AuthController extends Controller
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Resume Pdf Not Deleted"]);
     }
 }
-// User/FollowsController.php -> allUsres(), follow(), unfollow(), following(), followers(), removeFollower()
-// User/NotificationsController.php -> notifications(), markAsRead(), markAllAsRead(), markAsUnread(), deleteNotification(), deleteAllNotification()
-// User/PostsController.php -> indexPost(), allPost(), createPost(), storePost(), showPost(), editPost(), updatePost(), deletePost(), likePost(), unlikePost(),
-// commentPostIndex(), commentPostCreate(), commentPostStore(), commentPostEdit(), commentPostUpdate(), commentPostDelete()
-// User/UserController.php -> index(), create(), store(), show(), edit(), update(), destroy(), changePassword(), doChangePassword(), editProfile(), updateProfile(), editProfileImage(), updateProfileImage(), deleteProfileImage(), editResumePdf(), updateResumePdf(), deleteResumePdf()
-// User/AuthController.php  -> dashboard(), changePassword(), doChangePassword(), editProfile(), updateProfile(), editProfileImage(), updateProfileImage(), deleteProfileImage(), editResumePdf(), updateResumePdf(), deleteResumePdf()

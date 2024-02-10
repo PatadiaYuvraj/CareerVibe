@@ -50,7 +50,8 @@
                                             <div class=" col col-lg-9 col-md-8">
                                                 @csrf
                                                 <div class="input-group col">
-                                                    <input name="resume_pdf_url" type="file" class="form-control"
+                                                    <input name="resume_pdf_url" type="file"
+                                                        class="form-control @error('resume_pdf_url') is-invalid @enderror"
                                                         id="resume_pdf_url" />
                                                 </div>
                                                 @error('resume_pdf_url')
@@ -62,7 +63,7 @@
                                             <button type="submit" class="btn btn-primary btn-space">
                                                 Update
                                             </button>
-                                            <a href="{{ route('user.dashboard') }}" class="btn btn-secondary btn-space">
+                                            <a href="{{ route('user.dashboard') }}" class="btn btn-danger btn-space">
                                                 Cancel
                                             </a>
                                         </div>

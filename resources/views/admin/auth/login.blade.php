@@ -5,15 +5,15 @@
         <div class="card-body">
             <div class="pt-4 pb-2">
                 <h5 class="card-title text-center pb-0 fs-4">Login to Your Account</h5>
-                <p class="text-center small">Enter your username & password to login</p>
+                <p class="text-center small">Enter your email & password to login</p>
             </div>
 
             <form class="row g-3" action="{{ route('admin.doLogin') }}" method="POST">
                 @csrf
                 <div class="col-12">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" placeholder="Enter Email"
-                        value="{{ old('email') }}" id="email">
+                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                        placeholder="Enter Email" value="{{ old('email') }}" id="email">
                     @error('email')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -21,7 +21,11 @@
 
                 <div class="col-12">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" name="password" class="form-control" id="password" placeholder="Enter Password">
+                    <input type="password" name="password"
+                        class="form-control
+                    @error('password') is-invalid @enderror
+                    "
+                        id="password" placeholder="Enter Password">
                     @error('password')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror

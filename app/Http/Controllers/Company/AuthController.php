@@ -191,7 +191,6 @@ class AuthController extends Controller
         return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Email Not Verified"]);
     }
 
-    // forgotPassword
     public function forgotPassword()
     {
         return $this->navigationManagerService->loadView('company.auth.forgot-password');
@@ -366,34 +365,34 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request)
     {
-        $id = $this->authenticableService->getCompany()->id;
+        $company = $this->authenticableService->getCompany();
         $request->validate([
             "name" => [
                 "required",
                 "min:3",
                 "max:50",
-                function ($attribute, $value, $fail) use ($id) {
-                    $user = $this->company->where("name", $value)->where("id", "!=", $id)->first();
+                function ($attribute, $value, $fail) use ($company) {
+                    $user = $this->company->where("name", $value)->where("id", "!=", $company->id)->first();
                     if ($user) {
                         return $fail("Name already exist");
                     }
                 }
             ],
-            "email" => [
-                "required",
-                "email",
-                function ($attribute, $value, $fail) use ($id) {
-                    $user = $this->company->where("email", $value)->where("id", "!=", $id)->first();
-                    if ($user) {
-                        return $fail("Email already exist");
-                    }
-                }
-            ]
+            // "email" => [
+            //     "required",
+            //     "email",
+            //     function ($attribute, $value, $fail) use ($company) {
+            //         $user = $this->company->where("email", $value)->where("id", "!=", $company->id)->first();
+            //         if ($user) {
+            //             return $fail("Email already exist");
+            //         }
+            //     }
+            // ]
         ]);
 
         $data = [
             "name" => $request->get("name"),
-            "email" => $request->get("email")
+            // "email" => $request->get("email"),
         ];
 
         $data["website"] = $data["city"] = $data["address"] = $data["linkedin"] = $data["description"] = null;
@@ -472,7 +471,7 @@ class AuthController extends Controller
             $data["description"] = $request->get("description");
         }
 
-        $isUpdated = $this->company->where('id', $id)->update($data);
+        $isUpdated = $this->company->where('id', $company->id)->update($data);
 
         if ($isUpdated) {
             $company = $this->authenticableService->getCompany();

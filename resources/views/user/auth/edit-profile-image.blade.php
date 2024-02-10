@@ -50,7 +50,9 @@
                                             <div class=" col col-lg-9 col-md-8">
                                                 @csrf
                                                 <div class="input-group col">
-                                                    <input name="profile_image_url" type="file" class="form-control"
+                                                    <input name="profile_image_url" type="file"
+                                                        class="form-control
+                                                        @error('profile_image_url') is-invalid @enderror"
                                                         id="profile_image_url" />
                                                 </div>
                                                 @error('profile_image_url')
@@ -62,7 +64,7 @@
                                             <button type="submit" class="btn btn-primary btn-space">
                                                 Update
                                             </button>
-                                            <a href="{{ route('user.dashboard') }}" class="btn btn-secondary btn-space">
+                                            <a href="{{ route('user.dashboard') }}" class="btn btn-danger btn-space">
                                                 Cancel
                                             </a>
                                         </div>

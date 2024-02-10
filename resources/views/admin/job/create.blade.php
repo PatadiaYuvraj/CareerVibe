@@ -1,6 +1,8 @@
 @extends('admin.layout.app')
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
+
+
     <main id="main" class="main">
         <section class="section dashboard">
             <div class="card">
@@ -16,8 +18,7 @@
                             <label for="email" class="form-label">Company Name</label>
                             <label class="form-control">{{ $company['name'] }}</label>
                         </div>
-                        {{-- divide sub profiles in category wise --}}
-                        <div class="mb-3">
+                        {{-- <div class="mb-3">
                             <label for="email" class="form-label">Select Job Profile
                                 <span class="text-danger">*</span>
                             </label>
@@ -41,6 +42,29 @@
                                             value="No Profile Found" required>
                                     </div>
                                 @endforelse
+                            </div>
+                            @error('sub_profile_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div> --}}
+                        <div class="mb-3">
+                            <label for="sub_profile_id" class="form-label">Select Job Profile
+                                <span class="text-danger">*</span>
+                            </label>
+                            <div class="row row-cols-2">
+                                <select class="job-profile-selector form-select select2-single select2-hidden-accessibl"
+                                    name="sub_profile_id" id="sub_profile_id">
+                                    <option value="">Select Job Profile</option>
+                                    @foreach ($profile_categories as $category)
+                                        <optgroup label="{{ $category['name'] }}">
+                                            @foreach ($category['sub_profiles'] as $sub_profile)
+                                                <option value="{{ $sub_profile['id'] }}">
+                                                    {{ Str::ucfirst(Str::lower($sub_profile['name'])) }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
                             </div>
                             @error('sub_profile_id')
                                 <span class="text-danger">{{ $message }}</span>
@@ -81,7 +105,7 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="row row-cols-3">
-                                @foreach (Config::get('constants.job.work_type') as $key => $value)
+                                {{-- @foreach (Config::get('constants.job.work_type') as $key => $value)
                                     <div class="col">
                                         <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
@@ -93,7 +117,15 @@
                                             </div>
                                         </label>
                                     </div>
-                                @endforeach
+                                @endforeach --}}
+                                <select class="work-type-selector form-select" name="work_type" id="work_type">
+                                    {{-- <option value="">Select Work Type</option> --}}
+                                    @foreach (Config::get('constants.job.work_type') as $key => $value)
+                                        <option value="{{ $key }}">
+                                            {{ $value }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                             @error('work_type')
                                 <span class="text-danger">{{ $message }}</span>
@@ -104,7 +136,7 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="row row-cols-3">
-                                @forelse ($qualifications as $qualification)
+                                {{-- @forelse ($qualifications as $qualification)
                                     <div class="col">
                                         <label for="{{ $qualification['name'] }}" class="input-group mb-3">
                                             <div class="input-group-text">
@@ -122,7 +154,17 @@
                                         <input type="text" class="form-control text-danger" readonly
                                             value="No Qualification Found" required>
                                     </div>
-                                @endforelse
+                                @endforelse --}}
+                                <select class="qualifications-selector form-select" name="qualifications[]"
+                                    id="qualifications" multiple="multiple">
+                                    {{-- <option value="">Select Qualifications</option> --}}
+                                    @foreach ($qualifications as $qualification)
+                                        <option value="{{ $qualification['id'] }}">
+                                            {{ $qualification['name'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
                             </div>
                             @error('qualifications')
                                 <span class="text-danger">{{ $message }}</span>
@@ -133,7 +175,7 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="row row-cols-3">
-                                @forelse ($locations as $location)
+                                {{-- @forelse ($locations as $location)
                                     <div class="col">
                                         <label for="{{ $location['city'] }}" class="input-group mb-3">
                                             <div class="input-group-text">
@@ -155,7 +197,19 @@
                                         <input type="text" class="form-control text-danger" readonly
                                             value="No Location Found" required>
                                     </div>
-                                @endforelse
+                                @endforelse --}}
+                                <select class="locations-selector form-select" name="locations[]" id="locations"
+                                    multiple="multiple">
+                                    {{-- <option value="">Select Locations</option> --}}
+                                    @foreach ($locations as $location)
+                                        <option value="{{ $location['id'] }}">
+                                            {{ $location['city'] }}
+                                            @if ($location['state'])
+                                                <span class="small">({{ $location['state'] }})</span>
+                                            @endif
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                             @error('locations')
                                 <span class="text-danger">{{ $message }}</span>
@@ -167,7 +221,7 @@
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="row row-cols-4">
-                                @foreach (Config::get('constants.job.job_type') as $key => $value)
+                                {{-- @foreach (Config::get('constants.job.job_type') as $key => $value)
                                     <div class="col">
                                         <label for="{{ $key }}" class="input-group mb-3">
                                             <div class="input-group-text">
@@ -179,7 +233,15 @@
                                             </div>
                                         </label>
                                     </div>
-                                @endforeach
+                                @endforeach --}}
+                                <select class="job-type-selector form-select" name="job_type" id="job_type">
+                                    {{-- <option value="">Select Job Type</option> --}}
+                                    @foreach (Config::get('constants.job.job_type') as $key => $value)
+                                        <option value="{{ $key }}">
+                                            {{ $value }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
                             @error('work_type')
                                 <span class="text-danger">{{ $message }}</span>
@@ -242,7 +304,8 @@
                         </div>
                         <div class="row row-cols-2 mb-3">
                             <div class="col">
-                                <label for="benifits_perks" class="form-label">Benifits & Perks</label>
+                                <label for="benifits_perks" class="form-label">Benifits &
+                                    Perks</label>
                                 <textarea class="form-control" id="benifits_perks" name="benifits_perks" rows="3">{{ old('benifits_perks') }}</textarea>
                             </div>
                             <div class="col">
@@ -265,5 +328,46 @@
 @endsection
 
 @section('scripts')
-    <script></script>
+    <script>
+        $(document).ready(function() {
+
+            $('.job-profile-selector').select2({
+                placeholder: {
+                    id: '-1',
+                    text: 'Select Job Profile'
+                },
+                allowClear: true,
+                theme: "bootstrap"
+            });
+            $('.qualifications-selector').select2({
+                placeholder: {
+                    id: '-1',
+                    text: 'Select Qualifications'
+                },
+                allowClear: true,
+            });
+            $('.locations-selector').select2({
+                placeholder: {
+                    id: '-1',
+                    text: 'Select Locations'
+                },
+                allowClear: true
+            });
+            $('.job-type-selector').select2({
+                placeholder: {
+                    id: '-1',
+                    text: 'Select Job Type'
+                },
+                allowClear: true,
+            });
+            $('.work-type-selector').select2({
+                placeholder: {
+                    id: '-1',
+                    text: 'Select Work Type'
+                },
+                allowClear: true,
+            });
+
+        });
+    </script>
 @endsection

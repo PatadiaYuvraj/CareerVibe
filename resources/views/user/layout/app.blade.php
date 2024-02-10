@@ -147,7 +147,12 @@
             <hr>
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('user.notifications') }}">
-                    <span>Notifications</span>
+                    <span>
+                        Notifications
+                        <span class="badge bg-danger">
+                            {{ auth()->guard(config('constants.USER_GUARD'))->user()->unreadNotifications->count() }}
+                        </span>
+                    </span>
                 </a>
             </li>
             <hr>

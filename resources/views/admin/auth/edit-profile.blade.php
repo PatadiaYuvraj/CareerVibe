@@ -43,7 +43,10 @@
                                                 Full Name
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
-                                                <input name="name" type="text" class="form-control" id="name"
+                                                <input name="name" type="text"
+                                                    class="form-control
+                                                    {{ $errors->has('name') ? 'is-invalid' : '' }}"
+                                                    id="name"
                                                     value="{{ old('name') ?? auth()->guard('admin')->user()->name }}" />
                                                 @error('name')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
@@ -55,11 +58,8 @@
                                                 Email
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
-                                                <input name="email" type="text" class="form-control" id="email"
-                                                    value="{{ old('email') ?? auth()->guard('admin')->user()->email }}" />
-                                                @error('email')
-                                                    <div class="text-danger mt-1">{{ $message }}</div>
-                                                @enderror
+                                                <span
+                                                    class="form-control is-valid">{{ auth()->guard('admin')->user()->email }}</span>
                                             </div>
                                         </div>
                                         <div class="btn-group">

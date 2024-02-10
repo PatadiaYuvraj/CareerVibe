@@ -44,8 +44,9 @@
                                                 Old Password
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
-                                                <input name="currentPassword" type="password" class="form-control"
-                                                    id="currentPassword" />
+                                                <input name="currentPassword" type="password"
+                                                    class="form-control @error('currentPassword') is-invalid @enderror"
+                                                    id="currentPassword" placeholder="Enter your current password" />
                                                 @error('currentPassword')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
@@ -56,8 +57,10 @@
                                                 New Password
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
-                                                <input name="newPassword" type="password" class="form-control"
-                                                    id="newPassword" />
+                                                <input name="newPassword" type="password"
+                                                    class="form-control
+                                                    @error('newPassword') is-invalid @enderror"
+                                                    placeholder="Enter new password" id="newPassword" />
                                                 @error('newPassword')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
@@ -68,8 +71,10 @@
                                                 Confirm Password
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
-                                                <input name="confirmPassword" type="password" class="form-control"
-                                                    id="confirmPassword" />
+                                                <input name="confirmPassword" type="password"
+                                                    class="form-control
+                                                    @error('confirmPassword') is-invalid @enderror"
+                                                    id="confirmPassword" placeholder="Confirm new password" />
                                                 @error('confirmPassword')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror

@@ -44,10 +44,11 @@
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
                                                 <div class="input-group">
-                                                    <input type="password" class="form-control" id="currentPassword"
-                                                        name="currentPassword" placeholder="Old Password" value="">
-                                                    <span id="toggleCurrentPassword"
-                                                        class="bi-eye-slash input-group-text"></span>
+                                                    <input type="password"
+                                                        class="form-control @error('currentPassword') is-invalid @enderror"
+                                                        id="currentPassword" name="currentPassword"
+                                                        placeholder="Old Password" value="">
+
                                                 </div>
                                                 @error('currentPassword')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
@@ -60,10 +61,11 @@
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
                                                 <div class="input-group">
-                                                    <input type="password" class="form-control" id="newPassword"
-                                                        name="newPassword" placeholder="New Password" value="">
-                                                    <span id="toggleNewPassword"
-                                                        class="bi-eye-slash input-group-text"></span>
+                                                    <input type="password"
+                                                        class="form-control @error('newPassword') is-invalid @enderror"
+                                                        id="newPassword" name="newPassword" placeholder="New Password"
+                                                        value="">
+
                                                 </div>
                                                 @error('newPassword')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
@@ -76,11 +78,12 @@
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
                                                 <div class="input-group">
-                                                    <input type="password" class="form-control" id="confirmPassword"
-                                                        name="confirmPassword" placeholder="Confirm Password"
-                                                        value="">
-                                                    <span id="toggleConfirmPassword"
-                                                        class="bi-eye-slash input-group-text"></span>
+                                                    <input type="password"
+                                                        class="form-control
+                                                    @error('confirmPassword') is-invalid @enderror"
+                                                        id="confirmPassword" name="confirmPassword"
+                                                        placeholder="Confirm Password" value="">
+
                                                 </div>
                                                 @error('confirmPassword')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
@@ -104,43 +107,4 @@
             </div>
         </section>
     </main>
-@endsection
-@section('scripts')
-    <script>
-        $(document).ready(function() {
-            $('#toggleCurrentPassword').click(function() {
-                if ($(this).hasClass('bi-eye-slash')) {
-                    $(this).removeClass('bi-eye-slash');
-                    $(this).addClass('bi-eye');
-                    $('#currentPassword').attr('type', 'text');
-                } else {
-                    $(this).removeClass('bi-eye');
-                    $(this).addClass('bi-eye-slash');
-                    $('#currentPassword').attr('type', 'password');
-                }
-            });
-            $('#toggleNewPassword').click(function() {
-                if ($(this).hasClass('bi-eye-slash')) {
-                    $(this).removeClass('bi-eye-slash');
-                    $(this).addClass('bi-eye');
-                    $('#newPassword').attr('type', 'text');
-                } else {
-                    $(this).removeClass('bi-eye');
-                    $(this).addClass('bi-eye-slash');
-                    $('#newPassword').attr('type', 'password');
-                }
-            });
-            $('#toggleConfirmPassword').click(function() {
-                if ($(this).hasClass('bi-eye-slash')) {
-                    $(this).removeClass('bi-eye-slash');
-                    $(this).addClass('bi-eye');
-                    $('#confirmPassword').attr('type', 'text');
-                } else {
-                    $(this).removeClass('bi-eye');
-                    $(this).addClass('bi-eye-slash');
-                    $('#confirmPassword').attr('type', 'password');
-                }
-            });
-        });
-    </script>
 @endsection

@@ -18,8 +18,11 @@
                     <label for="password" class="form-label">
                         New Password
                     </label>
-                    <input type="password" name="password" class="form-control" placeholder="Enter new password"
-                        value="{{ old('password') }}" id="password">
+                    <input type="password" name="password"
+                        class="form-control
+                    @error('password') is-invalid @enderror
+                    "
+                        placeholder="Enter new password" value="{{ old('password') }}" id="password">
                     @error('password')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror
@@ -28,8 +31,11 @@
                     <label for="confirm_password" class="form-label">
                         Confirm Password
                     </label>
-                    <input type="password" name="confirm_password" class="form-control" placeholder="Confirm new password"
-                        value="{{ old('confirm_password') }}" id="confirm_password">
+                    <input type="password" name="confirm_password"
+                        class="form-control
+                    @error('confirm_password') is-invalid @enderror
+                    "
+                        placeholder="Confirm new password" value="{{ old('confirm_password') }}" id="confirm_password">
                     @error('confirm_password')
                         <span class="text-danger">{{ $message }}</span>
                     @enderror

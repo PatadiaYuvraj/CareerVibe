@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Job;
 use App\Models\Location;
+use App\Models\ProfileCategory;
 use App\Models\Qualification;
 use App\Models\SubProfile;
 use App\Services\AuthenticableService;
@@ -52,15 +53,29 @@ class JobController extends Controller
             }
         ])->get()->toArray();
 
+        $profile_categories = ProfileCategory::with([
+            'subProfiles' => function ($query) {
+                $query->select(['id', 'name', 'profile_category_id']);
+            }
+        ])->select(['id', 'name'])->get()->toArray();
+
         $locations = Location::select(['id', 'city', 'state'])->get()->toArray();
 
         $qualifications = Qualification::select(['id', 'name'])->get()->toArray();
 
-        return $this->navigationManagerService->loadView('admin.job.create', compact('company', 'sub_profiles', 'locations', 'qualifications'));
+        return $this->navigationManagerService->loadView('admin.job.create', compact(
+            'company',
+            // 'sub_profiles',
+            'profile_categories',
+            'locations',
+            'qualifications'
+        ));
     }
 
     public function store(Request $request, $id)
     {
+
+        dd($request->all());
         $company = $this->authenticableService->getCompanyById($id);
         if (!$company->is_verified) {
             return $this->navigationManagerService->redirectRoute('admin.company.index', [], 302, [], false, ["warning" => "Company is not verified"]);

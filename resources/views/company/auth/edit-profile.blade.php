@@ -36,27 +36,6 @@
                                     <h5 class="card-title">
                                         Edit Profile Details
                                     </h5>
-                                    {{-- <div class="row row-cols-3 mb-3">
-                                        <div class="col col-lg-3 col-md-4 label">
-                                            Profile Image
-                                        </div>
-                                        <div class=" col col-lg-9 col-md-8">
-                                            <form action="{{ route('company.updateProfileImage') }}" method="POST"
-                                                enctype="multipart/form-data">
-                                                @csrf
-                                                <div class="input-group col">
-                                                    <input name="profile_image_url" type="file" class="form-control"
-                                                        id="profile_image_url" />
-                                                    <button type="submit" class="btn btn-primary">
-                                                        Upload
-                                                    </button>
-                                                </div>
-                                                @error('profile_image_url')
-                                                    <div class="text-danger mt-1">{{ $message }}</div>
-                                                @enderror
-                                            </form>
-                                        </div>
-                                    </div> --}}
                                     <form action="{{ route('company.updateProfile') }}" method="POST">
                                         @csrf
                                         <div class="row">
@@ -64,8 +43,11 @@
                                                 Full Name
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
-                                                <input name="name" type="text" class="form-control" id="name"
-                                                    value="{{ old('name',auth()->guard('company')->user()->name) }}" />
+                                                <input name="name" type="text"
+                                                    class="form-control
+                                                @error('name') is-invalid @enderror"
+                                                    id="name"
+                                                    value="{{ old('name', auth()->guard('company')->user()->name) }}" />
                                                 @error('name')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
@@ -76,11 +58,8 @@
                                                 Email
                                             </div>
                                             <div class="col-lg-9 col-md-8">
-                                                <input name="email" type="text" class="form-control" id="email"
-                                                    value="{{ old('email',auth()->guard('company')->user()->email) }}" />
-                                                @error('email')
-                                                    <div class="text-danger mt-1">{{ $message }}</div>
-                                                @enderror
+                                                <span
+                                                    class="form-control is-valid">{{ auth()->guard('company')->user()->email }}</span>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -89,7 +68,7 @@
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
                                                 <input name="website" type="text" class="form-control" id="website"
-                                                    value="{{ old('website',auth()->guard('company')->user()->website) }}" />
+                                                    value="{{ old('website', auth()->guard('company')->user()->website) }}" />
                                                 @error('website')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
@@ -101,7 +80,7 @@
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
                                                 <input name="city" type="text" class="form-control" id="city"
-                                                    value="{{ old('city',auth()->guard('company')->user()->city) }}" />
+                                                    value="{{ old('city', auth()->guard('company')->user()->city) }}" />
                                                 @error('city')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
@@ -113,7 +92,7 @@
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
                                                 <input name="address" type="text" class="form-control" id="address"
-                                                    value="{{ old('address',auth()->guard('company')->user()->address) }}" />
+                                                    value="{{ old('address', auth()->guard('company')->user()->address) }}" />
                                                 @error('address')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
@@ -125,7 +104,7 @@
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
                                                 <input name="linkedin" type="text" class="form-control" id="linkedin"
-                                                    value="{{ old('linkedin',auth()->guard('company')->user()->linkedin) }}" />
+                                                    value="{{ old('linkedin', auth()->guard('company')->user()->linkedin) }}" />
                                                 @error('linkedin')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror
@@ -136,7 +115,7 @@
                                                 Description
                                             </div>
                                             <div class="col col-lg-9 col-md-8">
-                                                <textarea name="description" type="text" class="form-control" id="description" rows="5">{{ old('description',auth()->guard('company')->user()->description) }}</textarea>
+                                                <textarea name="description" type="text" class="form-control" id="description" rows="5">{{ old('description', auth()->guard('company')->user()->description) }}</textarea>
                                                 @error('description')
                                                     <div class="text-danger mt-1">{{ $message }}</div>
                                                 @enderror

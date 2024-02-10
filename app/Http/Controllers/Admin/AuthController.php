@@ -354,7 +354,16 @@ class AuthController extends Controller
 
 
         if ($isUpdated) {
-            return $this->navigationManagerService->redirectRoute('admin.dashboard', [], 302, [], false, ["success" => "Password Updated Successfully"]);
+            return $this->navigationManagerService->redirectRoute(
+                'admin.dashboard',
+                [],
+                302,
+                [],
+                false,
+                [
+                    "success" => "Password Updated Successfully"
+                ]
+            );
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Password Not Updated"]);
     }
@@ -376,34 +385,41 @@ class AuthController extends Controller
             "name" => [
                 "required",
                 "string",
-                "max:100",
+                'min:3',
+                "max:20",
             ],
-            "email" => [
-                "required",
-                "email",
-                function ($attribute, $value, $fail) use ($admin) {
-                    if ($value != $admin->email) {
-                        $isExist = $this->admin->where('email', $value)->get()->ToArray();
-                        if ($isExist) {
-                            return $fail($attribute . ' is already exist.');
-                        }
-                    }
-                },
-            ]
+            // "email" => [
+            //     "required",
+            //     "email",
+            //     function ($attribute, $value, $fail) use ($admin) {
+            //         if ($value != $admin->email) {
+            //             $isExist = $this->admin->where('email', $value)->get()->ToArray();
+            //             if ($isExist) {
+            //                 return $fail($attribute . ' is already exist.');
+            //             }
+            //         }
+            //     },
+            // ]
         ]);
+
+        if ($admin->name == $request->get("name")) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "No changes found"]);
+        }
 
         $data = [
             "name" => $request->get("name"),
-            "email" => $request->get("email")
+            // "email" => $request->get("email")
         ];
 
         $isUpdated = $this->admin->find($admin->id)->update($data);
 
         if ($isUpdated) {
+
             $details = [
                 'title' => 'Profile Updated',
                 'body' => "Your profile has been updated successfully"
             ];
+
             // UNCOMMENT: To send notification
             $this->notifiableService->sendNotification($admin, $details['body']);
             // UNCOMMENT: To send mail
