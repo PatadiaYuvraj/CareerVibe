@@ -6,19 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    private array $index, $unique;
     public function up(): void
     {
+
+        $this->index = [
+            "jobs_id",
+            "locations_id",
+        ];
+        $this->unique = [
+            "jobs_id",
+            "locations_id",
+        ];
+
         Schema::create('job_locations', function (Blueprint $table) {
             $table->id();
             $table->bigInteger("jobs_id")->unsigned();
             $table->bigInteger("locations_id")->unsigned();
             $table->foreign('jobs_id')->references('id')->on('jobs');
             $table->foreign('locations_id')->references('id')->on('locations');
-            $table->unique(['jobs_id', 'locations_id']);
-            $table->index(['jobs_id', 'locations_id']);
+            $table->unique(
+                $this->unique
+            );
+            $table->index(
+                $this->index
+            );
             $table->timestamps();
         });
     }

@@ -6,18 +6,30 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    private array $index, $unique;
     public function up(): void
     {
+
+        $this->index = [
+            "city",
+            "state",
+            "id",
+        ];
+        $this->unique = [
+            "city",
+        ];
         Schema::create('locations', function (Blueprint $table) {
             $table->id();
-            $table->string("city", 100);
-            $table->string("state", 100)->nullable();
-            $table->string("country", 100)->nullable();
+            $table->string("city", 20);
+            $table->string("state", 25)->nullable();
+            $table->string("country", 25)->nullable();
             $table->integer("pincode")->nullable();
-            $table->index(['id', "city", 'state']);
+            $table->index(
+                $this->index
+            );
+            $table->unique(
+                $this->unique
+            );
             $table->timestamps();
         });
     }

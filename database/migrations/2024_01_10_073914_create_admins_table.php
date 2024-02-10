@@ -6,16 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    private array $index, $unique;
     public function up(): void
     {
+
+        $this->index = [
+            'name',
+            'email',
+            'id',
+        ];
+        $this->unique = [
+            'email',
+            'id',
+        ];
+
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
             $table->string("userType", 10)->default("ADMIN");
-            $table->string('name', 60);
-            $table->string('email', 100)->unique();
+            $table->string('name', 20);
+            $table->string('email', 100);
             $table->string('password', 100)->nullable();
             $table->text("profile_image_url")->nullable();
             $table->text("profile_image_public_id")->nullable();
@@ -42,12 +51,12 @@ return new class extends Migration
             $table->timestamp("email_change_at")->nullable();
             $table->timestamp("last_login_at")->nullable();
             $table->rememberToken();
-            $table->index([
-                'name',
-                'email',
-                'id',
-                'password',
-            ]);
+            $table->index(
+                $this->index
+            );
+            $table->unique(
+                $this->unique
+            );
             $table->timestamps();
         });
     }

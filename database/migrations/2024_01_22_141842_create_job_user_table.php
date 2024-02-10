@@ -9,14 +9,27 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+    private array $index, $unique;
     public function up(): void
     {
+        $this->index = [
+            "user_id",
+            "job_id",
+        ];
+        $this->unique = [
+            "user_id",
+            "job_id",
+        ];
         Schema::create('job_user', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('job_id')->constrained()->onDelete('cascade');
-            $table->unique(['user_id', 'job_id']);
-            $table->index(['user_id', 'job_id']);
+            $table->unique(
+                $this->unique
+            );
+            $table->index(
+                $this->index
+            );
             $table->timestamps();
         });
     }

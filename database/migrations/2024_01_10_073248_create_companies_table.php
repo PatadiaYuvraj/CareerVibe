@@ -9,14 +9,28 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    private array $index, $unique;
+
     public function up(): void
     {
+
+        $this->index = [
+            "name",
+            "email",
+            "id",
+            "is_verified",
+        ];
+        $this->unique = [
+            "email",
+        ];
+
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->boolean('is_verified')->default(false);
             $table->string("userType", 10)->default("COMPANY");
             $table->string('name', 60);
-            $table->string('email', 100)->unique();
+            $table->string('email', 100);
             $table->string('password', 100)->nullable();
             $table->text("profile_image_url")->nullable();
             $table->text("profile_image_public_id")->nullable();
@@ -48,13 +62,12 @@ return new class extends Migration
             $table->timestamp("email_change_at")->nullable();
             $table->timestamp("last_login_at")->nullable();
             $table->rememberToken();
-            $table->index([
-                'name',
-                'email',
-                'id',
-                'is_verified',
-                'password',
-            ]);
+            $table->index(
+                $this->index
+            );
+            $table->unique(
+                $this->unique
+            );
             $table->timestamps();
         });
     }

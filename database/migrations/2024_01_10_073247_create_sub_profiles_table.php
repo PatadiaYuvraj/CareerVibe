@@ -9,17 +9,32 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    private array $index, $unique;
+
     public function up(): void
     {
+        $this->index = [
+            "name",
+            "profile_category_id",
+            "id",
+        ];
+
+        $this->unique = [
+            "name",
+            "profile_category_id",
+        ];
+
         Schema::create('sub_profiles', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger("profile_category_id")->unsigned()->index();
-            $table->string("name", 50);
-            $table->index([
-                'name',
-                'id',
-                'profile_category_id',
-            ]);
+            $table->bigInteger("profile_category_id")->unsigned();
+            $table->string("name", 100);
+            $table->index(
+                $this->index
+            );
+            $table->unique(
+                $this->unique
+            );
             $table->foreign('profile_category_id')->references('id')->on('profile_categories')->onDelete('cascade');
             $table->timestamps();
         });

@@ -12,26 +12,25 @@ return new class extends Migration
      */
 
 
-    private array $index = [
-        "name",
-        "email",
-        "id",
-        "is_active",
-    ];
-
-    private array $unique = [
-        "email",
-    ];
+    private array $index, $unique, $gender;
 
     public function up(): void
     {
-
-
+        $this->index = [
+            "name",
+            "email",
+            "id",
+            "is_active",
+        ];
+        $this->unique = [
+            "email",
+        ];
+        $this->gender = array_keys(Config::get('constants.gender'));
 
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string("name", 25);
-            $table->string("email", 50)->unique()->index();
+            $table->string("email", 50);
             $table->string("password", 100);
             $table->string("userType", 10)->default("USER");
             $table->text("profile_image_url")->nullable();
@@ -41,7 +40,7 @@ return new class extends Migration
             $table->string("contact", 15)->nullable();
             $table->enum(
                 "gender",
-                array_keys(Config::get('constants.gender'))
+                $this->gender
             )->nullable();
             $table->boolean('is_active')->default(true);
             $table->string("headline", 200)->nullable();

@@ -10,28 +10,38 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    private array $index, $unique, $type;
     public function up(): void
     {
+        $this->index = [
+            'id',
+            'authorable_id',
+            'authorable_type',
+            'title',
+            'type',
+        ];
+        $this->unique = [
+            'id',
+            'authorable_id',
+            'authorable_type',
+        ];
+        $this->type = array_keys(Config::get('constants.post.type'));
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->morphs('authorable');
             $table->string('title');
             $table->enum(
                 'type',
-                array_keys(Config::get('constants.post.type'))
+                $this->type
             )->default('text');
             $table->text('content');
-            $table->unique([
-                'id', 'authorable_id', 'authorable_type',
-            ]);
-            $table->index([
-                'id',
-                'authorable_id',
-                'authorable_type',
-                'title',
-                'type',
-            ]);
-            // $table->softDeletes();
+            $table->unique(
+                $this->unique
+            );
+            $table->index(
+                $this->index
+            );
             $table->timestamps();
         });
     }

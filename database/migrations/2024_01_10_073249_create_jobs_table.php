@@ -10,8 +10,18 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+    private array $index, $unique, $job_type, $work_type, $experience_level, $experience_type;
+
     public function up(): void
     {
+        $this->index = ["keywords", "id", "company_id", "sub_profile_id"];
+        $this->unique = ["id"];
+        $this->job_type = array_keys(Config::get('constants.job.job_type'));
+        $this->work_type = array_keys(Config::get('constants.job.work_type'));
+        $this->experience_level = array_keys(Config::get('constants.job.experience_level'));
+        $this->experience_type = array_keys(Config::get('constants.job.experience_type'));
+
         Schema::create('jobs', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('company_id')->unsigned();
@@ -29,26 +39,26 @@ return new class extends Migration
             $table->string('keywords')->nullable();
             $table->enum(
                 'work_type',
-                array_keys(Config::get('constants.job.work_type'))
+                $this->work_type
             )->nullable();
             $table->enum(
                 'job_type',
-                array_keys(Config::get('constants.job.job_type'))
+                $this->job_type
             )->nullable();
             $table->enum(
                 'experience_level',
-                array_keys(Config::get('constants.job.experience_level'))
+                $this->experience_level
             )->nullable();
             $table->enum(
                 'experience_type',
-                array_keys(Config::get('constants.job.experience_type'))
+                $this->experience_type
             )->nullable();
-            $table->index([
-                'keywords',
-                'id',
-                'company_id',
-                'sub_profile_id',
-            ]);
+            $table->index(
+                $this->index
+            );
+            $table->unique(
+                $this->unique
+            );
             $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->foreign('sub_profile_id')->references('id')->on('sub_profiles')->onDelete('cascade');
             $table->timestamps();
