@@ -117,7 +117,11 @@ class UserController extends Controller
 
         if ($request->gender) {
             $request->validate([
-                'gender' => ['required', 'string', 'max:10', 'in:MALE,FEMALE,OTHER'],
+                'gender' => [
+                    'required',
+                    'string',
+                    'in:' . implode(',', array_keys(Config::get('constants.gender'))),
+                ],
             ]);
             $data['gender'] = $request->gender;
         }
@@ -296,8 +300,7 @@ class UserController extends Controller
                 'gender' => [
                     'required',
                     'string',
-                    'max:10',
-                    'in:MALE,FEMALE,OTHER'
+                    'in:' . implode(',', array_keys(Config::get('constants.gender'))),
                 ],
             ]);
             $data['gender'] = $request->gender;

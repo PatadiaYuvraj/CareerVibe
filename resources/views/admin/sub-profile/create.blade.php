@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Add Sub Profile</span>
-                    <a wire:navigate href="{{ route('admin.sub-profile.index') }}" class="float-end btn btn-sm btn-primary">
+                    <a href="{{ route('admin.sub-profile.index') }}" class="float-end btn btn-sm btn-primary">
                         Back
                     </a>
                 </div>
@@ -45,7 +45,7 @@
                                     <div class="card-body">
                                         <span class="text-danger">No Profile Category Found</span>
 
-                                        <a wire:navigate href="{{ route('admin.profile-category.create') }}" class="">
+                                        <a href="{{ route('admin.profile-category.create') }}" class="">
                                             Add Profile Category
                                         </a>
 
@@ -58,8 +58,7 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a wire:navigate href="{{ route('admin.sub-profile.index') }}"
-                                class="btn btn-danger">Cancel</a>
+                            <a href="{{ route('admin.sub-profile.index') }}" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
                 </div>

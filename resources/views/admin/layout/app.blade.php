@@ -17,7 +17,6 @@
     <link href="{{ asset('admin/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('admin/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.css" />
-    @livewireStyles
 
 
     <link href="{{ asset('admin/css/style.css') }}" rel="stylesheet">
@@ -93,24 +92,24 @@
 
         <ul class="sidebar-nav" id="sidebar-nav">
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.dashboard') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.dashboard') }}">
                     <span>Dashboard</span>
                 </a>
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.company.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.company.index') }}">
                     <span>Company</span>
                 </a>
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.user.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.user.index') }}">
                     <span>User</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.user.livewire') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.user.livewire') }}">
                     <span>
                         User LiveWire
                     </span>
@@ -118,19 +117,19 @@
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.job.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.job.index') }}">
                     <span>Job</span>
                 </a>
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.profile-category.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.profile-category.index') }}">
                     <span>Profile Category</span>
                 </a>
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.profile-category.livewire') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.profile-category.livewire') }}">
                     <span>
                         Profile Category LiveWire
                     </span>
@@ -138,12 +137,12 @@
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.sub-profile.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.sub-profile.index') }}">
                     <span>Sub Profile</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.sub-profile.livewire') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.sub-profile.livewire') }}">
                     <span>
                         Sub Profile LiveWire
                     </span>
@@ -152,13 +151,13 @@
             {{-- <hr> --}}
 
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.location.index') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.location.index') }}">
                     <span>Location</span>
                 </a>
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link collapsed" wire:navigate href="{{ route('admin.location.livewire') }}">
+                <a class="nav-link collapsed" href="{{ route('admin.location.livewire') }}">
                     <span>
                         Location LiveWire
                     </span>
@@ -166,13 +165,13 @@
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link  collapsed" wire:navigate href="{{ route('admin.qualification.index') }}">
+                <a class="nav-link  collapsed" href="{{ route('admin.qualification.index') }}">
                     <span>Qualification</span>
                 </a>
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link  collapsed" wire:navigate href="{{ route('admin.qualification.livewire') }}">
+                <a class="nav-link  collapsed" href="{{ route('admin.qualification.livewire') }}">
                     <span>
                         Qualification LiveWire
                     </span>
@@ -180,9 +179,12 @@
             </li>
             {{-- <hr> --}}
             <li class="nav-item">
-                <a class="nav-link  collapsed" wire:navigate href="{{ route('admin.notifications') }}">
+                <a class="nav-link  collapsed" href="{{ route('admin.notifications') }}">
                     <span>
                         Notifications
+                        <span class="badge bg-danger">
+                            {{ auth()->guard('admin')->user()->unreadNotifications->count() }}
+                        </span>
                     </span>
                 </a>
             </li>
@@ -203,16 +205,12 @@
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.repeater/1.2.1/jquery.repeater.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js "></script>
     <script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     {{-- <script src="{{ asset('admin/vendor/tinymce/tinymce.min.js') }}"></script> --}}
     <script defer src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.4/dist/sweetalert2.all.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.repeater/1.2.1/jquery.repeater.js"
-        integrity="sha512-bZAXvpVfp1+9AUHQzekEZaXclsgSlAeEnMJ6LfFAvjqYUVZfcuVXeQoN5LhD7Uw0Jy4NCY9q3kbdEXbwhZUmUQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    @livewireScripts
+    <script src="https://cdn.jsdelivr.net/npm/jquery.repeater@1.2.1/jquery.repeater.min.js"></script>
     <script src="{{ asset('admin/js/main.js') }}"></script>
     <script>
         toastr.options = {

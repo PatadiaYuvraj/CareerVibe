@@ -419,8 +419,7 @@ class AuthController extends Controller
                 'gender' => [
                     'required',
                     'string',
-                    'max:10',
-                    'in:MALE,FEMALE,OTHER'
+                    'in:' . implode(',', array_keys(Config::get('constants.gender'))),
                 ],
             ]);
             $data['gender'] = $request->gender;

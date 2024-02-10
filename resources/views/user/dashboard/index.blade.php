@@ -119,7 +119,7 @@
                                         </div>
                                         <div class="col-lg-9 col-md-8">
                                             @if (auth()->guard('user')->user()->gender)
-                                                {{ auth()->guard('user')->user()->gender }}
+                                                {{ Config::get('constants.gender.' . auth()->guard('user')->user()->gender) }}
                                             @else
                                                 <span class="text-danger">No Gender</span>
                                             @endif
@@ -296,10 +296,8 @@
                                         </div>
                                         <div class="col-lg-9 col-md-8">
                                             You are following
-                                            {{ auth()->guard('user')->user()->following->count() +auth()->guard('user')->user()->followingCompanies->count() }}
-                                            @if (auth()->guard('user')->user()->following->count() +
-                                                    auth()->guard('user')->user()->followingCompanies->count() <=
-                                                    1)
+                                            {{ auth()->guard('user')->user()->following->count() + auth()->guard('user')->user()->followingCompanies->count() }}
+                                            @if (auth()->guard('user')->user()->following->count() + auth()->guard('user')->user()->followingCompanies->count() <= 1)
                                                 user/company
                                             @else
                                                 users/companies

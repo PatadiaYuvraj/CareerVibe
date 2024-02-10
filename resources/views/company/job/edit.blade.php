@@ -91,7 +91,7 @@
                                                     @if ($key == $job['work_type']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -157,7 +157,7 @@
                                                     @if ($key == $job['job_type']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -179,7 +179,7 @@
                                                     @if ($key == $job['experience_level']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -201,7 +201,7 @@
                                                     @if ($key == $job['experience_type']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>

@@ -8,7 +8,7 @@
             <div class="card">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Company</span>
-                    <a wire:navigate href="{{ route('admin.company.create') }}" class="float-end btn btn-sm btn-primary">Add
+                    <a href="{{ route('admin.company.create') }}" class="float-end btn btn-sm btn-primary">Add
                         Company</a>
                 </div>
                 <div class="card-body">
@@ -28,7 +28,7 @@
                             @forelse ($companies as $company)
                                 <tr>
                                     <td>
-                                        <a wire:navigate href="{{ route('admin.company.show', $company['id']) }}">
+                                        <a href="{{ route('admin.company.show', $company['id']) }}">
                                             {{ $company['name'] }}
                                         </a>
                                     </td>
@@ -50,12 +50,12 @@
                                     <td class="col-3">
                                         <div class="btn-group btn-group-sm d-flex">
                                             @if ($company['is_verified'])
-                                                <a wire:navigate href="{{ route('admin.job.create', $company['id']) }}"
+                                                <a href="{{ route('admin.job.create', $company['id']) }}"
                                                     class="btn btn-sm btn-primary">Add Job</a>
                                             @endif
-                                            <a wire:navigate href="{{ route('admin.company.edit', $company['id']) }}"
+                                            <a href="{{ route('admin.company.edit', $company['id']) }}"
                                                 class="btn btn-sm btn-primary">Edit</a>
-                                            <a wire:navigate href="{{ route('admin.company.delete', $company['id']) }}"
+                                            <a href="{{ route('admin.company.delete', $company['id']) }}"
                                                 class="btn btn-sm btn-primary">Delete</a>
                                         </div>
                                     </td>

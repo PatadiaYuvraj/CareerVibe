@@ -8,8 +8,8 @@
                 <div class="card-header ">
                     <nav aria-label="breadcrumb" class="">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a wire:navigate href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item"><a wire:navigate href="{{ route('admin.job.index') }}">Jobs</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.job.index') }}">Jobs</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Show</li>
                         </ol>
                     </nav>
@@ -20,8 +20,7 @@
                             {{ $job['sub_profile']['name'] }}
                         </h1>
                         <p class="lead position-relative">
-                            <a wire:navigate
-                                href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
+                            <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
                                 class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
                                 {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
                             </a>
@@ -34,8 +33,7 @@
                             @endif
                         </p>
                         <p class="lead">
-                            <a class="btn btn-outline-primary btn" wire:navigate
-                                href="{{ route('admin.job.edit', $job['id']) }}">Edit</a>
+                            <a class="btn btn-outline-primary btn" href="{{ route('admin.job.edit', $job['id']) }}">Edit</a>
                         </p>
                     </div>
                     <hr />

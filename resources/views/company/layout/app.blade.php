@@ -54,8 +54,7 @@
 
                     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="javascript:void(0);"
                         data-bs-toggle="dropdown">
-                        @if (auth()->guard('company')->check() &&
-                                auth()->guard('company')->user()->profile_image_url !== null)
+                        @if (auth()->guard('company')->check() && auth()->guard('company')->user()->profile_image_url !== null)
                             <img class="p-0 img-thumbnail border-0"
                                 src="{{ auth()->guard('company')->user()->profile_image_url }}" />
                         @endif
@@ -110,6 +109,9 @@
                 <a class="nav-link collapsed" href="{{ route('company.notifications') }}">
                     <span>
                         Notifications
+                        <span class="badge bg-danger">
+                            {{ auth()->guard('company')->user()->unreadNotifications->count() }}
+                        </span>
                     </span>
                 </a>
             </li>
@@ -194,6 +196,7 @@
             toastr.warning("{{ Session::get('warning') }}")
         }
     </script>
+
     @yield('scripts')
 </body>
 

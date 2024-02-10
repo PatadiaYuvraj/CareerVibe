@@ -46,11 +46,11 @@
                 </div>
                 <div class="col-12 text-center">
                     <p class="small mb-0">Already have an account?
-                        <a wire:navigate href="{{ route('admin.login') }}">Log in</a>
+                        <a href="{{ route('admin.login') }}">Log in</a>
                     </p>
                     <p class="small mb-0">
-                        <a wire:navigate href="{{ route('user.register') }}">User</a> |
-                        <a wire:navigate href="{{ route('company.register') }}">Company</a>
+                        <a href="{{ route('user.register') }}">User</a> |
+                        <a href="{{ route('company.register') }}">Company</a>
                     </p>
                 </div>
             </form>

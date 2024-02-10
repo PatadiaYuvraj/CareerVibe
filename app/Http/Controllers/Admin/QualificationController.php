@@ -34,41 +34,37 @@ class QualificationController extends Controller
     // getAll
     public function getAll(Request $request)
     {
-        if ($request->has('page')) {
-            $pageNumber = $request->get('page');
-            $qualifications = $this->qualification->withCount('jobs')->paginate($this->paginate, ['*'], 'page', $pageNumber);
-        }
+        // if ($request->has('page')) {
+        //     $pageNumber = $request->get('page');
+        //     $qualifications = $this->qualification->withCount('jobs')->paginate($this->paginate, ['*'], 'page', $pageNumber);
+        // }
 
-        if (!$request->has('page')) {
-            $qualifications = $this->qualification->withCount('jobs')->get();
-        }
+        // if (!$request->has('page')) {
+        //     $qualifications = $this->qualification->withCount('jobs')->get();
+        // }
 
+        $qualifications = $this->qualification->withCount('jobs')->get();
 
+        return  DataTables($qualifications)
+            ->addColumn('action', function ($qualification) {
+                return
+                    '<div class=" btn-group d-flex">
+                        <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="" class="showQualification btn btn-primary btn-sm show">
+                            <i class="bi bi-eye" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="" class="editQualification btn btn-info btn-sm edit">
+                            <i class="bi bi-pencil" aria-hidden="true"></i>
+                        </a>
+                        <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="" class="deleteQualification btn btn-danger btn-sm delete">
+                            <i class="bi bi-trash" aria-hidden="true"></i>
+                        </a>
+                    </div>';
+            })
+            ->rawColumns([
+                'action',
+            ])->make(true);
 
-
-
-        // $qualifications = $this->qualification->withCount('jobs')->get();
-
-        // return  DataTables($qualifications)
-        //     ->addColumn('action', function ($qualification) {
-        //         return
-        //             '<div class=" btn-group d-flex">
-        //                 <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="" class="showQualification btn btn-primary btn-sm show">
-        //                     <i class="bi bi-eye" aria-hidden="true"></i>
-        //                 </a>
-        //                 <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="" class="editQualification btn btn-info btn-sm edit">
-        //                     <i class="bi bi-pencil" aria-hidden="true"></i>
-        //                 </a>
-        //                 <a href="javascript:void(0)" data-id="' . $qualification->id . '" id="" class="deleteQualification btn btn-danger btn-sm delete">
-        //                     <i class="bi bi-trash" aria-hidden="true"></i>
-        //                 </a>
-        //             </div>';
-        //     })
-        //     ->rawColumns([
-        //         'action',
-        //     ])->make(true);
-
-        return response()->json($qualifications, 200);
+        // return response()->json($qualifications, 200);
     }
 
     // store

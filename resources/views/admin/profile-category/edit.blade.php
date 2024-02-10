@@ -8,8 +8,7 @@
                     <span class="h3 text-black">
                         Edit Profile Category
                     </span>
-                    <a wire:navigate href="{{ route('admin.profile-category.index') }}"
-                        class="float-end btn btn-sm btn-primary">Back</a>
+                    <a href="{{ route('admin.profile-category.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.profile-category.update', $profileCategory['id']) }}" method="POST">
@@ -27,8 +26,7 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Update</button>
-                            <a wire:navigate href="{{ route('admin.profile-category.index') }}"
-                                class="btn btn-danger">Cancel</a>
+                            <a href="{{ route('admin.profile-category.index') }}" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
                 </div>

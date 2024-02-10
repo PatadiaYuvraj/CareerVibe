@@ -10,23 +10,23 @@
                         <div class="card-body pt-3">
                             <ul class="nav nav-tabs nav-tabs-bordered">
                                 <li class="nav-item">
-                                    <a wire:navigate href='{{ route('admin.dashboard') }}' class="nav-link">
+                                    <a href='{{ route('admin.dashboard') }}' class="nav-link">
                                         Overview
                                     </a>
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link active" wire:navigate href="{{ route('admin.editProfile') }}">
+                                    <a class="nav-link active" href="{{ route('admin.editProfile') }}">
                                         Edit Profile
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" wire:navigate href="{{ route('admin.doChangePassword') }}">
+                                    <a class="nav-link" href="{{ route('admin.doChangePassword') }}">
                                         Change Password
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" wire:navigate href="{{ route('admin.editProfileImage') }}">
+                                    <a class="nav-link" href="{{ route('admin.editProfileImage') }}">
                                         Change Profile Image
                                     </a>
                                 </li>
@@ -66,8 +66,7 @@
                                             <button type="submit" class="btn btn-primary">
                                                 Update
                                             </button>
-                                            <a href="{{ route('admin.dashboard') }}" wire:navigate type="submit"
-                                                class="btn btn-danger">
+                                            <a href="{{ route('admin.dashboard') }}" type="submit" class="btn btn-danger">
                                                 Cancel
                                             </a>
                                         </div>

@@ -28,7 +28,7 @@
                             @forelse ($jobs as $job)
                                 <tr>
                                     <td>
-                                        <a wire:navigate href="{{ route('admin.job.show', $job['id']) }}">
+                                        <a href="{{ route('admin.job.show', $job['id']) }}">
                                             {{ $job['subProfile']['name'] }}
                                         </a>
                                     </td>
@@ -44,22 +44,19 @@
                                     </td>
                                     <td>{{ $job['work_type'] }}</td>
                                     <td>
-                                        <a wire:navigate
-                                            href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
+                                        <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
                                             class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">
                                             {{ $job['is_verified'] ? 'Verified' : 'Not Verified' }}
                                         </a>
                                     </td>
                                     <td>
-                                        <a wire:navigate
-                                            href="{{ route('admin.job.toggleFeatured', [$job['id'], $job['is_featured']]) }}"
+                                        <a href="{{ route('admin.job.toggleFeatured', [$job['id'], $job['is_featured']]) }}"
                                             class="badge bg-{{ $job['is_featured'] ? 'success' : 'danger' }}">
                                             {{ $job['is_featured'] ? 'Featured' : 'Not Featured' }}
                                         </a>
                                     </td>
                                     <td>
-                                        <a wire:navigate
-                                            href="{{ route('admin.job.toggleActive', [$job['id'], $job['is_active']]) }}"
+                                        <a href="{{ route('admin.job.toggleActive', [$job['id'], $job['is_active']]) }}"
                                             class="badge bg-{{ $job['is_active'] ? 'success' : 'danger' }}">
                                             {{ $job['is_active'] ? 'Active' : 'Not Active' }}
                                         </a>
@@ -67,9 +64,9 @@
                                     <td>
 
                                         <div class="d-flex btn-group">
-                                            <a wire:navigate href="{{ route('admin.job.edit', $job['id']) }}"
+                                            <a href="{{ route('admin.job.edit', $job['id']) }}"
                                                 class="btn btn-sm btn-primary">Edit</a>
-                                            <a wire:navigate href="{{ route('admin.job.delete', $job['id']) }}"
+                                            <a href="{{ route('admin.job.delete', $job['id']) }}"
                                                 class="btn btn-sm btn-danger">Delete</a>
                                         </div>
                                     </td>

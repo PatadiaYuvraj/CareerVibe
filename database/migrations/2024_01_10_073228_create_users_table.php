@@ -10,8 +10,24 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
+
+
+    private array $index = [
+        "name",
+        "email",
+        "id",
+        "is_active",
+    ];
+
+    private array $unique = [
+        "email",
+    ];
+
     public function up(): void
     {
+
+
+
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string("name", 25);
@@ -58,12 +74,12 @@ return new class extends Migration
             $table->timestamp("email_change_at")->nullable();
             $table->timestamp("last_login_at")->nullable();
             $table->rememberToken();
-            $table->index([
-                'name',
-                'email',
-                'id',
-                'is_active',
-            ]);
+            $table->index(
+                $this->index
+            );
+            $table->unique(
+                $this->unique
+            );
             $table->timestamps();
         });
     }

@@ -19,7 +19,7 @@
                     <span class="h3 text-black">
                         Edit Job
                     </span>
-                    <a wire:navigate href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
+                    <a href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.job.update', $job['id']) }}" method="POST">
@@ -93,7 +93,7 @@
                                                     @if ($key == $job['work_type']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -159,7 +159,7 @@
                                                     @if ($key == $job['job_type']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -181,7 +181,7 @@
                                                     @if ($key == $job['experience_level']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -203,7 +203,7 @@
                                                     @if ($key == $job['experience_type']) checked @endif>
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -239,7 +239,7 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a wire:navigate href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
+                            <a href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
                 </div>

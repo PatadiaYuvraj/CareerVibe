@@ -29,7 +29,7 @@
             <div class="card ">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Add User</span>
-                    <a wire:navigate href="{{ route('admin.user.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
+                    <a href="{{ route('admin.user.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.user.store') }}" method="POST" enctype="multipart/form-data">
@@ -135,21 +135,24 @@
                                 <label for="gender" class="form-label">
                                     Gender
                                 </label>
-                                <div class="row row-cols-3">
-                                    @foreach (['MALE', 'FEMALE', 'OTHER'] as $gender)
+                                <div class="row row-cols-2">
+                                    @foreach (Config::get('constants.gender') as $key => $gender)
                                         <div class="col">
                                             <label for="{{ $gender }}" class="input-group mb-3">
                                                 <div class="input-group-text">
                                                     <input class="form-check-input mt-0" id="{{ $gender }}"
-                                                        type="radio" value="{{ $gender }}" name="gender">
+                                                        type="radio" value="{{ $key }}" name="gender">
                                                 </div>
                                                 <div class="form-control">
-                                                    {{ Str::ucfirst(Str::lower($gender)) }}
+                                                    {{ $gender }}
                                                 </div>
                                             </label>
                                         </div>
                                     @endforeach
                                 </div>
+                                @error('gender')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                         <div class="row row-cols-2">
@@ -203,7 +206,7 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a wire:navigate href="{{ route('admin.user.index') }}" class="btn btn-danger">Cancel</a>
+                            <a href="{{ route('admin.user.index') }}" class="btn btn-danger">Cancel</a>
                     </form>
                 </div>
             </div>

@@ -89,7 +89,7 @@
                                                     type="radio" value="{{ $key }}" name="work_type">
                                             </div>
                                             <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower($value)) }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -175,7 +175,7 @@
                                                     type="radio" value="{{ $key }}" name="job_type">
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -196,7 +196,7 @@
                                                     type="radio" value="{{ $key }}" name="experience_level">
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -219,7 +219,7 @@
                                                     type="radio" value="{{ $key }}" name="experience_type">
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>

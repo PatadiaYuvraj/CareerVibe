@@ -8,7 +8,7 @@
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Users</span>
 
-                    <a wire:navigate href="{{ route('admin.user.create') }}" class="float-end btn btn-sm btn-primary">Add
+                    <a href="{{ route('admin.user.create') }}" class="float-end btn btn-sm btn-primary">Add
                         User</a>
                 </div>
                 <div class="card-body">
@@ -34,8 +34,8 @@
                                     <td>
                                         <div class="btn-group">
                                             @if ($user['profile_image_url'])
-                                                <a wire:navigate href="{{ $user['profile_image_url'] }}"
-                                                    class="btn btn-sm btn-primary" target="_blank">View</a>
+                                                <a href="{{ $user['profile_image_url'] }}" class="btn btn-sm btn-primary"
+                                                    target="_blank">View</a>
                                                 <form action="{{ route('admin.user.deleteProfileImage', $user['id']) }}"
                                                     method="POST">
                                                     @csrf
@@ -51,8 +51,8 @@
                                     <td>
                                         <div class="btn-group">
                                             @if ($user['resume_pdf_url'])
-                                                <a wire:navigate href="{{ url($user['resume_pdf_url']) }}"
-                                                    class="btn btn-sm btn-primary" target="_blank">View</a>
+                                                <a href="{{ url($user['resume_pdf_url']) }}" class="btn btn-sm btn-primary"
+                                                    target="_blank">View</a>
                                                 <form action="{{ route('admin.user.deleteResumePdf', $user['id']) }}"
                                                     method="POST">
                                                     @csrf
@@ -87,7 +87,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan='6' class="text-center">No User Found</td>
+                                    <td colspan='10' class="text-center">No User Found</td>
                                 </tr>
                             @endforelse
                         </tbody>

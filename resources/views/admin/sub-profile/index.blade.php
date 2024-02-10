@@ -9,7 +9,7 @@
                     <span class="h3 text-black">
                         Sub Profile
                     </span>
-                    <a wire:navigate href="{{ route('admin.sub-profile.create') }}" class="float-end btn btn-sm btn-primary">
+                    <a href="{{ route('admin.sub-profile.create') }}" class="float-end btn btn-sm btn-primary">
                         Add sub profile
                     </a>
                 </div>
@@ -29,12 +29,11 @@
                             @forelse ($subProfiles as $subProfile)
                                 <tr>
                                     <td>
-                                        <a wire:navigate
-                                            href="{{ route('admin.sub-profile.show', $subProfile['id']) }}">{{ $subProfile['name'] }}
+                                        <a href="{{ route('admin.sub-profile.show', $subProfile['id']) }}">{{ $subProfile['name'] }}
                                         </a>
                                     </td>
                                     <td>
-                                        <a wire:navigate
+                                        <a
                                             href="{{ route('admin.profile-category.show', $subProfile->profileCategory['id']) }}">
                                             {{ $subProfile->profileCategory['name'] }}
                                         </a>
@@ -42,10 +41,9 @@
                                     <td>{{ $subProfile['jobs_count'] }}</td>
                                     <td>
                                         <div class="btn-group">
-                                            <a wire:navigate href="{{ route('admin.sub-profile.edit', $subProfile['id']) }}"
+                                            <a href="{{ route('admin.sub-profile.edit', $subProfile['id']) }}"
                                                 class="btn btn-sm btn-primary">Edit</a>
-                                            <a wire:navigate
-                                                href="{{ route('admin.sub-profile.delete', $subProfile['id']) }}"
+                                            <a href="{{ route('admin.sub-profile.delete', $subProfile['id']) }}"
                                                 class="btn btn-sm btn-danger">Delete</a>
                                         </div>
                                     </td>

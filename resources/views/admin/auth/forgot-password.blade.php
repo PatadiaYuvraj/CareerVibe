@@ -29,7 +29,7 @@
                 </div>
                 <div class="col-12">
                     <p class="small mb-0">
-                        <a wire:navigate href="{{ route('admin.login') }}">Login?</a>
+                        <a href="{{ route('admin.login') }}">Login?</a>
                     </p>
                 </div>
             </form>

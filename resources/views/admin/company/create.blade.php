@@ -6,8 +6,7 @@
             <div class="card">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Add Company</span>
-                    <a wire:navigate href="{{ route('admin.company.index') }}"
-                        class="float-end btn btn-sm btn-primary">Back</a>
+                    <a href="{{ route('admin.company.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.company.store') }}" method="POST" enctype="multipart/form-data">
@@ -106,7 +105,7 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Submit</button>
-                            <a wire:navigate href="{{ route('admin.company.index') }}" class="btn btn-danger">Cancel</a>
+                            <a href="{{ route('admin.company.index') }}" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
                 </div>

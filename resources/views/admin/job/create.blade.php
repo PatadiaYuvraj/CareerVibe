@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Add Job to {{ $company['name'] }}</span>
-                    <a wire:navigate href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
+                    <a href="{{ route('admin.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
 
@@ -89,7 +89,7 @@
                                                     type="radio" value="{{ $key }}" name="work_type">
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -175,7 +175,7 @@
                                                     type="radio" value="{{ $key }}" name="job_type">
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -196,7 +196,7 @@
                                                     type="radio" value="{{ $key }}" name="experience_level">
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -219,7 +219,7 @@
                                                     type="radio" value="{{ $key }}" name="experience_type">
                                             </div>
                                             <div class="form-control">
-                                                {{ $value }}
+                                                <small>{{ $value }} </small>
                                             </div>
                                         </label>
                                     </div>
@@ -255,7 +255,7 @@
                             <textarea class="form-control" id="keywords" name="keywords" rows="3">{{ old('keywords') }}</textarea>
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>
-                        <a wire:navigate href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
+                        <a href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
                     </form>
                 </div>
             </div>

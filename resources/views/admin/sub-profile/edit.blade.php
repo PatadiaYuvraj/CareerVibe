@@ -6,8 +6,7 @@
             <div class="card">
                 <div class="card-header pagetitle">
                     <span class="h3 text-black">Edit Sub Profile</span>
-                    <a wire:navigate href="{{ route('admin.sub-profile.index') }}"
-                        class="float-end btn btn-sm btn-primary">Back</a>
+                    <a href="{{ route('admin.sub-profile.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('admin.sub-profile.update', $subProfile['id']) }}" method="POST">
@@ -56,8 +55,7 @@
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Update</button>
-                            <a wire:navigate href="{{ route('admin.sub-profile.index') }}"
-                                class="btn btn-danger">Cancel</a>
+                            <a href="{{ route('admin.sub-profile.index') }}" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
                 </div>

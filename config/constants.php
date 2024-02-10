@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route;
 
 return [
@@ -45,7 +46,7 @@ return [
   'job' => [
     'work_type' => [
       'REMOTE' => 'Remote',
-      'WFO' => 'Work From Office',
+      'ONSITE' => 'Onsite',
       'HYBRID' => 'Hybrid',
     ],
     'job_type' => [
@@ -53,6 +54,9 @@ return [
       'PART_TIME' => 'Part Time',
       'INTERNSHIP' => 'Internship',
       'CONTRACT' => 'Contract',
+      'FREELANCE' => 'Freelance',
+      'VOLUNTEER' => 'Volunteer',
+      'TEMPORARY' => 'Temporary',
     ],
     'experience_level' => [
       'FRESHER' => 'Fresher',
@@ -60,6 +64,7 @@ return [
     ],
     'experience_type' => [
       'ANY' => 'Any',
+      '0-1' => '0-1',
       '1-2' => '1-2',
       '2-3' => '2-3',
       '3-5' => '3-5',
@@ -67,5 +72,5 @@ return [
       '8-10' => '8-10',
       '10+' => '10+',
     ],
-  ]
+  ],
 ];

@@ -16,17 +16,17 @@
                                 </li>
 
                                 <li class="nav-item">
-                                    <a class="nav-link" wire:navigate href="{{ route('admin.editProfile') }}">
+                                    <a class="nav-link" href="{{ route('admin.editProfile') }}">
                                         Edit Profile
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" wire:navigate href="{{ route('admin.doChangePassword') }}">
+                                    <a class="nav-link" href="{{ route('admin.doChangePassword') }}">
                                         Change Password
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" wire:navigate href="{{ route('admin.editProfileImage') }}">
+                                    <a class="nav-link" href="{{ route('admin.editProfileImage') }}">
                                         Change Profile Image
                                     </a>
                                 </li>

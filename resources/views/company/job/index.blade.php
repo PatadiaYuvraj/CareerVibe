@@ -9,7 +9,11 @@
                     <span class="h3 text-black">
                         Job
                     </span>
-                    <a href="{{ route('company.job.create') }}" class="float-end btn btn-sm btn-primary">Add Job</a>
+                    @if (auth()->guard('company')->user()->is_verified)
+                        <a href="{{ route('company.job.create') }}" class="float-end btn btn-sm btn-primary">Add Job</a>
+                    @else
+                        <button class="float-end btn btn-sm btn-primary" disabled>Add Job</button>
+                    @endif
 
                 </div>
                 <div class="card-body">
