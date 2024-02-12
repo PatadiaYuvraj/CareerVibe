@@ -481,9 +481,6 @@ class AuthController extends Controller
 
     public function deleteProfileImage()
     {
-        // if (!$this->authenticableService->isAdmin()) {
-        //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
-        // }
 
         $admin = $this->authenticableService->getAdmin();
 

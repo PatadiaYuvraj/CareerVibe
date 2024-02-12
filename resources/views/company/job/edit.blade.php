@@ -10,50 +10,76 @@
 @endforeach
 
 @extends('company.layout.app')
-@section('pageTitle', 'Dashboard | Admin')
+@section('pageTitle', 'Edit Job')
 @section('content')
     <main id="main" class="main">
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header">
                     <span class="h3 text-black">
-                        Edit Job
+                        Edit Job to {{ $job['company']['name'] }}
                     </span>
-
                     <a href="{{ route('company.job.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('company.job.update', $job['id']) }}" method="POST">
                         @csrf
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Select Job Profile</label>
-                            <div class="row row-cols-2">
-                                @forelse ($sub_profiles as $profile)
-                                    <div class="col">
-                                        <label for="{{ $profile['name'] }}" class="input-group mb-3">
-                                            <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $profile['name'] }}"
-                                                    type="radio" value="{{ $profile['id'] }}" name="sub_profile_id"
-                                                    @if ($profile['id'] == $job['sub_profile_id']) checked @endif>
-                                            </div>
-                                            <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower($profile['name'])) }}
-
-                                            </div>
-                                        </label>
-                                    </div>
-                                @empty
-                                    <div class="col">
-                                        <input type="text" class="text-danger form-control" readonly
-                                            value="No Profile Found" required>
-                                    </div>
-                                @endforelse
+                        <div class="row row-cols-2 mb-3">
+                            <div class="">
+                                <label for="email" class="form-label">Select Job Profile</label>
+                                <select class="job-profile-selector form-select" name="sub_profile_id" id="sub_profile_id"
+                                    data-placeholder="Select Job Profile">
+                                    <option></option>
+                                    @foreach ($profile_categories as $category)
+                                        <optgroup label="{{ $category['name'] }}">
+                                            @foreach ($category['sub_profiles'] as $sub_profile)
+                                                <option value="{{ $sub_profile['id'] }}"
+                                                    @if ($job['sub_profile_id'] == $sub_profile['id']) selected @endif>
+                                                    {{ Str::ucfirst(Str::lower($sub_profile['name'])) }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
+                                @error('sub_profile_id')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
-                            @error('sub_profile_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
+                            <div class="">
+                                <label for="email" class="form-label">Select Job Type</label>
+                                <select class="job-type-selector form-select" name="job_type" id="job_type"
+                                    data-placeholder="Select Job Type">
+                                    <option></option>
+                                    @foreach (Config::get('constants.job.job_type') as $key => $value)
+                                        <option value="{{ $key }}"
+                                            @if ($key == $job['job_type']) selected @endif>
+                                            {{ $value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('job_type')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                         </div>
-                        <div class="row row-cols-3 mb-3">
+
+                        <div class="row row-cols-2 mb-3">
+                            <div class="">
+                                <label for="email" class="form-label">Select Work Type</label>
+                                <select class="work-type-selector form-control" name="work_type" id="work_type"
+                                    data-placeholder="Select Work Type">
+                                    <option></option>
+                                    @foreach (Config::get('constants.job.work_type') as $key => $value)
+                                        <option value="{{ $key }}"
+                                            @if ($key == $job['work_type']) selected @endif>
+                                            {{ $value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('work_type')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
                             <div class="col">
                                 <label for="vacancy" class="form-label">Vacancy</label>
                                 <input type="number" name="vacancy" id="vacancy" class="form-control"
@@ -62,6 +88,8 @@
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
+                        </div>
+                        <div class="row row-cols-2 mb-3">
                             <div class="col">
                                 <label for="min_salary" class="form-label">Min Salary</label>
                                 <input type="number" name="min_salary" id="min_salary" class="form-control"
@@ -79,161 +107,107 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="mt-3">
-                            <label for="email" class="form-label">Select Work Type</label>
-                            <div class="row row-cols-3">
-                                @foreach (Config::get('constants.job.work_type') as $key => $value)
-                                    <div class="col">
-                                        <label for="{{ $key }}" class="input-group mb-3">
-                                            <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $key }}"
-                                                    type="radio" value="{{ $key }}" name="work_type"
-                                                    @if ($key == $job['work_type']) checked @endif>
-                                            </div>
-                                            <div class="form-control">
-                                                <small>{{ $value }} </small>
-                                            </div>
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>company
-                            @error('work_type')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
+
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Qualification</label>
-                            <div class="row row-cols-3">
+
+                            <select class="qualifications-selector form-select" name="qualifications[]" id="qualifications"
+                                data-placeholder="Select Qualifications" multiple>
+                                <option></option>
                                 @foreach ($qualifications as $qualification)
-                                    <div class="col">
-                                        <label for="{{ $qualification['name'] }}" class="input-group mb-3">
-                                            <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $qualification['name'] }}"
-                                                    type="checkbox" @if (in_array($qualification['name'], $qjData)) checked @endif
-                                                    value="{{ $qualification['id'] }}" name="qualifications[]">
-                                            </div>
-                                            <div class="form-control">
-                                                {{ $qualification['name'] }}
-                                            </div>
-                                        </label>
-                                    </div>
+                                    <option value="{{ $qualification['id'] }}"
+                                        @if (in_array($qualification['name'], $qjData)) selected @endif>
+                                        {{ $qualification['name'] }}
+                                    </option>
                                 @endforeach
-                            </div>
+                            </select>
                             @error('qualifications')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="mt-3">
                             <label for="email" class="form-label">Select Location</label>
-                            <div class="row row-cols-3">
+                            <select class="locations-selector form-select" name="locations[]" id="locations" multiple
+                                data-placeholder="Select Locations">
+                                <option></option>
                                 @foreach ($locations as $location)
-                                    <div class="col">
-                                        <label for="{{ $location['city'] }}" class="input-group mb-3">
-                                            <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $location['city'] }}"
-                                                    type="checkbox" @if (in_array($location['city'], $ljData)) checked @endif
-                                                    value="{{ $location['id'] }}" name="locations[]">
-                                            </div>
-                                            <div class="form-control">
-                                                {{ $location['city'] }}
-                                            </div>
-                                        </label>
-                                    </div>
+                                    <option value="{{ $location['id'] }}"
+                                        @if (in_array($location['city'], $ljData)) selected @endif>
+                                        {{ $location['city'] }}
+                                        @if ($location['state'])
+                                            <span class="small">({{ $location['state'] }})</span>
+                                        @endif
+                                    </option>
                                 @endforeach
-                            </div>
+                            </select>
                             @error('locations')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
-                        <div class="mt-3">
-                            <label for="email" class="form-label">Select Job Type</label>
-                            <div class="row row-cols-4">
-                                @foreach (Config::get('constants.job.job_type') as $key => $value)
-                                    <div class="col">
-                                        <label for="{{ $key }}" class="input-group mb-3">
-                                            <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $key }}"
-                                                    type="radio" value="{{ $key }}" name="job_type"
-                                                    @if ($key == $job['job_type']) checked @endif>
-                                            </div>
-                                            <div class="form-control">
-                                                <small>{{ $value }} </small>
-                                            </div>
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                            @error('work_type')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="mt-3">
-                            <label for="email" class="form-label">Select Experience Level</label>
-                            <div class="row row-cols-2">
-                                @foreach (Config::get('constants.job.experience_level') as $key => $value)
-                                    <div class="col">
-                                        <label for="{{ $key }}" class="input-group mb-3">
-                                            <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $key }}"
-                                                    type="radio" value="{{ $key }}" name="experience_level"
-                                                    @if ($key == $job['experience_level']) checked @endif>
-                                            </div>
-                                            <div class="form-control">
-                                                <small>{{ $value }} </small>
-                                            </div>
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                            @error('experience_level')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <div class="mt-3">
-                            <label for="email" class="form-label">Select Experience Type</label>
-                            <div class="row row-cols-7">
-                                @foreach (Config::get('constants.job.experience_type') as $key => $value)
-                                    <div class="col">
-                                        <label for="{{ $key }}" class="input-group mb-3">
-                                            <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $key }}"
-                                                    type="radio" value="{{ $key }}" name="experience_type"
-                                                    @if ($key == $job['experience_type']) checked @endif>
-                                            </div>
-                                            <div class="form-control">
-                                                <small>{{ $value }} </small>
-                                            </div>
-                                        </label>
-                                    </div>
-                                @endforeach
-                            </div>
-                            @error('experience_type')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
+
                         <div class="row row-cols-2 mb-3">
+                            <div class="">
+                                <label for="email" class="form-label">Select Experience Level</label>
+                                <select class="experience-level-selector form-select" name="experience_level"
+                                    id="experience_level" data-placeholder="Select Experience Level">
+                                    <option></option>
+                                    @foreach (Config::get('constants.job.experience_level') as $key => $value)
+                                        <option value="{{ $key }}"
+                                            @if ($key == $job['experience_level']) selected @endif>
+                                            {{ $value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('experience_level')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div class="">
+                                <label for="email" class="form-label">Select Experience Type</label>
+                                <div class="row row-cols-4">
+                                    <select class="experience-type-selector form-select" name="experience_type"
+                                        id="experience_type" data-placeholder="Select Experience Type">
+                                        <option></option>
+                                        @foreach (Config::get('constants.job.experience_type') as $key => $value)
+                                            <option value="{{ $key }}"
+                                                @if ($key == $job['experience_type']) selected @endif>
+                                                {{ $value }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @error('experience_type')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-3">
                             <div class="col">
                                 <label for="description" class="form-label">Description</label>
-                                <textarea class="form-control" id="description" name="description" rows="3">{{ old('description', $job['description']) }}</textarea>
-                            </div>
-                            <div class="col">
-                                <label for="responsibility" class="form-label">Responsibilities</label>
-                                <textarea class="form-control" id="responsibility" name="responsibility" rows="3">{{ old('responsibility', $job['responsibility']) }}</textarea>
+                                <textarea class="form-control" id="description" name="description" rows="5">{{ old('description', $job['description']) }}</textarea>
                             </div>
                         </div>
-                        <div class="row row-cols-2 mb-3">
+                        <div class="mb-3">
+                            <div class="col">
+                                <label for="responsibility" class="form-label">Responsibilities</label>
+                                <textarea class="form-control" id="responsibility" name="responsibility" rows="5">{{ old('responsibility', $job['responsibility']) }}</textarea>
+                            </div>
+                        </div>
+                        <div class="mb-3">
                             <div class="col">
                                 <label for="benifits_perks" class="form-label">Benifits & Perks</label>
-                                <textarea class="form-control" id="benifits_perks" name="benifits_perks" rows="3">{{ old('benifits_perks', $job['benifits_perks']) }}</textarea>
+                                <textarea class="form-control" id="benifits_perks" name="benifits_perks" rows="5">{{ old('benifits_perks', $job['benifits_perks']) }}</textarea>
                             </div>
+                        </div>
+                        <div class="mb-3">
                             <div class="col">
                                 <label for="other_benifits" class="form-label">Other Benifits</label>
-                                <textarea class="form-control" id="other_benifits" name="other_benifits" rows="3">{{ old('other_benifits', $job['other_benifits']) }}</textarea>
+                                <textarea class="form-control" id="other_benifits" name="other_benifits" rows="5">{{ old('other_benifits', $job['other_benifits']) }}</textarea>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="keywords" class="form-label">Keywords</label>
-                            <textarea class="form-control" id="keywords" name="keywords" rows="3">{{ old('keywords', $job['keywords']) }}</textarea>
+                            <textarea class="form-control" id="keywords" name="keywords" rows="5">{{ old('keywords', $job['keywords']) }}</textarea>
                         </div>
                         <div class="btn-group">
                             <button type="submit" class="btn btn-primary">Submit</button>
@@ -244,4 +218,62 @@
             </div>
         </section>
     </main>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+
+            $('.work-type-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: true,
+            });
+
+            $('.job-profile-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: true,
+            });
+
+            $('.qualifications-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: false,
+            });
+
+            $('.locations-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: false,
+
+            });
+
+            $('.job-type-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: true,
+            });
+
+            $('.experience-level-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: true,
+            });
+
+            $('.experience-type-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: true,
+            });
+
+        });
+    </script>
 @endsection

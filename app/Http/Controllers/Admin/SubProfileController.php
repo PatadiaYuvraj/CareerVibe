@@ -26,9 +26,6 @@ class SubProfileController extends Controller
 
     public function create()
     {
-        // return $this->navigationManagerService->loadView('view-name');
-        // return $this->navigationManagerService->redirectRoute('view-name', [], 302, [], false, ["success" => "message"]);
-        // return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "message"]);
         $profileCategories = ProfileCategory::all();
         return $this->navigationManagerService->loadView('admin.sub-profile.create', compact('profileCategories'));
     }

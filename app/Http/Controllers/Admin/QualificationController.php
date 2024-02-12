@@ -34,14 +34,6 @@ class QualificationController extends Controller
     // getAll
     public function getAll(Request $request)
     {
-        // if ($request->has('page')) {
-        //     $pageNumber = $request->get('page');
-        //     $qualifications = $this->qualification->withCount('jobs')->paginate($this->paginate, ['*'], 'page', $pageNumber);
-        // }
-
-        // if (!$request->has('page')) {
-        //     $qualifications = $this->qualification->withCount('jobs')->get();
-        // }
 
         $qualifications = $this->qualification->withCount('jobs')->get();
 
@@ -63,8 +55,6 @@ class QualificationController extends Controller
             ->rawColumns([
                 'action',
             ])->make(true);
-
-        // return response()->json($qualifications, 200);
     }
 
     // store

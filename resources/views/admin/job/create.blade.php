@@ -14,30 +14,24 @@
 
                     <form action="{{ route('admin.job.store', $company['id']) }}" method="POST">
                         @csrf
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Company Name</label>
-                            <label class="form-control">{{ $company['name'] }}</label>
-                        </div>
                         <div class="row row-cols-2 mb-3">
                             <div class="">
                                 <label for="sub_profile_id" class="form-label">Select Job Profile
                                     <span class="text-danger">*</span>
                                 </label>
-                                <div class="row row-cols-2">
-                                    <select class="job-profile-selector form-select" name="sub_profile_id"
-                                        id="sub_profile_id" data-placeholder="Select Job Profile">
-                                        <option></option>
-                                        @foreach ($profile_categories as $category)
-                                            <optgroup label="{{ $category['name'] }}">
-                                                @foreach ($category['sub_profiles'] as $sub_profile)
-                                                    <option value="{{ $sub_profile['id'] }}">
-                                                        {{ Str::ucfirst(Str::lower($sub_profile['name'])) }}
-                                                    </option>
-                                                @endforeach
-                                            </optgroup>
-                                        @endforeach
-                                    </select>
-                                </div>
+                                <select class="job-profile-selector form-select" name="sub_profile_id" id="sub_profile_id"
+                                    data-placeholder="Select Job Profile">
+                                    <option></option>
+                                    @foreach ($profile_categories as $category)
+                                        <optgroup label="{{ $category['name'] }}">
+                                            @foreach ($category['sub_profiles'] as $sub_profile)
+                                                <option value="{{ $sub_profile['id'] }}">
+                                                    {{ Str::ucfirst(Str::lower($sub_profile['name'])) }}
+                                                </option>
+                                            @endforeach
+                                        </optgroup>
+                                    @endforeach
+                                </select>
                                 @error('sub_profile_id')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -46,18 +40,17 @@
                                 <label for="email" class="form-label">Select Job Type
                                     <span class="text-danger">*</span>
                                 </label>
-                                <div class="row row-cols-4">
-                                    <select class="job-type-selector form-select" name="job_type" id="job_type"
-                                        data-placeholder="Select Job Type">
-                                        <option></option>
-                                        @foreach (Config::get('constants.job.job_type') as $key => $value)
-                                            <option value="{{ $key }}">
-                                                {{ $value }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                @error('work_type')
+                                <select class="job-type-selector form-select" name="job_type" id="job_type"
+                                    data-placeholder="Select Job Type">
+                                    <option></option>
+                                    @foreach (Config::get('constants.job.job_type') as $key => $value)
+                                        <option value="{{ $key }}">
+                                            {{ $value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                @error('job_type')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -118,18 +111,15 @@
                             <label for="email" class="form-label">Select Qualification
                                 <span class="text-danger">*</span>
                             </label>
-                            <div class="row row-cols-3">
-                                <select class="qualifications-selector form-select" name="qualifications[]"
-                                    id="qualifications" data-placeholder="Select Qualifications" multiple>
-                                    <option></option>
-                                    @foreach ($qualifications as $qualification)
-                                        <option value="{{ $qualification['id'] }}">
-                                            {{ $qualification['name'] }}
-                                        </option>
-                                    @endforeach
-                                </select>
-
-                            </div>
+                            <select class="qualifications-selector form-select" name="qualifications[]" id="qualifications"
+                                data-placeholder="Select Qualifications" multiple>
+                                <option></option>
+                                @foreach ($qualifications as $qualification)
+                                    <option value="{{ $qualification['id'] }}">
+                                        {{ $qualification['name'] }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('qualifications')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -138,20 +128,18 @@
                             <label for="email" class="form-label">Select Location
                                 <span class="text-danger">*</span>
                             </label>
-                            <div class="row row-cols-3">
-                                <select class="locations-selector form-select" name="locations[]" id="locations" multiple
-                                    data-placeholder="Select Locations">
-                                    <option></option>
-                                    @foreach ($locations as $location)
-                                        <option value="{{ $location['id'] }}">
-                                            {{ $location['city'] }}
-                                            @if ($location['state'])
-                                                <span class="small">({{ $location['state'] }})</span>
-                                            @endif
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <select class="locations-selector form-select" name="locations[]" id="locations" multiple
+                                data-placeholder="Select Locations">
+                                <option></option>
+                                @foreach ($locations as $location)
+                                    <option value="{{ $location['id'] }}">
+                                        {{ $location['city'] }}
+                                        @if ($location['state'])
+                                            <span class="small">({{ $location['state'] }})</span>
+                                        @endif
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('locations')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -238,8 +226,10 @@
                             </label>
                             <textarea class="form-control" id="keywords" name="keywords" rows="5" placeholder="Enter Keywords">{{ old('keywords') }}</textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                        <a href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <a href="{{ route('admin.job.index') }}" class="btn btn-danger">Cancel</a>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -277,9 +267,7 @@
                 theme: "bootstrap-5",
                 width: '100%',
                 placeholder: $(this).data('placeholder'),
-                // close on escape key
                 closeOnSelect: false,
-
             });
 
             $('.job-type-selector').select2({

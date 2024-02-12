@@ -554,37 +554,6 @@ class UserController extends Controller
         return $this->navigationManagerService->loadView('admin.user.index-livewire');
     }
 
-    // follow a company
-
-    // public function followCompany($id)
-    // {
-    //     $user = $this->user->find($id);
-    //     if (!$user) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-    //     }
-    //     $isFollowed = $user->followers()->attach(auth()->user()->id);
-    //     if ($isFollowed) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is followed"]);
-    //     }
-    //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not followed"]);
-    // }
-
-    // unfollow a company
-
-    // public function unfollowCompany($id)
-    // {
-    //     $user = $this->user->find($id);
-    //     if (!$user) {
-    //         return  $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
-    //     }
-    //     $isUnfollowed = $user->followers()->detach(auth()->user()->id);
-    //     if ($isUnfollowed) {
-    //     return  $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is unfollowed"]);
-    //     }
-    //     return  $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not unfollowed"]);
-    // }
-
-    // following and followers
 
     public function following($id)
     {

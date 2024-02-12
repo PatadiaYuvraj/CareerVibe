@@ -42,6 +42,7 @@ class Index extends Component
     public function addRow()
     {
         if (count($this->items) < $this->maxRows) {
+            $this->validate();
             $this->key++;
             $this->items[] = [
                 'name' => '',

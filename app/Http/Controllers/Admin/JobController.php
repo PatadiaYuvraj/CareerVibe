@@ -42,17 +42,6 @@ class JobController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not verified"]);
         }
 
-        $sub_profiles = SubProfile::select([
-            'id',
-            'name',
-            'profile_category_id'
-        ])->with([
-            'profileCategory' =>
-            function ($query) {
-                $query->select(['id', 'name']);
-            }
-        ])->get()->toArray();
-
         $profile_categories = ProfileCategory::with([
             'subProfiles' => function ($query) {
                 $query->select(['id', 'name', 'profile_category_id']);
@@ -309,6 +298,7 @@ class JobController extends Controller
     public function edit($id)
     {
         $job = $this->job->where('id', $id)->with([
+            'company',
             'subProfile' => function ($query) {
                 $query->select(['id', 'name', 'profile_category_id']);
                 $query->with(['profileCategory' => function ($query) {
@@ -329,21 +319,16 @@ class JobController extends Controller
             'city',
             'state'
         ])->get()->toArray();
-        $sub_profiles = SubProfile::select([
-            'id',
-            'name',
-            'profile_category_id'
-
-        ])->with([
-            'profileCategory' => function ($query) {
-                $query->select(['id', 'name']);
+        $profile_categories = ProfileCategory::with([
+            'subProfiles' => function ($query) {
+                $query->select(['id', 'name', 'profile_category_id']);
             }
-        ])->get()->toArray();
+        ])->select(['id', 'name'])->get()->toArray();
         if (!$job) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
         $job  =  $job[0];
-        return $this->navigationManagerService->loadView('admin.job.edit', compact('job', 'qualifications', 'locations', 'sub_profiles'));
+        return $this->navigationManagerService->loadView('admin.job.edit', compact('job', 'qualifications', 'locations', 'profile_categories'));
     }
 
     public function update(Request $request, $id)

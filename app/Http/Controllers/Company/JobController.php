@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\Company;
 use App\Models\Job;
 use App\Models\Location;
+use App\Models\ProfileCategory;
 use App\Models\Qualification;
 use App\Models\SubProfile;
 use App\Services\AuthenticableService;
@@ -87,23 +88,25 @@ class JobController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not verified"]);
         }
 
-        $sub_profiles = SubProfile::select([
-            'id',
-            'name',
-            'profile_category_id'
-        ])
-            // ->with([
-            //     'profileCategory' =>
-            //     function ($query) {
-            //         $query->select(['id', 'name']);
-            //     }
-            // ])
-            ->get()->toArray();
+        $profile_categories = ProfileCategory::with([
+            'subProfiles' => function ($query) {
+                $query->select([
+                    'id', 'name', 'profile_category_id'
+                ]);
+            }
+        ])->select(['id', 'name'])->get()->toArray();
+
 
         $locations = Location::select(['id', 'city', 'state'])->get()->toArray();
 
         $qualifications = Qualification::select(['id', 'name'])->get()->toArray();
-        return $this->navigationManagerService->loadView('company.job.create', compact('company', 'sub_profiles', 'locations', 'qualifications'));
+        return $this->navigationManagerService->loadView('company.job.create', compact(
+            'company',
+            // 'sub_profiles',
+            'profile_categories',
+            'locations',
+            'qualifications'
+        ));
     }
 
     public function store(Request $request)
@@ -346,6 +349,8 @@ class JobController extends Controller
 
     public function edit($id)
     {
+
+
         $user_id = $this->authenticableService->getCompany()->id;
         // check this job is created by this company
         $job = $this->job
@@ -355,34 +360,37 @@ class JobController extends Controller
         if (!$job) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "The job is not created by this company."]);
         }
-        $job = $this->job->where('id', $id)->with([
-            'subProfile' => function ($query) {
-                $query->select(['id', 'name']);
-            }, "qualifications" => function ($query) {
-                $query->select(['qualifications.id', 'name']);
-            }, "locations" => function ($query) {
-                $query->select(['locations.id', 'city', 'state']);
-            }
-        ])->get()->toArray();
+        $job = $this->job->where('id', $id)->with(
+            [
+                'company',
+                'subProfile' => function ($query) {
+                    $query->select(['id', 'name']);
+                }, "qualifications" => function ($query) {
+                    $query->select(['qualifications.id', 'name']);
+                }, "locations" => function ($query) {
+                    $query->select(['locations.id', 'city', 'state']);
+                }
+            ]
+        )->get()->toArray();
         $qualifications = Qualification::select([
             'id',
-            'name'
+            'name',
         ])->get()->toArray();
         $locations = Location::select([
             'id',
             'city',
             'state'
         ])->get()->toArray();
-        $sub_profiles = SubProfile::select([
-            'id',
-            'name',
-        ])
-            ->get()->toArray();
+        $profile_categories = ProfileCategory::with([
+            'subProfiles' => function ($query) {
+                $query->select(['id', 'name', 'profile_category_id']);
+            }
+        ])->select(['id', 'name'])->get()->toArray();
         if (!$job) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
         $job  =  $job[0];
-        return $this->navigationManagerService->loadView('company.job.edit', compact('job', 'qualifications', 'locations', 'sub_profiles'));
+        return $this->navigationManagerService->loadView('company.job.edit', compact('job', 'qualifications', 'locations', 'profile_categories'));
     }
 
     public function update(Request $request, $id)

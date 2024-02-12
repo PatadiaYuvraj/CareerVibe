@@ -27,28 +27,15 @@
                                 Select Profile Category
                                 <span class="text-danger">*</span>
                             </label>
-                            <div class="row row-cols-3">
-                                @forelse ($profileCategories as $profileCategory)
-                                    <div class="col">
-                                        <label for="{{ $profileCategory['name'] }}" class="input-group mb-3">
-                                            <div class="input-group-text">
-                                                <input class="form-check-input mt-0" id="{{ $profileCategory['name'] }}"
-                                                    type="radio" value="{{ $profileCategory['id'] }}"
-                                                    {{ $profileCategory['id'] == $subProfile['profile_category_id'] ? 'checked' : '' }}
-                                                    name="profile_category_id">
-                                            </div>
-                                            <div class="form-control">
-                                                {{ Str::ucfirst(Str::lower($profileCategory['name'])) }}
-                                            </div>
-                                        </label>
-                                    </div>
-                                @empty
-                                    <div class="col">
-                                        <input type="text" class="text-danger form-control" readonly
-                                            value="No Profile Found" required>
-                                    </div>
-                                @endforelse
-                            </div>
+                            <select class="profile-category-selector form-select" name="profile_category_id"
+                                id="profile_category_id" data-placeholder="Select Profile Category">
+                                <option></option>
+                                @foreach ($profileCategories as $category)
+                                    <option value="{{ $category['id'] }}" @if ($category['id'] == $subProfile['profile_category_id']) selected @endif>
+                                        {{ Str::ucfirst(Str::lower($category['name'])) }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('profile_category_id')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -62,4 +49,19 @@
             </div>
         </section>
     </main>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+
+            $('.profile-category-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: true,
+            });
+
+        });
+    </script>
 @endsection
