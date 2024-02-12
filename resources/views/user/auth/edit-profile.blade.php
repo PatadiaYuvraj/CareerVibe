@@ -81,22 +81,17 @@
                                             <div class="col-lg-3 col-md-4 label">
                                                 Gender
                                             </div>
-                                            <div class="col col-lg-9 col-md-8 row row-cols-3">
-                                                @foreach (Config::get('constants.gender') as $key => $value)
-                                                    <div class="col">
-                                                        <label for="{{ $value }}" class="input-group mb-3">
-                                                            <div class="input-group-text">
-                                                                <input class="form-check-input mt-0"
-                                                                    id="{{ $value }}" type="radio"
-                                                                    value="{{ $key }}" name="gender"
-                                                                    @if (auth()->guard('user')->user()->gender == $key) checked @endif>
-                                                            </div>
-                                                            <div class="form-control">
-                                                                {{ $value }}
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                @endforeach
+                                            <div class="col col-lg-9 col-md-8">
+                                                <select class="gender-selector form-control" name="gender" id="gender"
+                                                    data-placeholder="Select Gender">
+                                                    <option></option>
+                                                    @foreach (Config::get('constants.gender') as $key => $value)
+                                                        <option value="{{ $key }}"
+                                                            @if (auth()->guard('user')->user()->gender == $key) selected @endif>
+                                                            {{ $value }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="row">
@@ -202,4 +197,20 @@
             </div>
         </section>
     </main>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+
+            $('.gender-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: true,
+            });
+
+
+        });
+    </script>
 @endsection

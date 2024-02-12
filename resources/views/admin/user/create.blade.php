@@ -135,71 +135,64 @@
                                 <label for="gender" class="form-label">
                                     Gender
                                 </label>
-                                <div class="row row-cols-2">
-                                    @foreach (Config::get('constants.gender') as $key => $gender)
-                                        <div class="col">
-                                            <label for="{{ $gender }}" class="input-group mb-3">
-                                                <div class="input-group-text">
-                                                    <input class="form-check-input mt-0" id="{{ $gender }}"
-                                                        type="radio" value="{{ $key }}" name="gender">
-                                                </div>
-                                                <div class="form-control">
-                                                    {{ $gender }}
-                                                </div>
-                                            </label>
-                                        </div>
+                                <select class="gender-selector form-select" name="gender  " id="gender"
+                                    data-placeholder="Select Gender">
+                                    <option></option>
+                                    @foreach (Config::get('constants.gender') as $key => $value)
+                                        <option value="{{ $key }}">
+                                            {{ $value }}
+                                        </option>
                                     @endforeach
-                                </div>
+                                </select>
                                 @error('gender')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
                         </div>
-                        <div class="row row-cols-2">
-                            <div class="mb-3">
-                                <label for="interest" class="form-label">
-                                    Interest
-                                </label>
-                                <textarea class="form-control" id="interest" name="interest" rows="3">{{ old('interest') }}</textarea>
-                                @error('interest')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label for="hobby" class="form-label">
-                                    Hobby
-                                </label>
-                                <textarea class="form-control" id="hobby" name="hobby" rows="3">{{ old('hobby') }}</textarea>
-                                @error('hobby')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
+
+                        <div class="mb-3">
+                            <label for="interest" class="form-label">
+                                Interest
+                            </label>
+                            <textarea class="form-control" id="interest" name="interest" rows="5">{{ old('interest') }}</textarea>
+                            @error('interest')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
-                        <div class="row row-cols-2">
-                            <div class="mb-3">
-                                <label for="education" class="form-label">
-                                    Education
-                                </label>
-                                <textarea class="form-control" id="education" name="education" rows="3">{{ old('education') }}</textarea>
-                                @error('education')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
-                            <div class="mb-3">
-                                <label for="experience" class="form-label">
-                                    Experience
-                                </label>
-                                <textarea class="form-control" id="experience" name="experience" rows="3">{{ old('description') }}</textarea>
-                                @error('experience')
-                                    <span class="text-danger">{{ $message }}</span>
-                                @enderror
-                            </div>
+                        <div class="mb-3">
+                            <label for="hobby" class="form-label">
+                                Hobby
+                            </label>
+                            <textarea class="form-control" id="hobby" name="hobby" rows="5">{{ old('hobby') }}</textarea>
+                            @error('hobby')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
                         </div>
+
+                        <div class="mb-3">
+                            <label for="education" class="form-label">
+                                Education
+                            </label>
+                            <textarea class="form-control" id="education" name="education" rows="5">{{ old('education') }}</textarea>
+                            @error('education')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
+                            <label for="experience" class="form-label">
+                                Experience
+                            </label>
+                            <textarea class="form-control" id="experience" name="experience" rows="5">{{ old('description') }}</textarea>
+                            @error('experience')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+
                         <div class="mb-3">
                             <label for="about" class="form-label">
                                 About
                             </label>
-                            <textarea class="form-control" id="about" name="about" rows="3">{{ old('about') }}</textarea>
+                            <textarea class="form-control" id="about" name="about" rows="5">{{ old('about') }}</textarea>
                             @error('about')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -213,4 +206,20 @@
         </section>
 
     </main>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+
+            $('.gender-selector').select2({
+                theme: "bootstrap-5",
+                width: '100%',
+                placeholder: $(this).data('placeholder'),
+                closeOnSelect: true,
+            });
+
+
+        });
+    </script>
 @endsection
