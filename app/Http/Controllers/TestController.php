@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
@@ -9,12 +10,15 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+// use function Laravel\Prompts;
+use function Laravel\Prompts\confirm;
 
 class TestController extends Controller
 {
     public function test()
     {
-        dd("test");
+        return view('test');
+        dd('test');
         DB::table('qualifications')->insert([
             // 'name' => 'B.E.',
             'name' => 'Bachelor of Engineering',

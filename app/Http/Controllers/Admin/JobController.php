@@ -74,8 +74,6 @@ class JobController extends Controller
 
     public function store(Request $request, $id)
     {
-
-        dd($request->all());
         $company = $this->authenticableService->getCompanyById($id);
         if (!$company->is_verified) {
             return $this->navigationManagerService->redirectRoute('admin.company.index', [], 302, [], false, ["warning" => "Company is not verified"]);
