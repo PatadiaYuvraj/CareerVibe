@@ -77,13 +77,14 @@ class Index extends Component
     // mount
     public function mount()
     {
+        $currentPage = $this->page;
         $this->users = $this->toArray(User::withCount([
             'appliedJobs',
             'savedJobs',
             'followers',
             'following',
             'followingCompanies',
-        ])->paginate($this->perPage));
+        ])->paginate($this->perPage, ['*'], 'page', $currentPage));
     }
 
     public function render()
@@ -331,7 +332,7 @@ class Index extends Component
 
     public function nextPage()
     {
-        $total_pages =  $this->subProfiles['last_page'];
+        $total_pages =  $this->users['last_page'];
         if ($this->page < $total_pages) {
             $this->page++;
         }

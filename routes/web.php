@@ -48,7 +48,9 @@ Route::get('/checkAuth',  function () {
 
 Route::get('/test', [TestController::class, "test"])->name('test');
 Route::post('/testing',  [TestController::class, "testing"])->name('testing');
-
+Route::get('/', function () {
+    return view('front.index');
+});
 
 Route::group(['middleware' => "isGuest"], function () {
 

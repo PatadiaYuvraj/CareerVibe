@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,6 +15,256 @@ class TestController extends Controller
 {
     public function test()
     {
+
+        // for ($i = 1; $i <= 100; $i++) {
+        //     DB::table('job_locations')
+        //         ->insert([
+        //             'jobs_id' => rand(1, 1000),
+        //             'locations_id' => rand(1, 100),
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+        // UPDATE `users` SET `gender` = in (MALE,FEMALE,OTHER) WHERE `id` = 1
+        // for ($i = 1; $i <= 100; $i++) {
+        //     DB::table('job_qualifications')
+        //         ->insert([
+        //             'jobs_id' => rand(1, 1000),
+        //             'qualifications_id' => rand(1, 100),
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+
+        dd("done");
+        // for ($i = 1; $i <= 100; $i++) {
+        //     DB::table('job_user')
+        //         ->insertGetId([
+        //             'user_id' => rand(1, 100),
+        //             'job_id' => rand(1, 1000),
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+        // // job_user 
+        // for ($i = 1; $i <= 100; $i++) {
+        //     DB::table('saved_jobs')
+        //         ->insertGetId([
+        //             'user_id' => rand(1, 100),
+        //             'job_id' => rand(1, 1000),
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+
+
+        // saved_jobs
+        //
+        // 1000 of follows
+        // for ($i = 1; $i <= 100; $i++) {
+        //     $follow = DB::table('follows')
+        //         ->insertGetId([
+        //             'user_id' => rand(1, 100),
+        //             'followable_id' => rand(1, 100),
+        //             'followable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+
+
+        // likes
+
+        // for ($i = 1; $i <= 500; $i++) {
+        //     $post = DB::table('likes')
+        //         ->insertGetId([
+        //             'likeable_id' => rand(1, 2500), // post 2500 or comment 4300
+        //             // 'App\Models\User' or 'App\Models\Company'
+        //             // 'likeable_type' => rand(0, 1) ? 'App\Models\Comment' : 'App\Models\Post',
+        //             'likeable_type' => 'App\Models\Post',
+        //             'authorable_id' => rand(1, 100),
+        //             'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+
+        // for ($i = 1; $i <= 500; $i++) {
+        //     $post = DB::table('posts')
+        //         ->insertGetId([
+        //             'authorable_id' => rand(1, 100),
+        //             // 'App\Models\User' or 'App\Models\Company'
+        //             'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'title' => 'This is post title ' . $i,
+        //             'type' => 'text',
+        //             'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+        // for ($j = 1; $j <= 1000; $j++) {
+        //     DB::table('comments')
+        //         ->insert([
+        //             'post_id' => rand(1, 2500),
+        //             'authorable_id' => rand(1, 100),
+        //             'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+        // for ($j = 1; $j <= 1000; $j++) {
+        //     DB::table('comments')
+        //         ->insert([
+        //             'post_id' => rand(1, 1000),
+        //             'authorable_id' => rand(1, 100),
+        //             'authorable_type' => rand(0, 1) ? 'App\Models\User' : 'App\Models\Company',
+        //             'content' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+
+        dd("done");
+
+        // for ($i = 1; $i <= 500; $i++) {
+        //     $job = DB::table('jobs')
+        //         ->insertGetId([
+        //             'company_id' => rand(1, 100),
+        //             'sub_profile_id' => rand(1, 100),
+        //             'vacancy' => rand(1, 25),
+        //             'min_salary' => rand(100000, 500000),
+        //             'max_salary' => rand(500000, 1000000),
+        //             'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'responsibility' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'benifits_perks' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'other_benifits' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'is_verified' => true,
+        //             'is_featured' => true,
+        //             'is_active' => true,
+        //             'keywords' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, voluptatum.',
+        //             'work_type' =>  array_rand(Config::get('constants.job.work_type')),
+        //             'job_type' => array_rand(Config::get('constants.job.job_type')),
+        //             'experience_level' => array_rand(Config::get('constants.job.experience_level')),
+        //             'experience_type' => array_rand(Config::get('constants.job.experience_type')),
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        //     $locations = DB::table('locations')
+        //         ->inRandomOrder()
+        //         ->limit(rand(1, 5))
+        //         ->get();
+
+        //     foreach ($locations as $location) {
+        //         DB::table('job_locations')
+        //             ->insert([
+        //                 'jobs_id' => $job,
+        //                 'locations_id' => $location->id,
+        //                 'created_at' => Carbon::now(),
+        //                 'updated_at' => Carbon::now(),
+        //             ]);
+        //     }
+
+        //     $qualifications = DB::table('qualifications')
+        //         ->inRandomOrder()
+        //         ->limit(rand(1, 5))
+        //         ->get();
+
+        //     foreach ($qualifications as $qualification) {
+        //         DB::table('job_qualifications')
+        //             ->insert([
+        //                 'jobs_id' => $job,
+        //                 'qualifications_id' => $qualification->id,
+        //                 'created_at' => Carbon::now(),
+        //                 'updated_at' => Carbon::now(),
+        //             ]);
+        //     }
+        // }
+
+        // $noOfAdmins = 10;
+
+
+        // for ($i = 1; $i <= $noOfAdmins; $i++) {
+        //     DB::table('admins')->insert([
+        //         'name' => 'Admin ' . $i,
+        //         'email' => 'admin' . $i . '@admin.com',
+        //         'password' => Hash::make('12121212'),
+
+        //         'is_email_verified' => 1,
+        //         'email_verified_at' => Carbon::now(),
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ]);
+        // }
+
+        dd("done");
+        // $noOfUsers = 100;
+
+        // for ($i = 1; $i <= $noOfUsers; $i++) {
+        //     $user = DB::table('users')
+        //         ->insertGetId([
+        //             'name' => 'User ' . $i,
+        //             'email' => 'user' . $i . '@user.com',
+        //             'password' => Hash::make('12121212'),
+        //             'is_email_verified' => 1,
+        //             'email_verified_at' => Carbon::now(),
+        //             'created_at' => Carbon::now(),
+        //             'updated_at' => Carbon::now(),
+        //         ]);
+        // }
+
+
+
+        // $noOfCompanies = 100;
+
+        // for ($i = 1; $i <= $noOfCompanies; $i++) {
+        //     DB::table('companies')->insert([
+        //         'name' => 'Company ' . $i,
+        //         'email' => 'company' . $i . '@company.com',
+        //         'password' => Hash::make('12121212'),
+        //         'is_verified' => true,
+        //         'is_email_verified' => 1,
+        //         'email_verified_at' => Carbon::now(),
+        //         'created_at' => Carbon::now(),
+        //         'updated_at' => Carbon::now(),
+        //     ]);
+        // }
+        // dd("user done");
+
+
+        // for ($i = 11; $i <= 100; $i++) {
+        //     DB::table('profile_categories')->insert([
+        //         'name' => 'Category ' . $i,
+        //     ]);
+        // }
+
+        // // Insert 10 rows for Sub Profiles
+        // for ($i = 11; $i <= 100; $i++) {
+        //     DB::table('sub_profiles')->insert([
+        //         'profile_category_id' => random_int(1, 10), // Assuming you have 10 categories already
+        //         'name' => 'Sub Profile ' . $i,
+        //     ]);
+        // }
+
+        // // Insert 10 rows for Qualifications
+        // for ($i = 11; $i <= 100; $i++) {
+        //     DB::table('qualifications')->insert([
+        //         'name' => 'Qualification ' . $i,
+        //     ]);
+        // }
+
+        // // Insert 10 rows for Locations
+        // for ($i = 11; $i <= 100; $i++) {
+        //     DB::table('locations')->insert([
+        //         'city' => 'City ' . $i,
+        //         'state' => 'State ' . $i,
+        //         'country' => 'Country ' . $i,
+        //         'pincode' => 10000 + $i,
+        //     ]);
+        // }
+
+        dd("done");
+
         // https://res.cloudinary.com/career-vibe/video/upload/v1707803711/career-vibe/videos/wyuftapb9wobdxj3a5e5.mp4
         $id = "career-vibe/videos/wyuftapb9wobdxj3a5e5";
         return view('test', compact('id'));

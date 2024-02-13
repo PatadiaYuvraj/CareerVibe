@@ -52,12 +52,11 @@
                                                     alt="Profile Image" class="col p-1 img-thumbnail" width="100"
                                                     height="100">
                                                 <form class="col" action="{{ route('user.deleteProfileImage') }}"
-                                                    method="POST">
+                                                    id="deleteProfileImageForm" method="POST">
                                                     @csrf
-                                                    <button type="submit"
+                                                    <button type="button" id="deleteProfileImage"
                                                         class="btn btn-danger btn-sm mt-2">Delete</button>
                                                 </form>
-
                                             </div>
                                         @else
                                             <div class="col col-lg-9 col-md-8 text-danger">
@@ -91,9 +90,10 @@
                                                     target="_blank" class="btn btn-primary btn-sm">View</a>
                                                 <!-- delete user.deleteResumePdf get -->
                                                 <form action="{{ route('user.deleteResumePdf') }}" method="GET"
-                                                    class="d-inline">
+                                                    class="d-inline" id="deleteResumePdfForm">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                                    <button type="button" class="btn btn-danger btn-sm"
+                                                        id="deleteResumePdf">Delete</button>
                                                 </form>
                                             @else
                                                 <span class="text-danger">No Resume Uploaded</span>
@@ -214,12 +214,12 @@
                                             Applied Jobs
                                         </div>
                                         <div class="col-lg-9 col-md-8">
-                                            @if (auth()->guard('user')->user()->experience)
-                                                {{ auth()->guard('user')->user()->experience }}
+                                            You have applied for
+                                            {{ auth()->guard('user')->user()->appliedJobs->count() }}
+                                            @if (auth()->guard('user')->user()->appliedJobs->count() <= 1)
+                                                job
                                             @else
-                                                <span class="text-dark">
-                                                    {{ auth()->guard('user')->user()->appliedJobs->count() }}
-                                                </span>
+                                                jobs
                                             @endif
                                         </div>
                                     </div>
@@ -228,12 +228,13 @@
                                             saved Jobs
                                         </div>
                                         <div class="col-lg-9 col-md-8">
-                                            @if (auth()->guard('user')->user()->experience)
-                                                {{ auth()->guard('user')->user()->experience }}
+                                            {{-- saved jobs --}}
+                                            You have saved
+                                            {{ auth()->guard('user')->user()->savedJobs->count() }}
+                                            @if (auth()->guard('user')->user()->savedJobs->count() <= 1)
+                                                job
                                             @else
-                                                <span class="text-dark">
-                                                    {{ auth()->guard('user')->user()->savedJobs->count() }}
-                                                </span>
+                                                jobs
                                             @endif
                                         </div>
                                     </div>
@@ -313,4 +314,81 @@
             </div>
         </section>
     </main>
+@endsection
+
+@section('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#deleteProfileImage').click(function() {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Are you sure you want to delete your profile image?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: "Deleted!",
+                            text: "Your file has been deleted.",
+                            icon: "success"
+                        });
+                        setTimeout(function() {
+                            $('#deleteProfileImageForm').submit();
+                        }, 2000);
+                    }
+
+                    if (result.isDismissed) {
+                        Swal.fire({
+                            title: "Cancelled!",
+                            text: "Your file is safe.",
+                            icon: "error"
+                        });
+                    }
+
+                }).catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+
+
+            $('#deleteResumePdf').click(function() {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "Are you sure you want to delete your resume pdf?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: "Deleted!",
+                            text: "Your file has been deleted.",
+                            icon: "success"
+                        });
+                        setTimeout(function() {
+                            $('#deleteResumePdfForm').submit();
+                        }, 2000);
+                    }
+
+                    if (result.isDismissed) {
+                        Swal.fire({
+                            title: "Cancelled!",
+                            text: "Your file is safe.",
+                            icon: "error"
+                        });
+                    }
+
+                }).catch((error) => {
+                    console.error('Swal Error :', error);
+                });
+            });
+
+        });
+    </script>
+
 @endsection
