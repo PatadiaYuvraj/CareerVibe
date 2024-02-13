@@ -8,7 +8,7 @@
                 <p class="text-center small">Enter your email & password to login</p>
             </div>
 
-            <form class="row g-3" action="{{ route('admin.doLogin') }}" method="POST">
+            <form class="row g-3" action="{{ route('admin.doLogin') }}" method="POST" form="adminLoginForm">
                 @csrf
                 <div class="col-12">
                     <label for="email" class="form-label">Email</label>
@@ -45,12 +45,35 @@
                 </div>
                 <div class="col-12 text-center">
                     <p class="small mb-0">
+
                         <a href="{{ route('user.login') }}">User</a> |
                         <a href="{{ route('company.login') }}">Company</a>
+
                     </p>
                 </div>
             </form>
 
         </div>
     </div>
+@endsection
+
+@section('scripts')
+    <script>
+        $("#adminLoginForm").validate({
+            rules: {
+                email: {
+                    required: true,
+                    email: true
+                },
+                password: {
+                    required: true,
+                    minlength: 5,
+                }
+            },
+
+            submitHandler: function(form) {
+                form.submit();
+            }
+        });
+    </script>
 @endsection

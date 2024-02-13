@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Jobs\DeleteFromCloudinary;
 use App\Jobs\UploadToCloudinary;
+use App\Jobs\uploadToCloudinaryDemoJob;
 use App\Repository\StorageManagerRepository;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Log;
@@ -27,6 +29,31 @@ class StorageManagerService implements StorageManagerRepository
             Log::info('File upload service is disabled');
         }
     }
+
+    // public function uploadToCloudinaryDemo(Request $request, string $field_name, string $local_path = null, string $model_type, int $model_id): void
+    // {
+    //     if (!Config::get('constants.IS_FILE_UPLOAD_SERVICE_ENABLED')) {
+    //         Log::info('File upload service is disabled');
+    //         return;
+    //     }
+
+    //     $local_path = $local_path ?? "temp";
+
+
+    //     $originalFilename = $request->file(
+    //         $field_name
+    //     )->getClientOriginalName();
+    //     $storedPath = Storage::putFileAs($local_path, $request->file($field_name), $originalFilename);
+    //     $data = [
+    //         "stored_path" => $storedPath,
+    //         "model_type" => $model_type,
+    //         "model_id" => $model_id,
+
+    //     ];
+    //     uploadToCloudinaryDemoJob::dispatch(
+    //         $data
+    //     );
+    // }
 
     public function deleteFromCloudinary(string $public_id): void
     {

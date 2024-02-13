@@ -31,17 +31,12 @@ return new class extends Migration
             $table->id();
             $table->morphs('authorable');
             $table->string('title');
-            $table->enum(
-                'type',
-                $this->type
-            )->default('text');
+            $table->enum('type', $this->type);
             $table->text('content');
-            $table->unique(
-                $this->unique
-            );
-            $table->index(
-                $this->index
-            );
+            $table->string('file')->nullable();
+            $table->string('public_id')->nullable();
+            $table->unique($this->unique);
+            $table->index($this->index);
             $table->timestamps();
         });
     }

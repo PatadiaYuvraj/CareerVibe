@@ -25,3 +25,5 @@ $this->mailableService->sendMail($company->email, $details);
 
 # MAIL_USERNAME="noreply.careervibe@gmail.com"
 # MAIL_PASSWORD="ibsqjkfvevxyzuma"
+
+https://apusthemes.com/wp-demo/superio/shortlist-candidates/

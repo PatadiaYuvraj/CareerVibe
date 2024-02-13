@@ -2,22 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Carbon\Carbon;
-use Faker\Provider\Uuid;
+use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-// use function Laravel\Prompts;
-use function Laravel\Prompts\confirm;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TestController extends Controller
 {
     public function test()
     {
-        return view('test');
+        // https://res.cloudinary.com/career-vibe/video/upload/v1707803711/career-vibe/videos/wyuftapb9wobdxj3a5e5.mp4
+        $id = "career-vibe/videos/wyuftapb9wobdxj3a5e5";
+        return view('test', compact('id'));
         dd('test');
         DB::table('qualifications')->insert([
             // 'name' => 'B.E.',
@@ -802,9 +800,31 @@ class TestController extends Controller
 
     public function testing(Request $request)
     {
-        return response()->json([
-            'message' => 'success',
-            'data' => $request->all()
+
+        $request->validate([
+            // video file
+            'file' => [
+                'required',
+                'file',
+                'mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,video/3gpp,video/x-msvideo,video/x-flv,video/x-ms-wmv,video/webm',
+                'max:102400',
+            ]
         ]);
+
+        // store video in local then upload to cloudinary
+        $originalFilename = $request->file('file')->getClientOriginalName();
+        $storedPath = Storage::putFileAs("temp/video", $request->file("file"), $originalFilename);
+
+        $response = (new UploadApi())->upload(
+            $storedPath,
+            [
+                'folder' => 'career-vibe/videos',
+                'resource_type' => 'video'
+            ]
+        );
+        Log::info('Local file path: ', [$storedPath]);
+        Log::info('File upload response: ', [$response]);
+        unlink(Storage::path($storedPath));
+        dd($response);
     }
 }

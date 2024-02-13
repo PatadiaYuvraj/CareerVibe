@@ -1,0 +1,48 @@
+{
+  "Cloudinary\\Api\\ApiResponse": {
+    "asset_id": "2c30db43e7076a907c59877b2da9d392",
+    "public_id": "career-vibe/videos/rwo3jn5oowcwqbkpj7wq",
+    "version": 1707805449,
+    "version_id": "f5df3c153904622dfc1f457916a6ca23",
+    "signature": "4e34824c78a823c27415869147e63a4f353a6618",
+    "width": 640,
+    "height": 360,
+    "format": "mp4",
+    "resource_type": "video",
+    "created_at": "2024-02-13T06:24:09Z",
+    "tags": [],
+    "pages": 0,
+    "bytes": 3114374,
+    "type": "upload",
+    "etag": "82d9b86b01560ce17d310f3fd2a79ca9",
+    "placeholder": false,
+    "url": "http://res.cloudinary.com/career-vibe/video/upload/v1707805449/career-vibe/videos/rwo3jn5oowcwqbkpj7wq.mp4",
+    "secure_url": "https://res.cloudinary.com/career-vibe/video/upload/v1707805449/career-vibe/videos/rwo3jn5oowcwqbkpj7wq.mp4",
+    "playback_url": "https://res.cloudinary.com/career-vibe/video/upload/sp_auto/v1707805449/career-vibe/videos/rwo3jn5oowcwqbkpj7wq.m3u8",
+    "folder": "career-vibe/videos",
+    "audio": {
+      "codec": "aac",
+      "bit_rate": "112000",
+      "frequency": 48000,
+      "channels": 2,
+      "channel_layout": "stereo"
+    },
+    "video": {
+      "pix_format": "yuv420p",
+      "codec": "h264",
+      "level": 31,
+      "profile": "High",
+      "bit_rate": "710666",
+      "dar": "16:9",
+      "time_base": "1/30"
+    },
+    "is_audio": false,
+    "frame_rate": 30.0,
+    "bit_rate": 816171,
+    "duration": 30.526667,
+    "rotation": 0,
+    "original_filename": "file_example_MP4_640_3MG",
+    "nb_frames": 901,
+    "api_key": "465536872651195"
+  }
+}
