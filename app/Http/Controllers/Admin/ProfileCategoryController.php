@@ -29,7 +29,7 @@ class ProfileCategoryController extends Controller
         return $this->navigationManagerService->loadView('admin.profile-category.create');
     }
 
-    public function store(Request $request)
+    public function store1(Request $request)
     {
         $request->validate([
             'profile_categories.*.name' => 'required|unique:profile_categories,name',  // Ensure unique names across all items
@@ -37,6 +37,26 @@ class ProfileCategoryController extends Controller
         $data = collect($request->get('profile_categories'))->map(function ($item) {
             return ['name' => $item['name']];
         })->toArray();
+        $isCreated = $this->profileCategory->insert($data);
+
+        if ($isCreated) {
+            return $this->navigationManagerService->redirectRoute('admin.profile-category.index', [], 302, [], false, ['success' => 'Profile Category is created']);
+        } else {
+            return $this->navigationManagerService->redirectBack(302, [], false, ['warning' => 'Profile Category could not be created']);
+        }
+    }
+
+    public function store(Request $request)
+    {
+        return response()->json($request->all());
+        $request->validate([
+            'name.*' => 'required|unique:profile_categories,name',
+        ]);
+
+        $data = collect($request->get('name'))->map(function ($item) {
+            return ['name' => $item];
+        })->toArray();
+
         $isCreated = $this->profileCategory->insert($data);
 
         if ($isCreated) {

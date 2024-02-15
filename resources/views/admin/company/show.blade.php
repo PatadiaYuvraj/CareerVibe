@@ -61,7 +61,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $job['sub_profile']['name'] }}</td>
                                         <td>{{ $job['vacancy'] }}</td>
-                                        <td>{{ $job['min_salary'] . ' - ' . $job['min_salary'] }}</td>
+                                        <td>{{ $job['min_salary'] . ' - ' . $job['max_salary'] }}</td>
                                         <td>
                                             <a href="{{ route('admin.job.toggleVerified', [$job['id'], $job['is_verified']]) }}"
                                                 class="badge bg-{{ $job['is_verified'] ? 'success' : 'danger' }}">

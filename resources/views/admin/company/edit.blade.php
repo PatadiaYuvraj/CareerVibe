@@ -9,10 +9,6 @@
                     <a href="{{ route('admin.company.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
-
-                    {{-- profile image form --}}
-
-
                     <form action="{{ route('admin.company.update', $company['id']) }}" method="POST"
                         enctype="multipart/form-data">
                         @csrf
@@ -22,7 +18,9 @@
                                 <input type="text" name="name" class="form-control"
                                     value="{{ old('name', $company['name']) }}">
                                 @error('name')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">
+                                        {{ $message }}
+                                    </span>
                                 @enderror
                             </div>
                             <div class="mb-3">
@@ -30,7 +28,9 @@
                                 <input type="email" name="email" class="form-control"
                                     value="{{ old('email', $company['email']) }}">
                                 @error('email')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">
+                                        {{ $message }}
+                                    </span>
                                 @enderror
                             </div>
                         </div>
@@ -40,15 +40,20 @@
                             </label>
                             <input name="profile_image_url" type="file" class="form-control" id="profile_image_url" />
                             @error('profile_image_url')
-                                <span class="text-danger">{{ $message }}</span>
+                                <span class="text-danger">
+                                    {{ $message }}
+                                </span>
                             @enderror
                         </div>
                         <div class="row row-cols-2">
                             <div class="mb-3">
                                 <label for="website" class="form-label">Company Website</label>
-                                <input type="text" name="website" class="form-control" value="{{ old('website') }}">
+                                <input type="text" name="website" class="form-control"
+                                    value="{{ old('website', $company['website']) }}">
                                 @error('website')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">
+                                        {{ $message }}
+                                    </span>
                                 @enderror
                             </div>
                             <div class="mb-3">
@@ -56,7 +61,9 @@
                                 <input type="text" name="linkedin" class="form-control"
                                     value="{{ old('linkedin', $company['linkedin']) }}">
                                 @error('linkedin')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">
+                                        {{ $message }}
+                                    </span>
                                 @enderror
                             </div>
                         </div>
@@ -66,15 +73,19 @@
                                 <input type="text" name="city" class="form-control"
                                     value="{{ old('city', $company['city']) }}">
                                 @error('city')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">
+                                        {{ $message }}
+                                    </span>
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="address" class="form-label">AddressT</label>
+                                <label for="address" class="form-label">Address</label>
                                 <input type="text" name="address" class="form-control"
                                     value="{{ old('address', $company['address']) }}">
                                 @error('address')
-                                    <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">
+                                        {{ $message }}
+                                    </span>
                                 @enderror
                             </div>
                         </div>
@@ -83,7 +94,9 @@
                             <label for="description" class="form-label">Description</label>
                             <textarea class="form-control" name="description" id="description" rows="5">{{ old('description', $company['description']) }}</textarea>
                             @error('description')
-                                <span class="text-danger">{{ $message }}</span>
+                                <span class="text-danger">
+                                    {{ $message }}
+                                </span>
                             @enderror
                         </div>
                         <div class="btn-group mb-3">

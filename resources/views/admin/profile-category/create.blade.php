@@ -13,23 +13,19 @@
                     </a>
                 </div>
                 <div class="card-body">
-                    <form method="POST" class="repeater" action="{{ route('admin.profile-category.store') }}">
+                    <form id="profile-category-form" method="POST" action="{{ route('admin.profile-category.store') }}">
                         @csrf
-                        <div class="form-group mb-3" data-repeater-list="profile_categories">
-                            <div data-repeater-item class="row">
-                                <div class="col-md-6 col">
-                                    <label for="name">Name</label>
-                                    <input type="text" class="form-control" name="name" id="name">
-                                </div>
-
-                                <div class="col-md-6 col" data-repeater-delete>
-                                    <button type="button" class="btn btn-danger mt-2">Delete</button>
+                        <div class="form-group mb-3" id="profile-categories">
+                            <div class="row">
+                                <label for="name">Name 1</label>
+                                <div class="input-group mb-2">
+                                    <input type="text" name="name[]" id="name" class="form-control col">
                                 </div>
                             </div>
                         </div>
                         <div class="form-group mb-3">
-                            <button data-repeater-create type="button" class="btn btn-primary">Add</button>
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="button" id="add-category" class="btn btn-primary">Add</button>
+                            <button type="button" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
                 </div>
@@ -50,20 +46,43 @@
 @endsection
 
 @section('scripts')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script>
-        // form repeater
+        const maxCategories = 5;
         $(document).ready(function() {
-            $('.repeater').repeater({
-                show: function() {
-                    $(this).slideDown();
-                },
-                hide: function(deleteElement) {
-                    if (confirm('Are you sure you want to delete this element?')) {
-                        $(this).slideUp(deleteElement);
-                    }
-                },
-                isFirstItemUndeletable: true,
+            $('#add-category').click(function() {
+                let categoryCount = $('#profile-categories').find('.row').length;
+                if (categoryCount < maxCategories) {
+                    let category = `
+                    <div class="row">
+                        <label for="name">Name ${categoryCount + 1}</label>
+                        <div class="input-group mb-2">
+                            <input type="text" name="name[]" id="name" class="form-control col">
+                            <button type="button" class="btn btn-danger col-2 delete-category">Delete</button>
+                        </div>
+                    </div>
+                    `;
+                    $('#profile-categories').append(category);
+                } else {
+                    // text : Maximum categories reached
+                    $("#add-category").attr("disabled", "disabled").text("Maximum categories reached");
+                }
             });
+
+            $(document).on('click', '.delete-category', function() {
+                $(this).parent().parent().remove();
+            });
+
+
+            $('#profile-category-form').submit(function() {
+                let categoryCount = $('#profile-categories').find('.row').length;
+                if (categoryCount < 1) {
+                    alert('Please add at least one category');
+                    return false;
+                }
+            });
+
         });
     </script>
 @endsection

@@ -2,7 +2,6 @@
 @section('pageTitle', 'Dashboard | Admin')
 @section('content')
     <main id="main" class="main">
-
         <section class="section dashboard">
             <div class="card">
                 <div class="card-header pagetitle">
@@ -87,7 +86,9 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan='10' class="text-center">No User Found</td>
+                                    <td colspan='10' class="text-center">
+                                        No Data Found
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Carbon\Carbon;
 use Cloudinary\Api\Upload\UploadApi;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ class TestController extends Controller
 {
     public function test()
     {
+        $users = User::all();
+        return view('test', compact('users'));
 
         // for ($i = 1; $i <= 100; $i++) {
         //     DB::table('job_locations')
@@ -1052,7 +1055,7 @@ class TestController extends Controller
 
     public function testing(Request $request)
     {
-
+        dd($request->all());
         $request->validate([
             // video file
             'file' => [
