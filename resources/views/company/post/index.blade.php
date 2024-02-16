@@ -2,9 +2,7 @@
 @section('pageTitle', 'Your Posts | ' . env('APP_NAME'))
 @section('content')
     @php
-        $currentAuthId = auth()
-            ->guard(config('constants.COMPANY_GUARD'))
-            ->id();
+        $currentAuthId = auth()->guard(config('constants.COMPANY_GUARD'))->id();
     @endphp
     <main id="main" class="main">
 
@@ -15,7 +13,7 @@
                         Posts
                         <a href="{{ route('company.post.create') }}" class="float-end btn btn-sm btn-primary">
                             <i class="bi-plus-lg">
-                                Add Post
+                                Add New Post
                             </i>
                         </a>
                     </span>
@@ -26,6 +24,7 @@
                             <tr>
                                 <th>Title</th>
                                 <th>Content</th>
+                                <th>Type</th>
                                 <th class="">Date</th>
                                 <th class="col-1">Likes</th>
                                 <th class="col-1">Comments</th>
@@ -48,6 +47,27 @@
                                             title="{{ $post['content'] }}">
                                             {{ Str::limit($post['content'], 20) }}
                                         </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            @if ($post['type'] == 'TEXT')
+                                                <button class="btn btn-info btn-sm">
+                                                    {{ $post['type'] }}
+                                                </button>
+                                            @else
+                                                @if ($post['type'] == 'IMAGE')
+                                                    <a href="{{ url($post['file']) }}" class="btn btn-sm btn-success"
+                                                        target="_blank">
+                                                        {{ $post['type'] }}
+                                                    </a>
+                                                @else
+                                                    <a href="{{ url($post['file']) }}" class="btn btn-sm btn-primary"
+                                                        target="_blank">
+                                                        {{ $post['type'] }}
+                                                    </a>
+                                                @endif
+                                            @endif
+                                        </div>
                                     </td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>
                                     <td>

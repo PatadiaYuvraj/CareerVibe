@@ -2,9 +2,7 @@
 @section('pageTitle', 'Comments | ' . env('APP_NAME'))
 @section('content')
     @php
-        $currentAuthId = auth()
-            ->guard(config('constants.USER_GUARD'))
-            ->id();
+        $currentAuthId = auth()->guard(config('constants.USER_GUARD'))->id();
     @endphp
     <main id="main" class="main">
 
@@ -82,8 +80,7 @@
                                             {{ 'N/A' }}
                                         @endif
                                     </td>
-                                    <td>
-                                        {{-- if this comment is created by current company then company can edit and delete comment  --}}
+                                    {{-- <td>
                                         @if ($comment['authorable_type'] == 'App\Models\User' && $comment['authorable_id'] == $currentAuthId)
                                             <div class="d-flex btn-group">
                                                 <a href="{{ route('user.post.commentEdit', [$post['id'], $comment['id']]) }}"
@@ -96,10 +93,34 @@
                                                 </a>
                                             </div>
                                         @else
-                                            {{-- you cant edit or delete --}}
                                             <span class="badge text-dark bg-transparent">
                                                 No Action
                                             </span>
+                                        @endif
+                                    </td> --}}
+                                    <td>
+                                        @if ($comment['authorable_type'] == 'App\Models\User' && $comment['authorable_id'] == $currentAuthId)
+                                            <div class="d-flex btn-group">
+                                                <a href="{{ route('user.post.commentEdit', [$post['id'], $comment['id']]) }}"
+                                                    class="btn btn-sm btn-outline-primary p-1">
+                                                    <i class="bi-pencil-square"></i>
+                                                </a>
+                                                <a href="{{ route('user.post.commentDelete', [$post['id'], $comment['id']]) }}"
+                                                    class="btn btn-sm btn-outline-danger p-1">
+                                                    <i class="bi-trash"></i>
+                                                </a>
+                                            </div>
+                                        @else
+                                            @if ($post['authorable_type'] == 'App\Models\User' && $post['authorable_id'] == $currentAuthId)
+                                                <a href="{{ route('user.post.commentDelete', [$post['id'], $comment['id']]) }}"
+                                                    class="btn btn-sm btn-outline-danger p-1">
+                                                    <i class="bi-trash"></i>
+                                                </a>
+                                            @else
+                                                <button class="badge bg-transparent text-dark border-0" disabled>
+                                                    No Action
+                                                </button>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>

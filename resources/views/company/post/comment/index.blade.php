@@ -2,9 +2,7 @@
 @section('pageTitle', 'Comments | ' . env('APP_NAME'))
 @section('content')
     @php
-        $currentAuthId = auth()
-            ->guard(config('constants.COMPANY_GUARD'))
-            ->id();
+        $currentAuthId = auth()->guard(config('constants.COMPANY_GUARD'))->id();
     @endphp
     <main id="main" class="main">
 
@@ -40,13 +38,11 @@
                                         @if ($comment['authorable_type'] == 'App\Models\Company' && $comment['authorable_id'] == $currentAuthId)
                                             <span class="badge text-dark bg-transparent" data-bs-toggle="tooltip"
                                                 data-bs-placement="right" title="{{ $comment['authorable']['name'] }}">
-                                                {{-- Posted by  --}}
                                                 You
                                             </span>
                                         @else
                                             <span class="badge text-dark bg-transparent" data-bs-toggle="tooltip"
                                                 data-bs-placement="right" title="{{ $comment['authorable']['name'] }}">
-                                                {{-- Posted by --}}
                                                 {{ $comment['authorable']['name'] }}
                                             </span>
                                         @endif
@@ -59,7 +55,9 @@
                                     </td>
                                     <td>
 
-                                        @if ($comment['likes']->where('authorable_type', 'App\Models\Company')->where('authorable_id', $currentAuthId)->count() > 0)
+                                        @if (
+                                            $comment['likes']->where('authorable_type', 'App\Models\Company')->where('authorable_id', $currentAuthId)->count() >
+                                                0)
                                             <a href="{{ route('company.post.commentUnlike', [$post['id'], $comment['id']]) }}"
                                                 class="btn btn-sm link-danger">
                                                 <i class="bi-heart-fill">
@@ -83,9 +81,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        {{-- if this comment is created by current company then company can edit and delete comment  --}}
                                         @if ($comment['authorable_type'] == 'App\Models\Company' && $comment['authorable_id'] == $currentAuthId)
-                                            {{-- Route::get('/comment/{id}/edit/{comment_id}',  [UserUserController::class, "commentPostEdit"])->name('company.post.commentEdit'); --}}
                                             <div class="d-flex btn-group">
                                                 <a href="{{ route('company.post.commentEdit', [$post['id'], $comment['id']]) }}"
                                                     class="btn btn-sm btn-outline-primary p-1">
@@ -97,10 +93,16 @@
                                                 </a>
                                             </div>
                                         @else
-                                            {{-- you cant edit or delete --}}
-                                            <span class="badge text-dark bg-transparent">
-                                                No Action
-                                            </span>
+                                            @if ($post['authorable_type'] == 'App\Models\Company' && $post['authorable_id'] == $currentAuthId)
+                                                <a href="{{ route('company.post.commentDelete', [$post['id'], $comment['id']]) }}"
+                                                    class="btn btn-sm btn-outline-danger p-1">
+                                                    <i class="bi-trash"></i>
+                                                </a>
+                                            @else
+                                                <button class="badge bg-transparent text-dark border-0" disabled>
+                                                    No Action
+                                                </button>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>

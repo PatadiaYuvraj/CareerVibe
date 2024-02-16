@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use App\Models\Post;
 use App\Services\AuthenticableService;
 use App\Services\NavigationManagerService;
@@ -340,14 +341,18 @@ class PostsController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
 
-        $comment = $post->comments()->find($comment_id);
+        $comment = Comment::with('post')->where('id', $comment_id)->first();
         if (!$comment) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not found"]);
         }
 
         $user_id = $this->authenticableService->getUser()->id;
-        if ($comment->authorable_id != $user_id || $comment->authorable_type != "App\Models\User") {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This comment is not created by you"]);
+        // if ($comment->authorable_id != $user_id || $comment->authorable_type != "App\Models\User") {
+        //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This comment is not created by you"]);
+        // }
+
+        if ($comment->post->authorable_id != $user_id || $comment->post->authorable_type != "App\Models\User") {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post/comment is not created by you"]);
         }
 
         $isDeleted = $comment->delete();

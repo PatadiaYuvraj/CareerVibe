@@ -2,9 +2,7 @@
 @section('pageTitle', 'All Posts | ' . env('APP_NAME'))
 @section('content')
     @php
-        $currentAuthId = auth()
-            ->guard(config('constants.COMPANY_GUARD'))
-            ->id();
+        $currentAuthId = auth()->guard(config('constants.COMPANY_GUARD'))->id();
         // $userType = 'App\Models\Company';
         $companyType = 'App\Models\Company';
         $userType = 'App\Models\User';

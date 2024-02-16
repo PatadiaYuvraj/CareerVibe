@@ -13,6 +13,33 @@
                 <div class="card-body">
                     <form action="{{ route('company.post.update', $post['id']) }}" method="POST">
                         @csrf
+                        <div class="row mb-2 row-cols-2">
+                            <div class="col">
+                                <div class="btn-group">
+                                    @foreach (config()->get('constants.post.type') as $key => $type)
+                                        <input type="radio" class="btn-check" id="{{ $key }}"
+                                            {{ $post['type'] == $key ? 'checked' : 'disabled' }} autocomplete="off"
+                                            required>
+                                        <label class="btn btn-outline-primary" for="{{ $key }}">
+                                            {{ $key }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                @error('type')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            @if ($post['type'] == 'IMAGE' || $post['type'] == 'VIDEO')
+                                <div class="col" id="file">
+                                    <input type="file" name="file" class="form-control" id="file-input"
+                                        placeholder="Enter file" accept="image/*, video/*" value="{{ old('file') }}" />
+
+                                    @error('file')
+                                        <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            @endif
+                        </div>
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
                             <input type="text" name="title" value="{{ old('title', $post['title']) }}"

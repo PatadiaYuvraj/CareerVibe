@@ -31,7 +31,7 @@ return new class extends Migration
             $table->id();
             $table->morphs('authorable');
             $table->string('title');
-            $table->enum('type', $this->type);
+            $table->enum('type', $this->type)->default('TEXT');
             $table->text('content');
             $table->string('file')->nullable();
             $table->string('public_id')->nullable();

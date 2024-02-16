@@ -362,6 +362,8 @@ Route::group(['middleware' => "isUser"], function () {
         });
 
         Route::prefix('job')->group(function () {
+            Route::get('/getAllJobs',  [UserJobController::class, "getAllJobs"])->name('user.job.getAllJobs');
+
             Route::get('/applied-jobs',  [UserJobController::class, "appliedJobs"])->name('user.job.appliedJobs');
             Route::get('/saved-jobs',  [UserJobController::class, "savedJobs"])->name('user.job.savedJobs');
             Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
