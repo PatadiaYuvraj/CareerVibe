@@ -11,7 +11,8 @@
                     <a href="{{ route('company.post.index') }}" class="float-end btn btn-sm btn-primary">Back</a>
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('company.post.update', $post['id']) }}" method="POST">
+                    <form action="{{ route('company.post.update', $post['id']) }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="row mb-2 row-cols-2">
                             <div class="col">
@@ -32,7 +33,7 @@
                             @if ($post['type'] == 'IMAGE' || $post['type'] == 'VIDEO')
                                 <div class="col" id="file">
                                     <input type="file" name="file" class="form-control" id="file-input"
-                                        placeholder="Enter file" accept="image/*, video/*" value="{{ old('file') }}" />
+                                        placeholder="Enter file" accept="image/*, video/*" />
 
                                     @error('file')
                                         <div class="text-danger">{{ $message }}</div>

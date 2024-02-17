@@ -9,6 +9,7 @@ use App\Services\AuthenticableService;
 use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 
 class PostsController extends Controller
 {
@@ -66,37 +67,123 @@ class PostsController extends Controller
         return $this->navigationManagerService->loadView('user.post.create');
     }
 
+
     public function storePost(Request $request)
     {
-        $request->validate([
-            "title" => [
-                "required",
-                "string",
-                "max:100",
-            ],
-            "content" => [
-                "required",
-                "string",
-                "max:500",
-            ],
-        ]);
-
         $user_id = $this->authenticableService->getUser()->id;
 
-        $data = [
-            "title" => $request->get("title"),
-            "content" => $request->get("content"),
-            "authorable_id" => $user_id,
-            "authorable_type" => "App\Models\User"
-        ];
+        switch ($request->type) {
+            case 'TEXT':
+                $rules = [
+                    'title' => ['required', 'string', 'max:100'],
+                    'content' => ['required', 'string', 'max:500'],
+                    'type' => ['required', 'string', 'in:' . implode(',', array_keys(Config::get('constants.post.type'))),],
+                    'file' => 'nullable',
+                ];
+                $messages = [
+                    'title.required' => 'The title field is required.',
+                    'title.string' => 'The title must be a string.',
+                    'title.max' => 'The title may not be greater than 100 characters.',
+                    'content.required' => 'The content field is required.',
+                    'content.string' => 'The content must be a string.',
+                    'content.max' => 'The content may not be greater than 500 characters.',
+                    'type.required' => 'The type field is required.',
+                    'type.string' => 'The type must be a string.',
+                    'type.in' => 'The selected type is invalid.',
+                ];
+                break;
+            case 'IMAGE':
+                $rules = [
+                    'title' => ['required', 'string', 'max:100'],
+                    'content' => ['required', 'string', 'max:500'],
+                    'type' => ['required', 'string', 'in:' . implode(',', array_keys(Config::get('constants.post.type'))),],
+                    'file' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:10240'],
+                ];
 
-        // $isCreated = $this->post->create($data);
-        $isCreated = $this->authenticableService->getUser()->posts()->create($data);
+                $messages = [
+                    'title.required' => 'The title field is required.',
+                    'title.string' => 'The title must be a string.',
+                    'title.max' => 'The title may not be greater than 100 characters.',
+                    'content.required' => 'The content field is required.',
+                    'content.string' => 'The content must be a string.',
+                    'content.max' => 'The content may not be greater than 500 characters.',
+                    'type.required' => 'The type field is required.',
+                    'type.string' => 'The type must be a string.',
+                    'type.in' => 'The selected type is invalid.',
+                    'file.required' => 'The file field is required.',
+                    'file.image' => 'The file must be an image.',
+                    'file.mimes' => 'The file must be a file of type: jpeg, png, jpg, gif, svg.',
+                    'file.max' => 'The file may not be greater than 10240 kilobytes.',
+                ];
+
+                break;
+            case 'VIDEO':
+                $rules = [
+                    'title' => ['required', 'string', 'max:100'],
+                    'content' => ['required', 'string', 'max:500'],
+                    'type' => ['required', 'string', 'in:' . implode(',', array_keys(Config::get('constants.post.type'))),],
+                    'file' => ['required', 'mimes:mp4,3gp,avi,mov,flv,wmv', 'max:30720'],
+                ];
+                $messages = [
+                    'title.required' => 'The title field is required.',
+                    'title.string' => 'The title must be a string.',
+                    'title.max' => 'The title may not be greater than 100 characters.',
+                    'content.required' => 'The content field is required.',
+                    'content.string' => 'The content must be a string.',
+                    'content.max' => 'The content may not be greater than 500 characters.',
+                    'type.required' => 'The type field is required.',
+                    'type.string' => 'The type must be a string.',
+                    'type.in' => 'The selected type is invalid.',
+                    'file.required' => 'The file field is required.',
+                    'file.mimes' => 'The file must be a file of type: mp4, 3gp, avi, mov, flv, wmv.',
+                    'file.max' => 'The file may not be greater than 30720 kilobytes.',
+                ];
+                break;
+            default:
+                // Handle invalid type
+                return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Post Type"]);
+        }
+
+        $request->validate($rules, $messages);
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            if ($request->type == "IMAGE") {
+                $stored_path = Storage::putFile(
+                    'uploads/user-post/image',
+                    $request->file('file')
+                );
+            } else {
+                $stored_path = Storage::putFile(
+                    'uploads/user-post/video',
+                    $request->file('file')
+                );
+            }
+            $data = [
+                "title" => $request->get("title"),
+                "content" => $request->get("content"),
+                "type" => $request->type,
+                "authorable_id" => $user_id,
+                "authorable_type" => "App\Models\User",
+                "file" => $stored_path,
+                "public_id" => null
+            ];
+        } else {
+            $data = [
+                "title" => $request->get("title"),
+                "content" => $request->get("content"),
+                "type" => $request->type,
+                "authorable_id" => $user_id,
+                "authorable_type" => "App\Models\User"
+            ];
+        }
+
+
+
+        $isCreated = $this->post->create($data);
 
         if ($isCreated) {
             return $this->navigationManagerService->redirectRoute('user.post.index', [], 302, [], false, ["success" => "Post Created Successfully"]);
         }
-
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Created"]);
     }
 
@@ -128,33 +215,109 @@ class PostsController extends Controller
 
     public function updatePost(Request $request, $id)
     {
-        $request->validate([
-            "title" => [
-                "required",
-                "string",
-                "max:100",
-            ],
-            "content" => [
-                "required",
-                "string",
-                "max:500",
-            ],
-        ]);
         $post = $this->post->find($id);
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
+
         $user_id = $this->authenticableService->getUser()->id;
-        if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
+        if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\User") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
+
+        if ($post->type == "TEXT") {
+            $rules = [
+                'title' => ['required', 'string', 'max:100'],
+                'content' => ['required', 'string', 'max:500'],
+                'file' => 'nullable',
+            ];
+            $messages = [
+                'title.required' => 'The title field is required.',
+                'title.string' => 'The title must be a string.',
+                'title.max' => 'The title may not be greater than 100 characters.',
+                'content.required' => 'The content field is required.',
+                'content.string' => 'The content must be a string.',
+                'content.max' => 'The content may not be greater than 500 characters.',
+            ];
+        } else if ($post->type == "IMAGE") {
+
+
+            $rules = [
+                'title' => ['required', 'string', 'max:100'],
+                'content' => ['required', 'string', 'max:500'],
+                'file' => [
+                    'nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:10240'
+                ],
+            ];
+
+            $messages = [
+                'title.required' => 'The title field is required.',
+                'title.string' => 'The title must be a string.',
+                'title.max' => 'The title may not be greater than 100 characters.',
+                'content.required' => 'The content field is required.',
+                'content.string' => 'The content must be a string.',
+                'content.max' => 'The content may not be greater than 500 characters.',
+                'file.image' => 'The file must be an image.',
+                'file.mimes' => 'The file must be a file of type: jpeg, png, jpg, gif, svg.',
+                'file.max' => 'The file may not be greater than 10240 kilobytes.',
+            ];
+        } else if ($post->type == "VIDEO") {
+            $rules = [
+                'title' => ['required', 'string', 'max:100'],
+                'content' => ['required', 'string', 'max:500'],
+                'file' => ['nullable', 'mimes:mp4,3gp,avi,mov,flv,wmv', 'max:30720'],
+            ];
+            $messages = [
+                'title.required' => 'The title field is required.',
+                'title.string' => 'The title must be a string.',
+                'title.max' => 'The title may not be greater than 100 characters.',
+                'content.required' => 'The content field is required.',
+                'content.string' => 'The content must be a string.',
+                'content.max' => 'The content may not be greater than 500 characters.',
+                'file.mimes' => 'The file must be a file of type: mp4, 3gp, avi, mov, flv, wmv.',
+                'file.max' => 'The file may not be greater than 30720 kilobytes.',
+            ];
+        } else {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Post Type"]);
+        }
+        $request->validate($rules, $messages);
+
         $data = [
             "title" => $request->get("title"),
             "content" => $request->get("content"),
         ];
-        // $isUpdated = $post->update($data);
 
-        $isUpdated = $this->authenticableService->getUser()->posts()->where('id', $id)->update($data);
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            if ($post->type == "IMAGE") {
+
+                if ($post->file) {
+                    Storage::delete($post->file);
+                }
+
+                $stored_path = Storage::putFile(
+                    'uploads/user-post/image',
+                    $request->file('file')
+                );
+                $data['file'] = $stored_path;
+            }
+            if ($post->type == "VIDEO") {
+
+                if ($post->file) {
+                    Storage::delete($post->file);
+                }
+
+                $stored_path = Storage::putFile(
+                    'uploads/user-post/video',
+                    $request->file('file')
+                );
+                $data['file'] = $stored_path;
+            }
+        }
+
+
+        $isUpdated = $post->update($data);
+
         if ($isUpdated) {
             return $this->navigationManagerService->redirectRoute('user.post.index', [], 302, [], false, ["success" => "Post Updated Successfully"]);
         }
@@ -171,6 +334,14 @@ class PostsController extends Controller
         if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
+
+        if ($post->type == "IMAGE" || $post->type == "VIDEO") {
+            if ($post->file) {
+                Storage::delete($post->file);
+            }
+        }
+
+
         $post->comments()->delete();
         $post->likes()->delete();
         // $isDeleted = $post->delete();

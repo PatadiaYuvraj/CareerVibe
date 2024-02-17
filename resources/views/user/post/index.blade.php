@@ -2,9 +2,7 @@
 @section('pageTitle', 'Your Posts | ' . env('APP_NAME'))
 @section('content')
     @php
-        $currentAuthId = auth()
-            ->guard(config('constants.USER_GUARD'))
-            ->id();
+        $currentAuthId = auth()->guard(config('constants.USER_GUARD'))->id();
     @endphp
     <main id="main" class="main">
 
@@ -26,6 +24,7 @@
                             <tr>
                                 <th>Title</th>
                                 <th>Content</th>
+                                <th>Type</th>
                                 <th>Date</th>
                                 <th>Like</th>
                                 <th>Comments</th>
@@ -48,6 +47,27 @@
                                             title="{{ $post['content'] }}">
                                             {{ Str::limit($post['content'], 20) }}
                                         </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            @if ($post['type'] == 'TEXT')
+                                                <button class="btn btn-info btn-sm">
+                                                    {{ $post['type'] }}
+                                                </button>
+                                            @else
+                                                @if ($post['type'] == 'IMAGE')
+                                                    <a href="{{ url($post['file']) }}" class="btn btn-sm btn-success"
+                                                        target="_blank">
+                                                        {{ $post['type'] }}
+                                                    </a>
+                                                @else
+                                                    <a href="{{ url($post['file']) }}" class="btn btn-sm btn-primary"
+                                                        target="_blank">
+                                                        {{ $post['type'] }}
+                                                    </a>
+                                                @endif
+                                            @endif
+                                        </div>
                                     </td>
                                     <td>{{ $post['created_at']->diffForHumans() }}</td>
                                     <td>

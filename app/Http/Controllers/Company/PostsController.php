@@ -154,7 +154,8 @@ class PostsController extends Controller
                     'uploads/company-post/image',
                     $request->file('file')
                 );
-            } else {
+            }
+            if ($request->type == "VIDEO") {
                 $stored_path = Storage::putFile(
                     'uploads/company-post/video',
                     $request->file('file')
@@ -217,30 +218,107 @@ class PostsController extends Controller
 
     public function updatePost(Request $request, $id)
     {
-        $request->validate([
-            "title" => [
-                "required",
-                "string",
-                "max:100",
-            ],
-            "content" => [
-                "required",
-                "string",
-                "max:500",
-            ],
-        ]);
         $post = $this->post->find($id);
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
+
         $user_id = $this->authenticableService->getCompany()->id;
         if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
+
+        if ($post->type == "TEXT") {
+            $rules = [
+                'title' => ['required', 'string', 'max:100'],
+                'content' => ['required', 'string', 'max:500'],
+                'file' => 'nullable',
+            ];
+            $messages = [
+                'title.required' => 'The title field is required.',
+                'title.string' => 'The title must be a string.',
+                'title.max' => 'The title may not be greater than 100 characters.',
+                'content.required' => 'The content field is required.',
+                'content.string' => 'The content must be a string.',
+                'content.max' => 'The content may not be greater than 500 characters.',
+            ];
+        } else if ($post->type == "IMAGE") {
+
+
+            $rules = [
+                'title' => ['required', 'string', 'max:100'],
+                'content' => ['required', 'string', 'max:500'],
+                'file' => [
+                    'nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:10240'
+                ],
+            ];
+
+            $messages = [
+                'title.required' => 'The title field is required.',
+                'title.string' => 'The title must be a string.',
+                'title.max' => 'The title may not be greater than 100 characters.',
+                'content.required' => 'The content field is required.',
+                'content.string' => 'The content must be a string.',
+                'content.max' => 'The content may not be greater than 500 characters.',
+                'file.image' => 'The file must be an image.',
+                'file.mimes' => 'The file must be a file of type: jpeg, png, jpg, gif, svg.',
+                'file.max' => 'The file may not be greater than 10240 kilobytes.',
+            ];
+        } else if ($post->type == "VIDEO") {
+            $rules = [
+                'title' => ['required', 'string', 'max:100'],
+                'content' => ['required', 'string', 'max:500'],
+                'file' => ['nullable', 'mimes:mp4,3gp,avi,mov,flv,wmv', 'max:30720'],
+            ];
+            $messages = [
+                'title.required' => 'The title field is required.',
+                'title.string' => 'The title must be a string.',
+                'title.max' => 'The title may not be greater than 100 characters.',
+                'content.required' => 'The content field is required.',
+                'content.string' => 'The content must be a string.',
+                'content.max' => 'The content may not be greater than 500 characters.',
+                'file.mimes' => 'The file must be a file of type: mp4, 3gp, avi, mov, flv, wmv.',
+                'file.max' => 'The file may not be greater than 30720 kilobytes.',
+            ];
+        } else {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Post Type"]);
+        }
+        $request->validate($rules, $messages);
+
         $data = [
             "title" => $request->get("title"),
             "content" => $request->get("content"),
         ];
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            if ($post->type == "IMAGE") {
+
+                if ($post->file) {
+                    Storage::delete($post->file);
+                }
+
+                $stored_path = Storage::putFile(
+                    'uploads/company-post/image',
+                    $request->file('file')
+                );
+                $data['file'] = $stored_path;
+            }
+            if ($post->type == "VIDEO") {
+
+                if ($post->file) {
+                    Storage::delete($post->file);
+                }
+
+                $stored_path = Storage::putFile(
+                    'uploads/company-post/video',
+                    $request->file('file')
+                );
+                $data['file'] = $stored_path;
+            }
+        }
+
+
         $isUpdated = $post->update($data);
 
         if ($isUpdated) {
@@ -252,6 +330,7 @@ class PostsController extends Controller
     public function deletePost($id)
     {
         $post = $this->post->find($id);
+
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
@@ -260,8 +339,15 @@ class PostsController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
 
+        if ($post->type == "IMAGE" || $post->type == "VIDEO") {
+            if ($post->file) {
+                Storage::delete($post->file);
+            }
+        }
+        $post->comments()->delete();
+        $post->likes()->delete();
 
-        $isDeleted = $post->delete();
+        $isDeleted = $this->authenticableService->getCompany()->posts()->where('id', $id)->delete();
         if ($isDeleted) {
             return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Deleted Successfully"]);
         }

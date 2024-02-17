@@ -43,6 +43,16 @@ return [
       'VIDEO' => 'video',
     ],
   ],
+  'report' => [
+    'type' => [
+      'INAPPROPRIATE' => 'inappropriate',
+      'SPAM' => 'spam',
+      'FRAUD' => 'fraud',
+      'HATE_SPEECH' => 'hate speech',
+      'ABUSIVE' => 'abusive',
+      'OTHER' => 'other',
+    ],
+  ],
   'job' => [
     'work_type' => [
       'REMOTE' => 'Remote',
