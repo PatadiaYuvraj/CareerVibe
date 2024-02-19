@@ -104,7 +104,7 @@ class User extends Authenticatable
 
     public function appliedJobs()
     {
-        return $this->belongsToMany(Job::class, 'job_user')->withTimestamps();
+        return $this->belongsToMany(Job::class, 'applied_jobs')->withTimestamps();
     }
 
     public function savedJobs()
@@ -115,5 +115,15 @@ class User extends Authenticatable
     public function posts()
     {
         return $this->morphMany(Post::class, 'authorable', 'authorable_type', 'authorable_id', 'id');
+    }
+
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'authorable', 'authorable_type', 'authorable_id', 'id');
+    }
+
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'authorable', 'authorable_type', 'authorable_id', 'id');
     }
 }

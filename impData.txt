@@ -631,7 +631,7 @@ php artisan config:clear
 
 
 // for ($i = 1; $i <= 100; $i++) {
-//     DB::table('job_user')
+//     DB::table('applied_jobs')
 //         ->insertGetId([
 //             'user_id' => rand(1, 20),
 //             'job_id' => rand(1, 400),
@@ -639,7 +639,7 @@ php artisan config:clear
 //             'updated_at' => Carbon::now(),
 //         ]);
 // }
-// // job_user 
+// // applied_jobs 
 // for ($i = 1; $i <= 100; $i++) {
 //     DB::table('saved_jobs')
 //         ->insertGetId([
@@ -743,3 +743,11 @@ php artisan config:clear
 //             'updated_at' => Carbon::now(),
 //         ]);
 // }
+
+php artisan make:migration add_soft_delete_column_to_profile_categories --table=profile_categories
+php artisan make:migration add_soft_delete_column_to_sub_profiles --table=sub_profiles
+php artisan make:migration add_soft_delete_column_to_locations --table=locations
+php artisan make:migration add_soft_delete_column_to_qualifications --table=qualifications
+php artisan make:migration add_soft_delete_column_to_jobs --table=jobs
+php artisan make:migration add_soft_delete_column_to_posts --table=posts
+php artisan make:migration add_soft_delete_column_to_comments --table=comments

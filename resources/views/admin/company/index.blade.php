@@ -55,8 +55,14 @@
                                             @endif
                                             <a href="{{ route('admin.company.edit', $company['id']) }}"
                                                 class="btn btn-sm btn-primary">Edit</a>
-                                            <a href="{{ route('admin.company.delete', $company['id']) }}"
-                                                class="btn btn-sm btn-primary">Delete</a>
+                                            {{-- <a href="{{ route('admin.company.delete', $company['id']) }}"
+                                                class="btn btn-sm btn-primary">Delete</a> --}}
+                                            <form action="{{ route('admin.company.delete', $company['id']) }}"
+                                                method="POST">
+                                                @method('DELETE')
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

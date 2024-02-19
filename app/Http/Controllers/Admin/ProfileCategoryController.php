@@ -48,10 +48,10 @@ class ProfileCategoryController extends Controller
 
     public function store(Request $request)
     {
-        return response()->json($request->all());
-        $request->validate([
+        $d = $request->validate([
             'name.*' => 'required|unique:profile_categories,name',
         ]);
+
 
         $data = collect($request->get('name'))->map(function ($item) {
             return ['name' => $item];
@@ -121,20 +121,28 @@ class ProfileCategoryController extends Controller
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not updated"]);
     }
 
-    public function delete($id)
+    public function destroy($id)
     {
         $profileCategory = $this->profileCategory->find($id)->withCount('subProfiles')->first();
         if (!$profileCategory) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not found"]);
+            session()->flash('warning', 'Profile Category is not found');
+            return response()->json(['warning' => 'Profile Category is not found'], 200);
         }
         if ($profileCategory['sub_profiles_count'] > 0) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not deleted because it has sub profiles"]);
+            session()->flash('warning', 'Profile Category is not deleted because it has sub profiles');
+            return response()->json(['warning' => 'Profile Category is not deleted because it has sub profiles'], 200);
         }
         $isDeleted = $this->profileCategory->where('id', $id)->delete();
         if ($isDeleted) {
             return $this->navigationManagerService->redirectRoute('admin.profile-category.index', [], 302, [], false, ["success" => "Profile Category is deleted"]);
+            session()->flash('success', 'Profile Category is deleted');
+            return response()->json(['success' => 'Profile Category is deleted'], 200);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not deleted"]);
+        session()->flash('warning', 'Profile Category is not deleted');
+        return response()->json(['warning' => 'Profile Category is not deleted'], 200);
     }
 
     public function livewire()

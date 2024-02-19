@@ -133,68 +133,124 @@ Route::group(['middleware' => "isAdmin"], function () {
         Route::get('/dashboard',  [AdminAuthController::class, "dashboard"])->name('admin.dashboard');
         Route::get('/logout',  [AdminAuthController::class, "logout"])->name('admin.logout');
 
+
         Route::prefix('user')->group(function () {
             Route::get('/livewire',  [AdminUserController::class, "livewire"])->name('admin.user.livewire');
-            Route::get('/create',  [AdminUserController::class, "create"])->name('admin.user.create');
-            Route::post('/store',  [AdminUserController::class, "store"])->name('admin.user.store');
-            Route::get('/',  [AdminUserController::class, "index"])->name('admin.user.index');
-            Route::get('/{id}',  [AdminUserController::class, "show"])->name('admin.user.show');
-            Route::post('/edit/{id}',  [AdminUserController::class, "edit"])->name('admin.user.edit');
-            Route::post('/update/{id}',  [AdminUserController::class, "update"])->name('admin.user.update');
-            Route::delete('/delete/{id}',  [AdminUserController::class, "delete"])->name('admin.user.delete');
             Route::post('/update-profile-image/{id}',  [AdminUserController::class, "updateUserProfileImage"])->name('admin.user.updateProfileImage');
             Route::post('/update-resume-pdf/{id}',  [AdminUserController::class, "updateUserResume"])->name('admin.user.updateResumePdf');
             Route::delete('/delete-profile-image/{id}',  [AdminUserController::class, "deleteUserProfileImage"])->name('admin.user.deleteProfileImage');
             Route::delete('/delete-resume-pdf/{id}',  [AdminUserController::class, "deleteUserResume"])->name('admin.user.deleteResumePdf');
         });
+
+        Route::resource('user', AdminUserController::class)->names([
+            'create' => 'admin.user.create',
+            'store' => 'admin.user.store',
+            'index' => 'admin.user.index',
+            'show' => 'admin.user.show',
+            'edit' => 'admin.user.edit',
+            'update' => 'admin.user.update',
+            'destroy' => 'admin.user.delete',
+        ]);
+
+
+
         Route::prefix('company')->group(function () {
-            Route::get('/create',  [AdminCompanyController::class, "create"])->name('admin.company.create');
-            Route::post('/store',  [AdminCompanyController::class, "store"])->name('admin.company.store');
-            Route::get('/',  [AdminCompanyController::class, "index"])->name('admin.company.index');
-            Route::get('/{id}',  [AdminCompanyController::class, "show"])->name('admin.company.show');
-            Route::get('/edit/{id}',  [AdminCompanyController::class, "edit"])->name('admin.company.edit');
-            Route::post('/update/{id}',  [AdminCompanyController::class, "update"])->name('admin.company.update');
-            Route::get('/delete/{id}',  [AdminCompanyController::class, "delete"])->name('admin.company.delete');
-            Route::get('/toggle-verified/{id}/{is_verified}',  [AdminCompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
-            Route::post('/store-profile-image/{id}',  [AdminCompanyController::class, "storeProfileImage"])->name('admin.company.storeProfileImage');
-            Route::post('/update-profile-image/{id}',  [AdminCompanyController::class, "updateCompanyProfileImage"])->name('admin.company.updateProfileImage');
-            Route::post('/delete-profile-image/{id}',  [AdminCompanyController::class, "deleteProfileImage"])->name('admin.company.deleteProfileImage');
+            Route::get('toggle-verified/{id}/{is_verified}',  [AdminCompanyController::class, "toggleVerified"])->name('admin.company.toggleVerified');
+            Route::post('store-profile-image/{id}',  [AdminCompanyController::class, "storeProfileImage"])->name('admin.company.storeProfileImage');
+            Route::post('update-profile-image/{id}',  [AdminCompanyController::class, "updateCompanyProfileImage"])->name('admin.company.updateProfileImage');
+            Route::post('delete-profile-image/{id}',  [AdminCompanyController::class, "deleteProfileImage"])->name('admin.company.deleteProfileImage');
         });
 
-        Route::prefix('job')->group(function () {
-            Route::get('/create/{id}',  [AdminJobController::class, "create"])->name('admin.job.create');
-            Route::post('/store/{id}',  [AdminJobController::class, "store"])->name('admin.job.store');
-            Route::get('/',  [AdminJobController::class, "index"])->name('admin.job.index');
-            Route::get('/{id}',  [AdminJobController::class, "show"])->name('admin.job.show');
-            Route::get('/edit/{id}',  [AdminJobController::class, "edit"])->name('admin.job.edit');
-            Route::post('/update/{id}',  [AdminJobController::class, "update"])->name('admin.job.update');
-            Route::get('/delete/{id}',  [AdminJobController::class, "delete"])->name('admin.job.delete');
-            Route::get('/toggle-verified/{id}/{is_verified}',  [AdminJobController::class, "toggleVerified"])->name('admin.job.toggleVerified');
-            Route::get('/toggle-featured/{id}/{is_featured}',  [AdminJobController::class, "toggleFeatured"])->name('admin.job.toggleFeatured');
-            Route::get('/toggle-active/{id}/{is_active}',  [AdminJobController::class, "toggleActive"])->name('admin.job.toggleActive');
-        });
 
-        Route::prefix('profile-category')->group(function () {
-            Route::get('/livewire',  [ProfileCategoryController::class, "livewire"])->name('admin.profile-category.livewire');
-            Route::get('/create',  [ProfileCategoryController::class, "create"])->name('admin.profile-category.create');
-            Route::post('/store',  [ProfileCategoryController::class, "store"])->name('admin.profile-category.store');
-            Route::get('/',  [ProfileCategoryController::class, "index"])->name('admin.profile-category.index');
-            Route::get('/{id}',  [ProfileCategoryController::class, "show"])->name('admin.profile-category.show');
-            Route::get('/edit/{id}',  [ProfileCategoryController::class, "edit"])->name('admin.profile-category.edit');
-            Route::post('/update/{id}',  [ProfileCategoryController::class, "update"])->name('admin.profile-category.update');
-            Route::get('/delete/{id}',  [ProfileCategoryController::class, "delete"])->name('admin.profile-category.delete');
-        });
+        Route::resource('company', AdminCompanyController::class)->names([
+            'create' => 'admin.company.create',
+            'store' => 'admin.company.store',
+            'index' => 'admin.company.index',
+            'show' => 'admin.company.show',
+            'edit' => 'admin.company.edit',
+            'update' => 'admin.company.update',
+            'destroy' => 'admin.company.delete',
+        ]);
 
-        Route::prefix('sub-profile')->group(function () {
-            Route::get('/livewire',  [SubProfileController::class, "livewire"])->name('admin.sub-profile.livewire');
-            Route::get('/create',  [SubProfileController::class, "create"])->name('admin.sub-profile.create');
-            Route::post('/store',  [SubProfileController::class, "store"])->name('admin.sub-profile.store');
-            Route::get('/',  [SubProfileController::class, "index"])->name('admin.sub-profile.index');
-            Route::get('/{id}',  [SubProfileController::class, "show"])->name('admin.sub-profile.show');
-            Route::get('/edit/{id}',  [SubProfileController::class, "edit"])->name('admin.sub-profile.edit');
-            Route::post('/update/{id}',  [SubProfileController::class, "update"])->name('admin.sub-profile.update');
-            Route::get('/delete/{id}',  [SubProfileController::class, "delete"])->name('admin.sub-profile.delete');
-        });
+
+        // Route::prefix('job')->group(function () {
+        //     Route::get('/',  [AdminJobController::class, "index"])->name('admin.job.index');
+        //     Route::get('/{id}',  [AdminJobController::class, "show"])->name('admin.job.show');
+        //     Route::get('/edit/{id}',  [AdminJobController::class, "edit"])->name('admin.job.edit');
+        //     Route::post('/update/{id}',  [AdminJobController::class, "update"])->name('admin.job.update');
+        //     Route::get('/delete/{id}',  [AdminJobController::class, "delete"])->name('admin.job.delete');
+        //     Route::get('/toggle-verified/{id}/{is_verified}',  [AdminJobController::class, "toggleVerified"])->name('admin.job.toggleVerified');
+        //     Route::get('/toggle-featured/{id}/{is_featured}',  [AdminJobController::class, "toggleFeatured"])->name('admin.job.toggleFeatured');
+        //     Route::get('/toggle-active/{id}/{is_active}',  [AdminJobController::class, "toggleActive"])->name('admin.job.toggleActive');
+        // });
+
+        // make resource route for job
+
+
+        Route::post('job/store/{id}',  [AdminJobController::class, "store"])->name('admin.job.store'); // id is company id
+        Route::get('job/create/{id}',  [AdminJobController::class, "create"])->name('admin.job.create'); // id is company id
+        Route::get('job/toggle-verified/{id}/{is_verified}',  [AdminJobController::class, "toggleVerified"])->name('admin.job.toggleVerified');
+        Route::get('job/toggle-featured/{id}/{is_featured}',  [AdminJobController::class, "toggleFeatured"])->name('admin.job.toggleFeatured');
+        Route::get('job/toggle-active/{id}/{is_active}',  [AdminJobController::class, "toggleActive"])->name('admin.job.toggleActive');
+
+        Route::resource('job', AdminJobController::class)->names([
+            // 'create' => 'admin.job.create',
+            // 'store' => 'admin.job.store',
+            'index' => 'admin.job.index',
+            'show' => 'admin.job.show',
+            'edit' => 'admin.job.edit',
+            'update' => 'admin.job.update',
+            'destroy' => 'admin.job.delete',
+        ]);
+
+
+
+        // Route::prefix('profile-category')->group(function () {
+        //     Route::get('/livewire',  [ProfileCategoryController::class, "livewire"])->name('admin.profile-category.livewire');
+        //     Route::get('/create',  [ProfileCategoryController::class, "create"])->name('admin.profile-category.create');
+        //     Route::post('/store',  [ProfileCategoryController::class, "store"])->name('admin.profile-category.store');
+        //     Route::get('/',  [ProfileCategoryController::class, "index"])->name('admin.profile-category.index');
+        //     Route::get('/{id}',  [ProfileCategoryController::class, "show"])->name('admin.profile-category.show');
+        //     Route::get('/edit/{id}',  [ProfileCategoryController::class, "edit"])->name('admin.profile-category.edit');
+        //     Route::post('/update/{id}',  [ProfileCategoryController::class, "update"])->name('admin.profile-category.update');
+        //     Route::get('/delete/{id}',  [ProfileCategoryController::class, "delete"])->name('admin.profile-category.delete');
+        // });
+        Route::get('profile-category/livewire',  [ProfileCategoryController::class, "livewire"])->name('admin.profile-category.livewire');
+
+        Route::resource('profile-category', ProfileCategoryController::class)->names([
+            'create' => 'admin.profile-category.create',
+            'store' => 'admin.profile-category.store',
+            'index' => 'admin.profile-category.index',
+            'show' => 'admin.profile-category.show',
+            'edit' => 'admin.profile-category.edit',
+            'update' => 'admin.profile-category.update',
+            'destroy' => 'admin.profile-category.delete',
+        ]);
+
+        // Route::prefix('sub-profile')->group(function () {
+        //     Route::get('/livewire',  [SubProfileController::class, "livewire"])->name('admin.sub-profile.livewire');
+        //     Route::get('/create',  [SubProfileController::class, "create"])->name('admin.sub-profile.create');
+        //     Route::post('/store',  [SubProfileController::class, "store"])->name('admin.sub-profile.store');
+        //     Route::get('/',  [SubProfileController::class, "index"])->name('admin.sub-profile.index');
+        //     Route::get('/{id}',  [SubProfileController::class, "show"])->name('admin.sub-profile.show');
+        //     Route::get('/edit/{id}',  [SubProfileController::class, "edit"])->name('admin.sub-profile.edit');
+        //     Route::post('/update/{id}',  [SubProfileController::class, "update"])->name('admin.sub-profile.update');
+        //     Route::get('/delete/{id}',  [SubProfileController::class, "delete"])->name('admin.sub-profile.delete');
+        // });
+
+        Route::get('sub-profile/livewire',  [SubProfileController::class, "livewire"])->name('admin.sub-profile.livewire');
+
+        Route::resource('sub-profile', SubProfileController::class)->names([
+            'create' => 'admin.sub-profile.create',
+            'store' => 'admin.sub-profile.store',
+            'index' => 'admin.sub-profile.index',
+            'show' => 'admin.sub-profile.show',
+            'edit' => 'admin.sub-profile.edit',
+            'update' => 'admin.sub-profile.update',
+            'destroy' => 'admin.sub-profile.delete',
+        ]);
+
+
 
         Route::prefix('location')->group(function () {
             Route::get('/livewire',  [LocationController::class, "livewire"])->name('admin.location.livewire');

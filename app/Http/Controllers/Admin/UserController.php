@@ -369,7 +369,7 @@ class UserController extends Controller
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not updated"]);
     }
 
-    public function delete($id)
+    public function destroy($id)
     {
         $user = $this->user->find($id);
         if (!$user) {
@@ -382,6 +382,16 @@ class UserController extends Controller
         if ($user->resume_pdf_url) {
             $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
         }
+
+        // delete pivot table data like followers, following, saved_jobs, applied_jobs, posts, comments, likes, etc
+        $user->followers()->detach();
+        $user->following()->detach();
+        $user->savedJobs()->detach();
+        $user->appliedJobs()->detach();
+        $user->posts()->delete();
+        $user->comments()->delete();
+        $user->likes()->delete();
+
         $isDeleted = $this->user->where('id', $id)->delete();
         if ($isDeleted) {
             return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => "User is deleted"]);

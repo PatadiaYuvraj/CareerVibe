@@ -91,7 +91,7 @@ class Job extends Model
 
     public function applyByUsers()
     {
-        return $this->belongsToMany(User::class, 'job_user')->withTimestamps();
+        return $this->belongsToMany(User::class, 'applied_jobs')->withTimestamps();
     }
 
     public function savedByUsers()

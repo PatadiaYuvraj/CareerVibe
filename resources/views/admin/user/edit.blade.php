@@ -46,6 +46,7 @@
                         </div>
                     </div>
                     <form action="{{ route('admin.user.update', $user['id']) }}" method="POST">
+                        @method('PUT')
                         @csrf
                         <div class="row row-cols-2">
                             <div class="mb-3">
@@ -65,7 +66,6 @@
                                 @enderror
                             </div>
                         </div>
-                        {{-- contact city headline city --}}
 
                         <div class="row row-cols-2">
                             <div class="mb-3">

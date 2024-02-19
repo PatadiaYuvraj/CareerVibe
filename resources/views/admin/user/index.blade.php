@@ -70,11 +70,8 @@
                                     <td>{{ $user->following_count + $user->following_companies_count }}</td>
                                     <td>
                                         <div class="btn-group">
-                                            <form action="{{ route('admin.user.edit', $user['id']) }}" method="POST">
-                                                @csrf
-                                                @method('POST')
-                                                <button type="submit" class="btn btn-sm btn-primary">Edit</button>
-                                            </form>
+                                            <a href="{{ route('admin.user.edit', $user['id']) }}"
+                                                class="btn btn-sm btn-primary">Edit</a>
                                             <form action="{{ route('admin.user.delete', $user['id']) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')

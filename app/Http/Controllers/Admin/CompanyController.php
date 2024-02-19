@@ -3,7 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Comment;
 use App\Models\Company;
+use App\Models\Like;
+use App\Models\Post;
 use App\Services\AuthenticableService;
 use App\Services\MailableService;
 use App\Services\NavigationManagerService;
@@ -288,7 +291,7 @@ class CompanyController extends Controller
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not updated"]);
     }
 
-    public function delete($id)
+    public function destroy($id)
     {
         $company = $this->company->where('id', $id)->withCount('jobs')->get()->ToArray();
         if (!$company) {
@@ -302,6 +305,8 @@ class CompanyController extends Controller
             $public_ids = $company['profile_image_public_id'];
             $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
+
+        // delete all posts of company
 
         $isDeleted = $this->company->find($id)->delete();
         if ($isDeleted) {

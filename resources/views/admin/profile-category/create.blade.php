@@ -13,6 +13,7 @@
                     </a>
                 </div>
                 <div class="card-body">
+                    {{-- <form method="POST" action="{{ route('admin.profile-category.store') }}"> --}}
                     <form id="profile-category-form" method="POST" action="{{ route('admin.profile-category.store') }}">
                         @csrf
                         <div class="form-group mb-3" id="profile-categories">
@@ -20,12 +21,15 @@
                                 <label for="name">Name 1</label>
                                 <div class="input-group mb-2">
                                     <input type="text" name="name[]" id="name" class="form-control col">
+                                    {{-- <button type="button" class="btn btn-danger col-2">Delete</button> --}}
                                 </div>
+                                {{-- error-container --}}
                             </div>
                         </div>
+                        <div id="error-container"></div>
                         <div class="form-group mb-3">
                             <button type="button" id="add-category" class="btn btn-primary">Add</button>
-                            <button type="button" class="btn btn-primary">Submit</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
                 </div>
@@ -46,43 +50,97 @@
 @endsection
 
 @section('scripts')
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script>
-        const maxCategories = 5;
-        $(document).ready(function() {
-            $('#add-category').click(function() {
-                let categoryCount = $('#profile-categories').find('.row').length;
-                if (categoryCount < maxCategories) {
-                    let category = `
-                    <div class="row">
-                        <label for="name">Name ${categoryCount + 1}</label>
-                        <div class="input-group mb-2">
-                            <input type="text" name="name[]" id="name" class="form-control col">
-                            <button type="button" class="btn btn-danger col-2 delete-category">Delete</button>
-                        </div>
-                    </div>
-                    `;
-                    $('#profile-categories').append(category);
-                } else {
-                    // text : Maximum categories reached
-                    $("#add-category").attr("disabled", "disabled").text("Maximum categories reached");
-                }
+        const profileCategoriesContainer = document.getElementById('profile-categories');
+        const addCategoryButton = document.getElementById('add-category');
+
+        function createCategoryField() {
+            const categoryField = document.createElement('div');
+            categoryField.classList.add('row', 'mb-32');
+
+            const nameLabel = document.createElement('label');
+            nameLabel.setAttribute('for', 'name');
+            nameLabel.textContent = `Name ${profileCategoriesContainer.children.length + 1}`;
+            categoryField.appendChild(nameLabel);
+
+            // const nameInput = document.createElement('input');
+            // nameInput.type = 'text';
+            // nameInput.name = 'name[]';
+            // nameInput.id = 'name';
+            // nameInput.classList.add('form-control', 'col');
+            // categoryField.appendChild(nameInput);
+
+            // const deleteButton = document.createElement('button');
+            // deleteButton.type = 'button';
+            // deleteButton.classList.add('btn', 'btn-danger', 'col-2');
+            // deleteButton.textContent = 'Delete';
+            // deleteButton.addEventListener('click', () => {
+            //     categoryField.remove();
+            // });
+
+
+            // categoryField.appendChild(deleteButton);
+
+            const innerDiv = document.createElement('div');
+            innerDiv.classList.add('input-group', 'col', 'mb-3');
+            const nameInput = document.createElement('input');
+            nameInput.type = 'text';
+            nameInput.name = 'name[]';
+            nameInput.id = 'name';
+            nameInput.classList.add('form-control', 'col');
+            innerDiv.appendChild(nameInput);
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.classList.add('btn', 'btn-danger', 'col-2');
+            deleteButton.textContent = 'Delete';
+
+            deleteButton.addEventListener('click', () => {
+                categoryField.remove();
             });
-
-            $(document).on('click', '.delete-category', function() {
-                $(this).parent().parent().remove();
-            });
+            innerDiv.appendChild(deleteButton);
+            categoryField.appendChild(innerDiv);
 
 
-            $('#profile-category-form').submit(function() {
-                let categoryCount = $('#profile-categories').find('.row').length;
-                if (categoryCount < 1) {
-                    alert('Please add at least one category');
-                    return false;
-                }
-            });
+            return categoryField;
+        }
 
+        addCategoryButton.addEventListener('click', () => {
+            const newCategoryField = createCategoryField();
+            profileCategoriesContainer.appendChild(newCategoryField);
         });
+
+        document.getElementById('profile-category-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            $.ajax({
+                type: "POST",
+                url: form.action,
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    console.log(response);
+                    window.location.href = '{{ route('admin.profile-category.index') }}';
+
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                    populateErrors(error.responseJSON.errors);
+                }
+            });
+        });
+
+        function populateErrors(errors) {
+            const errorContainer = document.getElementById('error-container');
+            errorContainer.innerHTML = '';
+            Object.keys(errors).forEach((errorKey) => {
+                const error = errors[errorKey];
+                const errorElement = document.createElement('div');
+                errorElement.classList.add('alert', 'alert-danger', 'mb-3', 'p-1');
+                errorElement.textContent = error[0];
+                errorContainer.appendChild(errorElement);
+            });
+        }
     </script>
 @endsection

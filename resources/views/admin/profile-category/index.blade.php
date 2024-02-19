@@ -47,10 +47,21 @@
                                                 class="btn btn-sm btn-primary">
                                                 Edit
                                             </a>
-                                            <a href="{{ route('admin.profile-category.delete', $profileCategory['id']) }}"
+                                            {{-- <a href="{{ route('admin.profile-category.delete', $profileCategory['id']) }}"
                                                 class="btn btn-sm btn-danger">
                                                 Delete
-                                            </a>
+                                            </a> --}}
+                                            {{-- <button type="button" class="btn btn-sm btn-danger" id="delete"
+                                                data-id="{{ $profileCategory['id'] }}">
+                                                Delete
+                                            </button> --}}
+                                            <form
+                                                action="{{ route('admin.profile-category.delete', $profileCategory['id']) }}"
+                                                method="POST">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -68,4 +79,9 @@
             </div>
         </section>
     </main>
+@endsection
+
+@section('scripts')
+
+
 @endsection

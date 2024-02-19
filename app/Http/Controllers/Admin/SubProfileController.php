@@ -154,21 +154,29 @@ class SubProfileController extends Controller
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not updated"]);
     }
 
-    public function delete($id)
+    public function destroy($id)
     {
         $subProfile = $this->subProfile->where('id', $id)->withCount('jobs')->get()->ToArray();
         if (!$subProfile) {
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not found"]);
+            // return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not found"]);
+            session()->flash('warning', 'Sub Profile is not found');
+            return;
         }
         $subProfile =  $subProfile[0];
         if ($subProfile['jobs_count'] == 0) {
             $isDeleted = $this->subProfile->where('id', $id)->delete();
             if ($isDeleted) {
-                return $this->navigationManagerService->redirectRoute('admin.sub-profile.index', [], 302, [], false, ["success" => "Sub Profile is deleted"]);
+                // return $this->navigationManagerService->redirectRoute('admin.sub-profile.index', [], 302, [], false, ["success" => "Sub Profile is deleted"]);
+                session()->flash('success', 'Sub Profile is deleted');
+                return;
             }
-            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not deleted"]);
+            // return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not deleted"]);
+            session()->flash('warning', 'Sub Profile is not deleted');
+            return;
         }
-        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not deleted, because it has jobs associated with it"]);
+        // return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Sub Profile is not deleted, because it has jobs associated with it"]);
+        session()->flash('warning', 'Sub Profile is not deleted, because it has jobs associated with it');
+        return;
     }
 
     // livewire

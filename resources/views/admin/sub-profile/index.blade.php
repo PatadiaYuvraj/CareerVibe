@@ -43,8 +43,12 @@
                                         <div class="btn-group">
                                             <a href="{{ route('admin.sub-profile.edit', $subProfile['id']) }}"
                                                 class="btn btn-sm btn-primary">Edit</a>
-                                            <a href="{{ route('admin.sub-profile.delete', $subProfile['id']) }}"
-                                                class="btn btn-sm btn-danger">Delete</a>
+                                            {{-- <a href="{{ route('admin.sub-profile.delete', $subProfile['id']) }}"
+                                                class="btn btn-sm btn-danger">Delete</a> --}}
+                                            <button type="button" class="btn btn-sm btn-danger" id="delete"
+                                                data-id="{{ $subProfile['id'] }}">
+                                                Delete
+                                            </button>
                                         </div>
                                     </td>
 
@@ -63,4 +67,33 @@
             </div>
         </section>
     </main>
+@endsection
+
+
+@section('scripts')
+
+    <script>
+        // delete using ajax
+        $(document).ready(function() {
+            $('body').on('click', '#delete', function() {
+                var id = $(this).data('id');
+                if (confirm('Are you sure you want to delete?')) {
+                    $.ajax({
+                        type: "DELETE",
+                        data: {
+                            "_token": "{{ csrf_token() }}",
+                        },
+                        url: "{{ route('admin.sub-profile.delete', '') }}" + '/' + id,
+                        success: function(data) {
+                            location.reload();
+                        },
+                        error: function(data) {
+                            console.log('Error : ', data);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
 @endsection
