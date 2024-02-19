@@ -154,7 +154,16 @@ class CompanyController extends Controller
         if ($isCreated) {
             $msg = "Company is created";
             if ($hasFile) {
-                $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $isCreated->id);
+                // $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $isCreated->id);
+                $this->storageManagerService->uploadToCloudinary(
+                    $request,
+                    'profile_image_url',
+                    Config::get('constants.CLOUDINARY_FOLDER_DEMO.company-profile-image'),
+                    'image',
+                    Company::class,
+                    $isCreated->id,
+                    Config::get('constants.TAGE_NAMES.company-profile-image')
+                );
             }
             // MAIL: when company is created send mail to company and admin
             return $this->navigationManagerService->redirectRoute('admin.company.index', [], 302, [], false, ["success" => $msg]);
@@ -226,7 +235,16 @@ class CompanyController extends Controller
             $data["profile_image_public_id"] = null;
             $data["profile_image_url"] = null;
             // ClouadStorageManager : To upload image to cloudinary
-            $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $company['id']);
+            // $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $company['id']);
+            $this->storageManagerService->uploadToCloudinary(
+                $request,
+                'profile_image_url',
+                Config::get('constants.CLOUDINARY_FOLDER_DEMO.company-profile-image'),
+                'image',
+                Company::class,
+                $company['id'],
+                Config::get('constants.TAGE_NAMES.company-profile-image')
+            );
         }
 
         $data['website'] = $data['city'] = $data['address'] = $data['linkedin'] = $data['description'] = null;
@@ -373,7 +391,16 @@ class CompanyController extends Controller
             $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
         // CloudStorageManager : To upload image to cloudinary
-        $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $company->id);
+        // $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $company->id);
+        $this->storageManagerService->uploadToCloudinary(
+            $request,
+            'profile_image_url',
+            Config::get('constants.CLOUDINARY_FOLDER_DEMO.company-profile-image'),
+            'image',
+            Company::class,
+            $company->id,
+            Config::get('constants.TAGE_NAMES.company-profile-image')
+        );
 
         $data = [
             "profile_image_public_id" => null,

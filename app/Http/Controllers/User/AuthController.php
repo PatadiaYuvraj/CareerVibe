@@ -529,7 +529,16 @@ class AuthController extends Controller
             $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
-        $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
+        // $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
+        $this->storageManagerService->uploadToCloudinary(
+            $request,
+            'profile_image_url',
+            Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-profile-image'),
+            'image',
+            User::class,
+            $user->id,
+            Config::get('constants.TAGE_NAMES.user-profile-image')
+        );
 
         $data = [
             "profile_image_public_id" => null,
@@ -615,11 +624,23 @@ class AuthController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         if ($user->resume_pdf_url) {
-            $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
+            // $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
+            $public_ids = $user->resume_pdf_public_id;
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
-        $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
+        // $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
+        $this->storageManagerService->uploadToCloudinary(
+            $request,
+            'resume_pdf_url',
+            Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-resume'),
+            'pdf',
+            User::class,
+            $user->id,
+            Config::get('constants.TAGE_NAMES.user-resume')
+        );
         $data = [
-            "resume_pdf_url" => $stored_path,
+            "resume_pdf_url" => null,
+            "resume_pdf_public_id" => null,
         ];
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
@@ -653,7 +674,8 @@ class AuthController extends Controller
         }
 
         if ($user->resume_pdf_url) {
-            unlink($user->resume_pdf_url);
+            $public_ids = $user->resume_pdf_public_id;
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
         $data = [

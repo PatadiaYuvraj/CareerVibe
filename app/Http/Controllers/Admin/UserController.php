@@ -35,7 +35,8 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $hasFile = false;
+        $hasProfileImage = false;
+        $hasResume = false;
         $request->validate([
             'name' => [
                 'required',
@@ -77,21 +78,27 @@ class UserController extends Controller
 
         if ($request->file('profile_image_url')) {
             $request->validate([
-                "profile_image_url" => ["required", "image", "mimes:jpeg,png,jpg", "max:2048"],
+                "profile_image_url" => [
+                    "required",
+                    "image",
+                    "mimes:jpeg,png,jpg",
+                    "max:2048" // 2MB
+                ],
             ]);
 
             $data["profile_image_public_id"] = null;
             $data["profile_image_url"] = null;
-            $hasFile = true;
+            $hasProfileImage = true;
         }
 
         if ($request->file('resume_pdf_url')) {
             $request->validate([
                 "resume_pdf_url" => ["required", "mimes:pdf", "max:2048",],
             ]);
-            $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
-            $data["resume_pdf_url"] = $stored_path;
+            // $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
+            $data["resume_pdf_url"] = null;
             $data["resume_pdf_public_id"] = null;
+            $hasResume = true;
         }
 
         if ($request->contact) {
@@ -164,9 +171,31 @@ class UserController extends Controller
         $isCreated = $this->user->create($data);
         if ($isCreated) {
             $msg = "User is created";
-            if ($hasFile) {
-                $this->storageManagerService->uploadToCloudinary($request, "USER", $isCreated->id);
+            if ($hasProfileImage) {
+                // $this->storageManagerService->uploadToCloudinary($request, "USER", $isCreated->id);
+                $this->storageManagerService->uploadToCloudinary(
+                    $request,
+                    'profile_image_url',
+                    Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-profile-image'),
+                    'image',
+                    User::class,
+                    $isCreated->id,
+                    Config::get('constants.TAGE_NAMES.user-profile-image')
+                );
             }
+
+            if ($hasResume) {
+                $this->storageManagerService->uploadToCloudinary(
+                    $request,
+                    'resume_pdf_url',
+                    Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-resume'),
+                    'pdf',
+                    User::class,
+                    $isCreated->id,
+                    Config::get('constants.TAGE_NAMES.user-resume')
+                );
+            }
+
             return $this->navigationManagerService->redirectRoute('admin.user.index', [], 302, [], false, ["success" => $msg]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not created"]);
@@ -237,7 +266,16 @@ class UserController extends Controller
                 $this->storageManagerService->deleteFromCloudinary($public_ids);
             }
 
-            $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
+            // $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
+            $this->storageManagerService->uploadToCloudinary(
+                $request,
+                'profile_image_url',
+                Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-profile-image'),
+                'image',
+                User::class,
+                $user->id,
+                Config::get('constants.TAGE_NAMES.user-profile-image')
+            );
 
             $data["profile_image_public_id"] = null;
             $data["profile_image_url"] = null;
@@ -253,11 +291,21 @@ class UserController extends Controller
             ]);
 
             if ($user->resume_pdf_url) {
-                $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
+                $public_ids = $user->resume_pdf_public_id;
+                $this->storageManagerService->deleteFromCloudinary($public_ids);
             }
 
-            $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
-            $data["resume_pdf_url"] = $stored_path;
+            // $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
+            $this->storageManagerService->uploadToCloudinary(
+                $request,
+                'resume_pdf_url',
+                Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-resume'),
+                'pdf',
+                User::class,
+                $user->id,
+                Config::get('constants.TAGE_NAMES.user-resume')
+            );
+            $data["resume_pdf_url"] = null;
             $data["resume_pdf_public_id"] = null;
         }
 
@@ -380,7 +428,8 @@ class UserController extends Controller
             $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
         if ($user->resume_pdf_url) {
-            $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
+            $public_ids = $user->resume_pdf_public_id;
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
         // delete pivot table data like followers, following, saved_jobs, applied_jobs, posts, comments, likes, etc
@@ -453,7 +502,16 @@ class UserController extends Controller
             $public_ids = $user->profile_image_public_id;
             $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
-        $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
+        // $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
+        $this->storageManagerService->uploadToCloudinary(
+            $request,
+            'profile_image_url',
+            Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-profile-image'),
+            'image',
+            User::class,
+            $user->id,
+            Config::get('constants.TAGE_NAMES.user-profile-image')
+        );
 
         $data = [
             "profile_image_public_id" => null,
@@ -501,11 +559,22 @@ class UserController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         if ($user->resume_pdf_url) {
-            $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
+            $public_ids = $user->resume_pdf_public_id;
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
-        $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
+        // $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
+        $this->storageManagerService->uploadToCloudinary(
+            $request,
+            'resume_pdf_url',
+            Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-resume'),
+            'pdf',
+            User::class,
+            $user->id,
+            Config::get('constants.TAGE_NAMES.user-resume')
+        );
         $data = [
-            "resume_pdf_url" => $stored_path,
+            "resume_pdf_url" => null,
+            "resume_pdf_public_id" => null,
         ];
         $isUpdated = $this->user->where('id', $id)->update($data);
         if ($isUpdated) {
@@ -521,7 +590,9 @@ class UserController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
         }
         if ($user->resume_pdf_url) {
-            $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
+            // $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
+            $public_ids = $user->resume_pdf_public_id;
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
         $data = [
             "resume_pdf_url" => null,

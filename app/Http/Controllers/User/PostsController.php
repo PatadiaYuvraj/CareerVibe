@@ -7,6 +7,7 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Services\AuthenticableService;
 use App\Services\NavigationManagerService;
+use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Storage;
@@ -18,15 +19,18 @@ class PostsController extends Controller
     private int $paginate;
     private NavigationManagerService $navigationManagerService;
     private AuthenticableService $authenticableService;
+    private StorageManagerService $storageManagerService;
 
     public function __construct(
         Post $post,
         NavigationManagerService $navigationManagerService,
         AuthenticableService $authenticableService,
+        StorageManagerService $storageManagerService
     ) {
         $this->post = $post;
         $this->navigationManagerService = $navigationManagerService;
         $this->authenticableService = $authenticableService;
+        $this->storageManagerService = $storageManagerService;
         $this->paginate = Config::get('constants.pagination');
     }
 
@@ -70,6 +74,7 @@ class PostsController extends Controller
 
     public function storePost(Request $request)
     {
+        $hasFile = false;
         $user_id = $this->authenticableService->getUser()->id;
 
         switch ($request->type) {
@@ -145,43 +150,47 @@ class PostsController extends Controller
         }
 
         $request->validate($rules, $messages);
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            if ($request->type == "IMAGE") {
-                $stored_path = Storage::putFile(
-                    'uploads/user-post/image',
-                    $request->file('file')
-                );
-            } else {
-                $stored_path = Storage::putFile(
-                    'uploads/user-post/video',
-                    $request->file('file')
-                );
-            }
-            $data = [
-                "title" => $request->get("title"),
-                "content" => $request->get("content"),
-                "type" => $request->type,
-                "authorable_id" => $user_id,
-                "authorable_type" => "App\Models\User",
-                "file" => $stored_path,
-                "public_id" => null
-            ];
-        } else {
-            $data = [
-                "title" => $request->get("title"),
-                "content" => $request->get("content"),
-                "type" => $request->type,
-                "authorable_id" => $user_id,
-                "authorable_type" => "App\Models\User"
-            ];
-        }
 
-
+        $data = [
+            "title" => $request->get("title"),
+            "content" => $request->get("content"),
+            "type" => $request->type,
+            "authorable_id" => $user_id,
+            "authorable_type" => "App\Models\User",
+            "file" => null,
+            "public_id" => null
+        ];
 
         $isCreated = $this->post->create($data);
 
         if ($isCreated) {
+
+            if ($request->hasFile('file')) {
+                if ($request->type == "IMAGE") {
+                    $this->storageManagerService->uploadToCloudinary(
+                        $request,
+                        'file',
+                        Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-post-image'),
+                        'image',
+                        Post::class,
+                        $isCreated->id,
+                        Config::get('constants.TAGE_NAMES.user-post-image')
+                    );
+                }
+
+                if ($request->type == "VIDEO") {
+                    $this->storageManagerService->uploadToCloudinary(
+                        $request,
+                        'file',
+                        Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-post-video'),
+                        'video',
+                        Post::class,
+                        $isCreated->id,
+                        Config::get('constants.TAGE_NAMES.user-post-video')
+                    );
+                }
+            }
+
             return $this->navigationManagerService->redirectRoute('user.post.index', [], 302, [], false, ["success" => "Post Created Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Created"]);
@@ -287,38 +296,77 @@ class PostsController extends Controller
             "content" => $request->get("content"),
         ];
 
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            if ($post->type == "IMAGE") {
+        // if ($request->hasFile('file')) {
+        //     $file = $request->file('file');
+        //     if ($post->type == "IMAGE") {
 
-                if ($post->file) {
-                    Storage::delete($post->file);
-                }
+        //         if ($post->file) {
+        //             Storage::delete($post->file);
+        //         }
 
-                $stored_path = Storage::putFile(
-                    'uploads/user-post/image',
-                    $request->file('file')
-                );
-                $data['file'] = $stored_path;
-            }
-            if ($post->type == "VIDEO") {
+        //         $stored_path = Storage::putFile(
+        //             'uploads/user-post/image',
+        //             $request->file('file')
+        //         );
+        //         $data['file'] = $stored_path;
+        //     }
+        //     if ($post->type == "VIDEO") {
 
-                if ($post->file) {
-                    Storage::delete($post->file);
-                }
+        //         if ($post->file) {
+        //             Storage::delete($post->file);
+        //         }
 
-                $stored_path = Storage::putFile(
-                    'uploads/user-post/video',
-                    $request->file('file')
-                );
-                $data['file'] = $stored_path;
-            }
-        }
+        //         $stored_path = Storage::putFile(
+        //             'uploads/user-post/video',
+        //             $request->file('file')
+        //         );
+        //         $data['file'] = $stored_path;
+        //     }
+        // }
 
 
         $isUpdated = $post->update($data);
 
         if ($isUpdated) {
+
+            if ($request->hasFile('file')) {
+                if ($post->type == "IMAGE") {
+
+                    if ($post->file) {
+                        $public_id = $post->public_id;
+                        $this->storageManagerService->deleteFromCloudinary($public_id);
+                    }
+
+                    $this->storageManagerService->uploadToCloudinary(
+                        $request,
+                        'file',
+                        Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-post-image'),
+                        'image',
+                        Post::class,
+                        $post->id,
+                        Config::get('constants.TAGE_NAMES.user-post-image')
+                    );
+                }
+
+                if ($post->type == "VIDEO") {
+
+                    if ($post->file) {
+                        $public_id = $post->public_id;
+                        $this->storageManagerService->deleteFromCloudinary($public_id);
+                    }
+
+                    $this->storageManagerService->uploadToCloudinary(
+                        $request,
+                        'file',
+                        Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-post-video'),
+                        'video',
+                        Post::class,
+                        $post->id,
+                        Config::get('constants.TAGE_NAMES.user-post-video')
+                    );
+                }
+            }
+
             return $this->navigationManagerService->redirectRoute('user.post.index', [], 302, [], false, ["success" => "Post Updated Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Updated"]);
@@ -337,7 +385,9 @@ class PostsController extends Controller
 
         if ($post->type == "IMAGE" || $post->type == "VIDEO") {
             if ($post->file) {
-                Storage::delete($post->file);
+                // Storage::delete($post->file);
+                $public_id = $post->public_id;
+                $this->storageManagerService->deleteFromCloudinary($public_id);
             }
         }
 

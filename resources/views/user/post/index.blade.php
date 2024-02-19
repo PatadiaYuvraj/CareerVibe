@@ -56,15 +56,27 @@
                                                 </button>
                                             @else
                                                 @if ($post['type'] == 'IMAGE')
-                                                    <a href="{{ url($post['file']) }}" class="btn btn-sm btn-success"
-                                                        target="_blank">
-                                                        {{ $post['type'] }}
-                                                    </a>
+                                                    @if ($post['file'])
+                                                        <a href="{{ url($post['file']) }}" class="btn btn-sm btn-primary"
+                                                            target="_blank">
+                                                            {{ $post['type'] }}
+                                                        </a>
+                                                    @else
+                                                        <button class="btn btn-info btn-sm">
+                                                            {{ $post['type'] }}
+                                                        </button>
+                                                    @endif
                                                 @else
-                                                    <a href="{{ url($post['file']) }}" class="btn btn-sm btn-primary"
-                                                        target="_blank">
-                                                        {{ $post['type'] }}
-                                                    </a>
+                                                    @if ($post['file'])
+                                                        <a href="{{ url($post['file']) }}" class="btn btn-sm btn-primary"
+                                                            target="_blank">
+                                                            {{ $post['type'] }}
+                                                        </a>
+                                                    @else
+                                                        <button class="btn btn-info btn-sm">
+                                                            {{ $post['type'] }}
+                                                        </button>
+                                                    @endif
                                                 @endif
                                             @endif
                                         </div>

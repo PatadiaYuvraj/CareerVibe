@@ -456,7 +456,17 @@ class AuthController extends Controller
             $public_ids = $admin->profile_image_public_id;
             $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
-        $this->storageManagerService->uploadToCloudinary($request, Config::get('constants.USER_TYPE.admin'), $admin->id);
+        // $this->storageManagerService->uploadToCloudinary($request, Config::get('constants.USER_TYPE.admin'), $admin->id);
+
+        $this->storageManagerService->uploadToCloudinary(
+            $request,
+            'profile_image_url',
+            Config::get('constants.CLOUDINARY_FOLDER_DEMO.admin-profile-image'),
+            'image',
+            Admin::class,
+            $admin->id,
+            Config::get('constants.TAGE_NAMES.admin-profile-image')
+        );
 
 
         $data = [

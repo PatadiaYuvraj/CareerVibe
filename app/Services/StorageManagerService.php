@@ -14,46 +14,34 @@ use Illuminate\Support\Facades\Storage;
 
 class StorageManagerService implements StorageManagerRepository
 {
-    public function uploadToCloudinary(Request $request, string $user_type, int $user_id): void
-    {
-        if (Config::get('constants.IS_FILE_UPLOAD_SERVICE_ENABLED')) {
-            $originalFilename = $request->file('profile_image_url')->getClientOriginalName();
-            $storedPath = Storage::putFileAs("temp", $request->file("profile_image_url"), $originalFilename);
-            $user_data = [
-                "stored_path" => $storedPath,
-                "user_type" => $user_type,
-                "user_id" => $user_id,
-            ];
-            UploadToCloudinary::dispatch($user_data);
-        } else {
+    public function uploadToCloudinary(
+        Request $request,
+        string $field_name,
+        string $folder,
+        string $resource_type, // image or video or pdf
+        string $model_type, // user, company, admin, post
+        int $model_id,
+        string $tag_name
+    ): void {
+        if (!Config::get('constants.IS_FILE_UPLOAD_SERVICE_ENABLED')) {
             Log::info('File upload service is disabled');
+            return;
         }
+
+
+        $temp_local_path = Config::get('constants.CLOUDINARY_FOLDER_DEMO.temp_local_path');
+
+        $local_stored_path = Storage::putFile($temp_local_path, $request->file($field_name));
+
+        UploadToCloudinary::dispatch(
+            $local_stored_path,
+            $model_type,
+            $model_id,
+            $folder,
+            $resource_type,
+            $tag_name
+        );
     }
-
-    // public function uploadToCloudinaryDemo(Request $request, string $field_name, string $local_path = null, string $model_type, int $model_id): void
-    // {
-    //     if (!Config::get('constants.IS_FILE_UPLOAD_SERVICE_ENABLED')) {
-    //         Log::info('File upload service is disabled');
-    //         return;
-    //     }
-
-    //     $local_path = $local_path ?? "temp";
-
-
-    //     $originalFilename = $request->file(
-    //         $field_name
-    //     )->getClientOriginalName();
-    //     $storedPath = Storage::putFileAs($local_path, $request->file($field_name), $originalFilename);
-    //     $data = [
-    //         "stored_path" => $storedPath,
-    //         "model_type" => $model_type,
-    //         "model_id" => $model_id,
-
-    //     ];
-    //     uploadToCloudinaryDemoJob::dispatch(
-    //         $data
-    //     );
-    // }
 
     public function deleteFromCloudinary(string $public_id): void
     {
@@ -76,6 +64,7 @@ class StorageManagerService implements StorageManagerRepository
         Log::info('File uploaded to local storage : ' . $stored_path);
         return $stored_path;
     }
+
 
     public function deleteFromLocal(string $path): void
     {

@@ -11,6 +11,7 @@ use App\Services\NavigationManagerService;
 use App\Services\NotifiableService;
 use App\Services\StorageManagerService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 
 class AuthController extends Controller
 {
@@ -516,7 +517,16 @@ class AuthController extends Controller
             $this->storageManagerService->deleteFromCloudinary($public_ids);
         }
 
-        $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $user->id);
+        // $this->storageManagerService->uploadToCloudinary($request, "COMPANY", $user->id);
+        $this->storageManagerService->uploadToCloudinary(
+            $request,
+            'profile_image_url',
+            Config::get('constants.CLOUDINARY_FOLDER_DEMO.company-profile-image'),
+            'image',
+            Company::class,
+            $user->id,
+            Config::get('constants.TAGE_NAMES.company-profile-image')
+        );
 
         $data = [
             "profile_image_public_id" => null,
