@@ -20,11 +20,13 @@
                             <div data-repeater-item class="mb-2">
                                 <div class="row">
                                     <input type="text" name="name" class="form-control col"
-                                        value="{{ old('name') }}">
-                                    <select class="col profile-category-selector form-select" name="profile_category_id"
-                                        id="profile_category_id" data-placeholder="Select Profile Category"
-                                        style="width: 50%;">
-                                        <option></option>
+                                        placeholder="Enter Sub Profile Name" value="{{ old('name') }}">
+                                    <select data-repeater="select2" class="col profile-category-selector form-select"
+                                        name="profile_category_id" id="profile_category_id"
+                                        data-placeholder="Select Profile Category" style="width: 50%;">
+                                        <option value="" selected disabled>
+                                            Select Profile Category
+                                        </option>
                                         @foreach ($profileCategories as $category)
                                             <option value="{{ $category['id'] }}">
                                                 {{ Str::ucfirst(Str::lower($category['name'])) }}
@@ -44,7 +46,7 @@
 
                         <div class="btn-group d-flex">
                             <button id="addButton" data-repeater-create type="button" class="btn btn-primary">Add</button>
-                            <button type="button" class="btn btn-success" id="submitForm">Submit</button>
+                            <profilebutton type="button" class="btn btn-success" id="submitForm">Submit</profilebutton>
                             <a href="{{ route('admin.sub-profile.index') }}" class="btn btn-danger">Cancel</a>
                         </div>
                     </form>
@@ -58,21 +60,33 @@
     <script>
         $(document).ready(function() {
 
-            // $('.profile-category-selector').select2({
-            //     theme: "bootstrap-5",
-            //     width: '50%',
-            //     placeholder: $(this).data('placeholder'),
-            //     closeOnSelect: true,
-            // });
-
-            // Initialize repeater
             $('.repeater').repeater({
                 show: function() {
                     $(this).show();
+                    $(this)
+                        .find('.profile-category-selector')
+                        .removeAttr("id")
+                        .removeAttr("data-select2-id");
+                    $(this)
+                        .find('.profile-category-selector')
+                        .select2({
+                            theme: "bootstrap-5",
+                            width: '50%',
+                            placeholder: $(this).data('placeholder'),
+                            closeOnSelect: true,
+                        });
                 },
 
                 hide: function(deleteElement) {
                     $(this).remove();
+                },
+                ready: function(e) {
+                    $('.profile-category-selector').select2({
+                        theme: "bootstrap-5",
+                        width: '50%',
+                        placeholder: $(this).data('placeholder'),
+                        closeOnSelect: true,
+                    });
                 },
 
                 isFirstItemUndeletable: true,
@@ -108,7 +122,8 @@
                                     const index = keyArr[1];
                                     const errorType = keyArr[2];
                                     if (errorType == 'name') {
-                                        $('.nameError').eq(index).show().text(value);
+                                        $('.nameError').eq(index).show().text(
+                                            value);
                                     }
                                     if (errorType == 'profile_category_id') {
                                         $('.profileCategoryError').eq(index).show()

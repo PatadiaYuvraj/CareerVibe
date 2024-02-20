@@ -71,16 +71,16 @@ class UploadToCloudinary implements ShouldQueue
                 ]
             );
 
-            if ($this->model_type  == "App\Models\User") {
+            if ($this->model_type === User::class) {
                 $model = User::find($this->model_id);
             }
-            if ($this->model_type  == "App\Models\Company") {
+            if ($this->model_type === Company::class) {
                 $model = Company::find($this->model_id);
             }
-            if ($this->model_type  == "App\Models\Admin") {
+            if ($this->model_type === Admin::class) {
                 $model = Admin::find($this->model_id);
             }
-            if ($this->model_type  == "App\Models\Post") {
+            if ($this->model_type === Post::class) {
                 $model = Post::find($this->model_id);
             }
 
@@ -113,17 +113,13 @@ class UploadToCloudinary implements ShouldQueue
                 $model->save();
             }
 
-
-
             $storageManagerService  = new StorageManagerService();
             $storageManagerService->deleteFromLocal($this->local_stored_path);
             unset($storageManagerService);
 
             Log::info('File upload response: ', [$response]);
-            Log::info('Local file path: ', [$this->local_stored_path]);
-            Log::info('Model: ', [$model]);
         } catch (\Exception $e) {
-            Log::error('Unexpected error during upload:', [$e->getMessage()]);
+            Log::error('Error occurred in ' . self::class . ' with message:', [$e->getMessage()]);
         }
     }
 }

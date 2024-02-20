@@ -24,7 +24,7 @@ interface StorageManagerRepository
     ): void;
 
     // uploadToLocal() is used to upload image to local storage
-    public function uploadToLocal(Request $request, string $field_name): string;
+    public function uploadToLocal(Request $request, string $field_name, string $temp_local_path): string;
 
     // deleteFromLocal() is used to delete image from local storage
     public function deleteFromLocal(string $path): void;

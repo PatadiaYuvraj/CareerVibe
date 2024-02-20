@@ -34,6 +34,8 @@ use Illuminate\Support\Facades\Route;
 // LiveWire
 use App\Livewire\Test1;
 use App\Livewire\Test2;
+use App\Models\Job;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/test1', Test1::class)->name('test1');
 Route::get('/test2', Test2::class)->name('test2');
@@ -48,7 +50,29 @@ Route::get('/checkAuth',  function () {
 
 Route::get('/test', [TestController::class, "test"])->name('test');
 Route::post('/testing',  [TestController::class, "testing"])->name('testing');
+
+
+
 Route::get('/', function () {
+    $user = Auth::guard('user')->user();
+
+    $jobs = Job::where('is_active', 1)->with([
+        'applyByUsers' => function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        },
+        'savedByUsers' => function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        },
+    ]);
+
+    $jobs = $jobs->paginate(10);
+
+    foreach ($jobs as $job) {
+        $job->is_applied = $job->applyByUsers->count() > 0;
+        $job->is_saved = $job->savedByUsers->count() > 0;
+    }
+    return view('front.job-list', compact('jobs'));
+    return view('front.job-details');
     return view('front.index');
 });
 

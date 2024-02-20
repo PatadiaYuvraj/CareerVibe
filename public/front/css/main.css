@@ -3984,7 +3984,7 @@ blockquote .shape {
 .find-job .single-job {
   margin-top: 30px;
   padding: 40px;
-  padding-left: 120px;
+  /* padding-left: 120px; */
   border: 1px solid #eee;
   border-radius: 5px;
   position: relative;
@@ -4326,6 +4326,7 @@ blockquote .shape {
   top: 26px;
   height: 2px;
   width: 48%;
+  border: 1px dashed #fff;
 }
 
 .call-action.style2 .button .btn {

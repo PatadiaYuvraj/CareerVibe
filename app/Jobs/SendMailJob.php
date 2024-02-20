@@ -33,8 +33,6 @@ class SendMailJob implements ShouldQueue
     public function handle(): void
     {
 
-        // Mail::to($this->email)->send(new SendMail($this->details));
-        // // Log::info('Mail sent to ' . $this->email . ' successfully');
-        Log::info('Send Mail Job : Wrong');
+        Mail::to($this->email)->send(new SendMail($this->details));
     }
 }
