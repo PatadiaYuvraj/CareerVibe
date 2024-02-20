@@ -48,21 +48,36 @@ class ProfileCategoryController extends Controller
 
     public function store(Request $request)
     {
-        $d = $request->validate([
-            'name.*' => 'required|unique:profile_categories,name',
-        ]);
 
+        $request->validate(
+            [
+                'profile_categories.*.name' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    'unique:profile_categories,name',
+                ],
+            ],
+            [
+                'profile_categories.*.name.required' => 'Name is required',
+                'profile_categories.*.name.string' => 'Name must be string',
+                'profile_categories.*.name.max' => 'Name must be less than 50 characters',
+                'profile_categories.*.name.unique' => 'Name must be unique',
+            ]
+        );
 
-        $data = collect($request->get('name'))->map(function ($item) {
-            return ['name' => $item];
+        $data = collect($request->get('profile_categories'))->map(function ($item) {
+            return ['name' => $item['name']];
         })->toArray();
 
         $isCreated = $this->profileCategory->insert($data);
 
         if ($isCreated) {
-            return $this->navigationManagerService->redirectRoute('admin.profile-category.index', [], 302, [], false, ['success' => 'Profile Category is created']);
+            // return $this->navigationManagerService->redirectRoute('admin.profile-category.index', [], 302, [], false, ['success' => 'Profile Category is created']);
+            return response()->json(['success' => 'Profile Category is created'], 200);
         } else {
-            return $this->navigationManagerService->redirectBack(302, [], false, ['warning' => 'Profile Category could not be created']);
+            // return $this->navigationManagerService->redirectBack(302, [], false, ['warning' => 'Profile Category could not be created']);
+            return response()->json(['warning' => 'Profile Category could not be created'], 200);
         }
     }
 

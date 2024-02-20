@@ -32,37 +32,48 @@ class SubProfileController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:50',
-                'unique:sub_profiles,name',
-            ],
-            'profile_category_id' => [
-                'required',
-                'integer',
-                'exists:profile_categories,id',
-                function ($attribute, $value, $fail) {
-                    $profileCategory = ProfileCategory::where('id', $value)->first();
-                    if (!$profileCategory) {
-                        return $fail('The ' . $attribute . ' is invalid.');
-                    }
-                },
+        // sub_profiles.*.name
+        // sub_profiles.*.profile_category_id
 
+        $request->validate(
+            [
+                "sub_profiles.*.name" => [
+                    "required",
+                    "string",
+                    "max:50",
+                    "unique:sub_profiles,name",
+                ],
+                "sub_profiles.*.profile_category_id" => [
+                    "required",
+                    "integer",
+                    "exists:profile_categories,id",
+                ]
             ],
-        ]);
-        $data = [
-            'name' => $request->name,
-            'profile_category_id' => $request->profile_category_id,
-        ];
+            [
+                "sub_profiles.*.name.required" => "Name is required",
+                "sub_profiles.*.name.string" => "Name must be a string",
+                "sub_profiles.*.name.max" => "Name must not exceed 50 characters",
+                "sub_profiles.*.name.unique" => "Name must be unique",
+                "sub_profiles.*.profile_category_id.required" => "Profile Category is required",
+                "sub_profiles.*.profile_category_id.integer" => "Profile Category must be an integer",
+                "sub_profiles.*.profile_category_id.exists" => "Profile Category does not exist",
+            ]
+        );
 
-        $isCreated = $this->subProfile->create($data);
+        $data = collect($request->get('sub_profiles'))->map(function ($item) {
+            return [
+                'name' => $item['name'],
+                'profile_category_id' => $item['profile_category_id'],
+            ];
+        })->toArray();
+        $isCreated = $this->subProfile->insert($data);
 
         if ($isCreated) {
-            return $this->navigationManagerService->redirectRoute('admin.sub-profile.index', [], 302, [], false, ["success" => "Sub Profile created successfully"]);
+            // return $this->navigationManagerService->redirectRoute('admin.sub-profile.index', [], 302, [], false, ["success" => "Sub Profile created successfully"]);
+            return response()->json(['success' => 'Sub Profile created successfully']);
         }
-        return $this->navigationManagerService->redirectBack(302, [], false, ["error" => "Sub Profile creation failed"]);
+        // return $this->navigationManagerService->redirectBack(302, [], false, ["error" => "Sub Profile creation failed"]);
+        return response()->json(['warning' => 'Sub Profile could not be created'], 200);
     }
 
     public function index()

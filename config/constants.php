@@ -38,8 +38,23 @@ return [
     'company-post-image' => 'company-post-image',
     'company-post-video' => 'company-post-video',
     'admin-profile-image' => 'admin-profile-image',
-
   ],
+  'Allowed_File_Types' => [
+    'image' => 'image',
+    'video' => 'video',
+    'pdf' => 'pdf',
+    'doc' => 'doc',
+    'docx' => 'docx',
+  ],
+
+  ' Allowed_File_Types_With_Extensions' => [
+    'image' => ['jpg', 'jpeg', 'png', 'gif'],
+    'video' => ['mp4', 'avi', 'mov', 'wmv', 'flv', '3gp'],
+    'pdf' => ['pdf'],
+    'doc' => ['doc'],
+    'docx' => ['docx'],
+  ],
+
   'USER_RESUME_PATH' => "uploads/users/resumes",
   "APP_URL" => Env::get('APP_URL', 'http://localhost:8000'),
   "APP_NAME" => Env::get('APP_NAME', 'Career Vibe'),
