@@ -47,7 +47,7 @@ class PostsController extends Controller
             ->paginate($this->paginate);
         //     ->get()->toArray();
         // dd($posts);
-        return $this->navigationManagerService->loadView('admin_user.post.index', compact('posts'));
+        return $this->navigationManagerService->loadView('user.post.index', compact('posts'));
     }
 
     public function allPost()
@@ -63,12 +63,12 @@ class PostsController extends Controller
             ->paginate($this->paginate);
         //     ->get()->toArray();
         // dd($posts);
-        return $this->navigationManagerService->loadView('admin_user.post.all-post', compact('posts'));
+        return $this->navigationManagerService->loadView('user.post.all-post', compact('posts'));
     }
 
     public function createPost()
     {
-        return $this->navigationManagerService->loadView('admin_user.post.create');
+        return $this->navigationManagerService->loadView('user.post.create');
     }
 
 
@@ -206,7 +206,7 @@ class PostsController extends Controller
         // if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
         //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized to see this post"]);
         // }
-        return $this->navigationManagerService->loadView('admin_user.post.show', compact('post'));
+        return $this->navigationManagerService->loadView('user.post.show', compact('post'));
     }
 
     public function editPost($id)
@@ -219,7 +219,7 @@ class PostsController extends Controller
         if ($post->authorable_type != "App\Models\User" || $post->authorable_id != $user_id) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
-        return $this->navigationManagerService->loadView('admin_user.post.edit', compact('post'));
+        return $this->navigationManagerService->loadView('user.post.edit', compact('post'));
     }
 
     public function updatePost(Request $request, $id)
@@ -464,7 +464,7 @@ class PostsController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
         // dd(count($post['comments'][0]['likes']));
-        return $this->navigationManagerService->loadView('admin_user.post.comment.index', compact('post'));
+        return $this->navigationManagerService->loadView('user.post.comment.index', compact('post'));
     }
 
     public function commentPostCreate($id)
@@ -473,7 +473,7 @@ class PostsController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        return $this->navigationManagerService->loadView('admin_user.post.comment.create', compact('post'));
+        return $this->navigationManagerService->loadView('user.post.comment.create', compact('post'));
     }
 
     public function commentPostStore(Request $request, $id)
@@ -518,7 +518,7 @@ class PostsController extends Controller
         if ($comment->authorable_id != $user_id || $comment->authorable_type != "App\Models\User") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This comment is not created by you"]);
         }
-        return $this->navigationManagerService->loadView('admin_user.post.comment.edit', compact('post', 'comment'));
+        return $this->navigationManagerService->loadView('user.post.comment.edit', compact('post', 'comment'));
     }
 
     public function commentPostUpdate(Request $request, $id, $comment_id)

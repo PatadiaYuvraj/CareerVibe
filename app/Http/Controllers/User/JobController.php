@@ -25,7 +25,7 @@ class JobController extends Controller
         $this->paginate = Config::get('constants.pagination');
     }
 
-    public function index_old(Request $request)
+    public function index(Request $request)
     {
         $user = $this->authenticableService->getUser();
         $type = $request->input('type', 'all');
@@ -33,6 +33,7 @@ class JobController extends Controller
         // type = all, applied, saved, verified, featured, active
 
         $jobs = Job::where('is_active', 1)
+
             ->with([
                 'applyByUsers' => function ($query) use ($user) {
                     $query->where('user_id', $user->id);
@@ -62,102 +63,83 @@ class JobController extends Controller
             $job->is_applied = $job->applyByUsers->count() > 0;
             $job->is_saved = $job->savedByUsers->count() > 0;
         }
-
-        return $this->navigationManagerService->loadView('admin_user.job.index', compact('jobs'));
-
-        // $jobs = Job::where('is_active', 1)
-        //     ->with([
-        //         'applyByUsers' => function ($query) use ($user) {
-        //             $query->where('user_id', $user->id);
-        //         },
-        //         'savedByUsers' => function ($query) use ($user) {
-        //             $query->where('user_id', $user->id);
-        //         },
-        //     ])
-        //     ->paginate($this->paginate);
-
-
-        // foreach ($jobs as $job) {
-        //     $job->is_applied = $job->applyByUsers->count() > 0;
-        //     $job->is_saved = $job->savedByUsers->count() > 0;
-        // }
-        // return $this->navigationManagerService->loadView('admin_user.job.index', compact('jobs'));
+        return $this->navigationManagerService->loadView('user.job.job-listing', compact('jobs'));
     }
 
-    public function index(Request $request)
-    {
-        return  $this->navigationManagerService->loadView('admin_user.job.index');
-    }
+    // public function index(Request $request)
+    // {
+    //     return  $this->navigationManagerService->loadView('user.job.index');
+    // }
 
     // get all jobs - ajax call
 
-    public function getAllJobs(Request $request)
-    {
-        $user = $this->authenticableService->getUser();
-        $filter = $request->input('filter', 'all');
+    // public function getAllJobs(Request $request)
+    // {
+    //     $user = $this->authenticableService->getUser();
+    //     $filter = $request->input('filter', 'all');
 
 
-        // type = all, applied, saved, verified, featured, active
+    //     // type = all, applied, saved, verified, featured, active
 
-        $jobs = Job::where('is_active', 1)
-            ->with([
-                'applyByUsers' => function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                },
-                'savedByUsers' => function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                },
-                'subProfile',
-            ]);
+    //     $jobs = Job::where('is_active', 1)
+    //         ->with([
+    //             'applyByUsers' => function ($query) use ($user) {
+    //                 $query->where('user_id', $user->id);
+    //             },
+    //             'savedByUsers' => function ($query) use ($user) {
+    //                 $query->where('user_id', $user->id);
+    //             },
+    //             'subProfile',
+    //         ]);
 
-        if ($filter == 'applied') {
-            $jobs = $jobs->whereHas('applyByUsers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            });
-        } else if ($filter == 'saved') {
-            $jobs = $jobs->whereHas('savedByUsers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            });
-        } else if ($filter == 'verified') {
-            $jobs = $jobs->where('is_verified', 1);
-        } else if ($filter == 'featured') {
-            $jobs = $jobs->where('is_featured', 1);
-        } else if ($filter == 'active') {
-            $jobs = $jobs->where('is_active', 1);
-        } else if ($filter == 'newest') {
-            $jobs = $jobs->orderBy('created_at', 'desc');
-        } else if ($filter == 'oldest') {
-            $jobs = $jobs->orderBy('created_at', 'asc');
-        } else if ($filter == 'salary_high') {
-            $jobs = $jobs->orderBy('max_salary', 'desc');
-        } else if ($filter == 'salary_low') {
-            $jobs = $jobs->orderBy('max_salary', 'asc');
-        } else if ($filter == 'remote') {
-            $jobs = $jobs->where('work_type', 'REMOTE');
-        } else if ($filter == 'onsite') {
-            $jobs = $jobs->where('work_type', 'ONSITE');
-        } else if ($filter == 'hybrid') {
-            $jobs = $jobs->where('work_type', 'HYBRID');
-        } else if ($filter == 'all') {
-            $jobs = $jobs;
-        } else {
-            $jobs = $jobs;
-        }
+    //     if ($filter == 'applied') {
+    //         $jobs = $jobs->whereHas('applyByUsers', function ($query) use ($user) {
+    //             $query->where('user_id', $user->id);
+    //         });
+    //     } else if ($filter == 'saved') {
+    //         $jobs = $jobs->whereHas('savedByUsers', function ($query) use ($user) {
+    //             $query->where('user_id', $user->id);
+    //         });
+    //     } else if ($filter == 'verified') {
+    //         $jobs = $jobs->where('is_verified', 1);
+    //     } else if ($filter == 'featured') {
+    //         $jobs = $jobs->where('is_featured', 1);
+    //     } else if ($filter == 'active') {
+    //         $jobs = $jobs->where('is_active', 1);
+    //     } else if ($filter == 'newest') {
+    //         $jobs = $jobs->orderBy('created_at', 'desc');
+    //     } else if ($filter == 'oldest') {
+    //         $jobs = $jobs->orderBy('created_at', 'asc');
+    //     } else if ($filter == 'salary_high') {
+    //         $jobs = $jobs->orderBy('max_salary', 'desc');
+    //     } else if ($filter == 'salary_low') {
+    //         $jobs = $jobs->orderBy('max_salary', 'asc');
+    //     } else if ($filter == 'remote') {
+    //         $jobs = $jobs->where('work_type', 'REMOTE');
+    //     } else if ($filter == 'onsite') {
+    //         $jobs = $jobs->where('work_type', 'ONSITE');
+    //     } else if ($filter == 'hybrid') {
+    //         $jobs = $jobs->where('work_type', 'HYBRID');
+    //     } else if ($filter == 'all') {
+    //         $jobs = $jobs;
+    //     } else {
+    //         $jobs = $jobs;
+    //     }
 
-        $jobs = $jobs->paginate($this->paginate);
+    //     $jobs = $jobs->paginate($this->paginate);
 
-        foreach ($jobs as $job) {
-            $job->is_applied = $job->applyByUsers->count() > 0;
-            $job->is_saved = $job->savedByUsers->count() > 0;
-        }
-        return response()->json($jobs);
-    }
+    //     foreach ($jobs as $job) {
+    //         $job->is_applied = $job->applyByUsers->count() > 0;
+    //         $job->is_saved = $job->savedByUsers->count() > 0;
+    //     }
+    //     return response()->json($jobs);
+    // }
 
 
     public function show($job_id)
     {
         $user_id = $this->authenticableService->getUser()->id;
-        $job = Job::find($job_id)
+        $job = Job::where("id", $job_id)
             ->with([
                 'company',
                 'locations',
@@ -166,10 +148,10 @@ class JobController extends Controller
                 'applyByUsers' => function ($query) use ($user_id) {
                     $query->where('user_id', $user_id);
                 },
+
             ])
-            ->first()
-            ->toArray();
-        return $this->navigationManagerService->loadView('admin_user.job.show', compact('job'));
+            ->first();
+        return $this->navigationManagerService->loadView('user.job.job-details', compact('job'));
     }
 
     public function appliedJobs()
@@ -181,7 +163,7 @@ class JobController extends Controller
             }
         ])->get()->toArray();
         $jobs = $jobs[0];
-        return $this->navigationManagerService->loadView('admin_user.job.applied', compact('jobs'));
+        return $this->navigationManagerService->loadView('user.job.applied', compact('jobs'));
     }
 
     public function apply($job_id)
@@ -218,7 +200,7 @@ class JobController extends Controller
             }
         ])->get()->toArray();
         $jobs = $jobs[0];
-        return $this->navigationManagerService->loadView('admin_user.job.saved', compact('jobs'));
+        return $this->navigationManagerService->loadView('user.job.saved', compact('jobs'));
     }
 
     public function saveJob($job_id)

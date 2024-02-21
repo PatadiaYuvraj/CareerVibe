@@ -33,7 +33,7 @@ class NotificationsController extends Controller
         $notifications = $company->notifications()->paginate($this->paginate);
 
         $notifications = $notifications->unique('data');
-        return $this->navigationManagerService->loadView('admin_company.dashboard.notifications', compact('notifications'));
+        return $this->navigationManagerService->loadView('company.dashboard.notifications', compact('notifications'));
     }
 
     public function markAsRead($id)

@@ -40,7 +40,7 @@ class FollowsController extends Controller
             'following',
             'followingCompanies'
         ])->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('admin_company.dashboard.all-users', compact('users'));
+        return $this->navigationManagerService->loadView('company.dashboard.all-users', compact('users'));
     }
 
     public function followers()
@@ -50,7 +50,7 @@ class FollowsController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         $followers = $company->followers()->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('admin_company.dashboard.followers', compact('followers'));
+        return $this->navigationManagerService->loadView('company.dashboard.followers', compact('followers'));
     }
 
     public function removeFollower($id)

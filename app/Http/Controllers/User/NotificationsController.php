@@ -38,7 +38,7 @@ class NotificationsController extends Controller
         $notifications = $user->notifications()->paginate($this->paginate);
 
         $notifications = $notifications->unique('data');
-        return $this->navigationManagerService->loadView('admin_user.dashboard.notifications', compact('notifications'));
+        return $this->navigationManagerService->loadView('user.dashboard.notifications', compact('notifications'));
     }
 
     public function markAsRead($id)

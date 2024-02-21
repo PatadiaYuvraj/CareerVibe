@@ -114,10 +114,10 @@ class JobController extends Controller
         // dd($request->all());
         $company = $this->authenticableService->getCompany();
         if (!$company->id) {
-            return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["warning" => "Company is not found"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.job.index', [], 302, [], false, ["warning" => "Company is not found"]);
         }
         if ($company->is_verified == 0) {
-            return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["warning" => "Company is not verified"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.job.index', [], 302, [], false, ["warning" => "Company is not verified"]);
         }
         $request->validate([
             "sub_profile_id" => [
@@ -317,7 +317,7 @@ class JobController extends Controller
                 $this->mailableService->sendMail($admin->email, $details);
             }
 
-            return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is created"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.job.index', [], 302, [], false, ["success" => "Job is created"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not created"]);
     }
@@ -573,7 +573,7 @@ class JobController extends Controller
         if ($isUpdated) {
             $isUpdated->qualifications()->sync($request->get('qualifications'));
             $isUpdated->locations()->sync($request->get('locations'));
-            return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not updated"]);
     }
@@ -594,7 +594,7 @@ class JobController extends Controller
         if (!$isDeleted) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
-        return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is deleted"]);
+        return $this->navigationManagerService->redirectRoute('admin_company.job.index', [], 302, [], false, ["success" => "Job is deleted"]);
     }
 
     public function toggleFeatured($id, $is_featured)
@@ -615,7 +615,7 @@ class JobController extends Controller
             $job->save();
             return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is featured"]);
         }
-        return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
+        return $this->navigationManagerService->redirectRoute('admin_company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
     }
 
     public function toggleActive($id, $is_active)
@@ -636,6 +636,6 @@ class JobController extends Controller
             $job->save();
             return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Company is active"]);
         }
-        return $this->navigationManagerService->redirectRoute('company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
+        return $this->navigationManagerService->redirectRoute('admin_company.job.index', [], 302, [], false, ["success" => "Job is updated"]);
     }
 }

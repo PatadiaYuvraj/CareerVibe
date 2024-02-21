@@ -191,7 +191,7 @@ class PostsController extends Controller
                 }
             }
 
-            return $this->navigationManagerService->redirectRoute('user.post.index', [], 302, [], false, ["success" => "Post Created Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin_user.post.index', [], 302, [], false, ["success" => "Post Created Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Created"]);
     }
@@ -367,7 +367,7 @@ class PostsController extends Controller
                 }
             }
 
-            return $this->navigationManagerService->redirectRoute('user.post.index', [], 302, [], false, ["success" => "Post Updated Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin_user.post.index', [], 302, [], false, ["success" => "Post Updated Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Updated"]);
     }
@@ -397,7 +397,7 @@ class PostsController extends Controller
         // $isDeleted = $post->delete();
         $isDeleted = $this->authenticableService->getUser()->posts()->where('id', $id)->delete();
         if ($isDeleted) {
-            return $this->navigationManagerService->redirectRoute('user.post.index', [], 302, [], false, ["success" => "Post Deleted Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin_user.post.index', [], 302, [], false, ["success" => "Post Deleted Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Deleted"]);
     }
@@ -497,7 +497,7 @@ class PostsController extends Controller
         ];
         $isCreated = $post->comments()->create($data);
         if ($isCreated) {
-            return $this->navigationManagerService->redirectRoute('user.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is created"]);
+            return $this->navigationManagerService->redirectRoute('admin_user.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is created"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not created"]);
     }
@@ -550,7 +550,7 @@ class PostsController extends Controller
         ];
         $isUpdated = $comment->update($data);
         if ($isUpdated) {
-            return $this->navigationManagerService->redirectRoute('user.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is updated"]);
+            return $this->navigationManagerService->redirectRoute('admin_user.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is updated"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not updated"]);
     }

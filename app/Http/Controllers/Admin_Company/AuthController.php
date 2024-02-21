@@ -92,7 +92,7 @@ class AuthController extends Controller
         }
 
         if ($this->authenticableService->loginCompany($data)) {
-            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.dashboard', [], 302, [], false, ["success" => "You're Logged In"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Invalid Credentials"]);
     }
@@ -132,7 +132,7 @@ class AuthController extends Controller
 
         $details = [
             'username' => $data['name'],
-            'url' => $this->authenticableService->generateUserEmailVerificationLink('company.verifyEmail', $token),
+            'url' => $this->authenticableService->generateUserEmailVerificationLink('admin_company.verifyEmail', $token),
         ];
 
 
@@ -169,7 +169,7 @@ class AuthController extends Controller
                 $this->mailableService->sendMail($admin->email, $details);
             }
 
-            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "Verification Link Sent To Your Email"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.login', [], 302, [], false, ["success" => "Verification Link Sent To Your Email"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Account Not Created"]);
     }
@@ -178,7 +178,7 @@ class AuthController extends Controller
     {
         $company = $this->company->where('email_verification_token', $token)->first();
         if (!$company) {
-            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
         }
         $data = [
             "is_email_verified" => true,
@@ -187,9 +187,9 @@ class AuthController extends Controller
         ];
         $isUpdated = $this->company->where('id', $company->id)->update($data);
         if ($isUpdated) {
-            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "Email Verified Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.login', [], 302, [], false, ["success" => "Email Verified Successfully"]);
         }
-        return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Email Not Verified"]);
+        return $this->navigationManagerService->redirectRoute('admin_company.login', [], 302, [], false, ["warning" => "Email Not Verified"]);
     }
 
     public function forgotPassword()
@@ -227,7 +227,7 @@ class AuthController extends Controller
 
         $details = [
             'username' => $data['email'],
-            'url' => $this->authenticableService->generateCompanyPasswordResetLink('company.resetPassword', $token),
+            'url' => $this->authenticableService->generateCompanyPasswordResetLink('admin_company.resetPassword', $token),
         ];
 
         // send mail
@@ -236,7 +236,7 @@ class AuthController extends Controller
         $isUpdated = $this->company->where('email', $data['email'])->update($data);
 
         if ($isUpdated) {
-            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "Reset Password Link Sent To Your Email"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.login', [], 302, [], false, ["success" => "Reset Password Link Sent To Your Email"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Reset Password Link Not Sent"]);
     }
@@ -245,7 +245,7 @@ class AuthController extends Controller
     {
         $company = $this->company->where('password_reset_token', $token)->first();
         if (!$company) {
-            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
         }
         return $this->navigationManagerService->loadView('admin_company.auth.reset-password', compact('token'));
     }
@@ -266,7 +266,7 @@ class AuthController extends Controller
 
         $company = $this->company->where('password_reset_token', $token)->first();
         if (!$company) {
-            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
         }
 
         $data = [
@@ -278,7 +278,7 @@ class AuthController extends Controller
         $isUpdated = $this->company->where('id', $company->id)->update($data);
 
         if ($isUpdated) {
-            return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "Password Reset Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.login', [], 302, [], false, ["success" => "Password Reset Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Password Not Reset"]);
     }
@@ -286,7 +286,7 @@ class AuthController extends Controller
     public function logout()
     {
         $this->authenticableService->logoutCompany();
-        return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["success" => "You're Logged Out"]);
+        return $this->navigationManagerService->redirectRoute('admin_company.login', [], 302, [], false, ["success" => "You're Logged Out"]);
     }
 
     public function dashboard()
@@ -354,7 +354,7 @@ class AuthController extends Controller
             $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
             $this->mailableService->sendMail($company->email, $details);
-            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "Password Updated Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.dashboard', [], 302, [], false, ["success" => "Password Updated Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Password Not Updated"]);
     }
@@ -483,7 +483,7 @@ class AuthController extends Controller
             $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
             $this->mailableService->sendMail($company->email, $details);
-            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "Profile Updated Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.dashboard', [], 302, [], false, ["success" => "Profile Updated Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Not Updated"]);
     }
@@ -546,7 +546,7 @@ class AuthController extends Controller
             // UNCOMMENT: To send mail
             $this->mailableService->sendMail($company->email, $details);
 
-            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "Profile Image Updated Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.dashboard', [], 302, [], false, ["success" => "Profile Image Updated Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Updated"]);
     }
@@ -583,7 +583,7 @@ class AuthController extends Controller
             $this->notifiableService->sendNotification($company, $details['body']);
             // UNCOMMENT: To send mail
             $this->mailableService->sendMail($company->email, $details);
-            return $this->navigationManagerService->redirectRoute('company.dashboard', [], 302, [], false, ["success" => "Profile Image Deleted Successfully"]);
+            return $this->navigationManagerService->redirectRoute('admin_company.dashboard', [], 302, [], false, ["success" => "Profile Image Deleted Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Deleted"]);
     }

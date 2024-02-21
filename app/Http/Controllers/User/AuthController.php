@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Job;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Services\AuthenticableService;
@@ -41,12 +42,12 @@ class AuthController extends Controller
 
     public function dashboard()
     {
-        return $this->navigationManagerService->loadView('admin_user.dashboard.index');
+        return $this->navigationManagerService->loadView('user.index');
     }
 
     public function login()
     {
-        return $this->navigationManagerService->loadView('admin_user.auth.login');
+        return $this->navigationManagerService->loadView('user.auth.login');
     }
 
     public function doLogin(Request $request)
@@ -114,7 +115,7 @@ class AuthController extends Controller
 
     public function register()
     {
-        return $this->navigationManagerService->loadView('admin_user.auth.register');
+        return $this->navigationManagerService->loadView('user.auth.register');
     }
 
     public function doRegister(Request $request)
@@ -195,7 +196,7 @@ class AuthController extends Controller
     // fogot password
     public function forgotPassword()
     {
-        return $this->navigationManagerService->loadView('admin_user.auth.forgot-password');
+        return $this->navigationManagerService->loadView('user.auth.forgot-password');
     }
 
     public function doForgotPassword(Request $request)
@@ -247,7 +248,7 @@ class AuthController extends Controller
         if (!$user) {
             return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Invalid Token"]);
         }
-        return $this->navigationManagerService->loadView('admin_user.auth.reset-password', compact('token'));
+        return $this->navigationManagerService->loadView('user.auth.reset-password', compact('token'));
     }
 
     public function doResetPassword(Request $request, $token)
@@ -292,7 +293,7 @@ class AuthController extends Controller
 
     public function changePassword()
     {
-        return $this->navigationManagerService->loadView('admin_user.auth.change-password');
+        return $this->navigationManagerService->loadView('user.auth.change-password');
     }
 
     public function doChangePassword(Request $request)
@@ -353,7 +354,7 @@ class AuthController extends Controller
 
     public function editProfile()
     {
-        return $this->navigationManagerService->loadView('admin_user.auth.edit-profile');
+        return $this->navigationManagerService->loadView('user.auth.edit-profile');
     }
 
     public function updateProfile(Request $request)
@@ -513,7 +514,7 @@ class AuthController extends Controller
 
     public function editProfileImage()
     {
-        return $this->navigationManagerService->loadView('admin_user.auth.edit-profile-image');
+        return $this->navigationManagerService->loadView('user.auth.edit-profile-image');
     }
 
     public function updateProfileImage(Request $request)
@@ -614,7 +615,7 @@ class AuthController extends Controller
 
     public function editResumePdf()
     {
-        return $this->navigationManagerService->loadView('admin_user.auth.edit-resume-pdf');
+        return $this->navigationManagerService->loadView('user.auth.edit-resume-pdf');
     }
 
     public function updateResumePdf(Request $request)

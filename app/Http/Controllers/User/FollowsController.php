@@ -48,7 +48,7 @@ class FollowsController extends Controller
                 'followingCompanies'
             ])
             ->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('admin_user.dashboard.all-users', compact('users'));
+        return $this->navigationManagerService->loadView('user.dashboard.all-users', compact('users'));
     }
 
     public function follow($id)
@@ -114,7 +114,7 @@ class FollowsController extends Controller
         $users = Follow::where('user_id', $user_id)
             ->with('followable')
             ->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('admin_user.dashboard.following', compact('users'));
+        return $this->navigationManagerService->loadView('user.dashboard.following', compact('users'));
     }
 
     public function followers()
@@ -126,7 +126,7 @@ class FollowsController extends Controller
         }
 
         $users = $user->followers()->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('admin_user.dashboard.followers', compact('users'));
+        return $this->navigationManagerService->loadView('user.dashboard.followers', compact('users'));
     }
 
     public function followCompany($company_id)

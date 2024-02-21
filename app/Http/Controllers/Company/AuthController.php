@@ -40,12 +40,12 @@ class AuthController extends Controller
 
     public function login()
     {
-        return $this->navigationManagerService->loadView('admin_company.auth.login');
+        return $this->navigationManagerService->loadView('company.auth.login');
     }
 
     public function register()
     {
-        return $this->navigationManagerService->loadView('admin_company.auth.register');
+        return $this->navigationManagerService->loadView('company.auth.register');
     }
 
     public function doLogin(Request $request)
@@ -194,7 +194,7 @@ class AuthController extends Controller
 
     public function forgotPassword()
     {
-        return $this->navigationManagerService->loadView('admin_company.auth.forgot-password');
+        return $this->navigationManagerService->loadView('company.auth.forgot-password');
     }
 
     public function doForgotPassword(Request $request)
@@ -247,7 +247,7 @@ class AuthController extends Controller
         if (!$company) {
             return $this->navigationManagerService->redirectRoute('company.login', [], 302, [], false, ["warning" => "Invalid Token"]);
         }
-        return $this->navigationManagerService->loadView('admin_company.auth.reset-password', compact('token'));
+        return $this->navigationManagerService->loadView('company.auth.reset-password', compact('token'));
     }
 
     public function doResetPassword(Request $request, $token)
@@ -291,12 +291,12 @@ class AuthController extends Controller
 
     public function dashboard()
     {
-        return $this->navigationManagerService->loadView('admin_company.dashboard.index');
+        return $this->navigationManagerService->loadView('company.dashboard.index');
     }
 
     public function changePassword()
     {
-        return $this->navigationManagerService->loadView('admin_company.auth.change-password');
+        return $this->navigationManagerService->loadView('company.auth.change-password');
     }
 
     public function doChangePassword(Request $request)
@@ -361,7 +361,7 @@ class AuthController extends Controller
 
     public function editProfile()
     {
-        return $this->navigationManagerService->loadView('admin_company.auth.edit-profile');
+        return $this->navigationManagerService->loadView('company.auth.edit-profile');
     }
 
     public function updateProfile(Request $request)
@@ -490,7 +490,7 @@ class AuthController extends Controller
 
     public function editProfileImage()
     {
-        return $this->navigationManagerService->loadView('admin_company.auth.edit-profile-image');
+        return $this->navigationManagerService->loadView('company.auth.edit-profile-image');
     }
 
     public function updateProfileImage(Request $request)

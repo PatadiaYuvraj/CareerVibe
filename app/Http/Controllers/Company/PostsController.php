@@ -48,7 +48,7 @@ class PostsController extends Controller
             ->paginate($this->paginate);
         //     ->get()->toArray();
         // dd($posts);
-        return $this->navigationManagerService->loadView('admin_company.post.index', compact('posts'));
+        return $this->navigationManagerService->loadView('company.post.index', compact('posts'));
     }
 
     public function allPost()
@@ -64,12 +64,12 @@ class PostsController extends Controller
             ->paginate($this->paginate);
         //     ->get()->toArray();
         // dd($posts);
-        return $this->navigationManagerService->loadView('admin_company.post.all-post', compact('posts'));
+        return $this->navigationManagerService->loadView('company.post.all-post', compact('posts'));
     }
 
     public function createPost()
     {
-        return $this->navigationManagerService->loadView('admin_company.post.create');
+        return $this->navigationManagerService->loadView('company.post.create');
     }
 
     public function storePost(Request $request)
@@ -226,7 +226,7 @@ class PostsController extends Controller
                 }
             }
 
-            return $this->navigationManagerService->redirectRoute('admin_company.post.index', [], 302, [], false, ["success" => "Post Created Successfully"]);
+            return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Created Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Created"]);
     }
@@ -241,7 +241,7 @@ class PostsController extends Controller
         // if ($post->authorable_type != "App\Models\Company" || $post->authorable_id != $user_id) {
         //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         // }
-        return $this->navigationManagerService->loadView('admin_company.post.show', compact('post'));
+        return $this->navigationManagerService->loadView('company.post.show', compact('post'));
     }
 
     public function editPost($id)
@@ -254,7 +254,7 @@ class PostsController extends Controller
         if ($post->authorable_id != $user_id || $post->authorable_type != "App\Models\Company") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This post is not created by you"]);
         }
-        return $this->navigationManagerService->loadView('admin_company.post.edit', compact('post'));
+        return $this->navigationManagerService->loadView('company.post.edit', compact('post'));
     }
 
     public function updatePost(Request $request, $id)
@@ -403,7 +403,7 @@ class PostsController extends Controller
                 }
             }
 
-            return $this->navigationManagerService->redirectRoute('admin_company.post.index', [], 302, [], false, ["success" => "Post Updated Successfully"]);
+            return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Updated Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Updated"]);
     }
@@ -432,7 +432,7 @@ class PostsController extends Controller
 
         $isDeleted = $this->authenticableService->getCompany()->posts()->where('id', $id)->delete();
         if ($isDeleted) {
-            return $this->navigationManagerService->redirectRoute('admin_company.post.index', [], 302, [], false, ["success" => "Post Deleted Successfully"]);
+            return $this->navigationManagerService->redirectRoute('company.post.index', [], 302, [], false, ["success" => "Post Deleted Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post Not Deleted"]);
     }
@@ -501,7 +501,7 @@ class PostsController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        return $this->navigationManagerService->loadView('admin_company.post.comment.index', compact('post'));
+        return $this->navigationManagerService->loadView('company.post.comment.index', compact('post'));
     }
 
     public function commentPostCreate($id)
@@ -510,7 +510,7 @@ class PostsController extends Controller
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }
-        return $this->navigationManagerService->loadView('admin_company.post.comment.create', compact('post'));
+        return $this->navigationManagerService->loadView('company.post.comment.create', compact('post'));
     }
 
     public function commentPostStore(Request $request, $id)
@@ -535,7 +535,7 @@ class PostsController extends Controller
         $isCreated = $post->comments()->create($data);
 
         if ($isCreated) {
-            return $this->navigationManagerService->redirectRoute('admin_company.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is created"]);
+            return $this->navigationManagerService->redirectRoute('company.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is created"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not created"]);
     }
@@ -556,7 +556,7 @@ class PostsController extends Controller
         if ($comment->authorable_id != $user_id || $comment->authorable_type != "App\Models\Company") {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "This comment is not created by you"]);
         }
-        return $this->navigationManagerService->loadView('admin_company.post.comment.edit', compact('post', 'comment'));
+        return $this->navigationManagerService->loadView('company.post.comment.edit', compact('post', 'comment'));
     }
 
     public function commentPostUpdate(Request $request, $id, $comment_id)
@@ -587,7 +587,7 @@ class PostsController extends Controller
         ];
         $isUpdated = $comment->update($data);
         if ($isUpdated) {
-            return $this->navigationManagerService->redirectRoute('admin_company.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is updated"]);
+            return $this->navigationManagerService->redirectRoute('company.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is updated"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not updated"]);
     }

@@ -75,7 +75,7 @@ class JobController extends Controller
                 'is_featured'
             ])
             ->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('admin_company.job.index', compact('jobs'));
+        return $this->navigationManagerService->loadView('company.job.index', compact('jobs'));
     }
 
     public function create()
@@ -100,7 +100,7 @@ class JobController extends Controller
         $locations = Location::select(['id', 'city', 'state'])->get()->toArray();
 
         $qualifications = Qualification::select(['id', 'name'])->get()->toArray();
-        return $this->navigationManagerService->loadView('admin_company.job.create', compact(
+        return $this->navigationManagerService->loadView('company.job.create', compact(
             'company',
             // 'sub_profiles',
             'profile_categories',
@@ -344,7 +344,7 @@ class JobController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
         $job = $job[0];
-        return $this->navigationManagerService->loadView('admin_company.job.show', compact('job'));
+        return $this->navigationManagerService->loadView('company.job.show', compact('job'));
     }
 
     public function edit($id)
@@ -390,7 +390,7 @@ class JobController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Job is not found"]);
         }
         $job  =  $job[0];
-        return $this->navigationManagerService->loadView('admin_company.job.edit', compact('job', 'qualifications', 'locations', 'profile_categories'));
+        return $this->navigationManagerService->loadView('company.job.edit', compact('job', 'qualifications', 'locations', 'profile_categories'));
     }
 
     public function update(Request $request, $id)

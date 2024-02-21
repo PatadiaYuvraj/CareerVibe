@@ -26,7 +26,7 @@ class CompanyController extends Controller
     public function index()
     {
         $companies = $this->company->with('followers')->paginate($this->paginate);
-        return $this->navigationManagerService->loadView('admin_user.company.index', compact('companies'));
+        return $this->navigationManagerService->loadView('user.company.index', compact('companies'));
     }
 
     public function show($id)
@@ -36,6 +36,6 @@ class CompanyController extends Controller
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Company is not found"]);
         }
         dd($company->toArray());
-        return $this->navigationManagerService->loadView('admin_user.company.show', compact('company'));
+        return $this->navigationManagerService->loadView('user.company.show', compact('company'));
     }
 }
