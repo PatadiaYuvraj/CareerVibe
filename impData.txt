@@ -9,7 +9,7 @@ is same as
 
 run specific job 
 php artisan queue:work --queue=SendNotification 
-
+https://bootstrapmade.com/demo/NiceAdmin/
 $details = [
 'title' => 'Password Changed',
 'body' => "Your password has been changed successfully"

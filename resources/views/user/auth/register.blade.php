@@ -1,5 +1,5 @@
 @extends('user.layout.auth')
-@section('title', 'Register | User | Career Vibe')
+@section('title', 'Register| Career Vibe')
 @section('content')
     <div class="card mb-3">
         <div class="card-body">
@@ -57,13 +57,15 @@
                     <button class="btn btn-primary w-100" type="submit">
                         Create Account</button>
                 </div>
-                <div class="col-12 text-center">
-                    <p class="small mb-0">Already have an account?
+                <div class="col-12">
+                    <p class="small mb-1">Already have an account?
                         <a href="{{ route('user.login') }}">Log in</a>
                     </p>
-                    <p class="small mb-0">
-                        <a href="{{ route('company.register') }}">Company</a> |
-                        <a href="{{ route('admin.register') }}">Admin</a>
+                    <p class="small mb-1">
+
+                        <a href="{{ route('company.register') }}">
+                            Want to register as Company?
+                        </a>
                     </p>
                 </div>
             </form>

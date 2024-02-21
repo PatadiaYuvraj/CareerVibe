@@ -139,9 +139,9 @@
 
     <!-- Start Find Job Area -->
     <section class="find-job job-list section">
-        <div class="container">
+        <div class="container ">
             <div class="single-head">
-                <div class="row row-cols-2">
+                {{-- <div class="row row-cols-2">
                     <div class="col-12">
                         <!-- Single Job -->
                         @foreach ($jobs as $job)
@@ -151,20 +151,19 @@
                                         <a href="">
                                             {{ $job->subProfile->name }}
                                         </a>
-                                        <a href="">
-                                            ({{ Config::get('constants.job.work_type')[$job->work_type] }})
-                                        </a>
                                     </h4>
                                     <p>
-                                        {{ $job->description }}
+                                        Offered By:
+
+                                        {{ $job->company->name }}
+                                        <br />
+                                        <br />
+                                        <span class="text-dark">Description:</span>
+                                        <br />
+                                        {{ Str::limit($job->description, 200, '...') }}
                                     </p>
                                     <ul>
-                                        <li>
-                                            <a href="">
-                                                {{ $job->company->name }}
-                                            </a>
-                                        </li>
-                                        <br />
+
                                         <li>
                                             @if ($job['min_salary'] >= 1000)
                                                 <i class="bi bi-currency-rupee"></i>{{ $job['min_salary'] / 1000 }}k
@@ -175,18 +174,6 @@
                                                 <i class="bi bi-currency-rupee"></i>{{ $job['max_salary'] }}
                                             @endif
                                         </li>
-                                        <br />
-                                        @foreach ($job->locations as $location)
-                                            <li>
-                                                {{ $location->city }}
-                                            </li>
-                                        @endforeach
-                                        <br />
-                                        @foreach ($job->qualifications as $qualification)
-                                            <li>
-                                                {{ $qualification->name }}
-                                            </li>
-                                        @endforeach
 
 
 
@@ -194,18 +181,6 @@
                                 </div>
                                 <div class="job-button">
                                     <ul>
-                                        <li>
-                                            @if ($job->is_applied)
-                                                <a href="{{ route('user.job.unapply', $job['id']) }}">
-                                                    <i class="bi bi-check-circle"></i> Applied
-                                                </a>
-                                            @else
-                                                <a href="{{ route('user.job.apply', $job['id']) }}">
-                                                    <i class="bi bi-plus-circle"></i>
-                                                    Apply Now
-                                                </a>
-                                            @endif
-                                        </li>
                                         <li>
                                             @if ($job->is_saved)
                                                 <a href="{{ route('user.job.unsaveJob', $job['id']) }}">
@@ -220,18 +195,7 @@
                                         </li>
                                         <li>
                                             <span>
-                                                {{ Config::get('constants.job.job_type')[$job->job_type] }}
-                                            </span>
-                                        </li>
-                                        <li>
-                                            <span>
                                                 {{ Config::get('constants.job.experience_level')[$job->experience_level] }}
-                                            </span>
-                                        </li>
-
-                                        <li>
-                                            <span>
-                                                {{ Config::get('constants.job.experience_type')[$job->experience_type] }}
                                             </span>
                                         </li>
 
@@ -241,15 +205,75 @@
                         @endforeach
                         <!-- End Single Job -->
                     </div>
+                </div> --}}
+                <div class="row">
+                    @forelse ($jobs as $job)
+                        <!-- Single Job -->
+                        <div class="single-job mx-auto">
+                            <div class="job-content">
+                                <h4>
+                                    <a href="">
+                                        {{ $job->subProfile->name }}
+                                    </a>
+                                </h4>
+                                <ul class="d-flex">
+                                    <li>
+                                        <a href="{{ route('user.company.show', $job->company->id) }}">
+                                            Offered By: {{ $job->company->name }}
+                                        </a>
+                                    </li>
+                                </ul>
+                                <ul>
+
+                                    <li>
+                                        @if ($job['min_salary'] >= 1000)
+                                            <i class="bi bi-currency-rupee"></i>{{ $job['min_salary'] / 1000 }}k
+                                            -
+                                            <i class="bi bi-currency-rupee"></i>{{ $job['max_salary'] / 1000 }}k
+                                        @else
+                                            <i class="bi bi-currency-rupee"></i>{{ $job['min_salary'] }} -
+                                            <i class="bi bi-currency-rupee"></i>{{ $job['max_salary'] }}
+                                        @endif
+                                    </li>
+
+
+
+                                </ul>
+                            </div>
+                            <div class="job-button">
+                                <ul>
+                                    <li>
+                                        @if ($job->is_saved)
+                                            <a href="{{ route('user.job.unsaveJob', $job['id']) }}">
+                                                <i class="bi bi-bookmark-check"></i> Saved
+                                            </a>
+                                        @else
+                                            <a href="{{ route('user.job.saveJob', $job['id']) }}">
+                                                <i class="bi bi-bookmark-plus"></i>
+                                                Save Now
+                                            </a>
+                                        @endif
+                                    </li>
+                                    <li>
+                                        <span>
+                                            {{ Config::get('constants.job.experience_level')[$job->experience_level] }}
+                                        </span>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- End Single Job -->
+                    @empty
+                    @endforelse
                 </div>
-                {{-- @dd ($jobs) --}}
 
                 <div class="pagination justify-content-center">
                     <nav>
                         <ul class="d-flex justify-content-center">
 
 
-                            {{ $jobs->links('pagination::bootstrap-5') }}
+                            {{-- {{ $jobs->links('pagination::bootstrap-5') }} --}}
                             {{-- <li class="page-item">
 
                                 @if ($jobs->onFirstPage())
@@ -417,8 +441,8 @@
                                     <!-- Default checkbox -->
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="">
-                                        <label class="form-check-label" for="flexCheckDefault">Agree to the <a
-                                                href="#">Terms & Conditions</a></label>
+                                        <label class="form-check-label" for="flexCheckDefault">Agree
+                                            to the <a href="#">Terms & Conditions</a></label>
                                     </div>
                                 </div>
                                 <div class="form-group mb-8 button">
@@ -442,15 +466,18 @@
                     <div class="col-lg-6 col-12">
                         <div class="download-text">
                             <h3>Download Our Best Apps</h3>
-                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do<br> eiusmod tempor
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do<br>
+                                eiusmod tempor
                                 incididunt ut labore et dolore</p>
                         </div>
                     </div>
                     <div class="col-lg-6 col-12">
                         <div class="download-button">
                             <div class="button">
-                                <a class="btn" href="#"><i class="lni lni-apple"></i> App Store</a>
-                                <a class="btn" href="#"><i class="lni lni-play-store"></i> Google Play</a>
+                                <a class="btn" href="#"><i class="lni lni-apple"></i> App
+                                    Store</a>
+                                <a class="btn" href="#"><i class="lni lni-play-store"></i>
+                                    Google Play</a>
                             </div>
                         </div>
                     </div>
@@ -467,7 +494,8 @@
                             <div class="logo">
                                 <a href="index.html"><img src="assets/images/logo/logo.svg" alt="Logo"></a>
                             </div>
-                            <p>Start building your creative website with our awesome template Massive.</p>
+                            <p>Start building your creative website with our awesome template Massive.
+                            </p>
                             <ul class="contact-address">
                                 <li><span>Address:</span> 555 Wall Street, USA, NY</li>
                                 <li><span>Email:</span> example@apus.com</li>
@@ -476,7 +504,8 @@
                             <div class="footer-social">
                                 <ul>
                                     <li><a href="#"><i class="lni lni-facebook-original"></i></a></li>
-                                    <li><a href="#"><i class="lni lni-twitter-original"></i></a></li>
+                                    <li><a href="#"><i class="lni lni-twitter-original"></i></a>
+                                    </li>
                                     <li><a href="#"><i class="lni lni-linkedin-original"></i></a></li>
                                     <li><a href="#"><i class="lni lni-pinterest"></i></a></li>
                                 </ul>
