@@ -206,6 +206,7 @@ Route::group(['middleware' => "isUser"], function () {
 
 
         Route::get('/dashboard',  [UserAuthController::class, "dashboard"])->name('user.dashboard');
+        Route::get('/profile',  [UserAuthController::class, "profile"])->name('user.profile');
         Route::get('/logout',  [UserAuthController::class, "logout"])->name('user.logout');
         Route::get('/edit-profile',  [UserAuthController::class, "editProfile"])->name('user.editProfile');
         Route::post('/update-profile',  [UserAuthController::class, "updateProfile"])->name('user.updateProfile');

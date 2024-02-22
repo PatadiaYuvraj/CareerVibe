@@ -1,5 +1,34 @@
 <!DOCTYPE html>
 <html lang="">
+@php
+    $isHomeActive = match (Route::currentRouteName()) {
+        'user.dashboard' => true,
+        default => false,
+    };
+
+    $isCategoryActive = match (Route::currentRouteName()) {
+        default => false,
+    };
+
+    $isPostActive = match (Route::currentRouteName()) {
+        default => false,
+    };
+
+    $isJobActive = match (Route::currentRouteName()) {
+        'user.job.index' => true,
+        default => false,
+    };
+
+    $isCompanyActive = match (Route::currentRouteName()) {
+        'user.company.index' => true,
+        default => false,
+    };
+
+    $isProfileActive = match (Route::currentRouteName()) {
+        'user.profile' => true,
+        default => false,
+    };
+@endphp
 
 <head>
     <meta charset="utf-8" />
@@ -29,19 +58,15 @@
 <body>
 
     {{-- <div id="loading-area"></div> --}}
-
     <!-- Start Header Area -->
-    <header class="header">
+    <header class="header other-page">
         <div class="navbar-area">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-12">
                         <nav class="navbar navbar-expand-lg">
                             <a class="navbar-brand logo" href="index.html">
-                                <img class="img-fluid w-25" {{-- style="width: 30px; height: 30px;" --}}
-                                    src="{{ asset('admin/img/apple-touch-icon.png') }}" alt="Logo" />
-                                {{-- Career Vibe --}}
-                                <span class="text-primary">Career Vibe</span>
+                                <img class="logo1" src="{{ asset('front/images/logo/logo.svg') }}" alt="Logo" />
                             </a>
                             <button class="navbar-toggler" type="button" data-toggle="collapse"
                                 data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
@@ -53,88 +78,124 @@
                             <div class="collapse navbar-collapse sub-menu-bar" id="navbarSupportedContent">
                                 <ul id="nav" class="navbar-nav ml-auto">
                                     <li class="nav-item">
-                                        <a class="active" href="{{ route('user.dashboard') }}">Home</a>
-                                        {{-- <ul class="sub-menu">
-                                            <li><a href="index.html">Home 1</a></li>
-                                            <li><a class="active" href="index2.html">Home 2</a></li>
-                                            <li><a href="index3.html">Home 3</a></li>
-                                            <li><a href="index4.html">Home 4</a></li>
-                                        </ul> --}}
+                                        <a class="@if ($isHomeActive) active @endif"
+                                            href="{{ route('user.dashboard') }}">Home</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#">See Jobs</a>
-                                        {{-- <ul class="sub-menu">
-                                            <li><a href="about-us.html">About Us</a></li>
-                                            <li><a href="job-list.html">Job List</a></li>
-                                            <li><a href="job-details.html">Job Details</a></li>
-                                            <li><a href="resume.html">Resume Page</a></li>
-                                            <li>
-                                                <a href="privacy-policy.html">Privacy Policy</a>
-                                            </li>
-                                            <li><a href="faq.html">Faq</a></li>
-                                            <li><a href="pricing.html">Our Pricing</a></li>
-                                            <li><a href="404.html">404 Error</a></li>
-                                            <li><a href="mail-success.html">Mail Success</a></li>
-                                        </ul> --}}
-                                    </li>
-                                    {{-- <li class="nav-item">
-                                        <a href="#">Candidates</a>
+                                        <a href="javascript:void(0)">Categories</a>
                                         <ul class="sub-menu">
-                                            <li><a href="browse-jobs.html">Browse Jobs</a></li>
-                                            <li>
-                                                <a href="browse-categories.html">Browse Categories</a>
+                                            <li class="nav-item">
+                                                <a href="">
+                                                    View All Categories
+                                                </a>
                                             </li>
-                                            <li><a href="add-resume.html">Add Resume</a></li>
-                                            <li><a href="job-alerts.html">Job Alerts</a></li>
+                                            @foreach (App\Models\ProfileCategory::limit(5)->get() as $category)
+                                                <li>
+                                                    <a href="{{ route('user.company.show', $category->id) }}">
+                                                        {{ $category->name }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
                                         </ul>
-                                    </li> --}}
+                                    </li>
                                     <li class="nav-item">
-                                        <a href="#">Companies</a>
-                                        {{-- <ul class="sub-menu">
-                                            <li><a href="post-job.html">Add Job</a></li>
-                                            <li><a href="manage-jobs.html">Manage Jobs</a></li>
+                                        <a href="javascript:void(0)"
+                                            class="@if ($isPostActive) active @endif">
+                                            Posts
+                                        </a>
+
+                                        <ul class="sub-menu">
                                             <li>
-                                                <a href="manage-applications.html">Manage Applications</a>
+                                                <a href="#">
+                                                    View All Posts
+                                                </a>
                                             </li>
-                                            <li><a href="manage-resumes.html">Manage Resume</a></li>
                                             <li>
-                                                <a href="browse-resumes.html">Browse Resumes</a>
+                                                <a href="#">
+                                                    View My Posts
+                                                </a>
                                             </li>
-                                        </ul> --}}
+                                            <li class="nav-item">
+                                                <a href="">
+                                                    Create Post
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="javascript:void(0)"
+                                            class="@if ($isJobActive) active @endif">
+                                            Jobs
+                                        </a>
+
+                                        <ul class="sub-menu">
+                                            <li>
+                                                <a href="{{ route('user.job.index') }}">
+                                                    View All Jobs
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    My Applied Jobs
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    My Saved Jobs
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="#"
+                                            class="@if ($isCompanyActive) active @endif">Companies</a>
+                                        <ul class="sub-menu">
+                                            <li>
+                                                <a href="">
+                                                    View All Companies
+                                                </a>
+                                            </li>
+                                            @foreach (App\Models\Company::limit(5)->get() as $company)
+                                                <li>
+                                                    <a href="{{ route('user.company.show', $company->id) }}">
+                                                        {{ $company->name }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
                                     </li>
 
-                                    {{-- <li class="nav-item">
-                                        <a href="#">Blog</a>
+                                    <li class="nav-item">
+                                        <a href="#" class="@if ($isProfileActive) active @endif">
+                                            {{ Auth::user()->name }}
+                                        </a>
                                         <ul class="sub-menu">
                                             <li>
-                                                <a href="blog-grid-sidebar.html">Blog Grid Sidebar</a>
+                                                <a href="{{ route('user.profile') }}">
+                                                    My Profile
+                                                </a>
                                             </li>
-                                            <li><a href="blog-single.html">Blog Single</a></li>
                                             <li>
-                                                <a href="blog-single-sidebar.html">Blog Single Sibebar</a>
+                                                <a href="#">
+                                                    My Following
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    My Followers
+                                                </a>
                                             </li>
                                         </ul>
                                     </li>
-                                    <li class="nav-item">
-                                        <a href="contact.html">Contact </a>
-                                    </li> --}}
+
+
                                 </ul>
                             </div>
                             <!-- navbar collapse -->
                             <div class="button">
-                                {{-- profile dropdown --}}
-                                <div class="dropdown">
-                                    <a class="btn" href="#" role="button" id="dropdownMenuLink"
-                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        {{ Auth::user()->name }}
-                                        <i class="lni lni-chevron-down"></i>
-                                    </a>
-
-                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                        <a class="dropdown-item" href="{{ route('user.dashboard') }}">Profile</a>
-                                        <a class="dropdown-item" href="{{ route('user.logout') }}">Logout</a>
-                                    </div>
-                                </div>
+                                <a href="{{ route('user.logout') }}" class="btn">
+                                    Logout
+                                </a>
                             </div>
                         </nav>
                         <!-- navbar -->

@@ -2,49 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Post;
-use App\Models\User;
-use App\Services\StorageManagerService;
-use Carbon\Carbon;
-use Cloudinary\Api\Admin\AdminApi;
-use Cloudinary\Api\Upload\UploadApi;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use App\Jobs\ProcessRecordsChunk;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
+use Faker\Generator as Faker;
+use Illuminate\Support\Facades\Process;
+use League\Csv\Reader;
+use League\Csv\Statement;
 
 class TestController extends Controller
 {
 
     public function test()
     {
-        return view("test");
+        $d = [
+            ["id", "name", "email", "email_verified_at", "password", "remember_token", "created_at", "updated_at"], ["1", "Gregory Bednar Sr.", "ernser.antwan@example.org", "2024-02-22 06:49:11", "", "fuF20WjNZ7", "2024-02-22 06:49:18", "2024-02-22 06:49:18"]
+        ];
+        $records = Reader::createFromPath(public_path('users.csv'), 'r');
+        // dd(collect($records->getRecords())->toArray());
+        // $DATA = $records->getRecords();
+
+
+        $stmt = Statement::create()->offset(1)->limit(100);
+        $data = $stmt->process($records);
+        ProcessRecordsChunk::dispatch($data);
+        dd("test");
     }
 
     public function testing(Request $request)
     {
         // file is pdf
-        $request->validate([
-            'file' => [
-                'required',
-                // video file
-                'file',
-                'mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,video/3gpp,video/x-msvideo,video/x-flv,video/x-ms-wmv,video/webm',
-                'max:102400',
+        // $request->validate([
+        //     'file' => [
+        //         'required',
+        //         // video file
+        //         'file',
+        //         'mimetypes:video/mp4,video/avi,video/mpeg,video/quicktime,video/3gpp,video/x-msvideo,video/x-flv,video/x-ms-wmv,video/webm',
+        //         'max:102400',
 
-            ]
-        ]);
+        //     ]
+        // ]);
 
 
-        $storageManagerService = new StorageManagerService();
-        $storageManagerService->uploadToCloudinary(
-            $request,
-            'file',
-            Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-post-video'),
-            'video',
-            Post::class,
-            2,
-            Config::get('constants.TAGE_NAMES.user-post-video')
-        );
+        // $storageManagerService = new StorageManagerService();
+        // $storageManagerService->uploadToCloudinary(
+        //     $request,
+        //     'file',
+        //     Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-post-video'),
+        //     'video',
+        //     Post::class,
+        //     2,
+        //     Config::get('constants.TAGE_NAMES.user-post-video')
+        // );
 
 
 

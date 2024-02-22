@@ -4,6 +4,7 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\Job;
+use App\Models\ProfileCategory;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Services\AuthenticableService;
@@ -42,7 +43,16 @@ class AuthController extends Controller
 
     public function dashboard()
     {
-        return $this->navigationManagerService->loadView('user.index');
+        $featuredJobs = Job::where('is_featured', 1)->orderBy('id', 'DESC')->limit(9)->get();
+        $latestJobs = Job::orderBy('id', 'DESC')->limit(10)->get();
+
+        $categories = ProfileCategory::orderBy('id', 'DESC')->limit(8)->get();
+        return $this->navigationManagerService->loadView('user.dashboard.index', compact('featuredJobs', 'latestJobs', 'categories'));
+    }
+
+    public function profile()
+    {
+        return $this->navigationManagerService->loadView('user.profile.index');
     }
 
     public function login()
