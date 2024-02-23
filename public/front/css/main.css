@@ -5772,6 +5772,15 @@ blockquote .shape {
   font-size: 14px;
 }
 
+.change-password .password-content form select {
+  height: 50px;
+  width: 100%;
+  border: 1px solid #eee;
+  border-radius: 5px;
+  padding: 0px 20px;
+  font-size: 14px;
+}
+
 .change-password .password-content .form-group {
   margin-bottom: 15px;
 }

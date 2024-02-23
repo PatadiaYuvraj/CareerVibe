@@ -1,4 +1,5 @@
 @extends('user.profile.layout.app')
+@section('title', 'Your Profile')
 @section('profile-content')
     <div class="col-lg-8 col-12">
         <div class="inner-content">

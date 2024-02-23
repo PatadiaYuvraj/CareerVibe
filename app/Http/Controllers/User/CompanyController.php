@@ -26,6 +26,7 @@ class CompanyController extends Controller
     public function index()
     {
         $companies = $this->company->with('followers')->paginate($this->paginate);
+        dd(collect($companies)->toArray());
         return $this->navigationManagerService->loadView('user.company.index', compact('companies'));
     }
 

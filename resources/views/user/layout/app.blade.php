@@ -25,7 +25,13 @@
     };
 
     $isProfileActive = match (Route::currentRouteName()) {
-        'user.profile' => true,
+        'user.profile.index' => true,
+        'user.profile.appliedJobs' => true,
+        'user.profile.savedJobs' => true,
+        'user.profile.followers' => true,
+        'user.profile.following' => true,
+        'user.profile.changePassword' => true,
+        'user.profile.editProfile' => true,
         default => false,
     };
 @endphp
@@ -33,12 +39,12 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
-    <title>
-        @yield('title')
-    </title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('front/images/favicon.svg') }}" />
+    <title>
+        @yield('title')
+    </title>
 
     <!-- Web Font -->
     <link
@@ -52,7 +58,12 @@
     <link rel="stylesheet" href="{{ asset('front/css/tiny-slider.css') }}" />
     <link rel="stylesheet" href="{{ asset('front/css/glightbox.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('front/css/main.css') }}" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
 </head>
 
 <body>
@@ -65,7 +76,7 @@
                 <div class="row align-items-center">
                     <div class="col-lg-12">
                         <nav class="navbar navbar-expand-lg">
-                            <a class="navbar-brand logo" href="index.html">
+                            <a class="navbar-brand logo" href="{{ route('user.dashboard') }}">
                                 <img class="logo1" src="{{ asset('front/images/logo/logo.svg') }}" alt="Logo" />
                             </a>
                             <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -91,7 +102,7 @@
                                             </li>
                                             @foreach (App\Models\ProfileCategory::limit(5)->get() as $category)
                                                 <li>
-                                                    <a href="{{ route('user.company.show', $category->id) }}">
+                                                    <a href="#">
                                                         {{ $category->name }}
                                                     </a>
                                                 </li>
@@ -157,7 +168,7 @@
                                             </li>
                                             @foreach (App\Models\Company::limit(5)->get() as $company)
                                                 <li>
-                                                    <a href="{{ route('user.company.show', $company->id) }}">
+                                                    <a href="#">
                                                         {{ $company->name }}
                                                     </a>
                                                 </li>
@@ -166,12 +177,13 @@
                                     </li>
 
                                     <li class="nav-item">
-                                        <a href="#" class="@if ($isProfileActive) active @endif">
-                                            {{ Auth::user()->name }}
+                                        <a href="{{ route('user.profile.index') }}"
+                                            class="@if ($isProfileActive) active @endif">
+                                            My Profile
                                         </a>
-                                        <ul class="sub-menu">
+                                        {{-- <ul class="sub-menu">
                                             <li>
-                                                <a href="{{ route('user.profile') }}">
+                                                <a href="{{ route('user.profile.index') }}">
                                                     My Profile
                                                 </a>
                                             </li>
@@ -185,7 +197,7 @@
                                                     My Followers
                                                 </a>
                                             </li>
-                                        </ul>
+                                        </ul> --}}
                                     </li>
 
 
@@ -536,101 +548,38 @@
 
 <!-- ========================= JS here ========================= -->
 <script src="{{ asset('front/js/bootstrap.min.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="{{ asset('front/js/wow.min.js') }}"></script>
 <script src="{{ asset('front/js/tiny-slider.js') }}"></script>
 <script src="{{ asset('front/js/glightbox.min.js') }}"></script>
 <script src="{{ asset('front/js/main.js') }}"></script>
-<script type="text/javascript">
-    //====== Clients Logo Slider
-    // tns({
-    //     container: ".client-logo-carousel",
-    //     slideBy: "page",
-    //     autoplay: true,
-    //     autoplayButtonOutput: false,
-    //     mouseDrag: true,
-    //     gutter: 15,
-    //     nav: false,
-    //     controls: false,
-    //     responsive: {
-    //         0: {
-    //             items: 1,
-    //         },
-    //         540: {
-    //             items: 2,
-    //         },
-    //         768: {
-    //             items: 3,
-    //         },
-    //         992: {
-    //             items: 4,
-    //         },
-    //         1170: {
-    //             items: 6,
-    //         },
-    //     },
-    // });
-    // //========= testimonial
-    // tns({
-    //     container: ".testimonial-slider",
-    //     items: 1,
-    //     slideBy: "page",
-    //     autoplayButtonOutput: false,
-    //     autoplay: true,
-    //     mouseDrag: true,
-    //     gutter: 0,
-    //     nav: false,
-    //     controls: true,
-    //     controlsText: [
-    //         '<i class="lni lni-arrow-left"></i>',
-    //         '<i class="lni lni-arrow-right"></i>',
-    //     ],
-    //     responsive: {
-    //         0: {
-    //             items: 1,
-    //         },
-    //         540: {
-    //             items: 1,
-    //         },
-    //         768: {
-    //             items: 1,
-    //         },
-    //         992: {
-    //             items: 1,
-    //         },
-    //         1170: {
-    //             items: 1,
-    //         },
-    //     },
-    // });
-
-    // //======== Home Slider
-    // var slider = new tns({
-    //     container: ".home-slider",
-    //     slideBy: "page",
-    //     autoplay: true,
-    //     autoplayButtonOutput: false,
-    //     mouseDrag: true,
-    //     gutter: 0,
-    //     items: 1,
-    //     nav: false,
-    //     controls: true,
-    //     controlsText: [
-    //         '<i class="lni lni-arrow-left prev"></i>',
-    //         '<i class="lni lni-arrow-right next"></i>',
-    //     ],
-    //     responsive: {
-    //         1200: {
-    //             items: 1,
-    //         },
-    //         992: {
-    //             items: 1,
-    //         },
-    //         0: {
-    //             items: 1,
-    //         },
-    //     },
-    // });
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js "></script>
+<script>
+    toastr.options = {
+        "closeButton": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        "positionClass": "toast-bottom-right",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    }
+    if ("{{ Session::has('success') }}") {
+        toastr.success("{{ Session::get('success') }}")
+    }
+    if ("{{ Session::has('error') }}") {
+        toastr.error("{{ Session::get('error') }}")
+    }
+    if ("{{ Session::has('info') }}") {
+        toastr.info("{{ Session::get('info') }}")
+    }
+    if ("{{ Session::has('warning') }}") {
+        toastr.warning("{{ Session::get('warning') }}")
+    }
 </script>
+@yield('scripts')
 
 
 </html>
