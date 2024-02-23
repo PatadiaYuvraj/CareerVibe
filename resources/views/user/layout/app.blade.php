@@ -32,6 +32,8 @@
         'user.profile.following' => true,
         'user.profile.changePassword' => true,
         'user.profile.editProfile' => true,
+        'user.profile.editProfileImage' => true,
+        'user.profile.editResumePdf' => true,
         default => false,
     };
 @endphp
@@ -55,15 +57,10 @@
     <link rel="stylesheet" href="{{ asset('front/css/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('front/css/LineIcons.2.0.css') }}" />
     <link rel="stylesheet" href="{{ asset('front/css/animate.css') }}" />
-    <link rel="stylesheet" href="{{ asset('front/css/tiny-slider.css') }}" />
-    <link rel="stylesheet" href="{{ asset('front/css/glightbox.min.css') }}" />
+    {{-- <link rel="stylesheet" href="{{ asset('front/css/tiny-slider.css') }}" /> --}}
+    {{-- <link rel="stylesheet" href="{{ asset('front/css/glightbox.min.css') }}" /> --}}
     <link rel="stylesheet" href="{{ asset('front/css/main.css') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
 </head>
 
 <body>
@@ -547,8 +544,8 @@
 </body>
 
 <!-- ========================= JS here ========================= -->
-<script src="{{ asset('front/js/bootstrap.min.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="{{ asset('front/js/bootstrap.min.js') }}"></script>
 <script src="{{ asset('front/js/wow.min.js') }}"></script>
 <script src="{{ asset('front/js/tiny-slider.js') }}"></script>
 <script src="{{ asset('front/js/glightbox.min.js') }}"></script>

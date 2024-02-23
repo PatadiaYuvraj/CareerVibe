@@ -3,12 +3,12 @@
 // })->map(function ($item, $key) {
 //     return $item->first();
 // });
-
+//// https://loading.io/spinner/square/-square-window-zoom-scale-rectangle-block
 is same as
 // $notifications = $notifications->unique('data');
 
-run specific job 
-php artisan queue:work --queue=SendNotification 
+run specific job
+php artisan queue:work --queue=SendNotification
 https://bootstrapmade.com/demo/NiceAdmin/
 $details = [
 'title' => 'Password Changed',
@@ -639,7 +639,7 @@ php artisan config:clear
 //             'updated_at' => Carbon::now(),
 //         ]);
 // }
-// // applied_jobs 
+// // applied_jobs
 // for ($i = 1; $i <= 100; $i++) {
 //     DB::table('saved_jobs')
 //         ->insertGetId([

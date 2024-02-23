@@ -198,7 +198,6 @@ class AuthController extends Controller
         return $this->navigationManagerService->redirectRoute('user.login', [], 302, [], false, ["warning" => "Email Not Verified"]);
     }
 
-    // fogot password
     public function forgotPassword()
     {
         return $this->navigationManagerService->loadView('user.auth.forgot-password');
@@ -255,7 +254,6 @@ class AuthController extends Controller
         }
         return $this->navigationManagerService->loadView('user.auth.reset-password', compact('token'));
     }
-
     public function doResetPassword(Request $request, $token)
     {
         $request->validate([
@@ -524,197 +522,211 @@ class AuthController extends Controller
         return $this->navigationManagerService->loadView('user.profile.edit-profile-image');
     }
 
-    // public function updateProfileImage(Request $request)
-    // {
-    //     if (!$this->authenticableService->isUser()) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
-    //     }
+    public function updateProfileImage(Request $request)
+    {
+        if (!$this->authenticableService->isUser()) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
+        }
+        $request->validate(
+            [
+                "profile_image_url" => [
+                    "required",
+                    "image",
+                    "mimes:jpeg,png,jpg",
+                    "max:2048",
+                ],
+            ],
+            [
+                "profile_image_url.required" => "Profile Image is required",
+                "profile_image_url.image" => "Profile Image should be image",
+                "profile_image_url.mimes" => "Profile Image should be jpeg, png, jpg",
+                "profile_image_url.max" => "Profile Image should not be greater than 2MB",
+            ]
+        );
 
-    //     $request->validate([
-    //         "profile_image_url" => [
-    //             "required",
-    //             "image",
-    //             "mimes:jpeg,png,jpg",
-    //             "max:2048",
-    //         ],
-    //     ]);
+        $user = $this->authenticableService->getUser();
 
-    //     $user = $this->authenticableService->getUser();
+        if (!$user) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
+        }
 
-    //     if (!$user) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
-    //     }
+        if ($user->profile_image_url) {
+            $public_ids = $user->profile_image_public_id;
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
+        }
 
-    //     if ($user->profile_image_url) {
-    //         $public_ids = $user->profile_image_public_id;
-    //         $this->storageManagerService->deleteFromCloudinary($public_ids);
-    //     }
+        // $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
+        $this->storageManagerService->uploadToCloudinary(
+            $request,
+            'profile_image_url',
+            Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-profile-image'),
+            'image',
+            User::class,
+            $user->id,
+            Config::get('constants.TAGE_NAMES.user-profile-image')
+        );
 
-    //     // $this->storageManagerService->uploadToCloudinary($request, "USER", $user->id);
-    //     $this->storageManagerService->uploadToCloudinary(
-    //         $request,
-    //         'profile_image_url',
-    //         Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-profile-image'),
-    //         'image',
-    //         User::class,
-    //         $user->id,
-    //         Config::get('constants.TAGE_NAMES.user-profile-image')
-    //     );
+        $data = [
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
+        ];
 
-    //     $data = [
-    //         "profile_image_public_id" => null,
-    //         "profile_image_url" => null,
-    //     ];
+        $isUpdated = $this->user->find($user->id)->update($data);
+        if ($isUpdated) {
+            $details = [
+                'title' => 'Profile Image Updated',
+                'body' => 'Your profile image is updated'
+            ];
+            $this->notifiableService->sendNotification($user, $details['body']);
+            $this->mailableService->sendMail($user->email, $details);
+            return $this->navigationManagerService->redirectRoute('user.profile.editProfileImage', [], 302, [], false, ["success" => "Profile Image Updated Successfully"]);
+        }
 
-    //     $isUpdated = $this->user->find($user->id)->update($data);
-    //     if ($isUpdated) {
-    //         $details = [
-    //             'title' => 'Profile Image Updated',
-    //             'body' => 'Your profile image is updated'
-    //         ];
-    //         $this->notifiableService->sendNotification($user, $details['body']);
-    //         $this->mailableService->sendMail($user->email, $details);
-    //         return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "Profile Image Updated Successfully"]);
-    //     }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Updated"]);
+    }
 
-    //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Updated"]);
-    // }
+    public function deleteProfileImage()
+    {
+        if (!$this->authenticableService->isUser()) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
+        }
 
-    // public function deleteProfileImage()
-    // {
-    //     if (!$this->authenticableService->isUser()) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
-    //     }
+        $id = $this->authenticableService->getUser()->id;
 
-    //     $id = $this->authenticableService->getUser()->id;
+        $user = $this->user->find($id);
 
-    //     $user = $this->user->find($id);
+        if (!$user) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
+        }
 
-    //     if (!$user) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
-    //     }
+        if ($user->profile_image_url) {
+            $public_ids = $user->profile_image_public_id;
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
+        }
 
-    //     if ($user->profile_image_url) {
-    //         $public_ids = $user->profile_image_public_id;
-    //         $this->storageManagerService->deleteFromCloudinary($public_ids);
-    //     }
+        $data = [
+            "profile_image_public_id" => null,
+            "profile_image_url" => null,
+        ];
 
-    //     $data = [
-    //         "profile_image_public_id" => null,
-    //         "profile_image_url" => null,
-    //     ];
+        $isUpdated = $this->user->where('id', $id)->update($data);
 
-    //     $isUpdated = $this->user->where('id', $id)->update($data);
+        if ($isUpdated) {
 
-    //     if ($isUpdated) {
-
-    //         $user = $this->user->find($id);
-    //         $details = [
-    //             'title' => 'Profile Image Deleted',
-    //             'body' => 'Your profile image is deleted'
-    //         ];
-    //         $this->notifiableService->sendNotification($user, $details['body']);
-    //         $this->mailableService->sendMail($user->email, $details);
-    //         return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "Profile Image Deleted Successfully"]);
-    //     }
-    //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Deleted"]);
-    // }
+            $user = $this->user->find($id);
+            $details = [
+                'title' => 'Profile Image Deleted',
+                'body' => 'Your profile image is deleted'
+            ];
+            $this->notifiableService->sendNotification($user, $details['body']);
+            $this->mailableService->sendMail($user->email, $details);
+            return $this->navigationManagerService->redirectRoute('user.profile.editProfileImage', [], 302, [], false, ["success" => "Profile Image Deleted Successfully"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Deleted"]);
+    }
 
     public function editResumePdf()
     {
         return $this->navigationManagerService->loadView('user.profile.edit-resume-pdf');
     }
 
-    // public function updateResumePdf(Request $request)
-    // {
-    //     if (!$this->authenticableService->isUser()) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
-    //     }
+    public function updateResumePdf(Request $request)
+    {
+        if (!$this->authenticableService->isUser()) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
+        }
 
-    //     $id = $this->authenticableService->getUser()->id;
+        $id = $this->authenticableService->getUser()->id;
 
-    //     $request->validate([
-    //         "resume_pdf_url" => [
-    //             "required",
-    //             "mimes:pdf",
-    //             "max:2048",
-    //         ],
-    //     ]);
-    //     $user = $this->user->find($id);
-    //     if (!$user) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
-    //     }
-    //     if ($user->resume_pdf_url) {
-    //         // $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
-    //         $public_ids = $user->resume_pdf_public_id;
-    //         $this->storageManagerService->deleteFromCloudinary($public_ids);
-    //     }
-    //     // $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
-    //     $this->storageManagerService->uploadToCloudinary(
-    //         $request,
-    //         'resume_pdf_url',
-    //         Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-resume'),
-    //         'pdf',
-    //         User::class,
-    //         $user->id,
-    //         Config::get('constants.TAGE_NAMES.user-resume')
-    //     );
-    //     $data = [
-    //         "resume_pdf_url" => null,
-    //         "resume_pdf_public_id" => null,
-    //     ];
-    //     $isUpdated = $this->user->where('id', $id)->update($data);
-    //     if ($isUpdated) {
+        $request->validate(
+            [
+                "resume_pdf_url" => [
+                    "required",
+                    "mimes:pdf",
+                    "max:2048",
+                ],
+            ],
+            [
+                "resume_pdf_url.required" => "Resume Pdf is required",
+                "resume_pdf_url.mimes" => "Resume Pdf should be pdf",
+                "resume_pdf_url.max" => "Resume Pdf should not be greater than 2MB",
+            ]
+        );
+        $user = $this->user->find($id);
+        if (!$user) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
+        }
+        if ($user->resume_pdf_url) {
+            // $this->storageManagerService->deleteFromLocal($user->resume_pdf_url);
+            $public_ids = $user->resume_pdf_public_id;
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
+        }
+        // $stored_path = $this->storageManagerService->uploadToLocal($request, "resume_pdf_url");
+        $this->storageManagerService->uploadToCloudinary(
+            $request,
+            'resume_pdf_url',
+            Config::get('constants.CLOUDINARY_FOLDER_DEMO.user-resume'),
+            'pdf',
+            User::class,
+            $user->id,
+            Config::get('constants.TAGE_NAMES.user-resume')
+        );
+        $data = [
+            "resume_pdf_url" => null,
+            "resume_pdf_public_id" => null,
+        ];
+        $isUpdated = $this->user->where('id', $id)->update($data);
+        if ($isUpdated) {
 
-    //         $user = $this->user->find($id);
-    //         $details = [
-    //             'title' => 'Resume Updated',
-    //             'body' => 'Your resume is updated'
-    //         ];
-    //         // UNCOMMENT: To send notification
-    //         $this->notifiableService->sendNotification($user, $details['body']);
-    //         // UNCOMMENT: To send mail
-    //         $this->mailableService->sendMail($user->email, $details);
-    //         return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "User resume is updated"]);
-    //     }
-    //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User resume is not updated"]);
-    // }
+            $user = $this->user->find($id);
+            $details = [
+                'title' => 'Resume Updated',
+                'body' => 'Your resume is updated'
+            ];
+            // UNCOMMENT: To send notification
+            $this->notifiableService->sendNotification($user, $details['body']);
+            // UNCOMMENT: To send mail
+            $this->mailableService->sendMail($user->email, $details);
+            return $this->navigationManagerService->redirectRoute('user.profile.editResumePdf', [], 302, [], false, ["success" => "User resume is updated"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User resume is not updated"]);
+    }
 
-    // public function deleteResumePdf()
-    // {
-    //     if (!$this->authenticableService->isUser()) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
-    //     }
+    public function deleteResumePdf()
+    {
+        if (!$this->authenticableService->isUser()) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "You are not authorized"]);
+        }
 
-    //     $id =  $this->authenticableService->getUser()->id;
+        $id =  $this->authenticableService->getUser()->id;
 
-    //     $user = $this->user->find($id);
+        $user = $this->user->find($id);
 
-    //     if (!$user) {
-    //         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
-    //     }
+        if (!$user) {
+            return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "User is not found"]);
+        }
 
-    //     if ($user->resume_pdf_url) {
-    //         $public_ids = $user->resume_pdf_public_id;
-    //         $this->storageManagerService->deleteFromCloudinary($public_ids);
-    //     }
+        if ($user->resume_pdf_url) {
+            $public_ids = $user->resume_pdf_public_id;
+            $this->storageManagerService->deleteFromCloudinary($public_ids);
+        }
 
-    //     $data = [
-    //         "resume_pdf_public_id" => null,
-    //         "resume_pdf_url" => null,
-    //     ];
+        $data = [
+            "resume_pdf_public_id" => null,
+            "resume_pdf_url" => null,
+        ];
 
-    //     $isUpdated = $this->user->where('id', $id)->update($data);
+        $isUpdated = $this->user->where('id', $id)->update($data);
 
-    //     if ($isUpdated) {
+        if ($isUpdated) {
 
-    //         $user = $this->user->find($id);
-    //         $details = [
-    //             'title' => 'Profile Image Deleted',
-    //             'body' => 'Your profile image is deleted'
-    //         ];
-    //         return $this->navigationManagerService->redirectRoute('user.dashboard', [], 302, [], false, ["success" => "Resume Pdf Deleted Successfully"]);
-    //     }
-    //     return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Resume Pdf Not Deleted"]);
-    // }
+            $user = $this->user->find($id);
+            $details = [
+                'title' => 'Profile Image Deleted',
+                'body' => 'Your profile image is deleted'
+            ];
+            return $this->navigationManagerService->redirectRoute('user.profile.editResumePdf', [], 302, [], false, ["success" => "Resume Pdf Deleted Successfully"]);
+        }
+        return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Resume Pdf Not Deleted"]);
+    }
 }

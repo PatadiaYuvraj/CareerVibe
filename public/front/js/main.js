@@ -7,7 +7,7 @@ Author: GrayGrids
     //===== Prealoder
 
     window.addEventListener("DOMContentLoaded", function () {
-        window.setTimeout(fadeout, 500);
+        window.setTimeout(fadeout, 800);
     });
 
     function fadeout() {

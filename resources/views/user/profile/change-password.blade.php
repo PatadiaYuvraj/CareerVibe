@@ -16,7 +16,7 @@
                                 Old Password
                             </label>
                             <input class="form-control @error('currentPassword') is-invalid border-danger border-2 @enderror"
-                                type="password" name="currentPassword" />
+                                type="password" name="currentPassword" placeholder="Enter your old password" />
                             @error('currentPassword')
                                 <div class="text-danger mt-1">
                                     {{ $message }}
@@ -28,7 +28,8 @@
                         <div class="form-group">
                             <label>New Password</label>
                             <input class="form-control @error('newPassword') is-invalid border-danger border-2 @enderror"
-                                type="password" name="newPassword" />
+                                type="password" name="newPassword" placeholder="Enter your new password" />
+
                             @error('newPassword')
                                 <div class="text-danger mt-1">
                                     {{ $message }}
@@ -41,7 +42,7 @@
                             <label>Confirm Password</label>
                             <input
                                 class="form-control @error('confirmPassword') is-invalid border-danger border-2 @enderror"
-                                type="password" name="confirmPassword" />
+                                type="password" name="confirmPassword" placeholder="Enter your new password again" />
                             @error('confirmPassword')
                                 <div class="text-danger mt-1">
                                     {{ $message }}

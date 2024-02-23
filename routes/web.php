@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Admin 
+// Admin
 // use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 // use App\Http\Controllers\Admin\CompanyController as AdminCompanyController;
 // use App\Http\Controllers\Admin\UserController as AdminUserController;
@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 // use App\Http\Controllers\Admin\ProfileCategoryController as AdminProfileCategoryController;
 
 // Company
-// use App\Http\Controllers\Company\AuthController as CompanyAuthController;
+use App\Http\Controllers\Company\AuthController as CompanyAuthController;
 // use App\Http\Controllers\Company\NotificationsController as CompanyNotificationsController;
 // use App\Http\Controllers\Company\JobController as CompanyJobController;
 // use App\Http\Controllers\Company\FollowsController as CompanyFollowsController;
@@ -48,7 +48,7 @@ use App\Http\Controllers\Admin_User\PostsController as AdminUserPostsController;
 
 Route::group(['middleware' => "isGuest"], function () {
 
-    // Admin Routes 
+    // Admin Routes
     // Route::prefix('/admin')->group(function () {
     //     Route::get('/login',  [AdminAuthController::class, "login"])->name('admin.login');
     //     Route::get('/register', [AdminAuthController::class, "register"])->name('admin.register');
@@ -79,19 +79,19 @@ Route::group(['middleware' => "isGuest"], function () {
     });
 
     // Company Routes
-    // Route::prefix('/company')->group(function () {
-    //     Route::get('/login',  [CompanyAuthController::class, "login"])->name('company.login');
-    //     Route::get('/register', [CompanyAuthController::class, "register"])->name('company.register');
-    //     Route::post('/login', [CompanyAuthController::class, "doLogin"])->name('company.doLogin');
-    //     Route::post('/register', [CompanyAuthController::class, "doRegister"])->name('company.doRegister');
-    //     Route::get('/verify-email/{token}',  [CompanyAuthController::class, "verifyEmail"])->name('company.verifyEmail');
-    //     Route::get('/resend-verification-email',  [CompanyAuthController::class, "resendVerificationEmail"])->name('company.resendVerificationEmail');
-    //     Route::get('/send-verification-email',  [CompanyAuthController::class, "sendVerificationEmail"])->name('company.sendVerificationEmail');
-    //     Route::get('/forgot-password',  [CompanyAuthController::class, "forgotPassword"])->name('company.forgotPassword');
-    //     Route::post('/forgot-password',  [CompanyAuthController::class, "doForgotPassword"])->name('company.doForgotPassword');
-    //     Route::get('/reset-password/{token}',  [CompanyAuthController::class, "resetPassword"])->name('company.resetPassword');
-    //     Route::post('/reset-password/{token}',  [CompanyAuthController::class, "doResetPassword"])->name('company.doResetPassword');
-    // });
+    Route::prefix('/company')->group(function () {
+        Route::get('/login',  [CompanyAuthController::class, "login"])->name('company.login');
+        Route::get('/register', [CompanyAuthController::class, "register"])->name('company.register');
+        Route::post('/login', [CompanyAuthController::class, "doLogin"])->name('company.doLogin');
+        Route::post('/register', [CompanyAuthController::class, "doRegister"])->name('company.doRegister');
+        Route::get('/verify-email/{token}',  [CompanyAuthController::class, "verifyEmail"])->name('company.verifyEmail');
+        Route::get('/resend-verification-email',  [CompanyAuthController::class, "resendVerificationEmail"])->name('company.resendVerificationEmail');
+        Route::get('/send-verification-email',  [CompanyAuthController::class, "sendVerificationEmail"])->name('company.sendVerificationEmail');
+        Route::get('/forgot-password',  [CompanyAuthController::class, "forgotPassword"])->name('company.forgotPassword');
+        Route::post('/forgot-password',  [CompanyAuthController::class, "doForgotPassword"])->name('company.doForgotPassword');
+        Route::get('/reset-password/{token}',  [CompanyAuthController::class, "resetPassword"])->name('company.resetPassword');
+        Route::post('/reset-password/{token}',  [CompanyAuthController::class, "doResetPassword"])->name('company.doResetPassword');
+    });
 
     // Admin User Routes
     Route::prefix('/admin_user')->group(function () {
@@ -215,10 +215,10 @@ Route::group(['middleware' => "isUser"], function () {
             Route::post('/update-profile',  [UserAuthController::class, "updateProfile"])->name('user.profile.updateProfile');
             Route::get('/edit-profile-image',  [UserAuthController::class, "editProfileImage"])->name('user.profile.editProfileImage');
             Route::post('/update-profile-image',  [UserAuthController::class, "updateProfileImage"])->name('user.profile.updateProfileImage');
-            Route::post('/delete-profile-image',  [UserAuthController::class, "deleteProfileImage"])->name('user.profile.deleteProfileImage');
+            Route::get('/delete-profile-image',  [UserAuthController::class, "deleteProfileImage"])->name('user.profile.deleteProfileImage');
             Route::get('/edit-resume-pdf',  [UserAuthController::class, "editResumePdf"])->name('user.profile.editResumePdf');
             Route::post('/update-resume-pdf',  [UserAuthController::class, "updateResumePdf"])->name('user.profile.updateResumePdf');
-            Route::get('/delete-resume-pdf',  [UserAuthController::class, "deleteResumePdf"])->name('user.  .deleteResumePdf');
+            Route::get('/delete-resume-pdf',  [UserAuthController::class, "deleteResumePdf"])->name('user.profile.deleteResumePdf');
 
 
             Route::get('/applied-jobs',  [UserProfileController::class, "appliedJobs"])->name('user.profile.appliedJobs');
@@ -274,7 +274,7 @@ Route::group(['middleware' => "isUser"], function () {
         Route::prefix('job')->group(function () {
             Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
 
-            // show job 
+            // show job
             Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
             Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
             Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
@@ -339,7 +339,7 @@ Route::group(['middleware' => "isUser"], function () {
 //         // Route::get('/edit-resume-pdf',  [AdminAuthController::class, "editResumePdf"])->name('admin.editResumePdf');
 //         // Route::post('/update-resume-pdf',  [AdminAuthController::class, "updateResumePdf"])->name('admin.updateResumePdf');
 //         Route::post('/delete-profile-image',  [AdminAuthController::class, "deleteProfileImage"])->name('admin.deleteProfileImage');
-//         // add throttle limit 
+//         // add throttle limit
 
 //         // Route::get('/dashboard',  [AdminAuthController::class, "dashboard"])->name('admin.dashboard');
 //         Route::get('/dashboard',  [AdminAuthController::class, "dashboard"])->name('admin.dashboard');
@@ -626,13 +626,13 @@ Route::group(['middleware' => "isUser"], function () {
             Route::get('/saved-jobs',  [AdminUserJobController::class, "savedJobs"])->name('admin_user.job.savedJobs');
             Route::get('/',  [AdminUserJobController::class, "index"])->name('admin_user.job.index');
             // Route::get('/search',  [AdminUserJobController::class, "search"])->name('admin_user.job.search');
-            // Route::post('/search',  [AdminUserJobController::class, "doSearch"])->name('admin_user.job.doSearch'); 
+            // Route::post('/search',  [AdminUserJobController::class, "doSearch"])->name('admin_user.job.doSearch');
             Route::get('/apply/{id}',  [AdminUserJobController::class, "apply"])->name('admin_user.job.apply');
             Route::get('/unapply/{id}',  [AdminUserJobController::class, "unapply"])->name('admin_user.job.unapply');
             // Route::get('/cancel-applied-job/{id}',  [AdminUserJobController::class, "cancelAppliedJob"])->name('admin_user.job.cancelAppliedJob');
             Route::get('/save-job/{id}',  [AdminUserJobController::class, "saveJob"])->name('admin_user.job.saveJob');
             Route::get('/unsave-job/{id}',  [AdminUserJobController::class, "unsaveJob"])->name('admin_user.job.unsaveJob');
-            // show job 
+            // show job
             Route::get('/company/{id}',  [AdminUserJobController::class, "jobByCompany"])->name('admin_user.job.jobByCompany');
             Route::get('/location/{id}',  [AdminUserJobController::class, "jobByLocation"])->name('admin_user.job.jobByLocation');
             Route::get('/qualification/{id}',  [AdminUserJobController::class, "jobByQualification"])->name('admin_user.job.jobByQualification');

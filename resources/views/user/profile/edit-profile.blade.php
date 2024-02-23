@@ -32,7 +32,8 @@
                             <div class="form-group">
                                 <label>Full Name</label>
                                 <input class="form-control @error('name') is-invalid border-danger border-2 @enderror"
-                                    type="text" name="name" value="{{ old('name') ?? Auth::user()->name }}" />
+                                    type="text" name="name" value="{{ old('name') ?? Auth::user()->name }}"
+                                    placeholder="Enter your full name" />
                                 @error('name')
                                     <div class="text-danger mt-1">
                                         {{ $message }}
@@ -42,7 +43,8 @@
                             <div class="form-group">
                                 <label>City</label>
                                 <input class="form-control @error('city') is-invalid border-danger border-2 @enderror"
-                                    type="tel" name="city" value="{{ old('city') ?? Auth::user()->city }}" />
+                                    type="tel" name="city" value="{{ old('city') ?? Auth::user()->city }}"
+                                    placeholder="Enter your city" />
 
                                 @error('city')
                                     <div class="text-danger mt-1">
@@ -69,8 +71,8 @@
                                     Gender
                                 </label>
                                 <select class="form-control" name="gender" data-placeholder="Select Gender">
-                                    <option selected disabled value="">
-                                        Select gender
+                                    <option selected value="">
+                                        Do not want to disclose
                                     </option>
                                     @foreach (Config::get('constants.gender') as $key => $value)
                                         <option value="{{ $key }}"

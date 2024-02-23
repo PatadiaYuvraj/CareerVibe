@@ -131,25 +131,26 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a class="
-                                        @if ($isSetProfileImageActive) active @endif"
+                                    <a class="@if ($isSetProfileImageActive) active @endif"
                                         href="{{ route('user.profile.editProfileImage') }}">
-                                        <i class="lni lni-envelope"></i>
                                         @if (auth()->user()->profile_image_url)
+                                            <i class="lni lni-image"></i>
                                             Update Profile Image
                                         @else
-                                            Set Profile Image
+                                            <i class="lni lni-add-files"></i>
+                                            Add Profile Image
                                         @endif
                                     </a>
                                 </li>
                                 <li>
                                     <a class="@if ($isSetResumeActive) active @endif"
                                         href="{{ route('user.profile.editResumePdf') }}">
-                                        <i class="lni lni-envelope"></i>
                                         @if (auth()->user()->resume_pdf_url)
+                                            <i class="lni lni-files"></i>
                                             Update Resume
                                         @else
-                                            Set Resume
+                                            <i class="lni lni-add-files"></i>
+                                            Add Resume
                                         @endif
                                     </a>
                                 </li>
