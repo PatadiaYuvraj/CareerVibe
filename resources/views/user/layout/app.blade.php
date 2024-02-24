@@ -108,30 +108,6 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="javascript:void(0)"
-                                            class="@if ($isPostActive) active @endif">
-                                            Posts
-                                        </a>
-
-                                        <ul class="sub-menu">
-                                            <li>
-                                                <a href="#">
-                                                    View All Posts
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <a href="#">
-                                                    View My Posts
-                                                </a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a href="">
-                                                    Create Post
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="javascript:void(0)"
                                             class="@if ($isJobActive) active @endif">
                                             Jobs
                                         </a>
@@ -143,12 +119,12 @@
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="#">
+                                                <a href="{{ route('user.profile.appliedJobs') }}">
                                                     My Applied Jobs
                                                 </a>
                                             </li>
                                             <li>
-                                                <a href="#">
+                                                <a href="{{ route('user.profile.savedJobs') }}">
                                                     My Saved Jobs
                                                 </a>
                                             </li>
@@ -172,7 +148,30 @@
                                             @endforeach
                                         </ul>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="javascript:void(0)"
+                                            class="@if ($isPostActive) active @endif">
+                                            Posts
+                                        </a>
 
+                                        <ul class="sub-menu">
+                                            <li>
+                                                <a href="#">
+                                                    View All Posts
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#">
+                                                    View My Posts
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a href="">
+                                                    Create Post
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
                                     <li class="nav-item">
                                         <a href="{{ route('user.profile.index') }}"
                                             class="@if ($isProfileActive) active @endif">
@@ -546,6 +545,7 @@
 <!-- ========================= JS here ========================= -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="{{ asset('front/js/bootstrap.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('front/js/wow.min.js') }}"></script>
 <script src="{{ asset('front/js/tiny-slider.js') }}"></script>
 <script src="{{ asset('front/js/glightbox.min.js') }}"></script>

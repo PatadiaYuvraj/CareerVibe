@@ -14,6 +14,7 @@ class TestController extends Controller
 
     public function test()
     {
+        dd("test");
         $d = [
             ["id", "name", "email", "email_verified_at", "password", "remember_token", "created_at", "updated_at"], ["1", "Gregory Bednar Sr.", "ernser.antwan@example.org", "2024-02-22 06:49:11", "", "fuF20WjNZ7", "2024-02-22 06:49:18", "2024-02-22 06:49:18"]
         ];
@@ -25,7 +26,6 @@ class TestController extends Controller
         $stmt = Statement::create()->offset(1)->limit(100);
         $data = $stmt->process($records);
         ProcessRecordsChunk::dispatch($data);
-        dd("test");
     }
 
     public function testing(Request $request)

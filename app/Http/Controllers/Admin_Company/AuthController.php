@@ -271,7 +271,7 @@ class AuthController extends Controller
 
         $data = [
             // "password" => $request->get("password"),
-            "password" => $this->authenticableService->passwordHash($request->get("password")), "password" => $this->authenticableService->passwordHash($request->get("password")),
+            "password" => $this->authenticableService->passwordHash($request->get("password")),
             "password_reset_token" => null,
         ];
 

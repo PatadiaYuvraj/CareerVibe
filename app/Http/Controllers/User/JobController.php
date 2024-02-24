@@ -30,8 +30,6 @@ class JobController extends Controller
         $user = $this->authenticableService->getUser();
         $type = $request->input('type', 'all');
 
-        // type = all, applied, saved, verified, featured, active
-
         $jobs = Job::where('is_active', 1)
 
             ->with([
@@ -63,6 +61,7 @@ class JobController extends Controller
             $job->is_applied = $job->applyByUsers->count() > 0;
             $job->is_saved = $job->savedByUsers->count() > 0;
         }
+        $jobs = [];
         return $this->navigationManagerService->loadView('user.job.job-listing', compact('jobs'));
     }
 

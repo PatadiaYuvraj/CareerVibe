@@ -94,9 +94,12 @@
                             </div>
                     @endforelse
                 </div>
-                @include('user.layout.pagination', [
-                    'paginator' => $jobs->toArray()['links'],
-                ])
+
+                @if (count($jobs) > 0 && $jobs->count() > 0)
+                    @include('user.layout.pagination', [
+                        'paginator' => $jobs->toArray()['links'],
+                    ])
+                @endif
             </div>
     </section>
     <!-- /End Find Job Area -->
