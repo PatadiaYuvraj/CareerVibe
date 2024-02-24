@@ -41,17 +41,19 @@
                             </div>
                             <div class="content col">
                                 <h5 class="title">
-                                    <a href="#!">{{ $job->subProfile->name }}</a>
+                                    <a href="javascript:void(0)">
+                                        {{ $job->subProfile->name }}</a>
                                 </h5>
                                 <ul class="meta">
                                     <li>
                                         <strong class="text-primary">
-                                            <a href="">
+                                            <a href="javascript:void(0)">
                                                 {{ $job->company->name }}
                                             </a>
                                         </strong>
                                     </li>
-                                    <li><i class="lni lni-map-marker"></i>
+                                    <li>
+                                        <i class="lni lni-map-marker"></i>
                                         {{ $job->company->address }}
                                     </li>
                                 </ul>
@@ -92,26 +94,38 @@
                         <!-- Sidebar (Apply Buttons) Start -->
                         <div class="sidebar-widget">
                             <div class="inner">
-                                <div class="row m-n2 button">
-                                    <div class="col-xl-auto col-lg-12 col-sm-auto col-12 p-2">
-                                        <a href="bookmarked.html" class="d-block btn"><i class="fa fa-heart-o mr-1"></i>
-                                            Save Job</a>
-                                    </div>
-                                    @if ($job->is_saved)
-                                        <a href="{{ route('admin_user.job.unsaveJob', $job['id']) }}"
-                                            class="badge bg-success">
-                                            Saved
-                                        </a>
-                                        <a href="bookmarked.html" class="d-block btn"><i class="fa fa-heart-o mr-1"></i>
-                                            Save Job</a>
-                                    @else
-                                        <a href="{{ route('admin_user.job.saveJob', $job['id']) }}" class="badge bg-info">
-                                            Save Now
-                                        </a>
-                                    @endif
+                                <div class="row m-n2 button g-2">
+                                    <div class="col-lg-12 col-sm-auto col-12">
+                                        @if ($job->is_saved)
+                                            <a href="{{ route('user.job.unsaveJob', $job['id']) }}" class="d-block btn">
+                                                <i class="bi bi-bookmark-fill">
+                                                    Saved
+                                                </i>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('user.job.saveJob', $job['id']) }}" class="d-block btn">
+                                                <i class="bi bi-bookmark">
+                                                    Save Now
+                                                </i>
+                                            </a>
+                                        @endif
 
-                                    <div class="col-xl-auto col-lg-12 col-sm-auto col-12 p-2">
-                                        <a href="job-details.html" class="d-block btn btn-alt">Apply Now</a>
+                                    </div>
+                                    <div class="col-lg-12 col-sm-auto col-12">
+                                        @if ($job->is_applied)
+                                            <a href="{{ route('user.job.unapply', $job['id']) }}" class="d-block btn">
+                                                <i class="bi bi-check-circle-fill">
+                                                    Applied
+                                                </i>
+                                            </a>
+                                        @else
+                                            <a href="{{ route('user.job.apply', $job['id']) }}" class="d-block btn">
+                                                <i class="bi bi-check-circle">
+                                                    Apply Now
+                                                </i>
+
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -122,14 +136,32 @@
                             <div class="inner">
                                 <h6 class="title">Job Overview</h6>
                                 <ul class="job-overview list-unstyled">
-                                    <li><strong>Published on:</strong> Nov 6, 2023</li>
-                                    <li><strong>Vacancy:</strong> 02</li>
-                                    <li><strong>Employment Status:</strong> Full-time</li>
-                                    <li><strong>Experience:</strong> 2 to 3 year(s)</li>
-                                    <li><strong>Job Location:</strong> Willshire Glen</li>
-                                    <li><strong>Salary:</strong> $5k - $8k</li>
-                                    <li><strong>Gender:</strong> Any</li>
-                                    <li><strong>Application Deadline:</strong> Dec 15, 2023</li>
+                                    <li>
+                                        <strong>Published on:</strong>
+                                        {{ $job->created_at->format('d M, Y') }}
+                                    </li>
+                                    <li>
+                                        <strong>Vacancy:</strong>
+                                        {{ $job->vacancy }}
+                                    </li>
+                                    <li>
+                                        <strong>Employment Status:</strong>
+                                        {{ Config::get('constants.job.job_type')[$job['job_type']] }}
+                                    </li>
+                                    <li>
+                                        <strong>Experience:</strong>
+                                        {{ Config::get('constants.job.experience_type')[$job->experience_type] }}
+                                    </li>
+                                    <li>
+                                        {{-- <strong>Job Location:</strong> Willshire Glen --}}
+                                    </li>
+                                    <li>
+                                        <strong>Salary:</strong>
+                                        {{ $job->min_salary }} - {{ $job->max_salary }}
+                                    </li>
+                                    <li>
+                                        <strong>Application Deadline:</strong> Dec 15, 2023
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -138,8 +170,8 @@
                         <!-- Sidebar (Job Location) Start -->
                         <div class="sidebar-widget">
                             <div class="inner">
-                                <h6 class="title">Job Location</h6>
-                                <div class="mapouter">
+                                <h6 class="title">Job Locations</h6>
+                                {{-- <div class="mapouter">
                                     <div class="gmap_canvas"><iframe width="100%" height="300" id="gmap_canvas"
                                             src="https://maps.google.com/maps?q=New%20York&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
                                             frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a
@@ -162,7 +194,39 @@
                                         </style><a href="https://maps-google.github.io/embed-google-map/">embed google
                                             map</a>
                                     </div>
-                                </div>
+                                </div> --}}
+                            </div>
+                        </div>
+                        <!-- Sidebar (Job Location) End -->
+
+                        <!-- Sidebar (Job Location) Start -->
+                        <div class="sidebar-widget">
+                            <div class="inner">
+                                <h6 class="title">Job Qualifications</h6>
+                                {{-- <div class="mapouter">
+                                    <div class="gmap_canvas"><iframe width="100%" height="300" id="gmap_canvas"
+                                            src="https://maps.google.com/maps?q=New%20York&amp;t=&amp;z=13&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
+                                            frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe><a
+                                            href="https://123movies-to.com/">123movies old
+                                            site</a>
+                                        <style>
+                                            .mapouter {
+                                                position: relative;
+                                                text-align: right;
+                                                height: 300px;
+                                                width: 100%;
+                                            }
+
+                                            .gmap_canvas {
+                                                overflow: hidden;
+                                                background: none !important;
+                                                height: 300px;
+                                                width: 100%;
+                                            }
+                                        </style><a href="https://maps-google.github.io/embed-google-map/">embed google
+                                            map</a>
+                                    </div>
+                                </div> --}}
                             </div>
                         </div>
                         <!-- Sidebar (Job Location) End -->

@@ -32,7 +32,7 @@
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="filterDropdown">
                             <li>
-                                <a class="dropdown-item 
+                                <a class="dropdown-item
                                     {{ request()->type == '' ? 'active' : '' }}
                                 "
                                     href="{{ route('admin_user.job.index') }}">

@@ -14,6 +14,7 @@
                         <div class="form-group">
                             <label>
                                 Old Password
+                                <span class="text-danger">*</span>
                             </label>
                             <input class="form-control @error('currentPassword') is-invalid border-danger border-2 @enderror"
                                 type="password" name="currentPassword" placeholder="Enter your old password" />
@@ -26,7 +27,10 @@
                     </div>
                     <div class="col-lg-12">
                         <div class="form-group">
-                            <label>New Password</label>
+                            <label>
+                                New Password
+                                <span class="text-danger">*</span>
+                            </label>
                             <input class="form-control @error('newPassword') is-invalid border-danger border-2 @enderror"
                                 type="password" name="newPassword" placeholder="Enter your new password" />
 
@@ -39,7 +43,10 @@
                     </div>
                     <div class="col-lg-12">
                         <div class="form-group">
-                            <label>Confirm Password</label>
+                            <label>
+                                Confirm Password
+                                <span class="text-danger">*</span>
+                            </label>
                             <input
                                 class="form-control @error('confirmPassword') is-invalid border-danger border-2 @enderror"
                                 type="password" name="confirmPassword" placeholder="Enter your new password again" />

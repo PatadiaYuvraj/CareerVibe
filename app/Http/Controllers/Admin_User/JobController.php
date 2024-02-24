@@ -139,9 +139,9 @@ class JobController extends Controller
         } else if ($filter == 'hybrid') {
             $jobs = $jobs->where('work_type', 'HYBRID');
         } else if ($filter == 'all') {
-            $jobs = $jobs;
+            // $jobs = $jobs;
         } else {
-            $jobs = $jobs;
+            // $jobs = $jobs;
         }
 
         $jobs = $jobs->paginate($this->paginate);

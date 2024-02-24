@@ -27,6 +27,11 @@
             default => false,
         };
 
+        // $isNotificationsActive = match (Route::currentRouteName()) {
+        //     'user.profile.notifications' => true,
+        //     default => false,
+        // };
+
         $isChangePasswordActive = match (Route::currentRouteName()) {
             'user.profile.changePassword' => true,
             default => false,
@@ -81,58 +86,80 @@
                     <div class="col-lg-4 col-12">
                         <div class="dashbord-sidebar">
                             <ul>
-                                <li class="heading">Manage Account</li>
+                                <li class="heading">
+                                    Manage Account
+                                </li>
                                 <li>
                                     <a class="@if ($isProfileActive) active @endif"
-                                        href="{{ route('user.profile.index') }}">
+                                        href="@if ($isProfileActive) javascript:void(0)
+                                         @else{{ route('user.profile.index') }} @endif">
                                         <i class="lni lni-user"></i>
-                                        My Profile</a>
+                                        My Profile
+                                    </a>
                                 </li>
                                 <li>
                                     <a class="@if ($isAppliedJobsActive) active @endif"
-                                        href="{{ route('user.profile.appliedJobs') }}">
+                                        href="@if ($isAppliedJobsActive) javascript:void(0)
+                                         @else{{ route('user.profile.appliedJobs') }} @endif">
                                         <i class="lni lni-briefcase"></i>
                                         Applied Jobs
                                     </a>
                                 </li>
                                 <li>
                                     <a class="@if ($isSavedJobsActive) active @endif"
-                                        href="{{ route('user.profile.savedJobs') }}">
+                                        href="@if ($isSavedJobsActive) javascript:void(0)
+                                         @else{{ route('user.profile.savedJobs') }} @endif">
                                         <i class="lni lni-bookmark"></i>
                                         Saved Jobs
                                     </a>
                                 </li>
                                 <li>
                                     <a class="@if ($isFollowersActive) active @endif"
-                                        href="{{ route('user.profile.followers') }}">
+                                        href="@if ($isFollowersActive) javascript:void(0)
+                                         @else{{ route('user.profile.followers') }} @endif">
                                         <i class="lni lni-users"></i>
                                         My Followers
                                     </a>
                                 </li>
                                 <li>
                                     <a class="@if ($isFollowingActive) active @endif"
-                                        href="{{ route('user.profile.following') }}">
+                                        href="@if ($isFollowingActive) javascript:void(0)
+                                         @else{{ route('user.profile.following') }} @endif">
                                         <i class="lni lni-users"></i>
                                         My Following
                                     </a>
                                 </li>
+                                {{-- <li>
+                                    <a class="@if ($isNotificationsActive = '') active @endif"
+                                        href="@if ($isNotificationsActive) javascript:void(0)
+                                         @else{{ route('user.profile.index') }} @endif">
+                                        <i class="lni lni-alarm"></i>
+                                        Notifications
+                                        <span class="badge py-2 px-2" style="background-color: #2042e3">
+                                            {{ auth()->user()->unreadNotifications->count() }}
+                                        </span>
+                                    </a>
+                                </li> --}}
                                 <li>
                                     <a class="@if ($isChangePasswordActive) active @endif"
-                                        href="{{ route('user.profile.changePassword') }}">
+                                        href="@if ($isChangePasswordActive) javascript:void(0)
+                                         @else{{ route('user.profile.changePassword') }} @endif">
                                         <i class="lni lni-lock-alt"></i>
                                         Change Password
                                     </a>
                                 </li>
                                 <li>
                                     <a class="@if ($isEditProfileActive) active @endif"
-                                        href="{{ route('user.profile.editProfile') }}">
+                                        href="@if ($isEditProfileActive) javascript:void(0)
+                                         @else{{ route('user.profile.editProfile') }} @endif">
                                         <i class="lni lni-envelope"></i>
                                         Edit Profile
                                     </a>
                                 </li>
                                 <li>
                                     <a class="@if ($isSetProfileImageActive) active @endif"
-                                        href="{{ route('user.profile.editProfileImage') }}">
+                                        href="@if ($isSetProfileImageActive) javascript:void(0)
+                                         @else{{ route('user.profile.editProfileImage') }} @endif">
                                         @if (auth()->user()->profile_image_url)
                                             <i class="lni lni-image"></i>
                                             Update Profile Image
@@ -144,7 +171,8 @@
                                 </li>
                                 <li>
                                     <a class="@if ($isSetResumeActive) active @endif"
-                                        href="{{ route('user.profile.editResumePdf') }}">
+                                        href="@if ($isSetResumeActive) javascript:void(0)
+                                         @else{{ route('user.profile.editResumePdf') }} @endif">
                                         @if (auth()->user()->resume_pdf_url)
                                             <i class="lni lni-files"></i>
                                             Update Resume

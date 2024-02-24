@@ -4,7 +4,7 @@
     <div class="col-lg-8 col-12">
         <div class="job-items mb-3">
             @forelse ($appliedJobs as $key =>$job)
-                <div class="manage-content mb-3 card py-2 px-4">
+                <div class="manage-content mb-2 card py-2 px-4">
                     <div class="row align-items-center justify-content-center">
                         <div class="col-lg-5 col-md-5 col-12">
                             <h6>

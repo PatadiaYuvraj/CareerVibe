@@ -21,6 +21,7 @@
                                     for="resume_pdf_url">
                                     <i class="lni lni-upload"></i>
                                     Browse File
+                                    <span class="text-danger">*</span>
                                 </label>
                                 <input class="d-none" type="file" class="form-control" id="resume_pdf_url"
                                     name="resume_pdf_url" accept="application/pdf">

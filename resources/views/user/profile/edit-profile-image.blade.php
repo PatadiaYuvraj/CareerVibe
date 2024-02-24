@@ -21,6 +21,7 @@
                                     for="profile_image_url">
                                     <i class="lni lni-upload"></i>
                                     Browse File
+                                    <span class="text-danger">*</span>
                                 </label>
                                 <input class="d-none" type="file" class="form-control" id="profile_image_url"
                                     name="profile_image_url"

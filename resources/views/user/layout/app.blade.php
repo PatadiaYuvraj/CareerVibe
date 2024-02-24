@@ -59,6 +59,7 @@
     <link rel="stylesheet" href="{{ asset('front/css/animate.css') }}" />
     {{-- <link rel="stylesheet" href="{{ asset('front/css/tiny-slider.css') }}" /> --}}
     {{-- <link rel="stylesheet" href="{{ asset('front/css/glightbox.min.css') }}" /> --}}
+    <link href="{{ asset('admin/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('front/css/main.css') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 </head>
@@ -131,7 +132,7 @@
                                         </ul>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="#"
+                                        <a href="javascript:void(0)"
                                             class="@if ($isCompanyActive) active @endif">Companies</a>
                                         <ul class="sub-menu">
                                             <li>
@@ -574,6 +575,76 @@
     }
     if ("{{ Session::has('warning') }}") {
         toastr.warning("{{ Session::get('warning') }}")
+    }
+
+    const downloadMedia = (url, name = '') => {
+        url = url.trim();
+        url = url.replace(/ /g, "%20"); // Replace all spaces with %20
+
+        if (!url) {
+            toastr.info("Invalid URL Found for Downloading File");
+            return;
+        }
+
+        const filename = getFileName(name, url);
+
+        const ext = getExtension(url);
+
+        try {
+            fetch(url, {
+                method: "GET",
+            }).then(response => {
+                response.arrayBuffer().then((buffer) => {
+                    const blob = new Blob([buffer], {
+                        type: `image/${ext}`
+                    });
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename + "." + ext;
+                    link.click();
+                });
+            });
+        } catch (error) {
+            console.log({
+                "Error While Downloding File": error,
+            });
+        }
+
+
+        console.log("Downloaded");
+        // fetch(url, {
+        //     method: "GET",
+        // }).then(response => {
+        //     response.arrayBuffer().then((buffer) => {
+        //         const blob = new Blob([buffer], {
+        //             type: type
+        //         });
+        //         const link = document.createElement('a');
+        //         link.href = window.URL.createObjectURL(blob);
+        //         link.download = filename + "." + ext;
+        //         link.click();
+        //     });
+        // });
+    }
+
+    function getFileName(filename, url) {
+        if (filename) {
+            return filename;
+        }
+        return url.split('/').pop().split("?")[0].split("#")[0].split("&")[0].split(";")[0].split("%")[0]
+            .split("/")[0].split(".").slice(0, -1).join(".");
+    }
+
+    function getExtension(url) {
+        ext = url.split(".").pop();
+        ext = ext.split("?")[0];
+        ext = ext.split("/")[0];
+        ext = ext.split("#")[0];
+        ext = ext.split("&")[0];
+        ext = ext.split(";")[0];
+        ext = ext.split("*")[0];
+        ext = ext.split("%")[0];
+        return ext;
     }
 </script>
 @yield('scripts')

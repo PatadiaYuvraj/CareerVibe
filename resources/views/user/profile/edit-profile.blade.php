@@ -26,11 +26,15 @@
                                     (You can't change your email address.)
                                 </span>
                             </label>
-                            <input class="form-control is-valid border-success border-2" value="{{ Auth::user()->email }}" />
+                            <input class="form-control is-valid bg-white border-success border-2" disabled
+                                value="{{ Auth::user()->email }}" />
                         </div>
                         <div class="row-cols-2 row">
                             <div class="form-group">
-                                <label>Full Name</label>
+                                <label>
+                                    Full Name
+                                    <span class="text-danger">*</span>
+                                </label>
                                 <input class="form-control @error('name') is-invalid border-danger border-2 @enderror"
                                     type="text" name="name" value="{{ old('name') ?? Auth::user()->name }}"
                                     placeholder="Enter your full name" />

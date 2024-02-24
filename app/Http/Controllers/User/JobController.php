@@ -61,8 +61,8 @@ class JobController extends Controller
             $job->is_applied = $job->applyByUsers->count() > 0;
             $job->is_saved = $job->savedByUsers->count() > 0;
         }
-        $jobs = [];
-        return $this->navigationManagerService->loadView('user.job.job-listing', compact('jobs'));
+
+        return $this->navigationManagerService->loadView('user.job.index', compact('jobs'));
     }
 
     // public function index(Request $request)
@@ -147,10 +147,16 @@ class JobController extends Controller
                 'applyByUsers' => function ($query) use ($user_id) {
                     $query->where('user_id', $user_id);
                 },
-
+                'savedByUsers' => function ($query) use ($user_id) {
+                    $query->where('user_id', $user_id);
+                },
             ])
             ->first();
-        return $this->navigationManagerService->loadView('user.job.job-details', compact('job'));
+
+        $job->is_applied = $job->applyByUsers->count() > 0;
+        $job->is_saved = $job->savedByUsers->count() > 0;
+
+        return $this->navigationManagerService->loadView('user.job.show', compact('job'));
     }
 
     public function appliedJobs()
