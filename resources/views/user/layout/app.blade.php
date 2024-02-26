@@ -7,6 +7,7 @@
     };
 
     $isCategoryActive = match (Route::currentRouteName()) {
+        'user.profileCategory.index' => true,
         default => false,
     };
 
@@ -36,8 +37,7 @@
         'user.profile.editResumePdf' => true,
         'user.profile.changePassword' => true,
         default => false,
-    };
-@endphp
+}; @endphp
 
 <head>
     <meta charset="utf-8" />
@@ -90,10 +90,13 @@
                                             href="{{ route('user.dashboard') }}">Home</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a href="javascript:void(0)">Categories</a>
+                                        <a href="javascript:void(0)"
+                                            class="
+                                        @if ($isCategoryActive) active @endif
+                                        ">Categories</a>
                                         <ul class="sub-menu">
                                             <li class="nav-item">
-                                                <a href="">
+                                                <a href="{{ route('user.profileCategory.index') }}">
                                                     View All Categories
                                                 </a>
                                             </li>
@@ -631,6 +634,5 @@
     }
 </script>
 @yield('scripts')
-
 
 </html>

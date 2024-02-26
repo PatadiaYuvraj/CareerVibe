@@ -31,6 +31,7 @@ class ProfileCategory extends Model
     // get sub profiles with jobs
     public function subProfilesWithJobs()
     {
-        return $this->hasMany(SubProfile::class, "profile_category_id", "id")->with('jobs');
+        return $this->hasMany(SubProfile::class, "profile_category_id", "id")
+            ->withCount('jobs');
     }
 }

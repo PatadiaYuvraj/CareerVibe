@@ -27,6 +27,7 @@ use App\Http\Controllers\User\JobController as UserJobController;
 use App\Http\Controllers\User\FollowsController as UserFollowsController;
 use App\Http\Controllers\User\ProfileController as UserProfileController;
 use App\Http\Controllers\User\NotificationsController as UserNotificationsController;
+use App\Http\Controllers\User\ProfileCategoryController as UserProfileCategoryController;
 
 // Admin Company
 use App\Http\Controllers\Admin_Company\AuthController as AdminCompanyAuthController;
@@ -199,7 +200,7 @@ Route::group(['middleware' => "isUser"], function () {
         Route::get('/dashboard',  [UserAuthController::class, "dashboard"])->name('user.dashboard');
         Route::get('/logout',  [UserAuthController::class, "logout"])->name('user.logout');
 
-
+        // profile
         Route::prefix('/me')->group(function () {
             Route::get('/',  [UserProfileController::class, "index"])->name('user.profile.index');
             Route::get('/change-password',  [UserAuthController::class, "changePassword"])->name('user.profile.changePassword');
@@ -252,10 +253,10 @@ Route::group(['middleware' => "isUser"], function () {
             Route::get('/',  [UserCompanyController::class, "index"])->name('user.company.index');
             Route::get('/{id}',  [UserCompanyController::class, "show"])->name('user.company.show');
         });
+
+
         Route::prefix('job')->group(function () {
             Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
-
-            // show job
             Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
             Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
             Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');
@@ -263,6 +264,19 @@ Route::group(['middleware' => "isUser"], function () {
             Route::get('/sub-profile/{id}',  [UserJobController::class, "jobBySubProfile"])->name('user.job.jobBySubProfile');
             Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
         });
+
+        // profile category
+
+        Route::prefix('profile-category')->group(function () {
+            Route::get('/',  [UserProfileCategoryController::class, "index"])->name('user.profileCategory.index');
+            Route::get('/{id}',  [UserProfileCategoryController::class, "show"])->name('user.profileCategory.show');
+            // Route::get('/create',  [UserProfileCategoryController::class, "create"])->name('user.profileCategory.create');
+            // Route::post('/store',  [UserProfileCategoryController::class, "store"])->name('user.profileCategory.store');
+            // Route::get('/edit/{id}',  [UserProfileCategoryController::class, "edit"])->name('user.profileCategory.edit');
+            // Route::post('/update/{id}',  [UserProfileCategoryController::class, "update"])->name('user.profileCategory.update');
+            // Route::get('/delete/{id}',  [UserProfileCategoryController::class, "delete"])->name('user.profileCategory.delete');
+        });
+
 
         // Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
         // Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');

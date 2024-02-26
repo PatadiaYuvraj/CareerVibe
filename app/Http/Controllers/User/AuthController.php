@@ -133,14 +133,14 @@ class AuthController extends Controller
             ->limit(10)
             ->get(['id', 'sub_profile_id', 'min_salary', 'max_salary', 'experience_level', 'description', 'job_type', 'work_type']);
         // });
-
+        //
         $categories =
-            Cache::remember('categories', now()->addMinutes(60), function () {
-                return
-                    ProfileCategory::limit(8)
-                    ->withCount(['jobs'])
-                    ->get(['id', 'name']);
-            });
+            // Cache::remember('categories', now()->addMinutes(60), function () {
+            //     return
+            ProfileCategory::limit(8)
+            ->withCount(['jobs'])
+            ->get(['id', 'name']);
+        // });
 
         return $this->navigationManagerService->loadView('user.dashboard.index', compact('latestJobs', 'featuredJobs', 'categories'));
     }
