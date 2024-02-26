@@ -1,5 +1,42 @@
 @extends('user.profile.layout.app')
+
 @section('title', 'Change Password')
+
+@section('profile-breadcrumb-content')
+    <!-- Start Breadcrumbs -->
+    <div class="breadcrumbs overlay">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumbs-content">
+                        <h1 class="page-title">
+                            Change Password
+                        </h1>
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetur adipisicing
+                            elit. Id beatae, doloremque<br />
+                            doloribus, similique ullam quos tempore nemo,
+                            voluptatibus placeat dignissimos ea.
+                        </p>
+                    </div>
+                    <ul class="breadcrumb-nav">
+                        <li>
+                            <a href="{{ route('user.dashboard') }}">Home</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('user.profile.index') }}">Profile</a>
+                        </li>
+                        <li>
+                            Change Password
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Breadcrumbs -->
+@endsection
+
 @section('profile-content')
     <div class="col-lg-8 col-12">
         <div class="password-content">
@@ -16,7 +53,8 @@
                                 Old Password
                                 <span class="text-danger">*</span>
                             </label>
-                            <input class="form-control @error('currentPassword') is-invalid border-danger border-2 @enderror"
+                            <input
+                                class="form-control @error('currentPassword') is-invalid border-danger border-2 @enderror"
                                 type="password" name="currentPassword" placeholder="Enter your old password" />
                             @error('currentPassword')
                                 <div class="text-danger mt-1">

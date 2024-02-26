@@ -10,17 +10,18 @@
         default => false,
     };
 
-    $isPostActive = match (Route::currentRouteName()) {
-        default => false,
-    };
-
     $isJobActive = match (Route::currentRouteName()) {
         'user.job.index' => true,
+        'user.job.show' => true,
         default => false,
     };
 
     $isCompanyActive = match (Route::currentRouteName()) {
         'user.company.index' => true,
+        default => false,
+    };
+
+    $isPostActive = match (Route::currentRouteName()) {
         default => false,
     };
 
@@ -30,10 +31,10 @@
         'user.profile.savedJobs' => true,
         'user.profile.followers' => true,
         'user.profile.following' => true,
-        'user.profile.changePassword' => true,
         'user.profile.editProfile' => true,
         'user.profile.editProfileImage' => true,
         'user.profile.editResumePdf' => true,
+        'user.profile.changePassword' => true,
         default => false,
     };
 @endphp
@@ -57,8 +58,6 @@
     <link rel="stylesheet" href="{{ asset('front/css/bootstrap.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('front/css/LineIcons.2.0.css') }}" />
     <link rel="stylesheet" href="{{ asset('front/css/animate.css') }}" />
-    {{-- <link rel="stylesheet" href="{{ asset('front/css/tiny-slider.css') }}" /> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('front/css/glightbox.min.css') }}" /> --}}
     <link href="{{ asset('admin/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('front/css/main.css') }}" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
@@ -98,13 +97,6 @@
                                                     View All Categories
                                                 </a>
                                             </li>
-                                            @foreach (App\Models\ProfileCategory::limit(5)->get() as $category)
-                                                <li>
-                                                    <a href="#">
-                                                        {{ $category->name }}
-                                                    </a>
-                                                </li>
-                                            @endforeach
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -140,13 +132,6 @@
                                                     View All Companies
                                                 </a>
                                             </li>
-                                            @foreach (App\Models\Company::limit(5)->get() as $company)
-                                                <li>
-                                                    <a href="#">
-                                                        {{ $company->name }}
-                                                    </a>
-                                                </li>
-                                            @endforeach
                                         </ul>
                                     </li>
                                     <li class="nav-item">
@@ -548,11 +533,9 @@
 <script src="{{ asset('front/js/bootstrap.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ asset('front/js/wow.min.js') }}"></script>
-<script src="{{ asset('front/js/tiny-slider.js') }}"></script>
-<script src="{{ asset('front/js/glightbox.min.js') }}"></script>
 <script src="{{ asset('front/js/main.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/toastr.min.js "></script>
+
 <script>
     toastr.options = {
         "closeButton": false,

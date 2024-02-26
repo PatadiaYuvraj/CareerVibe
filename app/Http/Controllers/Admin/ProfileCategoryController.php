@@ -138,7 +138,7 @@ class ProfileCategoryController extends Controller
 
     public function destroy($id)
     {
-        $profileCategory = $this->profileCategory->find($id)->withCount('subProfiles')->first();
+        $profileCategory = $this->profileCategory->where('id', $id)->withCount('subProfiles')->first();
         if (!$profileCategory) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Category is not found"]);
             session()->flash('warning', 'Profile Category is not found');

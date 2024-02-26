@@ -32,11 +32,6 @@
         //     default => false,
         // };
 
-        $isChangePasswordActive = match (Route::currentRouteName()) {
-            'user.profile.changePassword' => true,
-            default => false,
-        };
-
         $isEditProfileActive = match (Route::currentRouteName()) {
             'user.profile.editProfile' => true,
             default => false,
@@ -52,30 +47,14 @@
             default => false,
         };
 
+        $isChangePasswordActive = match (Route::currentRouteName()) {
+            'user.profile.changePassword' => true,
+            default => false,
+        };
+
     @endphp
-    <!-- Start Breadcrumbs -->
-    {{-- <div class="breadcrumbs overlay">
-        <div class="container">
-            <div class="row">
-                <div class="col-12">
-                    <div class="breadcrumbs-content">
-                        <h1 class="page-title">Profile</h1>
-                        <p>
-                            Lorem ipsum dolor sit amet, consectetur adipisicing
-                            elit. Id beatae, doloremque<br />
-                            doloribus, similique ullam quos tempore nemo,
-                            voluptatibus placeat dignissimos ea.
-                        </p>
-                    </div>
-                    <ul class="breadcrumb-nav">
-                        <li><a href="{{ route('user.dashboard') }}">Home</a></li>
-                        <li>Profile</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div> --}}
-    <!-- End Breadcrumbs -->
+
+    @yield('profile-breadcrumb-content')
 
     <!-- Main Content Start -->
     <div class="resume change-password section">
@@ -86,8 +65,8 @@
                     <div class="col-lg-4 col-12">
                         <div class="dashbord-sidebar">
                             <ul>
-                                <li class="heading">
-                                    Manage Account
+                                <li class="heading text-center">
+                                    <h4>Manage Account</h4>
                                 </li>
                                 <li>
                                     <a class="@if ($isProfileActive) active @endif"
@@ -103,6 +82,7 @@
                                          @else{{ route('user.profile.appliedJobs') }} @endif">
                                         <i class="lni lni-briefcase"></i>
                                         Applied Jobs
+                                        {{-- ({{ auth()->user()->appliedJobs->count() }}) --}}
                                     </a>
                                 </li>
                                 <li>
@@ -111,6 +91,7 @@
                                          @else{{ route('user.profile.savedJobs') }} @endif">
                                         <i class="lni lni-bookmark"></i>
                                         Saved Jobs
+                                        {{-- ({{ auth()->user()->savedJobs->count() }}) --}}
                                     </a>
                                 </li>
                                 <li>
@@ -119,6 +100,7 @@
                                          @else{{ route('user.profile.followers') }} @endif">
                                         <i class="lni lni-users"></i>
                                         My Followers
+                                        {{-- ({{ auth()->user()->followers->count() }}) --}}
                                     </a>
                                 </li>
                                 <li>
@@ -127,6 +109,7 @@
                                          @else{{ route('user.profile.following') }} @endif">
                                         <i class="lni lni-users"></i>
                                         My Following
+                                        {{-- ({{ auth()->user()->following->count() + auth()->user()->followingCompanies->count() }}) --}}
                                     </a>
                                 </li>
                                 {{-- <li>
@@ -140,14 +123,6 @@
                                         </span>
                                     </a>
                                 </li> --}}
-                                <li>
-                                    <a class="@if ($isChangePasswordActive) active @endif"
-                                        href="@if ($isChangePasswordActive) javascript:void(0)
-                                         @else{{ route('user.profile.changePassword') }} @endif">
-                                        <i class="lni lni-lock-alt"></i>
-                                        Change Password
-                                    </a>
-                                </li>
                                 <li>
                                     <a class="@if ($isEditProfileActive) active @endif"
                                         href="@if ($isEditProfileActive) javascript:void(0)
@@ -180,6 +155,14 @@
                                             <i class="lni lni-add-files"></i>
                                             Add Resume
                                         @endif
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="@if ($isChangePasswordActive) active @endif"
+                                        href="@if ($isChangePasswordActive) javascript:void(0)
+                                         @else{{ route('user.profile.changePassword') }} @endif">
+                                        <i class="lni lni-lock-alt"></i>
+                                        Change Password
                                     </a>
                                 </li>
                                 <li>

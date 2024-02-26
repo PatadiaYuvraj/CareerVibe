@@ -4,7 +4,7 @@
 @section('content')
 
     <!-- Start Hero Area -->
-    <section class="hero-area style2">
+    {{-- <section class="hero-area style2">
         <!-- Single Slider -->
         <div class="hero-inner">
             <div class="home-slider">
@@ -24,8 +24,7 @@
                                             overviews.
                                         </p>
                                         <div class="button wow fadeInUp" data-wow-delay=".7s">
-                                            {{-- <a href="#" class="btn">Post a Job</a> --}}
-                                            <a href="#" class="btn btn-alt">See Our Jobs</a>
+                                            <a href="{{ route('user.job.index') }}" class="btn btn-alt">See Our Jobs</a>
                                         </div>
                                     </div>
                                 </div>
@@ -54,8 +53,7 @@
                                             overviews.
                                         </p>
                                         <div class="button wow fadeInUp" data-wow-delay=".7s">
-                                            {{-- <a href="#" class="btn">Post a Job</a> --}}
-                                            <a href="#" class="btn btn-alt">See Our Jobs</a>
+                                            <a href="{{ route('user.job.index') }}" class="btn btn-alt">See Our Jobs</a>
                                         </div>
                                     </div>
                                 </div>
@@ -71,10 +69,10 @@
             </div>
         </div>
         <!--/ End Single Slider -->
-    </section>
+    </section> --}}
     <!--/ End Hero Area -->
 
-    <!-- Start Call Action Area Dont Show-->
+    <!-- Start Call Action Area Dont Show      -->
     {{-- <section class="call-action style2">
         <div class="container">
             <div class="row align-items-center">
@@ -116,8 +114,7 @@
                         <div class="col-lg-3 col-md-6 col-12">
                             <a href="#" class="single-cat wow fadeInUp" data-wow-delay=".2s">
                                 <div class="top-side">
-                                    <img src="{{ asset('front/images/jobs/category-' . $loop->iteration . '.jpg') }}"
-                                        alt="#" />
+                                    <img src="{{ asset('front/images/jobs/category-1.jpg') }}" alt="#" />
                                 </div>
                                 <div class="bottom-side">
                                     <span class="available-job">{{ $category->jobs_count }}</span>
@@ -242,8 +239,8 @@
     </section>
     <!-- End About Area -->
 
-    <!-- Start Call Action Area Dont Show -->
-    {{-- <section class="call-action overlay section">
+    <!-- Start Call Action Area Done -->
+    <section class="call-action overlay section">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 offset-lg-2 col-12">
@@ -251,24 +248,30 @@
                         <div class="section-title">
                             <span class="wow fadeInDown" data-wow-delay=".2s">GETTING STARTED TO WORK</span>
                             <h2 class="wow fadeInUp" data-wow-delay=".4s">
-                                Don’t just find. Be found. Put your CV in front of great
-                                employers
+                                Don’t just find. Be found.
+                                Put your CV in front of great employers.
                             </h2>
                             <p class="wow fadeInUp" data-wow-delay=".6s">
-                                It helps you to increase your chances of finding a suitable
-                                job and let recruiters contact you about jobs that are not
-                                needed to pay for advertising.
+                                There are many variations of passages of Lorem Ipsum available, but the majority have
+                                suffered alteration in some form.
                             </p>
                             <div class="button wow fadeInUp" data-wow-delay=".8s">
-                                <a href="add-resume.html" class="btn"><i class="lni lni-upload"></i> Upload Your
-                                    Resume</a>
+                                <a href="{{ route('user.profile.editResumePdf') }}" class="btn">
+                                    <i class="lni lni-upload"></i>
+                                    @if (!auth()->user()->resume_pdf_url)
+                                        Not Uploaded Your Resume Yet?
+                                    @else
+                                        Update Your Resume
+                                    @endif
+                                </a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section> --}}
+    </section>
+
     <!-- /End Call Action Area -->
 
     <!-- Start Find Job Area Done -->
@@ -293,40 +296,52 @@
                 <div class="row">
                     @forelse ($latestJobs as $job)
                         <!-- Single Job -->
-                        <div class="single-job wow fadeInUp mx-auto" data-wow-delay=".2s">
+                        <div class="single-job col-lg-4 col-md-6 col-12"
+                            style="width: 45%; margin: 0 auto; margin-bottom: 20px; padding: 20px; border: 1px solid #e0e0e0;   border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); transition: all 0.3s ease-in-out;">
                             <div class="job-content">
                                 <h4>
-                                    <a href="">
+                                    <a href="
+                                    {{ route('user.job.show', $job->id) }}">
                                         {{ $job->subProfile->name }}
                                     </a>
                                 </h4>
-                                <ul class="d-flex">
-                                    <li>
-                                        <a href="#">
-                                            Offered By: {{ $job->company->name }}
-                                        </a>
-                                    </li>
-                                </ul>
+                                <p>
+                                    {{ Str::limit($job->description, 150, $end = '...') }}
+                                </p>
                                 <ul>
                                     <li>
-                                        @if ($job['min_salary'] >= 1000)
-                                            <i class="bi bi-currency-rupee"></i>{{ $job['min_salary'] / 1000 }}k
+                                        @if ($job->min_salary >= 1000)
+                                            <i class="bi bi-currency-rupee"></i>{{ $job->min_salary / 1000 }}k
                                             -
-                                            <i class="bi bi-currency-rupee"></i>{{ $job['max_salary'] / 1000 }}k
+                                            <i class="bi bi-currency-rupee"></i>{{ $job->max_salary / 1000 }}k
                                         @else
-                                            <i class="bi bi-currency-rupee"></i>{{ $job['min_salary'] }} -
-                                            <i class="bi bi-currency-rupee"></i>{{ $job['max_salary'] }}
+                                            <i class="bi bi-currency-rupee"></i>{{ $job->min_salary }} -
+                                            <i class="bi bi-currency-rupee"></i>{{ $job->max_salary }}
                                         @endif
+                                    </li>
+                                    <li>
+                                        <i class="lni lni-briefcase"></i>
+                                        {{ Config::get('constants.job.work_type')[$job->work_type] }}
+                                    </li>
+                                    <li>
+                                        <i class="lni lni-briefcase"></i>
+                                        {{ Config::get('constants.job.job_type')[$job->job_type] }}
                                     </li>
                                 </ul>
                             </div>
                             <div class="job-button">
                                 <ul>
                                     <li>
-                                        <a href="#">
-                                            <i class="bi bi-bookmark-plus"></i>
-                                            Save Now
-                                        </a>
+                                        @if ($job->saved_by_users_count > 0)
+                                            <a href="{{ route('user.job.unsaveJob', $job->id) }}">
+                                                <i class="bi bi-bookmark-check"></i> Saved
+                                            </a>
+                                        @else
+                                            <a href="{{ route('user.job.saveJob', $job->id) }}">
+                                                <i class="bi bi-bookmark-plus"></i>
+                                                Save Now
+                                            </a>
+                                        @endif
                                     </li>
                                     <li>
                                         <span>
@@ -339,37 +354,15 @@
                         </div>
                         <!-- End Single Job -->
                     @empty
-
-                        <div class="col-12">
-                            <div class="alert alert-danger text-center">
-                                No Jobs Found
+                        <div class="single-job mx-auto">
+                            <div class="job-content">
+                                <h4 class="text-center">
+                                    <span class="text-danger">No Job Found</span>
+                                </h4>
                             </div>
                         </div>
                     @endforelse
-
                 </div>
-
-
-                <!-- Pagination -->
-                <!-- <div class="row">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <div class="col-12">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="pagination center wow fadeInUp" data-wow-delay=".3s">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <ul class="pagination-list">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <a href="#"><i class="lni lni-arrow-left"></i></a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <li class="active"><a href="#">1</a></li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <li><a href="#">2</a></li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <li><a href="#">3</a></li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <li><a href="#">4</a></li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        <li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <a href="#"><i class="lni lni-arrow-right"></i></a>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </li>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </div>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        </div> -->
-                <!--/ End Pagination -->
             </div>
         </div>
     </section>
@@ -381,7 +374,9 @@
             <div class="row">
                 <div class="col-12">
                     <div class="section-title">
-                        <span class="wow fadeInDown" data-wow-delay=".2s">Featured Jobs</span>
+                        <span class="wow fadeInDown" data-wow-delay=".2s">
+                            Featured Jobs
+                        </span>
                         <h2 class="wow fadeInUp" data-wow-delay=".4s">
                             Browse Featured Jobs
                         </h2>
@@ -394,180 +389,91 @@
             </div>
             <div class="single-head">
                 <div class="row">
-
                     @forelse ($featuredJobs as $job)
                         <div class="col-lg-4 col-md-6 col-12">
                             <div class="single-job wow fadeInUp" data-wow-delay=".2s">
                                 <div class="shape"></div>
                                 <div class="feature">Featured</div>
-                                <div class="image">
-                                    <img src="{{ asset('front/images/featured-job/img1.jpg') }}" alt="#" />
-                                </div>
                                 <div class="content">
-                                    <h4><a href="job-details.html">Graphics Design</a></h4>
+                                    <h4>
+                                        <a href="{{ route('user.job.show', $job->id) }}">
+                                            {{ $job->subProfile->name }}
+                                        </a>
+                                    </h4>
                                     <ul>
-                                        <li><i class="lni lni-map-marker"></i> New York</li>
-                                        <li><i class="lni lni-briefcase"></i> Full-time</li>
-                                        <li><i class="lni lni-dollar"></i> 80K-90K</li>
+
+                                        <li class="text-capitalize">
+                                            <i class="lni lni-briefcase"></i>
+                                            {{ Config::get('constants.job.work_type')[$job->work_type] }}
+                                        </li>
+                                        <li>
+                                            <i class="lni lni-briefcase"></i>
+                                            {{ Config::get('constants.job.job_type')[$job['job_type']] }}
+                                        </li>
+                                        <li>
+                                            <i class="bi bi-currency-rupee"></i>
+                                            @if ($job['min_salary'] >= 1000)
+                                                {{ $job['min_salary'] / 1000 }}k
+                                                -
+                                                {{ $job['max_salary'] / 1000 }}k
+                                            @else
+                                                {{ $job['min_salary'] }} -
+                                                {{ $job['max_salary'] }}
+                                            @endif
+                                        </li>
+
                                     </ul>
-                                    <p>
-                                        We are looking for Enrollment Advisors who are looking to
-                                        take 30-35 appointments per week. All leads are
-                                        pre-scheduled.
-                                    </p>
-                                    <div class="button">
-                                        <a href="job-details.html" class="btn">Apply Now</a>
-                                        <a href="bookmarked.html" class="btn save"><i class="lni lni-bookmark"></i> Save
-                                            It</a>
+                                    <p>{{ Str::limit($job->description, 150, $end = '...') }}</p>
+                                    <div class="sidebar-widget">
+                                        <div class="inner">
+                                            <div class="row m-n2 button g-2">
+                                                <div class="col-lg-12 col-sm-auto col-12">
+                                                    @if ($job->apply_by_users_count > 0)
+                                                        <a href="{{ route('user.job.unapply', $job['id']) }}"
+                                                            class="d-block btn">
+                                                            <i class="bi bi-check-circle-fill">
+                                                                Applied
+                                                            </i>
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('user.job.apply', $job['id']) }}"
+                                                            class="d-block btn">
+                                                            <i class="bi bi-check-circle">
+                                                                Apply Now
+                                                            </i>
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                                <div class="col-lg-12 col-sm-auto col-12">
+                                                    @if ($job->saved_by_users_count > 0)
+                                                        <a href="{{ route('user.job.unsaveJob', $job['id']) }}"
+                                                            class="d-block btn">
+                                                            <i class="bi bi-bookmark-fill">
+                                                                Saved
+                                                            </i>
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('user.job.saveJob', $job['id']) }}"
+                                                            class="d-block btn">
+                                                            <i class="bi bi-bookmark">
+                                                                Save Now
+                                                            </i>
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     @empty
-
                         <div class="col-12">
                             <div class="alert alert-danger text-center">
                                 No Jobs Found
                             </div>
                         </div>
                     @endforelse
-
-                    {{-- <div class="col-lg-4 col-md-6 col-12">
-                        <div class="single-job wow fadeInUp" data-wow-delay=".4s">
-                            <div class="shape"></div>
-                            <div class="feature">Featured</div>
-                            <div class="image">
-                                <img src="{{ asset('front/images/featured-job/img2.jpg') }}" alt="#" />
-                            </div>
-                            <div class="content">
-                                <h4><a href="job-details.html">Restaurant Services</a></h4>
-                                <ul>
-                                    <li><i class="lni lni-map-marker"></i> New York</li>
-                                    <li><i class="lni lni-briefcase"></i> Full-time</li>
-                                    <li><i class="lni lni-dollar"></i> 80K-90K</li>
-                                </ul>
-                                <p>
-                                    We are looking for Enrollment Advisors who are looking to
-                                    take 30-35 appointments per week. All leads are
-                                    pre-scheduled.
-                                </p>
-                                <div class="button">
-                                    <a href="job-details.html" class="btn">Apply Now</a>
-                                    <a href="bookmarked.html" class="btn save"><i class="lni lni-bookmark"></i> Save
-                                        It</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-12">
-                        <div class="single-job wow fadeInUp" data-wow-delay=".6s">
-                            <div class="shape"></div>
-                            <div class="feature">Featured</div>
-                            <div class="image">
-                                <img src="{{ asset('front/images/featured-job/img3.jpg') }}" alt="#" />
-                            </div>
-                            <div class="content">
-                                <h4><a href="job-details.html">Share Maeket Analysis</a></h4>
-                                <ul>
-                                    <li><i class="lni lni-map-marker"></i> New York</li>
-                                    <li><i class="lni lni-briefcase"></i> Full-time</li>
-                                    <li><i class="lni lni-dollar"></i> 80K-90K</li>
-                                </ul>
-                                <p>
-                                    We are looking for Enrollment Advisors who are looking to
-                                    take 30-35 appointments per week. All leads are
-                                    pre-scheduled.
-                                </p>
-                                <div class="button">
-                                    <a href="job-details.html" class="btn">Apply Now</a>
-                                    <a href="bookmarked.html" class="btn save"><i class="lni lni-bookmark"></i> Save
-                                        It</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-12">
-                        <div class="single-job wow fadeInUp" data-wow-delay=".2s">
-                            <div class="shape"></div>
-                            <div class="feature">Featured</div>
-                            <div class="image">
-                                <img src="{{ asset('front/images/featured-job/img4.jpg') }}" alt="#" />
-                            </div>
-                            <div class="content">
-                                <h4><a href="job-details.html">Medical services</a></h4>
-                                <ul>
-                                    <li><i class="lni lni-map-marker"></i> New York</li>
-                                    <li><i class="lni lni-briefcase"></i> Full-time</li>
-                                    <li><i class="lni lni-dollar"></i> 80K-90K</li>
-                                </ul>
-                                <p>
-                                    We are looking for Enrollment Advisors who are looking to
-                                    take 30-35 appointments per week. All leads are
-                                    pre-scheduled.
-                                </p>
-                                <div class="button">
-                                    <a href="job-details.html" class="btn">Apply Now</a>
-                                    <a href="bookmarked.html" class="btn save"><i class="lni lni-bookmark"></i> Save
-                                        It</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-12">
-                        <div class="single-job wow fadeInUp" data-wow-delay=".4s">
-                            <div class="shape"></div>
-                            <div class="feature">Featured</div>
-                            <div class="image">
-                                <img src="{{ asset('front/images/featured-job/img5.jpg') }}" alt="#" />
-                            </div>
-                            <div class="content">
-                                <h4><a href="job-details.html">Auto Mobile Services</a></h4>
-                                <ul>
-                                    <li><i class="lni lni-map-marker"></i> New York</li>
-                                    <li><i class="lni lni-briefcase"></i> Full-time</li>
-                                    <li><i class="lni lni-dollar"></i> 80K-90K</li>
-                                </ul>
-                                <p>
-                                    We are looking for Enrollment Advisors who are looking to
-                                    take 30-35 appointments per week. All leads are
-                                    pre-scheduled.
-                                </p>
-                                <div class="button">
-                                    <a href="job-details.html" class="btn">Apply Now</a>
-                                    <a href="bookmarked.html" class="btn save"><i class="lni lni-bookmark"></i> Save
-                                        It</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-4 col-md-6 col-12">
-                        <div class="single-job wow fadeInUp" data-wow-delay=".6s">
-                            <div class="shape"></div>
-                            <div class="feature">Featured</div>
-                            <div class="image">
-                                <img src="{{ asset('front/images/featured-job/img6.jpg') }}" alt="#" />
-                            </div>
-                            <div class="content">
-                                <h4><a href="job-details.html">IT & Networing Sevices</a></h4>
-                                <ul>
-                                    <li><i class="lni lni-map-marker"></i> New York</li>
-                                    <li><i class="lni lni-briefcase"></i> Full-time</li>
-                                    <li><i class="lni lni-dollar"></i> 80K-90K</li>
-                                </ul>
-                                <p>
-                                    We are looking for Enrollment Advisors who are looking to
-                                    take 30-35 appointments per week. All leads are
-                                    pre-scheduled.
-                                </p>
-                                <div class="button">
-                                    <a href="job-details.html" class="btn">Apply Now</a>
-                                    <a href="bookmarked.html" class="btn save"><i class="lni lni-bookmark"></i> Save
-                                        It</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div> --}}
                 </div>
             </div>
         </div>
@@ -626,7 +532,7 @@
     <!-- /End Testimonials Section -->
 
     <!-- Start Pricing Table Area Dont Show -->
-    {{-- <section class="pricing-table section">
+    <section class="pricing-table section">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -735,10 +641,10 @@
                 </div>
             </div>
         </div>
-    </section> --}}
+    </section>
     <!--/ End Pricing Table Area -->
 
-    <!-- Start Latest News Area Done -->
+    <!-- Start Latest News Area Done Latest Post Show Here -->
     <div class="latest-news-area section">
         <div class="container">
             <div class="row">

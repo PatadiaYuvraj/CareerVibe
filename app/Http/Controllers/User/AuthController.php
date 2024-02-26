@@ -12,6 +12,7 @@ use App\Services\NavigationManagerService;
 use App\Services\StorageManagerService;
 use App\Services\MailableService;
 use App\Services\NotifiableService;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
 class AuthController extends Controller
@@ -25,6 +26,7 @@ class AuthController extends Controller
     private AuthenticableService $authenticableService;
 
     public function __construct(
+
         User $user,
         NotifiableService $notifiableService,
         MailableService $mailableService,
@@ -41,14 +43,108 @@ class AuthController extends Controller
         $this->paginate = Config::get('constants.pagination');
     }
 
+    public function dashboard1()
+    {
+        $latestJobs = Job::select([
+            'id',
+            "sub_profile_id",
+            'min_salary',
+            'max_salary',
+            "experience_level",
+            'description',
+            "job_type",
+            "work_type",
+
+        ])->with([
+            'subProfile' => function ($query) {
+                $query->select('id', 'name');
+            },
+        ])->withCount([
+            'savedByUsers' => function ($query) {
+                $query->where('user_id', auth()->id());
+            }
+        ])->orderBy('id', 'DESC')->limit(10)->get();
+
+        $featuredJobs = Job::select([
+            'id',
+            "sub_profile_id",
+            'min_salary',
+            'max_salary',
+            "experience_level",
+            'description',
+            "job_type",
+            "work_type",
+
+        ])->with([
+            'subProfile' => function ($query) {
+                $query->select('id', 'name');
+            },
+        ])->withCount([
+            'savedByUsers' => function ($query) {
+                $query->where('user_id', auth()->id());
+            },
+            'applyByUsers' => function ($query) {
+                $query->where('user_id', auth()->id());
+            }
+        ])->where('is_featured', 1)->orderBy('id', 'DESC')->limit(10)->get();
+
+        // $categories = ProfileCategory::limit(8)->select([
+        //     'id',
+        //     'name',
+        // ])->withCount([
+        //     'jobs'
+        // ])->get();
+
+        return $this->navigationManagerService->loadView('user.dashboard.index', compact(
+            'latestJobs',
+            'featuredJobs',
+            // 'categories'
+        ));
+    }
+
     public function dashboard()
     {
-        $featuredJobs = Job::where('is_featured', 1)->orderBy('id', 'DESC')->limit(9)->get();
-        $latestJobs = Job::orderBy('id', 'DESC')->limit(10)->get();
+        $latestJobs =
+            // Cache::remember('latestJobs', now()->addMinutes(60), function () {
+            //     return
+            Job::with(['subProfile:id,name'])
+            ->withCount(['savedByUsers' => function ($query) {
+                $query->where('user_id', auth()->id());
+            }])
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get(['id', 'sub_profile_id', 'min_salary', 'max_salary', 'experience_level', 'description', 'job_type', 'work_type']);
+        // });
 
-        $categories = ProfileCategory::orderBy('id', 'DESC')->limit(8)->get();
-        return $this->navigationManagerService->loadView('user.dashboard.index', compact('featuredJobs', 'latestJobs', 'categories'));
+        $featuredJobs =
+            // Cache::remember('featuredJobs', now()->addMinutes(60), function () {
+            //     return
+            Job::with(['subProfile:id,name'])
+            ->withCount([
+                'savedByUsers' => function ($query) {
+                    $query->where('user_id', auth()->id());
+                },
+                'applyByUsers' => function ($query) {
+                    $query->where('user_id', auth()->id());
+                }
+            ])
+            ->where('is_featured', 1)
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get(['id', 'sub_profile_id', 'min_salary', 'max_salary', 'experience_level', 'description', 'job_type', 'work_type']);
+        // });
+
+        $categories =
+            Cache::remember('categories', now()->addMinutes(60), function () {
+                return
+                    ProfileCategory::limit(8)
+                    ->withCount(['jobs'])
+                    ->get(['id', 'name']);
+            });
+
+        return $this->navigationManagerService->loadView('user.dashboard.index', compact('latestJobs', 'featuredJobs', 'categories'));
     }
+
 
     public function login()
     {
@@ -620,7 +716,7 @@ class AuthController extends Controller
             ];
             $this->notifiableService->sendNotification($user, $details['body']);
             $this->mailableService->sendMail($user->email, $details);
-            return $this->navigationManagerService->redirectRoute('user.profile.editProfileImage', [], 302, [], false, ["success" => "Profile Image Deleted Successfully"]);
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Profile Image Deleted Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Profile Image Not Deleted"]);
     }
@@ -725,7 +821,7 @@ class AuthController extends Controller
                 'title' => 'Profile Image Deleted',
                 'body' => 'Your profile image is deleted'
             ];
-            return $this->navigationManagerService->redirectRoute('user.profile.editResumePdf', [], 302, [], false, ["success" => "Resume Pdf Deleted Successfully"]);
+            return $this->navigationManagerService->redirectBack(302, [], false, ["success" => "Resume Pdf Deleted Successfully"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Resume Pdf Not Deleted"]);
     }

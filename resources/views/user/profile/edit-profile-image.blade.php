@@ -1,5 +1,50 @@
 @extends('user.profile.layout.app')
+
 @section('title', 'Edit Profile Image')
+
+@section('profile-breadcrumb-content')
+    <!-- Start Breadcrumbs -->
+    <div class="breadcrumbs overlay">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="breadcrumbs-content">
+                        <h1 class="page-title">
+                            @if (auth()->user()->profile_image_url)
+                                Edit Profile Image
+                            @else
+                                Add Profile Image
+                            @endif
+                        </h1>
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetur adipisicing
+                            elit. Id beatae, doloremque<br />
+                            doloribus, similique ullam quos tempore nemo,
+                            voluptatibus placeat dignissimos ea.
+                        </p>
+                    </div>
+                    <ul class="breadcrumb-nav">
+                        <li>
+                            <a href="{{ route('user.dashboard') }}">Home</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('user.profile.index') }}">Profile</a>
+                        </li>
+                        <li>
+                            @if (auth()->user()->profile_image_url)
+                                Edit Profile Image
+                            @else
+                                Add Profile Image
+                            @endif
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Breadcrumbs -->
+@endsection
+
 @section('profile-content')
     <div class="col-lg-8 col-12">
         <div class="password-content">
