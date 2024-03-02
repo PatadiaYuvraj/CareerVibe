@@ -31,12 +31,11 @@
     <header id="header" class="header fixed-top d-flex align-items-center">
 
         <div class="d-flex align-items-center justify-content-between">
-            <a href="{{ route('admin.dashboard') }}" class="logo d-flex align-items-center">
-                <img src="{{ asset('admin/img/logo.png') }}">
-                <span class="d-none d-lg-block">Carrer Vibe</span>
-            </a>
-            <i class="bi bi-list toggle-sidebar-btn"></i>
-        </div><!-- End Logo -->
+
+            <img src="{{ asset('front/images/logo/logo.svg') }}" class="img-fluid w-50">
+            <i class="bi
+                    bi-list toggle-sidebar-btn"></i>
+        </div>
 
         <nav class="header-nav ms-auto">
 

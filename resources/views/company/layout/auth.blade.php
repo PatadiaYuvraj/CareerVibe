@@ -7,8 +7,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
     <title>
-        Front Company
-        {{-- @yield('title') --}}
+        @yield('title')
     </title>
     <meta content="" name="description">
     <meta content="" name="keywords">
@@ -56,12 +55,12 @@
                     <div class="row justify-content-center">
                         <div class="col-lg-4 col-md-6 d-flex flex-column align-items-center justify-content-center">
 
-                            <div class="d-flex justify-content-center py-4">
-                                <a href="index.html" class="logo d-flex align-items-center w-auto">
-                                    <img src="{{ asset('admin/img/logo.png') }}" alt="">
-                                    <span class="d-none d-lg-block">Career Vibe</span>
-                                </a>
-                            </div><!-- End Logo -->
+                            <!-- Start Logo -->
+                            <div class="text-center mb-3" draggable="false">
+                                <img src="{{ asset('front/images/logo/logo.svg') }}" class="img-fluid w-50"
+                                    draggable="false">
+                            </div>
+                            <!-- End Logo -->
                             @yield('content')
 
 
