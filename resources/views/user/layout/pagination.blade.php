@@ -1,4 +1,3 @@
-{{--  --}}
 <div class="text-center">
     @foreach ($paginator as $link)
         @if ($link['url'] == null)

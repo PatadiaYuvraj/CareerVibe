@@ -9,6 +9,7 @@ use App\Services\AuthenticableService;
 use App\Services\NavigationManagerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 class JobController extends Controller
 {
@@ -27,42 +28,28 @@ class JobController extends Controller
 
     public function index(Request $request)
     {
-        $user = $this->authenticableService->getUser();
-        $type = $request->input('type', 'all');
+        // $page = $request->input('page', 1);
+        // $limit = $request->input('limit', 10);
+        // $offset = ($page - 1) * $limit;
+        // $authUserId = auth()->id();
 
-        $jobs = Job::where('is_active', 1)
-
-            ->with([
-                'applyByUsers' => function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                },
-                'savedByUsers' => function ($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                },
-            ]);
-
-        if ($type == 'applied') {
-            $jobs = $jobs->whereHas('applyByUsers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            });
-        } else if ($type == 'saved') {
-            $jobs = $jobs->whereHas('savedByUsers', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            });
-        } else if ($type == 'verified') {
-            $jobs = $jobs->where('is_verified', 1);
-        } else if ($type == 'featured') {
-            $jobs = $jobs->where('is_featured', 1);
-        }
-
-        $jobs = $jobs->paginate($this->paginate);
-
-        foreach ($jobs as $job) {
-            $job->is_applied = $job->applyByUsers->count() > 0;
-            $job->is_saved = $job->savedByUsers->count() > 0;
-        }
-
-        return $this->navigationManagerService->loadView('user.job.index', compact('jobs'));
+        // $jobs = Job::with([
+        //     'company',
+        //     'locations',
+        //     'qualifications',
+        //     'subProfile',
+        //     'applyByUsers' => function ($query) use ($authUserId) {
+        //         $query->where('user_id', $authUserId);
+        //     },
+        //     'savedByUsers' => function ($query) use ($authUserId) {
+        //         $query->where('user_id', $authUserId);
+        //     },
+        // ])
+        //     ->offset($offset)
+        //     ->limit($limit)
+        //     ->get()->toArray();
+        // dd($jobs);
+        return $this->navigationManagerService->loadView('user.job.index');
     }
 
     // public function index(Request $request)
@@ -133,6 +120,74 @@ class JobController extends Controller
     //     }
     //     return response()->json($jobs);
     // }
+
+    public function loadMoreJobs(Request $request)
+    {
+        $page = $request->input('page', 1) ?? 1;
+        $limit = 20;
+        $offset = ($page - 1) * $limit;
+
+
+        $authUserId = auth()->id();
+        $jobs = Job::select([
+            'jobs.id',
+            DB::raw("CONCAT('" . route('user.job.show', ['id' => ':id']) . "') as sub_profile_url"),
+            DB::raw("CONCAT('" . route('user.company.show', ['id' => ':id']) . "') as company_url"),
+            DB::raw("CONCAT('" . route('user.job.saveJob', ['id' => ':id']) . "') as save_job_url"),
+            DB::raw("CONCAT('" . route('user.job.unsaveJob', ['id' => ':id']) . "') as unsave_job_url"),
+            DB::raw("CONCAT('" . route('user.job.apply', ['id' => ':id']) . "') as apply_job_url"),
+            DB::raw("CONCAT('" . route('user.job.unapply', ['id' => ':id']) . "') as unapply_job_url"),
+            'jobs.min_salary',
+            'jobs.max_salary',
+            'jobs.experience_level',
+            'jobs.description',
+            'jobs.job_type',
+            'jobs.work_type',
+            'companies.id as company_id',
+            'companies.name as company_name',
+            'sub_profiles.name as sub_profile_name',
+            'profile_categories.name as profile_category_name',
+            DB::raw('IFNULL(applied_jobs.user_id, 0) as applied_by_me'),
+            DB::raw('IFNULL(saved_jobs.user_id, 0) as saved_by_me'),
+        ])
+            ->leftJoin('companies', 'companies.id', '=', 'jobs.company_id')
+            ->leftJoin('sub_profiles', 'sub_profiles.id', '=', 'jobs.sub_profile_id')
+            // add profile category
+            ->leftJoinSub(
+                'select * from profile_categories',
+                'profile_categories',
+                function ($join) {
+                    $join->on('profile_categories.id', '=', 'sub_profiles.profile_category_id');
+                }
+            )
+            ->leftJoin('applied_jobs', function ($join) use ($authUserId) {
+                $join->on('applied_jobs.job_id', '=', 'jobs.id')
+                    ->where('applied_jobs.user_id', '=', $authUserId);
+            })
+            ->leftJoin('saved_jobs', function ($join) use ($authUserId) {
+                $join->on('saved_jobs.job_id', '=', 'jobs.id')
+                    ->where('saved_jobs.user_id', '=', $authUserId);
+            })
+            ->with([
+                'qualifications' => function ($query) {
+                    $query->select('qualifications.id', 'name');
+                },
+                'locations' => function ($query) {
+                    $query->select('locations.id', 'city');
+                }
+            ])
+            ->offset($offset)
+            ->limit($limit)
+            ->paginate($limit);
+
+        return response()->json([
+            'jobs' => $jobs->toArray()['data'],
+            'has_more' => count($jobs) == $limit ? true : false,
+            'page' => $page,
+            'limit' => $limit,
+            'offset' => $offset,
+        ]);
+    }
 
 
     public function show($job_id)

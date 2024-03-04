@@ -543,6 +543,7 @@ Route::group(['middleware' => "isUser"], function () {
 
         Route::prefix('job')->group(function () {
             Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
+            Route::post('/loadMoreJobs',  [UserJobController::class, "loadMoreJobs"])->name('user.job.loadMoreJobs');
             Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
             Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
             Route::get('/qualification/{id}',  [UserJobController::class, "jobByQualification"])->name('user.job.jobByQualification');

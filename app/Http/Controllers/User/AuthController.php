@@ -14,6 +14,7 @@ use App\Services\MailableService;
 use App\Services\NotifiableService;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -88,12 +89,12 @@ class AuthController extends Controller
             }
         ])->where('is_featured', 1)->orderBy('id', 'DESC')->limit(10)->get();
 
-        // $categories = ProfileCategory::limit(8)->select([
-        //     'id',
-        //     'name',
-        // ])->withCount([
-        //     'jobs'
-        // ])->get();
+        $categories = ProfileCategory::limit(8)->select([
+            'id',
+            'name',
+        ])->withCount([
+            'jobs'
+        ])->get();
 
         return $this->navigationManagerService->loadView('user.dashboard.index', compact(
             'latestJobs',
@@ -102,48 +103,232 @@ class AuthController extends Controller
         ));
     }
 
+    // public function dashboard2()
+    // {
+    //     // $latestJobs =
+    //     //     // Cache::remember('latestJobs', now()->addMinutes(60), function () {
+    //     //     //     return
+    //     //     Job::with(['subProfile:id,name'])
+    //     //     ->withCount(['savedByUsers' => function ($query) {
+    //     //         $query->where('user_id', auth()->id());
+    //     //     }])
+    //     //     ->orderByDesc('id')
+    //     //     ->limit(10)
+    //     //     ->get(['id', 'sub_profile_id', 'min_salary', 'max_salary', 'experience_level', 'description', 'job_type', 'work_type']);
+    //     // // });
+
+    //     // $featuredJobs =
+    //     //     // Cache::remember('featuredJobs', now()->addMinutes(60), function () {
+    //     //     //     return
+    //     //     Job::with(['subProfile:id,name'])
+    //     //     ->withCount([
+    //     //         'savedByUsers' => function ($query) {
+    //     //             $query->where('user_id', auth()->id());
+    //     //         },
+    //     //         'applyByUsers' => function ($query) {
+    //     //             $query->where('user_id', auth()->id());
+    //     //         }
+    //     //     ])
+    //     //     ->where('is_featured', 1)
+    //     //     ->orderByDesc('id')
+    //     //     ->limit(10)
+    //     //     ->get(['id', 'sub_profile_id', 'min_salary', 'max_salary', 'experience_level', 'description', 'job_type', 'work_type']);
+    //     // // });
+    //     // //
+    //     // $categories =
+    //     //     // Cache::remember('categories', now()->addMinutes(60), function () {
+    //     //     //     return
+    //     //     ProfileCategory::limit(8)
+    //     //     ->withCount(['jobs'])
+    //     //     ->get(['id', 'name']);
+    //     // // });
+
+    //     // return $this->navigationManagerService->loadView('user.dashboard.index', compact('latestJobs', 'featuredJobs', 'categories'));
+
+    //     $authUserId = auth()->id();
+
+    //     $latestJobs = DB::table('jobs')
+    //         ->select([
+    //             'jobs.id',
+    //             'jobs.min_salary',
+    //             'jobs.max_salary',
+    //             'jobs.experience_level',
+    //             'jobs.description',
+    //             'jobs.job_type',
+    //             'jobs.work_type',
+    //             'sub_profiles.name as sub_profile_name',
+    //             DB::raw('IFNULL(applied_jobs.user_id, 0) as applied_by_me'),
+    //             DB::raw('IFNULL(saved_jobs.user_id, 0) as saved_by_me'),
+    //         ])
+    //         ->leftJoin('sub_profiles', 'sub_profiles.id', '=', 'jobs.sub_profile_id')
+    //         ->leftJoin('applied_jobs', function ($join) use ($authUserId) {
+    //             $join->on('applied_jobs.job_id', '=', 'jobs.id')
+    //                 ->where('applied_jobs.user_id', '=', $authUserId);
+    //         }, 'applied_by_me')
+    //         ->leftJoin('saved_jobs', function ($join) use ($authUserId) {
+    //             $join->on('saved_jobs.job_id', '=', 'jobs.id')
+    //                 ->where('saved_jobs.user_id', '=', $authUserId);
+    //         }, 'saved_by_me')
+    //         ->orderBy('jobs.id', 'desc')
+    //         ->paginate(
+    //             perPage: 10,
+    //             pageName: 'latestJobsPage',
+    //         )
+    //         ->appends(request()->query());
+
+    //     $featuredJobs = DB::table('jobs')
+    //         ->select([
+    //             'jobs.id',
+    //             'jobs.min_salary',
+    //             'jobs.max_salary',
+    //             'jobs.experience_level',
+    //             'jobs.description',
+    //             'jobs.job_type',
+    //             'jobs.work_type',
+    //             'sub_profiles.name as sub_profile_name',
+    //             DB::raw('IFNULL(applied_jobs.user_id, 0) as applied_by_me'),
+    //             DB::raw('IFNULL(saved_jobs.user_id, 0) as saved_by_me'),
+    //         ])
+    //         ->leftJoin(
+    //             'sub_profiles',
+    //             'sub_profiles.id',
+    //             '=',
+    //             'jobs.sub_profile_id'
+    //         )
+    //         ->leftJoin('applied_jobs', function ($join) use ($authUserId) {
+    //             $join->on('applied_jobs.job_id', '=', 'jobs.id')
+    //                 ->where('applied_jobs.user_id', '=', $authUserId);
+    //         }, 'applied_by_me')
+    //         ->leftJoin('saved_jobs', function ($join) use ($authUserId) {
+    //             $join->on('saved_jobs.job_id', '=', 'jobs.id')
+    //                 ->where('saved_jobs.user_id', '=', $authUserId);
+    //         }, 'saved_by_me')
+    //         ->where('is_featured', 1)
+    //         ->orderBy('jobs.id', 'desc')
+    //         // ->limit(15)->get();
+    //         ->paginate(
+    //             perPage: 10,
+    //             pageName: 'featuredJobsPage',
+
+    //         )
+    //         ->appends(request()->query());
+
+    //     $categories = DB::table('profile_categories')
+    //         ->select([
+    //             'profile_categories.id',
+    //             'profile_categories.name',
+    //             DB::raw('COUNT(jobs.id) as jobs_count'),
+    //         ])
+    //         ->leftJoin('jobs', 'jobs.sub_profile_id', '=', 'profile_categories.id')
+    //         ->groupBy('profile_categories.id')
+    //         ->orderBy('profile_categories.id', 'asc')
+    //         ->limit(8)
+    //         ->get();
+
+
+
+    //     // $categories =
+    //     //     // Cache::remember('categories', now()->addMinutes(60), function () {
+    //     //     //     return
+    //     //     ProfileCategory::limit(8)
+    //     //     ->withCount(['jobs'])
+    //     //     ->get(['id', 'name']);
+    //     // // });
+
+    //     return $this->navigationManagerService->loadView('user.dashboard.index', compact('latestJobs', 'featuredJobs', 'categories'));
+    // }
+
     public function dashboard()
     {
-        $latestJobs =
-            // Cache::remember('latestJobs', now()->addMinutes(60), function () {
-            //     return
-            Job::with(['subProfile:id,name'])
-            ->withCount(['savedByUsers' => function ($query) {
-                $query->where('user_id', auth()->id());
-            }])
-            ->orderByDesc('id')
-            ->limit(10)
-            ->get(['id', 'sub_profile_id', 'min_salary', 'max_salary', 'experience_level', 'description', 'job_type', 'work_type']);
-        // });
+        $authUserId = auth()->id();
 
-        $featuredJobs =
-            // Cache::remember('featuredJobs', now()->addMinutes(60), function () {
-            //     return
-            Job::with(['subProfile:id,name'])
-            ->withCount([
-                'savedByUsers' => function ($query) {
-                    $query->where('user_id', auth()->id());
-                },
-                'applyByUsers' => function ($query) {
-                    $query->where('user_id', auth()->id());
-                }
-            ])
+        // dd(
+        //     Job::with(
+        //         [
+        //             'appliedByMe',
+        //             'savedByMe',
+        //         ]
+        //     )
+        //         ->select([
+        //             'jobs.*',
+        //             'sub_profiles.name as sub_profile_name',
+        //             'profile_categories.name as profile_category_name',
+        //         ])
+        //         ->leftJoin('sub_profiles', 'sub_profiles.id', '=', 'jobs.sub_profile_id')
+        //         // profile_categories is not available in job model
+        //         ->leftJoin('profile_categories', 'profile_categories.id', '=', 'sub_profiles.profile_category_id')
+        //         ->limit(10)->get()->toArray()[0]
+        // );
+
+        $latestJobs = Job::select([
+            'jobs.id',
+            'jobs.min_salary',
+            'jobs.max_salary',
+            'jobs.experience_level',
+            'jobs.description',
+            'jobs.job_type',
+            'jobs.work_type',
+            'sub_profiles.name as sub_profile_name',
+            DB::raw('IFNULL(applied_jobs.user_id, 0) as applied_by_me'),
+            DB::raw('IFNULL(saved_jobs.user_id, 0) as saved_by_me'),
+        ])
+            ->leftJoin('sub_profiles', 'sub_profiles.id', '=', 'jobs.sub_profile_id')
+            ->leftJoin('applied_jobs', function ($join) use ($authUserId) {
+                $join->on('applied_jobs.job_id', '=', 'jobs.id')
+                    ->where('applied_jobs.user_id', '=', $authUserId);
+            }, 'applied_by_me')
+            ->leftJoin('saved_jobs', function ($join) use ($authUserId) {
+                $join->on('saved_jobs.job_id', '=', 'jobs.id')
+                    ->where('saved_jobs.user_id', '=', $authUserId);
+            }, 'saved_by_me')
+            ->orderBy('jobs.id', 'desc')
+            ->paginate(10, ['*'], 'latestJobsPage')
+            ->appends(request()->query());
+
+        $featuredJobs = Job::select([
+            'jobs.id',
+            'jobs.min_salary',
+            'jobs.max_salary',
+            'jobs.experience_level',
+            'jobs.description',
+            'jobs.job_type',
+            'jobs.work_type',
+            'sub_profiles.name as sub_profile_name',
+            DB::raw('IFNULL(applied_jobs.user_id, 0) as applied_by_me'),
+            DB::raw('IFNULL(saved_jobs.user_id, 0) as saved_by_me'),
+        ])
+            ->leftJoin('sub_profiles', 'sub_profiles.id', '=', 'jobs.sub_profile_id')
+            ->leftJoin('applied_jobs', function ($join) use ($authUserId) {
+                $join->on('applied_jobs.job_id', '=', 'jobs.id')
+                    ->where('applied_jobs.user_id', '=', $authUserId);
+            }, 'applied_by_me')
+            ->leftJoin('saved_jobs', function ($join) use ($authUserId) {
+                $join->on('saved_jobs.job_id', '=', 'jobs.id')
+                    ->where('saved_jobs.user_id', '=', $authUserId);
+            }, 'saved_by_me')
             ->where('is_featured', 1)
-            ->orderByDesc('id')
-            ->limit(10)
-            ->get(['id', 'sub_profile_id', 'min_salary', 'max_salary', 'experience_level', 'description', 'job_type', 'work_type']);
-        // });
-        //
-        $categories =
-            // Cache::remember('categories', now()->addMinutes(60), function () {
-            //     return
-            ProfileCategory::limit(8)
-            ->withCount(['jobs'])
-            ->get(['id', 'name']);
-        // });
+            ->orderBy('jobs.id', 'desc')
+            ->paginate(10, ['*'], 'featuredJobsPage')
+            ->appends(request()->query());
 
-        return $this->navigationManagerService->loadView('user.dashboard.index', compact('latestJobs', 'featuredJobs', 'categories'));
+        $categories = ProfileCategory::select([
+            'profile_categories.id',
+            'profile_categories.name',
+            DB::raw('COUNT(jobs.id) as jobs_count'),
+        ])
+            ->leftJoin('jobs', 'jobs.sub_profile_id', '=', 'profile_categories.id')
+            ->groupBy('profile_categories.id')
+            ->orderBy('profile_categories.id', 'asc')
+            ->limit(8)
+            ->get();
+
+        return $this->navigationManagerService->loadView('user.dashboard.index', compact(
+            'latestJobs',
+            'featuredJobs',
+            'categories'
+        ));
     }
+
 
 
     public function login()

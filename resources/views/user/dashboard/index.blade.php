@@ -4,7 +4,7 @@
 @section('content')
 
     <!-- Start Hero Area -->
-    {{-- <section class="hero-area style2">
+    <section class="hero-area style2">
         <!-- Single Slider -->
         <div class="hero-inner">
             <div class="home-slider">
@@ -69,7 +69,7 @@
             </div>
         </div>
         <!--/ End Single Slider -->
-    </section> --}}
+    </section>
     <!--/ End Hero Area -->
 
     <!-- Start Call Action Area Dont Show      -->
@@ -292,17 +292,16 @@
                 </div>
             </div>
             <div class="single-head">
-
-                <div class="row">
+                <div class="row mb-3">
                     @forelse ($latestJobs as $job)
                         <!-- Single Job -->
-                        <div class="single-job col-lg-4 col-md-6 col-12"
-                            style="width: 45%; margin: 0 auto; margin-bottom: 20px; padding: 20px; border: 1px solid #e0e0e0;   border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); transition: all 0.3s ease-in-out;">
+                        <div class="single-job col-lg-12 col-md-12 col-12"
+                            style=" padding: 25px; border: 1px solid #e0e0e0;   border-radius: 10px;
+                            ">
                             <div class="job-content">
                                 <h4>
-                                    <a href="
-                                    {{ route('user.job.show', $job->id) }}">
-                                        {{ $job->subProfile->name }}
+                                    <a href="{{ route('user.job.show', $job->id) }}">
+                                        {{ $job->sub_profile_name }}
                                     </a>
                                 </h4>
                                 <p>
@@ -327,12 +326,16 @@
                                         <i class="lni lni-briefcase"></i>
                                         {{ Config::get('constants.job.job_type')[$job->job_type] }}
                                     </li>
+                                    <li>
+                                        <i class="lni lni-briefcase"></i>
+                                        {{ Config::get('constants.job.experience_level')[$job->experience_level] }}
+                                    </li>
                                 </ul>
                             </div>
                             <div class="job-button">
                                 <ul>
                                     <li>
-                                        @if ($job->saved_by_users_count > 0)
+                                        @if ($job->saved_by_me == 1)
                                             <a href="{{ route('user.job.unsaveJob', $job->id) }}">
                                                 <i class="bi bi-bookmark-check"></i> Saved
                                             </a>
@@ -344,11 +347,20 @@
                                         @endif
                                     </li>
                                     <li>
-                                        <span>
-                                            {{ Config::get('constants.job.experience_level')[$job->experience_level] }}
-                                        </span>
+                                        @if ($job->applied_by_me == 1)
+                                            <a href="{{ route('user.job.unapply', $job->id) }}">
+                                                <i class="bi bi-bookmark-check">
+                                                </i>
+                                                Applied
+                                            </a>
+                                        @else
+                                            <a href="{{ route('user.job.apply', $job->id) }}">
+                                                <i class="bi bi-check-circle">
+                                                </i>
+                                                Apply Now
+                                            </a>
+                                        @endif
                                     </li>
-
                                 </ul>
                             </div>
                         </div>
@@ -363,6 +375,11 @@
                         </div>
                     @endforelse
                 </div>
+                @if (count($latestJobs) > 0 && $latestJobs->count() > 0)
+                    @include('user.layout.pagination', [
+                        'paginator' => $latestJobs->toArray()['links'],
+                    ])
+                @endif
             </div>
         </div>
     </section>
@@ -388,7 +405,7 @@
                 </div>
             </div>
             <div class="single-head">
-                <div class="row">
+                <div class="row mb-3">
                     @forelse ($featuredJobs as $job)
                         <div class="col-lg-4 col-md-6 col-12">
                             <div class="single-job wow fadeInUp" data-wow-delay=".2s">
@@ -397,7 +414,7 @@
                                 <div class="content">
                                     <h4>
                                         <a href="{{ route('user.job.show', $job->id) }}">
-                                            {{ $job->subProfile->name }}
+                                            {{ $job->sub_profile_name }}
                                         </a>
                                     </h4>
                                     <ul>
@@ -408,17 +425,17 @@
                                         </li>
                                         <li>
                                             <i class="lni lni-briefcase"></i>
-                                            {{ Config::get('constants.job.job_type')[$job['job_type']] }}
+                                            {{ Config::get('constants.job.job_type')[$job->job_type] }}
                                         </li>
                                         <li>
                                             <i class="bi bi-currency-rupee"></i>
-                                            @if ($job['min_salary'] >= 1000)
-                                                {{ $job['min_salary'] / 1000 }}k
+                                            @if ($job->min_salary >= 1000)
+                                                {{ $job->min_salary / 1000 }}k
                                                 -
-                                                {{ $job['max_salary'] / 1000 }}k
+                                                {{ $job->max_salary / 1000 }}k
                                             @else
-                                                {{ $job['min_salary'] }} -
-                                                {{ $job['max_salary'] }}
+                                                {{ $job->min_salary }} -
+                                                {{ $job->max_salary }}
                                             @endif
                                         </li>
 
@@ -428,15 +445,15 @@
                                         <div class="inner">
                                             <div class="row m-n2 button g-2">
                                                 <div class="col-lg-12 col-sm-auto col-12">
-                                                    @if ($job->apply_by_users_count > 0)
-                                                        <a href="{{ route('user.job.unapply', $job['id']) }}"
+                                                    @if ($job->applied_by_me == 1)
+                                                        <a href="{{ route('user.job.unapply', $job->id) }}"
                                                             class="d-block btn">
                                                             <i class="bi bi-check-circle-fill">
                                                                 Applied
                                                             </i>
                                                         </a>
                                                     @else
-                                                        <a href="{{ route('user.job.apply', $job['id']) }}"
+                                                        <a href="{{ route('user.job.apply', $job->id) }}"
                                                             class="d-block btn">
                                                             <i class="bi bi-check-circle">
                                                                 Apply Now
@@ -445,15 +462,15 @@
                                                     @endif
                                                 </div>
                                                 <div class="col-lg-12 col-sm-auto col-12">
-                                                    @if ($job->saved_by_users_count > 0)
-                                                        <a href="{{ route('user.job.unsaveJob', $job['id']) }}"
+                                                    @if ($job->saved_by_me == 1)
+                                                        <a href="{{ route('user.job.unsaveJob', $job->id) }}"
                                                             class="d-block btn">
                                                             <i class="bi bi-bookmark-fill">
                                                                 Saved
                                                             </i>
                                                         </a>
                                                     @else
-                                                        <a href="{{ route('user.job.saveJob', $job['id']) }}"
+                                                        <a href="{{ route('user.job.saveJob', $job->id) }}"
                                                             class="d-block btn">
                                                             <i class="bi bi-bookmark">
                                                                 Save Now
@@ -475,6 +492,11 @@
                         </div>
                     @endforelse
                 </div>
+                @if (count($featuredJobs) > 0 && $featuredJobs->count() > 0)
+                    @include('user.layout.pagination', [
+                        'paginator' => $featuredJobs->toArray()['links'],
+                    ])
+                @endif
             </div>
         </div>
     </section>
@@ -532,7 +554,7 @@
     <!-- /End Testimonials Section -->
 
     <!-- Start Pricing Table Area Dont Show -->
-    <section class="pricing-table section">
+    {{-- <section class="pricing-table section">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -641,7 +663,7 @@
                 </div>
             </div>
         </div>
-    </section>
+    </section> --}}
     <!--/ End Pricing Table Area -->
 
     <!-- Start Latest News Area Done Latest Post Show Here -->

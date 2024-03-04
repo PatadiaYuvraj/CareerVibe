@@ -82,7 +82,29 @@ class Job extends Model
 
     public function subProfile()
     {
-        return $this->belongsTo(SubProfile::class, 'sub_profile_id', 'id');
+        return $this->belongsTo(SubProfile::class);
+    }
+
+    public function appliedByMe()
+    {
+        return $this
+            ->hasOne(AppliedJob::class)
+            ->where('user_id', auth()->id())
+            ->select([
+                'job_id',
+                'user_id',
+            ]);
+    }
+
+    public function savedByMe()
+    {
+        return $this
+            ->hasOne(SavedJob::class)
+            ->where('user_id', auth()->id())
+            ->select([
+                'job_id',
+                'user_id',
+            ]);
     }
 
     public function profileCategory()
