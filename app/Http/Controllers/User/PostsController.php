@@ -61,8 +61,6 @@ class PostsController extends Controller
                 'likes'
             ])
             ->paginate($this->paginate);
-        //     ->get()->toArray();
-        // dd($posts);
         return $this->navigationManagerService->loadView('user.post.all-post', compact('posts'));
     }
 
@@ -198,7 +196,12 @@ class PostsController extends Controller
 
     public function showPost($id)
     {
-        $post = $this->post->find($id);
+        $post = $this->post->with([
+            'comments',
+            'comments.authorable',
+            'comments.likes',
+        ])
+            ->find($id);
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
         }

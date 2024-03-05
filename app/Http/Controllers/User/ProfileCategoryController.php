@@ -44,8 +44,56 @@ class ProfileCategoryController extends Controller
     }
     public function index()
     {
-        $categories = ProfileCategory::with('subProfilesWithJobs')->get();
+        $categories = ProfileCategory::select([
+            'profile_categories.id',
+            'profile_categories.name',
+        ])
+            ->with([
+                'subProfiles' => function ($query) {
+                    $query->select([
+                        'sub_profiles.id',
+                        'sub_profiles.profile_category_id',
+                        'sub_profiles.name',
+                    ]);
+                    $query->with([
+                        'jobs' => function ($query) {
+                            $query->select([
+                                'jobs.id',
+                                'jobs.sub_profile_id',
+                            ]);
+                        },
+                    ]);
+                },
+            ])
+            ->get();
+        return view('user.profile-category.index', compact('categories'));
+    }
 
-        return view('user.category.index', compact('categories'));
+    public function show($id)
+    {
+        $category = ProfileCategory::select([
+            'profile_categories.id',
+            'profile_categories.name',
+        ])
+            ->with([
+                'subProfiles' => function ($query) {
+                    $query->select([
+                        'sub_profiles.id',
+                        'sub_profiles.profile_category_id',
+                        'sub_profiles.name',
+                    ]);
+                    $query->with([
+                        'jobs' => function ($query) {
+                            $query->select([
+                                'jobs.id',
+                                'jobs.sub_profile_id',
+                            ]);
+                        },
+                    ]);
+                },
+            ])
+            ->find($id);
+        dd($category);
+        return view('user.profile-category.show', compact('category'));
     }
 }

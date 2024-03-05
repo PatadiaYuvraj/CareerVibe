@@ -28,6 +28,7 @@ use App\Http\Controllers\User\FollowsController as UserFollowsController;
 use App\Http\Controllers\User\ProfileController as UserProfileController;
 use App\Http\Controllers\User\NotificationsController as UserNotificationsController;
 use App\Http\Controllers\User\ProfileCategoryController as UserProfileCategoryController;
+use App\Http\Controllers\User\PostsController as UserPostsController;
 
 // Admin Company
 use App\Http\Controllers\Admin_Company\AuthController as AdminCompanyAuthController;
@@ -46,6 +47,7 @@ use App\Http\Controllers\Admin_User\PostsController as AdminUserPostsController;
 
 use App\Http\Controllers\TestController;
 
+// FallBack Route Start
 Route::fallback(function () {
     // https://demo.graygrids.com/themes/jobgrids/index.html
 
@@ -74,6 +76,8 @@ Route::fallback(function () {
         'message' => 'Page Not Found'
     ]);
 });
+// FallBack Route End
+
 
 Route::group(['middleware' => "isGuest"], function () {
 
@@ -543,6 +547,13 @@ Route::group(['middleware' => "isUser"], function () {
 
         Route::prefix('job')->group(function () {
             Route::get('/',  [UserJobController::class, "index"])->name('user.job.index');
+            Route::get('/loadMoreJobs', function () {
+                $redirectUrl = route('user.job.index');
+                return view('custom-errors.404', [
+                    'redirectUrl' => $redirectUrl ?? null,
+                    'message' => 'Page Not Found'
+                ]);
+            });
             Route::post('/loadMoreJobs',  [UserJobController::class, "loadMoreJobs"])->name('user.job.loadMoreJobs');
             Route::get('/company/{id}',  [UserJobController::class, "jobByCompany"])->name('user.job.jobByCompany');
             Route::get('/location/{id}',  [UserJobController::class, "jobByLocation"])->name('user.job.jobByLocation');
@@ -556,12 +567,7 @@ Route::group(['middleware' => "isUser"], function () {
 
         Route::prefix('profile-category')->group(function () {
             Route::get('/',  [UserProfileCategoryController::class, "index"])->name('user.profileCategory.index');
-            Route::get('/{id}',  [UserProfileCategoryController::class, "show"])->name('user.profileCategory.show');
-            // Route::get('/create',  [UserProfileCategoryController::class, "create"])->name('user.profileCategory.create');
-            // Route::post('/store',  [UserProfileCategoryController::class, "store"])->name('user.profileCategory.store');
-            // Route::get('/edit/{id}',  [UserProfileCategoryController::class, "edit"])->name('user.profileCategory.edit');
-            // Route::post('/update/{id}',  [UserProfileCategoryController::class, "update"])->name('user.profileCategory.update');
-            // Route::get('/delete/{id}',  [UserProfileCategoryController::class, "delete"])->name('user.profileCategory.delete');
+            // Route::get('/{id}',  [UserProfileCategoryController::class, "show"])->name('user.profileCategory.show');
         });
 
 
@@ -573,30 +579,30 @@ Route::group(['middleware' => "isUser"], function () {
         // Route::get('/{id}',  [UserJobController::class, "show"])->name('user.job.show');
 
         // posts comments likes
-        // Route::prefix('post')->group(function () {
-        //     Route::get('/',  [UserPostsController::class, "indexPost"])->name('user.post.index');
-        //     Route::get('/all',  [UserPostsController::class, "allPost"])->name('user.post.all');
-        //     Route::get('/create',  [UserPostsController::class, "createPost"])->name('user.post.create');
-        //     Route::post('/store',  [UserPostsController::class, "storePost"])->name('user.post.store');
-        //     Route::get('/{id}',  [UserPostsController::class, "showPost"])->name('user.post.show');
-        //     Route::get('/edit/{id}',  [UserPostsController::class, "editPost"])->name('user.post.edit');
-        //     Route::post('/update/{id}',  [UserPostsController::class, "updatePost"])->name('user.post.update');
-        //     Route::get('/delete/{id}',  [UserPostsController::class, "deletePost"])->name('user.post.delete');
-        //     Route::get('/like/{id}',  [UserPostsController::class, "likePost"])->name('user.post.like');
-        //     Route::get('/unlike/{id}',  [UserPostsController::class, "unlikePost"])->name('user.post.unlike');
+        Route::prefix('post')->group(function () {
+            Route::get('/',  [UserPostsController::class, "indexPost"])->name('user.post.index');
+            Route::get('/all',  [UserPostsController::class, "allPost"])->name('user.post.all');
+            Route::get('/create',  [UserPostsController::class, "createPost"])->name('user.post.create');
+            Route::post('/store',  [UserPostsController::class, "storePost"])->name('user.post.store');
+            Route::get('/{id}',  [UserPostsController::class, "showPost"])->name('user.post.show');
+            Route::get('/edit/{id}',  [UserPostsController::class, "editPost"])->name('user.post.edit');
+            Route::post('/update/{id}',  [UserPostsController::class, "updatePost"])->name('user.post.update');
+            Route::get('/delete/{id}',  [UserPostsController::class, "deletePost"])->name('user.post.delete');
+            Route::get('/like/{id}',  [UserPostsController::class, "likePost"])->name('user.post.like');
+            Route::get('/unlike/{id}',  [UserPostsController::class, "unlikePost"])->name('user.post.unlike');
 
-        //     // comments profix
-        //     Route::prefix('comment')->group(function () {
-        //         Route::get('/{id}',  [UserPostsController::class, "commentPostIndex"])->name('user.post.commentIndex');  // comment index page
-        //         Route::get('/{id}/create',  [UserPostsController::class, "commentPostCreate"])->name('user.post.commentCreate');  // comment create page
-        //         Route::post('/{id}/store',  [UserPostsController::class, "commentPostStore"])->name('user.post.commentStore');  // comment store page
-        //         Route::get('/{id}/edit/{comment_id}',  [UserPostsController::class, "commentPostEdit"])->name('user.post.commentEdit');  // comment edit page
-        //         Route::post('/{id}/update/{comment_id}',  [UserPostsController::class, "commentPostUpdate"])->name('user.post.commentUpdate');  // comment update page
-        //         Route::get('/{id}/delete/{comment_id}',  [UserPostsController::class, "commentPostDelete"])->name('user.post.commentDelete');  // comment delete page
-        //         Route::get('/{id}/like/{comment_id}',  [UserPostsController::class, "commentPostLike"])->name('user.post.commentLike');  // comment like page
-        //         Route::get('/{id}/unlike/{comment_id}',  [UserPostsController::class, "commentPostUnlike"])->name('user.post.commentUnlike');  // comment unlike page
-        //     });
-        // });
+            // comments profix
+            Route::prefix('comment')->group(function () {
+                Route::get('/{id}',  [UserPostsController::class, "commentPostIndex"])->name('user.post.commentIndex');  // comment index page
+                Route::get('/{id}/create',  [UserPostsController::class, "commentPostCreate"])->name('user.post.commentCreate');  // comment create page
+                Route::post('/{id}/store',  [UserPostsController::class, "commentPostStore"])->name('user.post.commentStore');  // comment store page
+                Route::get('/{id}/edit/{comment_id}',  [UserPostsController::class, "commentPostEdit"])->name('user.post.commentEdit');  // comment edit page
+                Route::post('/{id}/update/{comment_id}',  [UserPostsController::class, "commentPostUpdate"])->name('user.post.commentUpdate');  // comment update page
+                Route::get('/{id}/delete/{comment_id}',  [UserPostsController::class, "commentPostDelete"])->name('user.post.commentDelete');  // comment delete page
+                Route::get('/{id}/like/{comment_id}',  [UserPostsController::class, "commentPostLike"])->name('user.post.commentLike');  // comment like page
+                Route::get('/{id}/unlike/{comment_id}',  [UserPostsController::class, "commentPostUnlike"])->name('user.post.commentUnlike');  // comment unlike page
+            });
+        });
     });
     // Front User Routes End
 
