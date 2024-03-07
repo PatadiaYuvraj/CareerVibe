@@ -1,0 +1,306 @@
+Users table // a user can apply for many jobs
+Schema::create('users', function (Blueprint $table) {
+    $table->id();
+    $table->string("name", 25);
+    $table->string("email", 50);
+    $table->string("password", 100);
+    $table->string("userType", 10)->default("USER");
+    $table->text("profile_image_url")->nullable();
+    $table->text("profile_image_public_id")->nullable();
+    $table->text("resume_pdf_url")->nullable();
+    $table->text("resume_pdf_public_id")->nullable();
+    $table->string("contact", 15)->nullable();
+    $table->enum(
+        "gender",
+        [
+            "MALE",
+            "FEMALE",
+            "OTHER",
+            "NOT_SPECIFIED",
+        ]
+    )->nullable();
+    $table->boolean('is_active')->default(true);
+    $table->string("headline", 200)->nullable();
+    $table->string("education", 200)->nullable();
+    $table->string("interest", 100)->nullable();
+    $table->string("hobby", 100)->nullable();
+    $table->string("city", 30)->nullable();
+    $table->text("about")->nullable();
+    $table->string("experience", 200)->nullable();
+    $table->boolean('is_email_verified')->default(false);
+    $table->string(
+        "email_verification_token",
+        100
+    )->nullable();
+    $table->timestamp("email_verified_at")->nullable();
+    $table->string(
+        "password_reset_token",
+        100
+    )->nullable();
+    $table->timestamp("password_reset_at")->nullable();
+    $table->string(
+        "password_change_token",
+        100
+    )->nullable();
+    $table->timestamp("password_change_at")->nullable();
+    $table->string(
+        "email_change_token",
+        100
+    )->nullable();
+    $table->timestamp("email_change_at")->nullable();
+    $table->timestamp("last_login_at")->nullable();
+    $table->rememberToken();
+    $table->timestamps();
+});
+
+Companies Table // a company has many jobs
+Schema::create('companies', function (Blueprint $table) {
+    $table->id();
+    $table->boolean('is_verified')->default(false);
+    $table->string("userType", 10)->default("COMPANY");
+    $table->string('name', 60);
+    $table->string('email', 100);
+    $table->string('password', 100)->nullable();
+    $table->text("profile_image_url")->nullable();
+    $table->text("profile_image_public_id")->nullable();
+    $table->string('website', 100)->nullable();
+    $table->string('city', 100)->nullable();
+    $table->string('address', 100)->nullable();
+    $table->string('linkedin', 100)->nullable();
+    $table->text('description')->nullable();
+    $table->boolean('is_email_verified')->default(false);
+    $table->string(
+        "email_verification_token",
+        100
+    )->nullable();
+    $table->timestamp("email_verified_at")->nullable();
+    $table->string(
+        "password_reset_token",
+        100
+    )->nullable();
+    $table->timestamp("password_reset_at")->nullable();
+    $table->string(
+        "password_change_token",
+        100
+    )->nullable();
+    $table->timestamp("password_change_at")->nullable();
+    $table->string(
+        "email_change_token",
+        100
+    )->nullable();
+    $table->timestamp("email_change_at")->nullable();
+    $table->timestamp("last_login_at")->nullable();
+    $table->rememberToken();
+    $table->timestamps();
+});
+
+Admins Table 
+Schema::create('admins', function (Blueprint $table) {
+    $table->id();
+    $table->string("userType", 10)->default("ADMIN");
+    $table->string('name', 20);
+    $table->string('email', 100);
+    $table->string('password', 100)->nullable();
+    $table->text("profile_image_url")->nullable();
+    $table->text("profile_image_public_id")->nullable();
+    $table->boolean('is_email_verified')->default(false);
+    $table->string(
+        "email_verification_token",
+        100
+    )->nullable();
+    $table->timestamp("email_verified_at")->nullable();
+    $table->string(
+        "password_reset_token",
+        100
+    )->nullable();
+    $table->timestamp("password_reset_at")->nullable();
+    $table->string(
+        "password_change_token",
+        100
+    )->nullable();
+    $table->timestamp("password_change_at")->nullable();
+    $table->string(
+        "email_change_token",
+        100
+    )->nullable();
+    $table->timestamp("email_change_at")->nullable();
+    $table->timestamp("last_login_at")->nullable();
+    $table->rememberToken();
+    $table->timestamps();
+});
+
+
+Profile Categories Table // a profile category has many sub profiles
+Schema::create('profile_categories', function (Blueprint $table) {
+    $table->id();
+    $table->string("name", 100);
+    $table->timestamps();
+});
+
+Sub Profiles Table // a profile category has many sub profiles and a job has one sub profile
+Schema::create('sub_profiles', function (Blueprint $table) {
+    $table->id();
+    $table->bigInteger("profile_category_id")->unsigned();
+    $table->string("name", 100);
+    $table->foreign('profile_category_id')->references('id')->on('profile_categories')->onDelete('cascade');
+    $table->timestamps();
+});
+
+Qualifications Table // a job has many qualifications
+Schema::create('qualifications', function (Blueprint $table) {
+    $table->id();
+    $table->string("name", 100);
+    $table->timestamps();
+});
+
+Locations Table // a company has many locations
+Schema::create('locations', function (Blueprint $table) {
+    $table->id();
+    $table->string("city", 20);
+    $table->string("state", 25)->nullable();
+    $table->string("country", 25)->nullable();
+    $table->integer("pincode")->nullable();
+    $table->timestamps();
+});
+
+Jobs Table // a company has many jobs
+Schema::create('jobs', function (Blueprint $table) {
+    $table->id();
+    $table->bigInteger('company_id')->unsigned();
+    $table->bigInteger('sub_profile_id')->unsigned();
+    $table->tinyInteger("vacancy")->nullable();
+    $table->mediumInteger("min_salary")->nullable();
+    $table->mediumInteger("max_salary")->nullable();
+    $table->text('description')->nullable();
+    $table->text('responsibility')->nullable();
+    $table->text('benifits_perks')->nullable();
+    $table->text('other_benifits')->nullable();
+    $table->boolean('is_verified')->default(false);
+    $table->boolean('is_featured')->default(false);
+    $table->boolean('is_active')->default(true);
+    $table->string('keywords')->nullable();
+    $table->enum(
+        'work_type',
+        [
+      'REMOTE',
+      'ONSITE',
+      'HYBRID',
+    ]
+    )->nullable();
+    $table->enum(
+        'job_type',
+        [
+            'Full Time',
+'Part Time',
+ 'Internship',
+ 'Contract',
+ 'Freelance',
+ 'Volunteer',
+ 'Temporary',
+        ]
+    )->nullable();
+    $table->enum(
+        'experience_level',
+        [
+            'Fresher',
+'Experienced',
+        ]
+    )->nullable();
+    $table->enum(
+        'experience_type',
+        [
+      'Any',
+      '0-1',
+      '1-2',
+      '2-3',
+      '3-5',
+      '5-8',
+      '8-10',
+      '10+',
+    ]
+    )->nullable();
+    $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+    $table->foreign('sub_profile_id')->references('id')->on('sub_profiles')->onDelete('cascade');
+    $table->timestamps();
+});
+
+Job Qualifications Table // a job has many qualifications
+Schema::create('job_qualifications', function (Blueprint $table) {
+    $table->id();
+    $table->bigInteger("jobs_id")->unsigned();
+    $table->bigInteger("qualifications_id")->unsigned();
+    $table->foreign('jobs_id')->references('id')->on('jobs');
+    $table->foreign('qualifications_id')->references('id')->on('qualifications');
+    $table->timestamps();
+});
+
+Job Locations Table // a job has many locations
+Schema::create('job_locations', function (Blueprint $table) {
+    $table->id();
+    $table->bigInteger("jobs_id")->unsigned();
+    $table->bigInteger("locations_id")->unsigned();
+    $table->foreign('jobs_id')->references('id')->on('jobs');
+    $table->foreign('locations_id')->references('id')->on('locations');
+    $table->timestamps();
+});
+
+Applied Jobs Table // a user can apply for many jobs
+Schema::create('applied_jobs', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->onDelete('cascade');
+    $table->foreignId('job_id')->constrained()->onDelete('cascade');
+    $table->timestamps();
+});
+
+Saved Jobs Table // a user can save many jobs
+Schema::create('saved_jobs', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('user_id')->constrained()->onDelete('cascade');
+    $table->foreignId('job_id')->constrained()->onDelete('cascade');
+    $table->timestamps();
+});
+
+Follows Table // a user can follow many users and companies
+Schema::create('follows', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('user_id');
+    $table->unsignedBigInteger('followable_id');
+    $table->string('followable_type');
+    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+    $table->timestamps();
+});
+
+Posts Table // a user and company can create many posts
+Schema::create('posts', function (Blueprint $table) {
+    $table->id();
+    $table->morphs('authorable');
+    $table->string('title');
+    $table->enum('type', [
+        'TEXT',
+        'IMAGE',
+        'VIDEO',
+    ])->default('TEXT');
+    $table->text('content');
+    $table->string('file')->nullable();
+    $table->string('public_id')->nullable();
+    $table->timestamps();
+});
+
+Comments Table // a user and company can comment on many posts
+Schema::create('comments', function (Blueprint $table) {
+    $table->id();
+    $table->unsignedBigInteger('post_id');
+    $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
+    $table->morphs('authorable');
+    $table->text('content');
+    $table->timestamps();
+});
+
+Likes Table // a user and company can like many posts and comments
+Schema::create('likes', function (Blueprint $table) {
+    $table->id();
+    $table->morphs('likeable');
+    $table->morphs('authorable');
+    $table->unique(['likeable_id', 'likeable_type', 'authorable_id', 'authorable_type'], 'likeable_authorable_unique');
+    $table->timestamps();
+});
