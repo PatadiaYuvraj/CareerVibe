@@ -304,3 +304,236 @@ Schema::create('likes', function (Blueprint $table) {
     $table->unique(['likeable_id', 'likeable_type', 'authorable_id', 'authorable_type'], 'likeable_authorable_unique');
     $table->timestamps();
 });
+
+
+
+
+CREATE TABLE `users` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(25),
+    `email` VARCHAR(50),
+    `password` VARCHAR(100),
+    `userType` VARCHAR(10) DEFAULT 'USER',
+    `profile_image_url` TEXT,
+    `profile_image_public_id` TEXT,
+    `resume_pdf_url` TEXT,
+    `resume_pdf_public_id` TEXT,
+    `contact` VARCHAR(15),
+    `gender` ENUM('MALE', 'FEMALE', 'OTHER', 'NOT_SPECIFIED'),
+    `is_active` TINYINT(1) DEFAULT 1,
+    `headline` VARCHAR(200),
+    `education` VARCHAR(200),
+    `interest` VARCHAR(100),
+    `hobby` VARCHAR(100),
+    `city` VARCHAR(30),
+    `about` TEXT,
+    `experience` VARCHAR(200),
+    `is_email_verified` TINYINT(1) DEFAULT 0,
+    `email_verification_token` VARCHAR(100),
+    `email_verified_at` TIMESTAMP NULL,
+    `password_reset_token` VARCHAR(100),
+    `password_reset_at` TIMESTAMP NULL,
+    `password_change_token` VARCHAR(100),
+    `password_change_at` TIMESTAMP NULL,
+    `email_change_token` VARCHAR(100),
+    `email_change_at` TIMESTAMP NULL,
+    `last_login_at` TIMESTAMP NULL,
+    `remember_token` VARCHAR(100),
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `companies` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `is_verified` TINYINT(1) DEFAULT 0,
+    `userType` VARCHAR(10) DEFAULT 'COMPANY',
+    `name` VARCHAR(60),
+    `email` VARCHAR(100),
+    `password` VARCHAR(100),
+    `profile_image_url` TEXT,
+    `profile_image_public_id` TEXT,
+    `website` VARCHAR(100),
+    `city` VARCHAR(100),
+    `address` VARCHAR(100),
+    `linkedin` VARCHAR(100),
+    `description` TEXT,
+    `is_email_verified` TINYINT(1) DEFAULT 0,
+    `email_verification_token` VARCHAR(100),
+    `email_verified_at` TIMESTAMP NULL,
+    `password_reset_token` VARCHAR(100),
+    `password_reset_at` TIMESTAMP NULL,
+    `password_change_token` VARCHAR(100),
+    `password_change_at` TIMESTAMP NULL,
+    `email_change_token` VARCHAR(100),
+    `email_change_at` TIMESTAMP NULL,
+    `last_login_at` TIMESTAMP NULL,
+    `remember_token` VARCHAR(100),
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `admins` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `userType` VARCHAR(10) DEFAULT 'ADMIN',
+    `name` VARCHAR(20),
+    `email` VARCHAR(100),
+    `password` VARCHAR(100),
+    `profile_image_url` TEXT,
+    `profile_image_public_id` TEXT,
+    `is_email_verified` TINYINT(1) DEFAULT 0,
+    `email_verification_token` VARCHAR(100),
+    `email_verified_at` TIMESTAMP NULL,
+    `password_reset_token` VARCHAR(100),
+    `password_reset_at` TIMESTAMP NULL,
+    `password_change_token` VARCHAR(100),
+    `password_change_at` TIMESTAMP NULL,
+    `email_change_token` VARCHAR(100),
+    `email_change_at` TIMESTAMP NULL,
+    `last_login_at` TIMESTAMP NULL,
+    `remember_token` VARCHAR(100),
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `profile_categories` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(100),
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `sub_profiles` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `profile_category_id` BIGINT UNSIGNED,
+    `name` VARCHAR(100),
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`profile_category_id`) REFERENCES `profile_categories`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `qualifications` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `name` VARCHAR(100),
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `locations` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `city` VARCHAR(20),
+    `state` VARCHAR(25),
+    `country` VARCHAR(25),
+    `pincode` INT,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `jobs` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `company_id` BIGINT UNSIGNED,
+    `sub_profile_id` BIGINT UNSIGNED,
+    `vacancy` TINYINT,
+    `min_salary` MEDIUMINT,
+    `max_salary` MEDIUMINT,
+    `description` TEXT,
+    `responsibility` TEXT,
+    `benifits_perks` TEXT,
+    `other_benifits` TEXT,
+    `is_verified` TINYINT(1) DEFAULT 0,
+    `is_featured` TINYINT(1) DEFAULT 0,
+    `is_active` TINYINT(1) DEFAULT 1,
+    `keywords` VARCHAR(191),
+    `work_type` ENUM('REMOTE', 'ONSITE', 'HYBRID'),
+    `job_type` ENUM('Full Time', 'Part Time', 'Internship', 'Contract', 'Freelance', 'Volunteer', 'Temporary'),
+    `experience_level` ENUM('Fresher', 'Experienced'),
+    `experience_type` ENUM('Any', '0-1', '1-2', '2-3', '3-5', '5-8', '8-10', '10+'),
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`company_id`) REFERENCES `companies`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`sub_profile_id`) REFERENCES `sub_profiles`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `job_qualifications` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `jobs_id` BIGINT UNSIGNED,
+    `qualifications_id` BIGINT UNSIGNED,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`jobs_id`) REFERENCES `jobs`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`qualifications_id`) REFERENCES `qualifications`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `job_locations` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `jobs_id` BIGINT UNSIGNED,
+    `locations_id` BIGINT UNSIGNED,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`jobs_id`) REFERENCES `jobs`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`locations_id`) REFERENCES `locations`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `applied_jobs` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT UNSIGNED,
+    `job_id` BIGINT UNSIGNED,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`job_id`) REFERENCES `jobs`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `saved_jobs` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT UNSIGNED,
+    `job_id` BIGINT UNSIGNED,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`job_id`) REFERENCES `jobs`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `follows` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT UNSIGNED,
+    `followable_id` BIGINT UNSIGNED,
+    `followable_type` VARCHAR(255),
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `posts` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `authorable_type` VARCHAR(255),
+    `authorable_id` BIGINT UNSIGNED,
+    `title` VARCHAR(255),
+    `type` ENUM('TEXT', 'IMAGE', 'VIDEO') DEFAULT 'TEXT',
+    `content` TEXT,
+    `file` VARCHAR(255),
+    `public_id` VARCHAR(255),
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE `comments` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `post_id` BIGINT UNSIGNED,
+    `authorable_type` VARCHAR(255),
+    `authorable_id` BIGINT UNSIGNED,
+    `content` TEXT,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`post_id`) REFERENCES `posts`(`id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `likes` (
+    `id` BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `likeable_type` VARCHAR(255),
+    `likeable_id` BIGINT UNSIGNED,
+    `authorable_type` VARCHAR(255),
+    `authorable_id` BIGINT UNSIGNED,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY `likeable_authorable_unique` (`likeable_id`, `likeable_type`, `authorable_id`, `authorable_type`)
+);

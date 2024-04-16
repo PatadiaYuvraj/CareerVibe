@@ -27,6 +27,16 @@
             default => false,
         };
 
+        $isYourPostsActive = match (Route::currentRouteName()) {
+            'user.profile.post' => true,
+            default => false,
+        };
+
+        $isCreatePostActive = match (Route::currentRouteName()) {
+            'user.profile.create-post' => true,
+            default => false,
+        };
+
         // $isNotificationsActive = match (Route::currentRouteName()) {
         //     'user.profile.notifications' => true,
         //     default => false,
@@ -110,6 +120,22 @@
                                         <i class="lni lni-users"></i>
                                         My Following
                                         {{-- ({{ auth()->user()->following->count() + auth()->user()->followingCompanies->count() }}) --}}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="@if ($isYourPostsActive) active @endif"
+                                        href="@if ($isYourPostsActive) javascript:void(0)
+                                         @else{{ route('user.profile.post') }} @endif">
+                                        <i class="bi bi-journal-text"></i>
+                                        Your Posts
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="@if ($isEditProfileActive) active @endif"
+                                        href="@if ($isEditProfileActive) javascript:void(0)
+                                         @else{{ route('user.profile.create-post') }} @endif">
+                                        <i class="lni lni-pencil"></i>
+                                        Create Post
                                     </a>
                                 </li>
                                 {{-- <li>

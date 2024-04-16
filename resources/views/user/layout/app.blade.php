@@ -97,7 +97,7 @@
                                         <ul class="sub-menu">
                                             <li class="nav-item">
                                                 <a href="{{ route('user.profileCategory.index') }}">
-                                                    View All Categories
+                                                    All Categories
                                                 </a>
                                             </li>
                                         </ul>
@@ -111,7 +111,7 @@
                                         <ul class="sub-menu">
                                             <li>
                                                 <a href="{{ route('user.job.index') }}">
-                                                    View All Jobs
+                                                    All Jobs
                                                 </a>
                                             </li>
                                             <li>
@@ -128,11 +128,18 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="javascript:void(0)"
-                                            class="@if ($isCompanyActive) active @endif">Companies</a>
+                                            class="@if ($isCompanyActive) active @endif">
+                                            Job Grid Profiles
+                                        </a>
                                         <ul class="sub-menu">
                                             <li>
                                                 <a href="">
-                                                    View All Companies
+                                                    All Companies
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="">
+                                                    All Users
                                                 </a>
                                             </li>
                                         </ul>
@@ -145,13 +152,13 @@
 
                                         <ul class="sub-menu">
                                             <li>
-                                                <a href="#">
-                                                    View All Posts
+                                                <a href="{{ route('user.post.all') }}">
+                                                    All Posts
                                                 </a>
                                             </li>
                                             <li>
                                                 <a href="#">
-                                                    View My Posts
+                                                    My Posts
                                                 </a>
                                             </li>
                                             <li class="nav-item">

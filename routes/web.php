@@ -515,6 +515,12 @@ Route::group(['middleware' => "isUser"], function () {
 
             Route::get('/followers',  [UserProfileController::class, "followers"])->name('user.profile.followers');
             Route::get('/following',  [UserProfileController::class, "following"])->name('user.profile.following');
+
+            // posts
+            Route::prefix('post')->group(function () {
+                Route::get('/',  [UserPostsController::class, "indexPost"])->name('user.profile.post');
+                Route::get('/create', [UserPostsController::class, "createPost"])->name('user.profile.create-post');
+            });
         });
 
         // notification
@@ -580,9 +586,9 @@ Route::group(['middleware' => "isUser"], function () {
 
         // posts comments likes
         Route::prefix('post')->group(function () {
-            Route::get('/',  [UserPostsController::class, "indexPost"])->name('user.post.index');
+            // Route::get('/',  [UserPostsController::class, "indexPost"])->name('user.post.index');
             Route::get('/all',  [UserPostsController::class, "allPost"])->name('user.post.all');
-            Route::get('/create',  [UserPostsController::class, "createPost"])->name('user.post.create');
+            // Route::get('/create',  [UserPostsController::class, "createPost"])->name('user.post.create');
             Route::post('/store',  [UserPostsController::class, "storePost"])->name('user.post.store');
             Route::get('/{id}',  [UserPostsController::class, "showPost"])->name('user.post.show');
             Route::get('/edit/{id}',  [UserPostsController::class, "editPost"])->name('user.post.edit');
@@ -688,7 +694,7 @@ Route::group(['middleware' => "isUser"], function () {
         // Route::get('/{id}',  [AdminUserJobController::class, "show"])->name('admin_user.job.show');
 
         // posts comments likes
-        Route::prefix('post')->group(function () {
+        Route::prefix('post')->group(function () { // http://localhost:8000/admin_user/post
             Route::get('/',  [AdminUserPostsController::class, "indexPost"])->name('admin_user.post.index');
             Route::get('/all',  [AdminUserPostsController::class, "allPost"])->name('admin_user.post.all');
             Route::get('/create',  [AdminUserPostsController::class, "createPost"])->name('admin_user.post.create');

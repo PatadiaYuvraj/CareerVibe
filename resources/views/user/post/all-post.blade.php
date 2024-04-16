@@ -9,18 +9,17 @@ $currentAuthId = auth()->guard(config('constants.USER_GUARD'))->id(); @endphp
             <div class="row">
                 <div class="col-12">
                     <div class="breadcrumbs-content">
-                        <h1 class="page-title">Blog Grid Sidebar</h1>
+                        <h1 class="page-title">
+                            All Posts
+                        </h1>
                         <p>
-                            Business plan draws on a wide range of knowledge from
-                            different business<br />
-                            disciplines. Business draws on a wide range of different
-                            business .
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Id, quas, ipsam. <br />
+                            Minima quae veritatis eum maxime minus maiores, accusamus.
                         </p>
                     </div>
                     <ul class="breadcrumb-nav">
-                        <li><a href="index-2.html">Home</a></li>
-                        <li><a href="#">Blog</a></li>
-                        <li>Blog Grid Sidebar</li>
+                        <li><a href="{{ route('user.dashboard') }}">Home</a></li>
+                        <li>Post</li>
                     </ul>
                 </div>
             </div>
@@ -49,14 +48,35 @@ $currentAuthId = auth()->guard(config('constants.USER_GUARD'))->id(); @endphp
                                             <ul>
                                                 <li class="d-block">
                                                     <i class="lni lni-user"></i>
-                                                    Published by User 1
+                                                    Published by
+                                                    @if ($post->authorable->id == $currentAuthId && $post->authorable->userType == 'USER')
+                                                        You
+                                                    @else
+                                                        {{ $post->authorable->name }}
+                                                    @endif
                                                 </li>
                                                 <li class="d-block">
                                                     <i class="lni lni-calendar"></i>
-                                                    12-09-2023
+                                                    {{ $post['created_at']->diffForHumans() }}
                                                 </li>
                                                 <li>
-                                                    <i class="bi-heart  "> {{ $post->likes_count }}</i>
+                                                    {{-- @if ($post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', $currentAuthId)->count() > 0) --}}
+                                                    <a href="{{ $post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', $currentAuthId)->count() >
+                                                    0
+                                                        ? route('admin_user.post.unlike', $post['id'])
+                                                        : route('admin_user.post.like', $post['id']) }}"
+                                                        class="{{ $post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', $currentAuthId)->count() >
+                                                        0
+                                                            ? 'bi-heart-fill'
+                                                            : 'bi-heart' }}">
+                                                        {{ $post->likes_count }}</i>
+                                                    </a>
+                                                    {{-- @else --}}
+                                                    {{-- <a href="{{ route('admin_user.post.like', $post['id']) }}"
+                                                            class="bi-heart">
+                                                            {{ $post->likes_count }}</i>
+                                                        </a> --}}
+                                                    {{-- @endif --}}
                                                 </li>
                                                 <li>
                                                     <i class="bi-chat-square-text">

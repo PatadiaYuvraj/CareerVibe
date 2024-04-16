@@ -43,7 +43,7 @@
                                                 {{ $post->authorable->name }}
                                             </span>
                                         @endif
-
+                                    </td>
                                     <td>
                                         <a href="{{ route('admin_user.post.show', $post['id']) }}" data-bs-toggle="tooltip"
                                             data-bs-placement="right" title="{{ $post['title'] }}">

@@ -1,5 +1,10 @@
 @extends('user.layout.app') @section('title', 'Post | ' . env('APP_NAME'))
+@php
+    $currentAuthId = auth()->guard(config('constants.USER_GUARD'))->id();
+@endphp
+
 @section('content')
+
     <!-- Start Breadcrumbs -->
     {{-- <div class="breadcrumbs overlay">
         <div class="container">
@@ -33,41 +38,42 @@
                         <div class="post-details">
                             <div class="detail-inner">
                                 <h2 class="post-title">
-                                    <a href="blog-single.html">Let's explore 5 cool new features in JobBoard theme</a>
+                                    {{ $post->title }}
                                 </h2>
                                 <!-- post meta -->
                                 <ul class="custom-flex post-meta">
                                     <li>
                                         <a href="#">
                                             <i class="lni lni-calendar"></i>
-                                            20th March 2023
+                                            @if ($post['created_at'])
+                                                {{ date('d-m-Y', strtotime($post['created_at'])) }}
+                                            @else
+                                                {{ 'N/A' }}
+                                            @endif
                                         </a>
                                     </li>
                                     <li>
                                         <a href="#">
                                             <i class="lni lni-comments"></i>
-                                            35 Comments
+                                            {{ count($post->comments) }} Comments
                                         </a>
                                     </li>
                                     <li>
-                                        <a href="#">
-                                            <i class="lni lni-eye"></i>
-                                            55 View
+                                        <a href="{{ $post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', $currentAuthId)->count() >
+                                        0
+                                            ? route('user.post.unlike', $post['id'])
+                                            : route('user.post.like', $post['id']) }}"
+                                            class="{{ $post->likes->where('authorable_type', 'App\Models\User')->where('authorable_id', $currentAuthId)->count() >
+                                            0
+                                                ? 'lni lni-heart-filled text-danger'
+                                                : 'lni lni-heart' }}">
+                                            {{ $post->likes_count }}</i>
                                         </a>
                                     </li>
                                 </ul>
-                                <p>We denounce with righteous indige nation and dislike men who are so beguiled and demo
-                                    realized by the charms of pleasure of the moment, so blinded by desire, that they
-                                    cannot
-                                    foresee the pain and trouble that are bound to ensue; and equal blame belongs to
-                                    those
-                                    who fail in their duty through weakness of will, which is the same as saying through
-                                    shrinking from toil and pain. These cases are perfectly simple and easy to
-                                    distinguish.
-                                    In a free hour, when our power of choice is untrammelled and when nothing prevents
-                                    our
-                                    being able to do what we like best, every pleasure is to be welcomed and every pain
-                                    avoided.</p>
+                                <p>
+                                    {{ $post->content }}
+                                </p>
                                 <!-- post image -->
                                 {{-- <div class="post-image">
                                     <div class="row">
@@ -166,72 +172,74 @@
                                     </div>
                                 </div> --}}
                             </div>
-                            <!-- Comments -->
+                            {{-- Comments --}}
                             <div class="post-comments">
                                 <h3 class="comment-title">
                                     <span>
-                                        3 comments on this post
+                                        {{ count($post->comments) }} comments on this post
                                     </span>
                                 </h3>
                                 <ul class="comments-list">
-                                    <li>
-                                        <div class="comment-img">
-                                            <img src="assets/images/blog/comment1.png" class="rounded-circle"
-                                                alt="img">
-                                        </div>
-                                        <div class="comment-desc" style="padding-left: 130px">
-                                            <div class="desc-top">
-                                                <h6>Rosalina Kelian</h6>
-                                                <span class="date">19th May 2023</span>
-                                                <a href="#" class="reply-link"><i class="lni lni-heart"></i>Reply</a>
+                                    @foreach ($post->comments as $comment)
+                                        <li>
+                                            <div class="comment-desc">
+                                                <div class="desc-top">
+                                                    <h6>{{ $comment->authorable->name }}</h6>
+                                                    <span class="date">{{ $comment->created_at->diffForHumans() }}</span>
+                                                    @if ($comment['likes']->where('authorable_type', 'App\Models\User')->where('authorable_id', $currentAuthId)->count() > 0)
+                                                        <a href="{{ route('user.post.commentUnlike', [$post['id'], $comment['id']]) }}"
+                                                            class="btn btn-sm link-danger reply-link">
+                                                            <i class="bi-heart-fill">
+                                                                {{ $comment['likes']->count() }}
+                                                                {{ $comment['likes']->count() > 1 ? 'Likes' : 'Like' }}
+                                                            </i>
+                                                        </a>
+                                                    @else
+                                                        <a href="{{ route('user.post.commentLike', [$post['id'], $comment['id']]) }}"
+                                                            class="btn btn-sm reply-link">
+                                                            <i class="bi-heart">
+                                                                {{ $comment['likes']->count() }}
+                                                                {{ $comment['likes']->count() > 1 ? 'Likes' : 'Like' }}
+                                                            </i>
+                                                        </a>
+                                                    @endif
+                                                </div>
+                                                <p>
+                                                    {{ $comment->content }}
+                                                </p>
                                             </div>
-                                            <p>
-                                                Donec aliquam ex ut odio dictum, ut consequat leo interdum. Aenean nunc
-                                                ipsum, blandit eu enim sed, facilisis convallis orci. Etiam commodo
-                                                lectus
-                                                quis vulputate tincidunt. Mauris tristique velit eu magna maximus
-                                                condimentum.
-                                            </p>
-                                        </div>
-                                    </li>
+                                        </li>
+                                    @endforeach
                                 </ul>
                             </div>
-                            {{-- <div class="comment-form">
+                            <div class="comment-form">
                                 <h3 class="comment-reply-title"><span>Leave a comment</span></h3>
-                                <form action="#" method="POST">
+                                <form action="{{ route('user.post.commentStore', $post['id']) }}" method="POST">
+                                    @csrf
                                     <div class="row">
-                                        <div class="col-lg-6 col-12">
-                                            <div class="form-box form-group">
-                                                <input type="text" name="#"
-                                                    class="form-control form-control-custom" placeholder="Your Name" />
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-6 col-12">
-                                            <div class="form-box form-group">
-                                                <input type="email" name="#"
-                                                    class="form-control form-control-custom" placeholder="Your Email" />
-                                            </div>
-                                        </div>
                                         <div class="col-12">
                                             <div class="form-box form-group">
-                                                <input type="email" name="#"
-                                                    class="form-control form-control-custom" placeholder="Your Subject" />
+                                                <textarea id="content" name="content" rows="3" class="form-control form-control-custom"
+                                                    placeholder="Your Comments"></textarea>
                                             </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="form-box form-group">
-                                                <textarea name="#" rows="6" class="form-control form-control-custom" placeholder="Your Comments"></textarea>
-                                            </div>
+                                            @error('content')
+                                                <div class="text-danger">
+                                                    {{ $message }}
+                                                </div>
+                                            @enderror
                                         </div>
                                         <div class="col-12">
                                             <div class="button">
-                                                <button type="submit" class="btn mouse-dir white-bg">Post Comment <span
-                                                        class="dir-part"></span></button>
+                                                <button type="submit" class="btn mouse-dir white-bg">
+                                                    Post Comment
+                                                    <span class="dir-part">
+                                                    </span>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                 </form>
-                            </div> --}}
+                            </div>
                         </div>
                     </div>
                 </div>

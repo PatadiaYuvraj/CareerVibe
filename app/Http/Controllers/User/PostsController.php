@@ -45,9 +45,7 @@ class PostsController extends Controller
                 'authorable',
             ])
             ->paginate($this->paginate);
-        //     ->get()->toArray();
-        // dd($posts);
-        return $this->navigationManagerService->loadView('user.post.index', compact('posts'));
+        return $this->navigationManagerService->loadView('user.profile.your-post', compact('posts'));
     }
 
     public function allPost()
@@ -66,7 +64,7 @@ class PostsController extends Controller
 
     public function createPost()
     {
-        return $this->navigationManagerService->loadView('user.post.create');
+        return $this->navigationManagerService->loadView('user.profile.create-post');
     }
 
 
@@ -201,6 +199,10 @@ class PostsController extends Controller
             'comments.authorable',
             'comments.likes',
         ])
+            ->withCount([
+                'comments',
+                'likes'
+            ])
             ->find($id);
         if (!$post) {
             return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Post is not found"]);
@@ -500,7 +502,7 @@ class PostsController extends Controller
         ];
         $isCreated = $post->comments()->create($data);
         if ($isCreated) {
-            return $this->navigationManagerService->redirectRoute('user.post.commentIndex', [$id], 302, [], false, ["success" => "Comment is created"]);
+            return $this->navigationManagerService->redirectRoute('user.post.show', [$id], 302, [], false, ["success" => "Comment is created"]);
         }
         return $this->navigationManagerService->redirectBack(302, [], false, ["warning" => "Comment is not created"]);
     }
